@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl.threads;
+package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 
 import java.io.BufferedReader;
@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.gcube.application.aquamaps.impl.ServiceContext;
-import org.gcube.application.aquamaps.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.AquaMapArray;
 import org.gcube.application.aquamaps.stubs.Area;

@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl.util;
+package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 import org.gcube.application.aquamaps.stubs.Area;
 

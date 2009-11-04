@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl.threads;
+package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.sql.Connection;
 import java.sql.SQLException;

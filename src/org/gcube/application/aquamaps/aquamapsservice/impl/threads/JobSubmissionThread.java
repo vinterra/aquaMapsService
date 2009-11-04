@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl.threads;
+package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.File;
 import java.sql.Connection;
@@ -11,7 +11,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.gcube.application.aquamaps.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Perturbation;

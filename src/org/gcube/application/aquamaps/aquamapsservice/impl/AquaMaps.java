@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl;
+package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.rmi.RemoteException;
 import java.sql.Connection;
@@ -10,10 +10,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import org.gcube.application.aquamaps.impl.threads.JobSubmissionThread;
-import org.gcube.application.aquamaps.impl.util.DBCostants;
-import org.gcube.application.aquamaps.impl.util.DBUtils;
-import org.gcube.application.aquamaps.impl.util.DataTranslation;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
 import org.gcube.application.aquamaps.stubs.*;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;

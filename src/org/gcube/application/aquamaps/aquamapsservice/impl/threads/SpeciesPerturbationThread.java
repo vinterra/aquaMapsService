@@ -1,9 +1,9 @@
-package org.gcube.application.aquamaps.impl.threads;
+package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.lang.Thread;
 import java.sql.Connection;
 
-import org.gcube.application.aquamaps.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 
 public class SpeciesPerturbationThread extends Thread {
 JobGenerationDetails generationDetails;

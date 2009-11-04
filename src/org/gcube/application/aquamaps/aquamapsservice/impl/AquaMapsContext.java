@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl;
+package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import org.gcube.common.core.contexts.GCUBEPortTypeContext;
 import org.gcube.common.core.contexts.GCUBEServiceContext;

@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.impl.util;
+package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

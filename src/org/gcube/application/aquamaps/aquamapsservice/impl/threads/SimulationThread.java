@@ -1,8 +1,8 @@
-package org.gcube.application.aquamaps.impl.threads;
+package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.sql.SQLException;
 
-import org.gcube.application.aquamaps.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SimulationThread extends Thread {
