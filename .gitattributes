@@ -1,0 +1,26 @@
+* text=auto !eol
+/.ant-targets-build.xml -text
+/.classpath -text
+/.project -text
+/build.xml -text
+etc/build.properties -text
+etc/deploy-jndi-config.xml -text
+etc/deploy-server.wsdd -text
+etc/profile.xml -text
+etc/registration.xml -text
+etc/security_descriptor.xml -text
+schema/AquaMaps.wsdl -text
+src/org/gcube/application/aquamaps/impl/AquaMaps.java -text
+src/org/gcube/application/aquamaps/impl/AquaMapsContext.java -text
+src/org/gcube/application/aquamaps/impl/ServiceContext.java -text
+src/org/gcube/application/aquamaps/impl/threads/AreaPerturbationThread.java -text
+src/org/gcube/application/aquamaps/impl/threads/BiodiversityThread.java -text
+src/org/gcube/application/aquamaps/impl/threads/DistributionThread.java -text
+src/org/gcube/application/aquamaps/impl/threads/JobGenerationDetails.java -text
+src/org/gcube/application/aquamaps/impl/threads/JobSubmissionThread.java -text
+src/org/gcube/application/aquamaps/impl/threads/JobUtils.java -text
+src/org/gcube/application/aquamaps/impl/threads/SimulationThread.java -text
+src/org/gcube/application/aquamaps/impl/threads/SpeciesPerturbationThread.java -text
+src/org/gcube/application/aquamaps/impl/util/DBCostants.java -text
+src/org/gcube/application/aquamaps/impl/util/DBUtils.java -text
+src/org/gcube/application/aquamaps/impl/util/DataTranslation.java -text
