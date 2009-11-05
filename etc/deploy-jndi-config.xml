@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jndiConfig xmlns="http://wsrf.globus.org/jndi/config">
 
-	<service name="gcube/application/aquamaps">
+	<service name="gcube/application/aquamaps/aquamapsservice">
 	
 		<environment 
 		name="configDir" 
@@ -30,7 +30,7 @@
 	</service>
 	
 	
-	<service name="gcube/application/aquamaps/AquaMaps">
+	<service name="gcube/application/aquamaps/aquamapsservice/AquaMaps">
     	 	<environment 
 			name="frequentUserLimit" 
 	 		value="3" 

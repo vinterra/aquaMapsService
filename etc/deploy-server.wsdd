@@ -4,7 +4,7 @@
     xmlns:java="http://xml.apache.org/axis/wsdd/providers/java" 
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-   <service name="gcube/application/aquamaps/AquaMaps" provider="Handler" use="literal" style="document">
+   <service name="gcube/application/aquamaps/aquamapsservice/AquaMaps" provider="Handler" use="literal" style="document">
         <parameter name="className" value="org.gcube.application.aquamaps.impl.AquaMaps"/>
         <wsdlFile>share/schema/org.gcube.application.aquamaps/AquaMaps_service.wsdl</wsdlFile>
         <parameter name="allowedMethods" value="*"/>

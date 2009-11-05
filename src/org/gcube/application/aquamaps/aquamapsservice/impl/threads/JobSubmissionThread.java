@@ -38,7 +38,7 @@ public class JobSubmissionThread extends Thread {
 	public JobSubmissionThread(Job toPerform) {
 		super(toPerform.getName()+"_thread");
 		generationStatus=new JobGenerationDetails(toPerform);
-		waitingGroup=new ThreadGroup(toPerform.getName());
+		waitingGroup=new ThreadGroup(toPerform.getName());		
 	}
 
 

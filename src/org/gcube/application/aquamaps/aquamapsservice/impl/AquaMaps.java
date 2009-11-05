@@ -33,8 +33,9 @@ public class AquaMaps extends GCUBEPortType {
 	}
 
 	public String submitJob(Job req)throws GCUBEFault{
-		
-		return "";//TODO return created job Id
+		JobSubmissionThread thread=new JobSubmissionThread(req);
+		thread.start();
+		return "";
 	}
 	
 	public FieldArray getSpeciesEnvelop(String speciesId)throws GCUBEFault{

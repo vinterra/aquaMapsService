@@ -24,9 +24,9 @@
 						<Optional>false</Optional>
 					</Dependency>					
 				</Dependencies>
-				<GARArchive>org.gcube.application.aquamaps.gar</GARArchive>
+				<GARArchive>org.gcube.application.aquamaps.aquamapsservice.gar</GARArchive>
 				<PortType>
-					<Name>gcube/application/aquamaps/AquaMaps</Name>
+					<Name>gcube/application/aquamaps/aquamapsservice/AquaMaps</Name>
 					<WSDL></WSDL>
 				</PortType>
 			</Main>
@@ -34,7 +34,7 @@
 				<Description>Aquamaps stubs</Description>
 				<Name>Stubs</Name>
 				<Version>1.0.0</Version>
-				<Files><File>org.gcube.application.aquamaps.stubs.jar</File></Files>
+				<Files><File>org.gcube.application.aquamaps.aquamapsservice.stubs.jar</File></Files>
 			</Software>
 		</Packages>
 	</Profile>
