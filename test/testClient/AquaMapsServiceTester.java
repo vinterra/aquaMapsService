@@ -5,12 +5,12 @@ import org.apache.axis.message.addressing.EndpointReferenceType;
 
 import org.gcube.application.aquamaps.stubs.*;
 import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
+//import org.gcube.application.framework.core.session.ASLSession;
+//import org.gcube.application.framework.core.session.SessionManager;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 
 public class AquaMapsServiceTester {
-
+/*
 	private static final String SERVICE_URI="http://wn02.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 	public static AquaMapsPortType getPortType(ASLSession session) throws Exception{
@@ -69,6 +69,6 @@ public class AquaMapsServiceTester {
 	}
 
 	
-	
+	*/
 	
 }
