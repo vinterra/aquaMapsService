@@ -38,6 +38,9 @@ public class JobSubmissionThread extends Thread {
 	public JobSubmissionThread(Job toPerform) {
 		super(toPerform.getName()+"_thread");
 		generationStatus=new JobGenerationDetails(toPerform);
+		logger.trace("JobSubmissionThread created for job: "+toPerform.getName()+
+				" with "+generationStatus.getToPerformBiodiversity().size()+" Biodiversity AquaMaps and "+
+				generationStatus.getToPerformDistribution().size()+" Distribution AquaMaps");
 		waitingGroup=new ThreadGroup(toPerform.getName());		
 	}
 
@@ -163,8 +166,9 @@ public class JobSubmissionThread extends Thread {
 		String myData = String.valueOf(anno)+"-"+String.valueOf(mese)+"-"+String.valueOf(giorno);
 		String myJob = "INSERT INTO JOBS(title, author, date, status) VALUES('"+
 							generationStatus.getToPerform().getName()+"', '"+
-							generationStatus.getToPerform().getAuthor()+"', "+
+							generationStatus.getToPerform().getAuthor()+"', '"+
 							myData+"', '"+generationStatus.getStatus().toString()+"')";
+		logger.trace("Going to execute : "+myJob);
 		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
 		ResultSet rs=stmt.getGeneratedKeys();
 		rs.first();
@@ -173,14 +177,15 @@ public class JobSubmissionThread extends Thread {
 		stmt.close();	
 		try{
 		for(AquaMap aquaMapObj:generationStatus.getToPerform().getAquaMapList().getAquaMapList()){
-			String myAquaMapObj="INSERT INTO AquaMaps(title, author, date, status,jobId) VALUES('"+
+			String myAquaMapObj="INSERT INTO AquaMaps(title, author, date, status,jobId,type) VALUES('"+
 							aquaMapObj.getName()+"', '"+
-							aquaMapObj.getAuthor()+"', "+
-							myData+"', '"+JobGenerationDetails.Status.Pending+
-							jobId+"')";
+							aquaMapObj.getAuthor()+"', '"+
+							myData+"', '"+JobGenerationDetails.Status.Pending+"', '"+
+							jobId+"', '"+ aquaMapObj.getType()+"')";
 			Statement aquaStatement=conn.createStatement();
-			aquaStatement.execute(myAquaMapObj);
-			ResultSet rsA=stmt.getGeneratedKeys();
+			logger.trace("Going to execute : "+myAquaMapObj);
+			aquaStatement.execute(myAquaMapObj,Statement.RETURN_GENERATED_KEYS);
+			ResultSet rsA=aquaStatement.getGeneratedKeys();
 			rsA.first();
 			aquaMapObj.setId(String.valueOf(rsA.getInt(1)));
 			aquaStatement.close();
@@ -188,7 +193,8 @@ public class JobSubmissionThread extends Thread {
 		conn.commit();
 		
 		}catch(NullPointerException e ){
-			throw new Exception("No AquaMap objects found");
+			logger.error("Exception while inserting aquamaps object(s) ",e);
+			throw new Exception("Unable to insert aquamaps Object(s)");
 			
 		}
 		logger.trace("New Job created with Id "+jobId);

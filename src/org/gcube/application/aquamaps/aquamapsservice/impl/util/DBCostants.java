@@ -25,7 +25,7 @@ public class DBCostants {
 	public static final String UNASSIGNED="unassigned";
 	public static final String areaCode="code";
 	
-	public static String clusteringDiversityQuery(String hspecName, String tmpTable){
+	public static String clusteringBiodiversityQuery(String hspecName, String tmpTable){
 		return "Select "+cSquareCode+", count("+hspecName+"."+SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
 				" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesID+" = "+tmpTable+"."+SpeciesID+" where probability > ? GROUP BY "+cSquareCode+" ORDER BY MaxSpeciesCountInACell DESC";
 	}
@@ -42,11 +42,12 @@ public class DBCostants {
 								" OR "+HCAF_S+"."+cell_EEZ+" = "+tempName+"."+areaCode+
 								" OR "+HCAF_S+"."+cell_LME+" = "+tempName+"."+areaCode+"))";
 	}
-	public static final String JobStatusUpdating="UPDATE JOBS SET status=?, WHERE searchID=?";
+	public static final String JobStatusUpdating="UPDATE JOBS SET status=? WHERE searchID=?";
 	
-	public static final String AquaMapStatusUpdating="UPDATE AquaMap SET status=?, WHERE searchID=?";
+
+	public static final String AquaMapStatusUpdating="UPDATE AquaMap SET status=? WHERE searchID=?";
 	
-	public static final String fileInsertion="INSERT INTO Files (published, name , path, type, owner) VALUE(?, ?, ?, ?, ?)";
+	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";
 	
 	public static final String speciesEnvelop="Select * from "+HSPEN+" where "+SpeciesID+" = ?";
 	

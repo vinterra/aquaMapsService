@@ -172,13 +172,13 @@ public class JobUtils {
 	public static void updateStatus(JobGenerationDetails.Status status,String jobId,Connection c)throws SQLException{
 		PreparedStatement ps=c.prepareStatement(DBCostants.JobStatusUpdating);
 		ps.setString(1, status.toString());		
-		ps.setString(2,jobId);
+		ps.setInt(2,Integer.parseInt(jobId));
 		ps.execute();		
 	}
 	public static void updateAquaMapStatus(JobGenerationDetails.Status status,String aquamapObjectId,Connection c)throws SQLException{
 		PreparedStatement ps=c.prepareStatement(DBCostants.JobStatusUpdating);
-		ps.setString(1, status.toString());		
-		ps.setString(2,aquamapObjectId);
+		ps.setString(1, status.toString());
+		ps.setInt(2,Integer.parseInt(aquamapObjectId));		
 		ps.execute();		
 	}
 	

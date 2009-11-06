@@ -17,7 +17,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class BiodiversityThread extends Thread {
 	JobGenerationDetails generationDetails;
-	private static final GCUBELog logger=new GCUBELog(DistributionThread.class);
+	private static final GCUBELog logger=new GCUBELog(BiodiversityThread.class);
 	int selectedAquaMap;
 	private static final int waitTime=10*1000;
 	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
@@ -48,16 +48,20 @@ public class BiodiversityThread extends Thread {
 	Statement stmt = generationDetails.getConnection().createStatement();
 	String tableName=(uuidGen.nextUUID()).replaceAll("-", "_");
 	PreparedStatement prep=null;
-	
-	stmt.execute("CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY , foreign key("+DBCostants.SpeciesID+") references "+generationDetails.getHspecTable()+"("+DBCostants.SpeciesID+"))");
-	for(String specId: speciesIds)		
+	String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY , foreign key("+DBCostants.SpeciesID+") references "+generationDetails.getHspecTable()+"("+DBCostants.SpeciesID+"))";
+	logger.trace("Going to execute query : "+creationSQL);
+	stmt.execute(creationSQL);
+	stmt.close();
+	for(String specId: speciesIds){	
+		stmt = generationDetails.getConnection().createStatement();
 		stmt.execute("INSERT INTO "+tableName+" VALUES('"+specId+"')");
+		stmt.close();}
 	logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
 	
-	prep=generationDetails.getConnection().prepareStatement(DBCostants.clusteringDiversityQuery(generationDetails.getHspecTable(),tableName));				
+	prep=generationDetails.getConnection().prepareStatement(DBCostants.clusteringBiodiversityQuery(generationDetails.getHspecTable(),tableName));				
 	prep.setFloat(1,toPerform.getThreshold());
 	ResultSet rs=prep.executeQuery();
-	stmt.execute("DROP TABLE "+tableName);
+	
 	String header=toPerform.getName();
 	String header_map = header+"_maps";
 	StringBuilder[] csq_str;
@@ -90,7 +94,10 @@ public class BiodiversityThread extends Thread {
 				logger.trace(this.getName()+" "+app.size()+" file information inserted in DB");
 			}
 		}
-	}
+	}	
+		stmt = generationDetails.getConnection().createStatement();
+		stmt.execute("DROP TABLE "+tableName);
+		stmt.close();
 		generationDetails.setAquaMapStatus(JobGenerationDetails.Status.Completed, selectedAquaMap);
 	} catch (Exception e) {
 		logger.error(e.getMessage());

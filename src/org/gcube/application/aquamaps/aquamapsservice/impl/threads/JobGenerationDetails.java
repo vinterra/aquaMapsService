@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Specie;
