@@ -225,8 +225,9 @@
 			</xsd:complexType>
 
  			<xsd:complexType name="getSpeciesRequestType">
-				<xsd:sequence>
-					<xsd:element name="fieldList" type="tns:fieldArray" />
+				<xsd:sequence>					
+					<xsd:element name="sortColumn" type="xsd:string"/>
+					<xsd:element name="sortDirection" type="xsd:string"/>
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
@@ -236,6 +237,8 @@
 				<xsd:sequence>
 					<xsd:element name="filter1" type="tns:filter" />
 					<xsd:element name="filter2" type="tns:filter" />
+					<xsd:element name="sortColumn" type="xsd:string"/>
+					<xsd:element name="sortDirection" type="xsd:string"/>
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
@@ -244,6 +247,8 @@
 				<xsd:complexType name="searchByFilterRequestType">
 					<xsd:sequence>
 						<xsd:element name="filter" type="tns:filter" />
+						<xsd:element name="sortColumn" type="xsd:string"/>
+					<xsd:element name="sortDirection" type="xsd:string"/>
 						<xsd:element name="limit" type="xsd:int" />
 						<xsd:element name="offset" type="xsd:int" />
 					</xsd:sequence>
@@ -251,9 +256,14 @@
 			
 				<xsd:complexType name="getSpeciesByFiltersRequestType">
 					<xsd:sequence>
-						<xsd:element name="filterList" type="tns:filterArray" />
+						<xsd:element name="characteristicFilters" type="tns:fieldArray"/>				
+						<xsd:element name="codeFilters" type="tns:filterArray" />
+						<xsd:element name="nameFilters" type="tns:filterArray" />
+						<xsd:element name="sortColumn" type="xsd:string"/>
+						<xsd:element name="sortDirection" type="xsd:string"/>
 						<xsd:element name="limit" type="xsd:int" />
 						<xsd:element name="offset" type="xsd:int" />
+						<xsd:element name="hspen" type="xsd:string" />
 					</xsd:sequence>
 				</xsd:complexType>
 				
@@ -294,12 +304,21 @@
 			<xsd:complexType name="getSelectedCellsRequestType">
 				<xsd:sequence>
 					<xsd:element name="areas" type="tns:areasArray" />
+					<xsd:element name="sortColumn" type="xsd:string"/>
+					<xsd:element name="sortDirection" type="xsd:string"/>
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
 				
+				
 			<!-- Request / Response elements -->
+
+			<xsd:element name="getJobListRequest" type="xsd:string"/>
+			<xsd:element name="getJobListResponse" type="xsd:string"/>
+			
+			<xsd:element name="getAquaMapsListRequest" type="xsd:string"/>
+			<xsd:element name="getAquaMapsListResponse" type="xsd:string"/>
 
 			<xsd:element name="submitJobRequest" type="tns:job"/>
 			<xsd:element name="submitJobResponse" type="xsd:string"/>
@@ -370,6 +389,22 @@
 	</types>
 
 	<!-- message part -->
+	
+	<message name="GetAquaMapsListRequest">
+	<part name="request" element="tns:getAquaMapsListRequest"/>
+	</message>
+	<message name="GetAquaMapsListResponse">
+	<part name="response" element="tns:getAquaMapsListResponse"/>
+	</message>
+	
+	
+	<message name="GetJobListRequest">
+	<part name="request" element="tns:getJobListRequest"/>
+	</message>
+	<message name="GetJobListResponse">
+	<part name="response" element="tns:getJobListResponse"/>
+	</message>
+	
 	<message name="SubmitJobRequest">
 	<part name="request" element="tns:submitJobRequest"/>
 	</message>
@@ -471,6 +506,19 @@
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
+		
+		<wsdl:operation name="getJobList">
+			<input message="tns:GetJobListRequest" />
+			<output message="tns:GetJobListResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
+		
+		<wsdl:operation name="getAquaMapsList">
+			<input message="tns:GetAquaMapsListRequest" />
+			<output message="tns:GetAquaMapsListResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
+		
 		<wsdl:operation name="getSelectedCells">
 			<input message="tns:GetSelectedCellsRequest" />
 			<output message="tns:GetSelectedCellsResponse" />
