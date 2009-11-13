@@ -6,9 +6,12 @@ import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.Filter;
 import org.gcube.application.aquamaps.stubs.FilterArray;
 import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class DBCostants {
 
+	private static GCUBELog logger= new GCUBELog(DBCostants.class);
+	
 	public static final String HCAF_S="HCAF_S";
 	public static final String JOB_Table="JOBS";
 	public static final String HCAF_D="HCAF_D";
@@ -32,21 +35,27 @@ public class DBCostants {
 	public static final String jobId="jobId";
 	
 	public static String clusteringBiodiversityQuery(String hspecName, String tmpTable){
-		return "Select "+cSquareCode+", count("+hspecName+"."+SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
+		String query= "Select "+cSquareCode+", count("+hspecName+"."+SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
 				" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesID+" = "+tmpTable+"."+SpeciesID+" where probability > ? GROUP BY "+cSquareCode+" ORDER BY MaxSpeciesCountInACell DESC";
+		logger.trace("clusteringBiodiversityQuery: "+query);
+		return query;
 	}
 	public static String clusteringDistributionQuery(String hspecName){
-		return "Select "+cSquareCode+", "+probability+"  FROM "+hspecName+" where "+
+		String query= "Select "+cSquareCode+", "+probability+"  FROM "+hspecName+" where "+
 				hspecName+"."+SpeciesID+"=? AND "+probability+" > 0.5 ORDER BY "+probability+" DESC";
+		logger.trace("clusteringDistributionQuery: "+query);
+		return query;
 	}
 	
 	public static String filterCellByAreaQuery(String newName,String sourceTable,String tempName){
-		return "Insert into "+newName+" (Select * from "+sourceTable+	
+		String query= "Insert into "+newName+" (Select * from "+sourceTable+	
 				 " where "+DBCostants.cSquareCode+" in "+
 				 	" (Select "+DBCostants.cSquareCode+" from "+DBCostants.HCAF_S+ ", "+tempName+
 								" where "+HCAF_S+"."+cell_FAO+" = "+tempName+"."+areaCode+
 								" OR "+HCAF_S+"."+cell_EEZ+" = "+tempName+"."+areaCode+
 								" OR "+HCAF_S+"."+cell_LME+" = "+tempName+"."+areaCode+"))";
+		logger.trace("filterCellByAreaQuery: "+query);
+		return query;
 	}
 	
 	public static String getCompleteName(String hspenName,String fieldName)throws Exception{
@@ -122,8 +131,11 @@ public class DBCostants {
 		}
 		
 		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" , "+selHspen:"");
-		return new String[] {"Select "+speciesOccurSum+".* "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString(),
-				"Select count("+speciesOccurSum+"."+SpeciesID+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString()};		
+		String query= "Select "+speciesOccurSum+".* "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
+		String count= "Select count("+speciesOccurSum+"."+SpeciesID+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
+		logger.trace("filterSpecies: "+query);
+		logger.trace("filterSpecies: "+count);
+		return new String[] {query,count};		
 	}
 	
 	
