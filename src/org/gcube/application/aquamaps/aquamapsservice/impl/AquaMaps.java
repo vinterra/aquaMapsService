@@ -38,6 +38,55 @@ public class AquaMaps extends GCUBEPortType {
 		return "";
 	}
 	
+	public String getJobList(String author)throws GCUBEFault{
+		logger.trace("Serving get JobList for author : "+author);
+		String toReturn="";
+		try{
+		Class.forName(DBCostants.JDBCClassName).newInstance();
+		Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+		PreparedStatement ps=conn.prepareStatement(DBCostants.JobList);
+		ps.setString(1, author);		
+		ResultSet rs=ps.executeQuery();
+		toReturn=DBUtils.toJSon(rs);
+		rs.close();
+		ps.close();
+		conn.close();
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getjobList");
+			logger.trace("Raised Exception", e);			
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}
+		return toReturn;
+	}
+	
+	public String getAquaMapsList(String jobId)throws GCUBEFault{
+		logger.trace("Serving getAquaMapsList");
+		String toReturn="";
+		try{
+		Class.forName(DBCostants.JDBCClassName).newInstance();
+		Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+		PreparedStatement ps=conn.prepareStatement(DBCostants.AquaMapsList);		
+		ps.setInt(1, Integer.parseInt(jobId));
+		ResultSet rs=ps.executeQuery();
+		toReturn=DBUtils.toJSon(rs);
+		rs.close();
+		ps.close();
+		conn.close();
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getAquaMapsList");
+			logger.trace("Raised Exception", e);
+		}catch (NumberFormatException e){
+			logger.error("Invalid jobId");
+			logger.trace("Raised Exception",e);		
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}
+		return toReturn;
+	}
+	
 	public FieldArray getSpeciesEnvelop(String speciesId)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving getSpeciesEnvelop for speciesID : "+speciesId);
@@ -90,6 +139,8 @@ public class AquaMaps extends GCUBEPortType {
 		String toReturn="";
 		int limit=req.getLimit();
 		int offset=req.getOffset();
+		String sortColumn=req.getSortColumn();
+		String sortDirection=req.getSortDirection();
 		AreasArray areas=req.getAreas();
 		logger.trace("Serving getSelectedCells ");
 		try{
@@ -98,12 +149,12 @@ public class AquaMaps extends GCUBEPortType {
 			Area[] selection=areas.getAreasList();
 			String[] queries=DBCostants.cellFiltering(selection, DBCostants.HCAF_S);
 			logger.trace("Gonna use query : "+queries[0]);
-			PreparedStatement ps=conn.prepareStatement(queries[0]+" LIMIT "+limit+" OFFSET "+offset);
+			PreparedStatement ps=conn.prepareStatement(queries[0]+((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+limit+" OFFSET "+offset);
 			PreparedStatement psCount=conn.prepareStatement(queries[1]);
 			if((selection!=null)&&(selection.length>0))			
 				for(int i=0;i<selection.length;i++){
-					ps.setString(i+1, selection[i].getCode());
-					psCount.setString(i+1,selection[i].getCode());
+					ps.setInt(i+1, Integer.parseInt(selection[i].getCode()));
+					psCount.setInt(i+1,Integer.parseInt(selection[i].getCode()));
 				}
 			ResultSet rs=ps.executeQuery();
 			ResultSet rsCount=psCount.executeQuery();
@@ -124,10 +175,19 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 
+	/**
+	 * return a complete list of available species (within limit and offset specified) ordered by a specified column in a specified order
+	 * 
+	 * @param req
+	 * @return
+	 * @throws GCUBEFault
+	 */
+	
+	
 	public String getSpecies(GetSpeciesRequestType req)throws GCUBEFault{
 		String toReturn="";
 		logger.debug("entro in getSpecies");
-		Field[] L = req.getFieldList().getFields();		
+		/*Field[] L = req.getFieldList().getFields();		
 		String myQuery = "Select speciesoccursum.* from hspen, speciesoccursum WHERE hspen.SpeciesID = speciesoccursum.SPECIESID AND ";
 		if(L!=null){
 			for(int i = 0; i < L.length;i++){
@@ -135,16 +195,23 @@ public class AquaMaps extends GCUBEPortType {
 				myQuery+= (String)(DataTranslation.completeFieldNamesMap.get(myField.getName()))+myField.getValue()+" AND ";				
 
 			}
-		}
-		int index = myQuery.lastIndexOf("AND");
-		myQuery = myQuery.substring(0, index-1);
-		//myQuery+=" LIMIT "+l+" OFFSET "+o;
+		}*/
+		String sortColumn=req.getSortColumn();
+		String sortDirection=req.getSortDirection();
+		
 		try{
 			Class.forName(DBCostants.JDBCClassName).newInstance();
 			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
 			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(myQuery);
-			toReturn= DBUtils.toJSon(rs,req.getOffset(),req.getLimit());
+			ResultSet rs = stmt.executeQuery("Select * from "+DBCostants.speciesOccurSum+
+						((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
+			Statement stmtCount=conn.createStatement();
+			ResultSet rsCount=stmtCount.executeQuery("Select count("+DBCostants.SpeciesID+") from "+DBCostants.speciesOccurSum);
+			rsCount.first();
+			int count=rsCount.getInt(1);
+			toReturn= DBUtils.toJSon(rs,count);
+			rsCount.close();
+			stmtCount.close();
 			rs.close();
 			stmt.close();
 			conn.close();			
@@ -155,22 +222,58 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 
+	/**
+	 * return a list of species filtered by 3 groups of filters (species characteristics OR species names OR species codes) 
+	 * 
+	 * @param req
+	 * @return
+	 * @throws GCUBEFault
+	 */
+	
+	
+	
 	public String getSpeciesByFilters(GetSpeciesByFiltersRequestType req) throws GCUBEFault{
-		//TODO Implement Method
-		return null;
+		logger.trace("Serving getSpecies by filters");
+		String toReturn="";
+		try{
+		String[] queries=DBCostants.filterSpecies(req);
+		logger.trace("Gonna use query :"+queries[0]);
+		String sortColumn=req.getSortColumn();
+		String sortDirection=req.getSortDirection();
+		Class.forName(DBCostants.JDBCClassName).newInstance();
+		Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(queries[0]+
+					((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
+		Statement stmtCount=conn.createStatement();
+		ResultSet rsCount=stmtCount.executeQuery(queries[1]);
+		rsCount.first();
+		int count=rsCount.getInt(1);
+		toReturn= DBUtils.toJSon(rs,count);
+		rsCount.close();
+		stmtCount.close();
+		rs.close();
+		stmt.close();
+		conn.close();		
+		}catch(Exception e){
+			logger.error("Exception occurred : "+e.getMessage());
+			logger.trace("Errors while performing operation",e);
+		}
+		return toReturn;
 	}
 
 	public String searchBy2Filters(SearchBy2FiltersRequestType req) throws GCUBEFault{
 		logger.debug("entro in searchBy2Filters");
 		String toReturn="";
-
+	/*	String sortColumn=req.getSortColumn();
+		String sortDirection=req.getSortDirection();
 
 		StringBuilder myQueryCount = new StringBuilder("Select count(speciesoccursum.SPECIESID) As conta from hspen, speciesoccursum WHERE hspen.SpeciesID = speciesoccursum.SPECIESID AND ");
 		StringBuilder myQuery = new StringBuilder("Select speciesoccursum.SPECIESID, speciesoccursum.Species, speciesoccursum.Genus, speciesoccursum.FBNAME, speciesoccursum.Scientific_Name, speciesoccursum.English_Name, speciesoccursum.French_Name, speciesoccursum.Spanish_Name from hspen, speciesoccursum WHERE hspen.SpeciesID = speciesoccursum.SPECIESID AND ");
 
 		myQueryCount.append(" "+DataTranslation.filterToString(req.getFilter1())+" AND "+DataTranslation.filterToString(req.getFilter2()));
 		myQuery.append(" "+DataTranslation.filterToString(req.getFilter1())+" AND "+DataTranslation.filterToString(req.getFilter2()));
-		myQuery.append(" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
+		myQuery.append(((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
 
 
 		try{
@@ -189,21 +292,22 @@ public class AquaMaps extends GCUBEPortType {
 		}catch(Exception e){
 			logger.error("Errors while performing operation",e);
 		}
-		logger.debug("esco da searchBy2Filters");
+		logger.debug("esco da searchBy2Filters");*/
 		return toReturn;
 	}
 
 	public String searchByFilter(SearchByFilterRequestType req) throws GCUBEFault{
-		logger.debug("entro in searchBy2Filters");
+/*		logger.debug("entro in searchBy2Filters");
 		String toReturn="";
-
+		String sortColumn=req.getSortColumn();
+		String sortDirection=req.getSortDirection();
 
 		StringBuilder myQueryCount = new StringBuilder("Select count(speciesoccursum.SPECIESID) As conta from hspen, speciesoccursum WHERE hspen.SpeciesID = speciesoccursum.SPECIESID AND ");
 		StringBuilder myQuery = new StringBuilder("Select speciesoccursum.SPECIESID, speciesoccursum.Species, speciesoccursum.Genus, speciesoccursum.FBNAME, speciesoccursum.Scientific_Name, speciesoccursum.English_Name, speciesoccursum.French_Name, speciesoccursum.Spanish_Name from hspen, speciesoccursum WHERE hspen.SpeciesID = speciesoccursum.SPECIESID AND ");
 
 		myQueryCount.append(" "+DataTranslation.filterToString(req.getFilter()));
 		myQuery.append(" "+DataTranslation.filterToString(req.getFilter()));
-		myQuery.append(" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
+		myQuery.append(((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
 
 
 		try{
@@ -223,7 +327,8 @@ public class AquaMaps extends GCUBEPortType {
 			logger.error("Errors while performing operation",e);
 		}
 		logger.debug("esco da searchBy2Filters");
-		return toReturn;
+		return toReturn;*/
+		return null;
 	}
 
 

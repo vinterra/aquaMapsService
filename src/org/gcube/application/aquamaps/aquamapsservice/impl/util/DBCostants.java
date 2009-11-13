@@ -1,6 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 import org.gcube.application.aquamaps.stubs.Area;
+import org.gcube.application.aquamaps.stubs.Field;
+import org.gcube.application.aquamaps.stubs.FieldArray;
+import org.gcube.application.aquamaps.stubs.Filter;
+import org.gcube.application.aquamaps.stubs.FilterArray;
+import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
 
 public class DBCostants {
 
@@ -9,7 +14,7 @@ public class DBCostants {
 	public static final String HCAF_D="HCAF_D";
 	public static final String HSPEN="hspen";
 	public static final String HSPEC="hcaf_species_native";
-	
+	public static final String speciesOccurSum="speciesoccursum";
 	
 	
 	public static final String FAOType="FAO";
@@ -24,6 +29,7 @@ public class DBCostants {
 	public static final String cell_LME="LME";
 	public static final String UNASSIGNED="unassigned";
 	public static final String areaCode="code";
+	public static final String jobId="jobId";
 	
 	public static String clusteringBiodiversityQuery(String hspecName, String tmpTable){
 		return "Select "+cSquareCode+", count("+hspecName+"."+SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
@@ -42,9 +48,92 @@ public class DBCostants {
 								" OR "+HCAF_S+"."+cell_EEZ+" = "+tempName+"."+areaCode+
 								" OR "+HCAF_S+"."+cell_LME+" = "+tempName+"."+areaCode+"))";
 	}
+	
+	public static String getCompleteName(String hspenName,String fieldName)throws Exception{
+		if(DataTranslation.speciesoccurSumFields.contains(fieldName))
+			return speciesOccurSum+"."+fieldName;
+		else if(DataTranslation.hspenFields.contains(fieldName))
+			return hspenName+"."+fieldName;
+		else throw new Exception("invalid field name");
+	}
+	
+	public static String getFieldOperator(String fieldName){
+		if(fieldName.contains("min")) return ">=";
+		else if(fieldName.contains("max")) return "<=";
+		else return "=";
+	}
+	
+	/**
+	 * Creates a query string to filter species against characteristic OR names OR codes filtering
+	 * 
+	 * @param req
+	 * @return
+	 * 			[0] query to retrieve species information
+	 * 			[1] query to count retrieved species
+	 * 
+	 * @throws Exception
+	 */
+	
+	public static String[] filterSpecies(GetSpeciesByFiltersRequestType req)throws Exception{
+		String selHspen=req.getHspen();
+		selHspen=HSPEN;
+		FieldArray characteristics=req.getCharacteristicFilters();
+		FilterArray names=req.getNameFilters();
+		FilterArray codes=req.getCodeFilters();
+		StringBuilder characteristicsFilter=new StringBuilder();
+		StringBuilder namesFilter=new StringBuilder();
+		StringBuilder codesFilter=new StringBuilder();
+		
+		if((characteristics!=null)&&(characteristics.getFields()!=null)&&(characteristics.getFields().length>0)){
+			for(int i=0;i<characteristics.getFields().length;i++){				
+				Field field=characteristics.getFields(i);
+				String fieldName=field.getName().toLowerCase();
+				characteristicsFilter.append(getCompleteName(selHspen, fieldName));
+				String value=(field.getType().toLowerCase().equals("string"))?"'"+field.getValue()+"'":field.getValue();
+				characteristicsFilter.append(" "+getFieldOperator(fieldName)+" "+value);
+				if(i<characteristics.getFields().length-1) characteristicsFilter.append(" AND ");
+			}
+		}
+		
+		if((names!=null)&&(names.getFilterList()!=null)&&(names.getFilterList().length>0)){
+			for(int i=0;i<names.getFilterList().length;i++){				
+				Filter filter=names.getFilterList(i);
+				namesFilter.append(DataTranslation.filterToString(filter));
+				if(i<names.getFilterList().length-1) namesFilter.append(" AND ");
+			}
+		}
+		
+		if((codes!=null)&&(codes.getFilterList()!=null)&&(codes.getFilterList().length>0)){
+			for(int i=0;i<codes.getFilterList().length;i++){				
+				Filter filter=codes.getFilterList(i);
+				codesFilter.append(DataTranslation.filterToString(filter));
+				if(i<codes.getFilterList().length-1) codesFilter.append(" AND ");
+			}
+		}
+		
+		StringBuilder filter=new StringBuilder((characteristicsFilter.length()>0)?"( "+characteristicsFilter.toString()+" )":"");
+		if(namesFilter.length()>0) {
+			filter.append((filter.length()>0)?" AND ":"");
+			filter.append("( "+namesFilter.toString()+")");			
+		}
+		if(codesFilter.length()>0) {
+			filter.append((filter.length()>0)?" AND ":"");
+			filter.append("( "+codesFilter.toString()+")");			
+		}
+		
+		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" , "+selHspen:"");
+		return new String[] {"Select "+speciesOccurSum+".* "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString(),
+				"Select count("+speciesOccurSum+"."+SpeciesID+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString()};		
+	}
+	
+	
 	public static final String JobStatusUpdating="UPDATE JOBS SET status=? WHERE searchID=?";
 	
 
+	public static final String JobList="select * from JOBS where author = ?";
+	
+	public static final String AquaMapsList="SELECT * from AquaMaps where jobId=?";
+	
 	public static final String AquaMapStatusUpdating="UPDATE AquaMap SET status=? WHERE searchID=?";
 	
 	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";

@@ -5,6 +5,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
@@ -17,7 +19,46 @@ public class DataTranslation {
 	static HashMap<String,String> completePhylogenyQuery = new HashMap<String, String>();
 	public static HashMap<String,String> completeResourceListQuery = new HashMap<String, String>();
 
+	public static Set<String> speciesoccurSumFields=new HashSet<String>();
+	public static Set<String> hspenFields=new HashSet<String>();
+	
 	static{
+		speciesoccurSumFields.add("genus");
+		speciesoccurSumFields.add("species");
+		speciesoccurSumFields.add("fbname");
+		speciesoccurSumFields.add("speccode");
+		speciesoccurSumFields.add("speciesid");
+		speciesoccurSumFields.add("kingdom");
+		speciesoccurSumFields.add("phylum");
+		speciesoccurSumFields.add("class");
+		speciesoccurSumFields.add("order");
+		speciesoccurSumFields.add("family");
+		speciesoccurSumFields.add("deepwater");
+		speciesoccurSumFields.add("angling");
+		speciesoccurSumFields.add("diving");
+		speciesoccurSumFields.add("dangerous");
+		speciesoccurSumFields.add("algae");
+		speciesoccurSumFields.add("seabirds");
+		speciesoccurSumFields.add("freshwater");
+		speciesoccurSumFields.add("scientific_name");
+		speciesoccurSumFields.add("english_name");
+		speciesoccurSumFields.add("french_name");
+		speciesoccurSumFields.add("spanish_name");
+		
+		hspenFields.add("speccode");
+		hspenFields.add("speciesid");
+		hspenFields.add("depthmin");
+		hspenFields.add("depthmax");
+		hspenFields.add("pelagic");
+		hspenFields.add("tempmin");
+		hspenFields.add("tempmax");
+		hspenFields.add("salinitymin");
+		hspenFields.add("salinitymax");
+		hspenFields.add("landdistmin");
+		hspenFields.add("landdistmax");
+		hspenFields.add("primprodmin");
+		hspenFields.add("primprodmax");		
+		
 		completeFieldNamesMap.put("DepthMin", "hspen.DepthMin>=");
 		completeFieldNamesMap.put("DepthMax", "hspen.DepthMax<=");
 		
@@ -82,9 +123,9 @@ public class DataTranslation {
 		return toReturn;
 	}
 	
-	public static String filterToString(Filter filter){
-		StringBuilder toReturn=new StringBuilder();
-		toReturn.append("speciesoccursum."+filter.getName());
+	public static String filterToString(Filter filter)throws Exception{
+		StringBuilder toReturn=new StringBuilder();		
+		toReturn.append(DBCostants.getCompleteName(DBCostants.HSPEN, filter.getName().toLowerCase()));
 		if(filter.getType().equalsIgnoreCase("is")){
 	    	toReturn.append(" = '"+filter.getValue()+"'");	  
 	    }else
@@ -96,7 +137,7 @@ public class DataTranslation {
 	    }else
 	    if(filter.getType().equalsIgnoreCase("ends")){
 	    	toReturn.append(" like '%"+filter.getValue()+"'");	    	
-	    }
+	    }else throw new Exception("invalid filter Condition : "+filter.getType());
 		return toReturn.toString();
 	}
 	
