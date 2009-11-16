@@ -10,7 +10,7 @@
 		<Packages>
 			<Main>
 				<Description>Aquamaps Stateless Service</Description>
-				<Name>Main</Name>
+				<Name>AquaMaps-Service</Name>
 				<Version>1.0.0</Version>
 				<Dependencies>
 					<Dependency>
@@ -18,7 +18,7 @@
 							<Class>Application</Class>
 							<Name>AquaMaps</Name>
 						</Service>
-						<Package>Stubs</Package>
+						<Package>AquaMaps-stubs</Package>
 						<Version>1.0.0</Version>
 						<Scope level="GHN"/>
 						<Optional>false</Optional>
@@ -32,7 +32,7 @@
 			</Main>
 			<Software>
 				<Description>Aquamaps stubs</Description>
-				<Name>Stubs</Name>
+				<Name>AquaMaps-stubs</Name>
 				<Version>1.0.0</Version>
 				<Files><File>org.gcube.application.aquamaps.stubs.jar</File></Files>
 			</Software>
