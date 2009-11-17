@@ -48,13 +48,14 @@ public class BiodiversityThread extends Thread {
 	Statement stmt = generationDetails.getConnection().createStatement();
 	String tableName=(uuidGen.nextUUID()).replaceAll("-", "_");
 	PreparedStatement prep=null;
-	String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY , foreign key("+DBCostants.SpeciesID+") references "+generationDetails.getHspecTable()+"("+DBCostants.SpeciesID+"))";
+	String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
 	logger.trace("Going to execute query : "+creationSQL);
 	stmt.execute(creationSQL);
 	stmt.close();
 	for(String specId: speciesIds){	
 		stmt = generationDetails.getConnection().createStatement();
 		stmt.execute("INSERT INTO "+tableName+" VALUES('"+specId+"')");
+		logger.trace("INSERT INTO "+tableName+" VALUES('"+specId+"')");
 		stmt.close();}
 	logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
 	
@@ -74,7 +75,9 @@ public class BiodiversityThread extends Thread {
 		logger.trace(this.getName()+" Perl execution exit message :"+result);
 		if(result!=0) logger.error("No images were generated");
 		else {
-			Map<String,File> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",toPerform.getName());			
+			Map<String,File> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",toPerform.getName());
+						
+			
 			logger.trace(this.getName()+" found "+app.size()+" files to publish");
 			if(app.size()>0){
 				String basePath=JobUtils.publish(generationDetails.getFirstLevelDirName(), generationDetails.getSecondLevelDirName(), app.values());
@@ -84,7 +87,7 @@ public class BiodiversityThread extends Thread {
 				for(String mapName:app.keySet()){
 					ps.setBoolean(1,true);
 					ps.setString(2,mapName);
-					ps.setString(3, basePath+File.separator+app.get(mapName).getName());
+					ps.setString(3, basePath+app.get(mapName).getName());
 					ps.setString(4,"IMG");
 					ps.setString(5,toPerform.getId());
 					ps.execute();
@@ -103,7 +106,7 @@ public class BiodiversityThread extends Thread {
 		logger.error(e.getMessage());
 		try {
 			generationDetails.setAquaMapStatus(JobGenerationDetails.Status.Error, selectedAquaMap);
-		} catch (SQLException e1) {
+		} catch (Exception e1) {
 			logger.error("Unable to handle previous error! : "+e1.getMessage());
 		}
 	}

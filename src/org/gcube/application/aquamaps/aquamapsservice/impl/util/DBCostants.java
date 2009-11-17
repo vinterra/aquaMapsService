@@ -72,6 +72,9 @@ public class DBCostants {
 		else return "=";
 	}
 	
+	public static final String profileUpdate="Update Files set Path=? where owner=? and type ='XML'";
+	
+	
 	/**
 	 * Creates a query string to filter species against characteristic OR names OR codes filtering
 	 * 
@@ -141,12 +144,13 @@ public class DBCostants {
 	
 	public static final String JobStatusUpdating="UPDATE JOBS SET status=? WHERE searchID=?";
 	
+	
 
 	public static final String JobList="select * from JOBS where author = ?";
 	
 	public static final String AquaMapsList="SELECT * from AquaMaps where jobId=?";
 	
-	public static final String AquaMapStatusUpdating="UPDATE AquaMap SET status=? WHERE searchID=?";
+	public static final String AquaMapStatusUpdating="UPDATE AquaMaps SET status=? WHERE searchID=?";
 	
 	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";
 	

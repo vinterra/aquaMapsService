@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -13,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +47,8 @@ public class JobUtils {
 
 	private static GCUBELog logger= new GCUBELog(JobUtils.class);
 	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	public static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
+	
 /**
  *  Clusterize rs in N stringBuilders compliant with CsquareCode convention
  * @param rs 			
@@ -123,7 +127,7 @@ public class JobUtils {
 		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 		String line = null;
 		while ((line = input.readLine())!=null){
-			logger.debug(line);
+			//logger.debug(line);
 		}
 		
 		try {
@@ -168,23 +172,153 @@ public class JobUtils {
 
 	}
 	
-	
-	public static void updateStatus(JobGenerationDetails.Status status,String jobId,Connection c)throws SQLException{
-		PreparedStatement ps=c.prepareStatement(DBCostants.JobStatusUpdating);
-		ps.setString(1, status.toString());		
-		ps.setInt(2,Integer.parseInt(jobId));
-		ps.execute();		
+	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir,Connection c) throws Exception{
+		Collection<File> toUpdateProfile=new ArrayList<File>();
+		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+resName);
+		dir.mkdirs();
+		File file=new File(dir.getAbsolutePath(),resName+".xml");
+		//file.mkdirs();
+		FileWriter writer=new FileWriter(file);
+		writer.write(resProfile);
+		writer.close();
+		toUpdateProfile.add(file);
+		String path=publish(firstLevelDir,secondLevelDir,toUpdateProfile);
+		logger.trace("Profile for "+resName+" created, gonna update DB");
+		PreparedStatement ps=c.prepareStatement(DBCostants.profileUpdate);
+		ps.setString(1, path+file.getName());
+		ps.setInt(2, Integer.parseInt(resId));		
+		if(ps.executeUpdate()==0){
+			logger.trace("Entry not found for profile, gonna create it");
+			PreparedStatement pps =c.prepareStatement(DBCostants.fileInsertion);
+				pps.setBoolean(1,true);
+				pps.setString(2,"Metadata");
+				pps.setString(3, path+file.getName());
+				pps.setString(4,"XML");
+				pps.setString(5,resId);
+				pps.execute();			
+		}
 	}
-	public static void updateAquaMapStatus(JobGenerationDetails.Status status,String aquamapObjectId,Connection c)throws SQLException{
+	
+	public static void updateStatus(JobGenerationDetails generationDetails,Connection c,JobGenerationDetails.Status status)throws SQLException, IOException, Exception{
+		Job toUpdate=generationDetails.getToPerform();
+		toUpdate.setStatus(status.toString());
 		PreparedStatement ps=c.prepareStatement(DBCostants.JobStatusUpdating);
+		ps.setString(1, toUpdate.getStatus());		
+		ps.setInt(2,Integer.parseInt(toUpdate.getId()));
+		ps.execute();		
+		updateProfile(toUpdate.getName(),toUpdate.getId(),makeJobProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
+		logger.trace("done Job status updateing status : "+status.toString());
+	}
+	
+	
+	public static void updateAquaMapStatus(JobGenerationDetails generationDetails,AquaMap toUpdate,Connection c,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
+		toUpdate.setStatus(status.toString());
+		PreparedStatement ps=c.prepareStatement(DBCostants.AquaMapStatusUpdating);
 		ps.setString(1, status.toString());
-		ps.setInt(2,Integer.parseInt(aquamapObjectId));		
+		ps.setInt(2,Integer.parseInt(toUpdate.getId()));		
 		ps.execute();		
+		updateProfile(toUpdate.getName(),toUpdate.getId(),makeAquaMapProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
+		logger.trace("done AquaMap status updateing status : "+status.toString());
+	}
+	
+
+	
+	public static String projectCitation=	"Kaschner, K., J. S. Ready, E. Agbayani, J. Rius, K. Kesner-Reyes, P. D. Eastwood, A. B. South, "+
+ 	"S. O. Kullander, T. Rees, C. H. Close, R. Watson, D. Pauly, and R. Froese. 2008 AquaMaps: "+
+ 	"Predicted range maps for aquatic species. World wide web electronic publication, www.aquamaps.org, Version 10/2008.";
+	
+	public static String makeAquaMapProfile(AquaMap obj){
+		StringBuilder profileBuilder=new StringBuilder(xmlHeader);
+		profileBuilder.append("<AquaMap>");
+		profileBuilder.append("<Name>"+obj.getName()+"</Name>");
+		profileBuilder.append("<Author>"+obj.getAuthor()+"</Author>");
+		profileBuilder.append("<Source>"+obj.getSource()+"</Source>");
+		profileBuilder.append("<Status>"+obj.getStatus()+"</Status>");
+		profileBuilder.append("<date>"+obj.getDate()+"</date>");
+		profileBuilder.append("<SelectedSpecies>");
+		if((obj.getSelectedSpecies()!=null)&&(obj.getSelectedSpecies().getSpeciesList()!=null)){
+			Specie[] specs=obj.getSelectedSpecies().getSpeciesList();
+			for(int i=0;i<specs.length;i++) profileBuilder.append(speciesToXML(specs[i]));
+		}
+		profileBuilder.append("</SelectedSpecies>");
+		
+		profileBuilder.append("<EnvelopCustomization>");
+		
+		if((obj.getEnvelopCustomization()!=null)&&(obj.getEnvelopCustomization().getPerturbationList()!=null)){
+			Perturbation[] perts=obj.getEnvelopCustomization().getPerturbationList();
+			Map <String,StringBuilder> envelopMap=new HashMap<String, StringBuilder>();
+			for(int i=0;i<perts.length;i++){
+				String specId=perts[i].getToPerturbId();
+				if(!envelopMap.containsKey(specId)) 
+						envelopMap.put(specId, new StringBuilder("<SpeciesId>"+specId+"</SpeciesId>\n<Customizations>"));
+				envelopMap.get(specId).append("<Customization>");
+				envelopMap.get(specId).append("<FieldName>"+perts[i].getField()+"</FieldName>");
+				envelopMap.get(specId).append("<Type>"+perts[i].getType()+"</Type>");
+				envelopMap.get(specId).append("<Value>"+perts[i].getValue()+"</Value>");
+				envelopMap.get(specId).append("</Customization>");
+			}
+			for(String specId:envelopMap.keySet()){
+				profileBuilder.append(envelopMap.get(specId).toString()+"\n<Customizations>");
+			}
+		}
+		profileBuilder.append("</EnvelopCustomization>");
+		
+		profileBuilder.append("<SelectedAreas>");
+		if((obj.getSelectedAreas()!=null)&&(obj.getSelectedAreas().getAreasList()!=null)){
+			Area[] areas=obj.getSelectedAreas().getAreasList();
+			for(int i=0;i<areas.length;i++) profileBuilder.append(areaToXML(areas[i]));
+		}
+		profileBuilder.append("</SelectedAreas>");
+		
+		profileBuilder.append("<CellExclusion>");
+		if((obj.getExcludedCells()!=null)&&(obj.getExcludedCells().getCellList()!=null)){
+			Cell[] cells=obj.getExcludedCells().getCellList();
+			for(int i=0;i<cells.length;i++) profileBuilder.append(cellToXML(cells[i]));
+		}		
+		profileBuilder.append("</CellExclusion>");
+		
+		profileBuilder.append("<EnvironmentCustomization>");
+		
+		if((obj.getEnvironmentCustomization()!=null)&&(obj.getEnvironmentCustomization().getPerturbationList()!=null)){
+			Perturbation[] perts=obj.getEnvironmentCustomization().getPerturbationList();
+			Map <String,StringBuilder> envelopMap=new HashMap<String, StringBuilder>();
+			for(int i=0;i<perts.length;i++){
+				String cellId=perts[i].getToPerturbId();
+				if(!envelopMap.containsKey(cellId)) 
+						envelopMap.put(cellId, new StringBuilder("<cSquareCode>"+cellId+"</cSquareCode>\n<Customizations>"));
+				envelopMap.get(cellId).append("<Customization>");
+				envelopMap.get(cellId).append("<FieldName>"+perts[i].getField()+"</FieldName>");
+				envelopMap.get(cellId).append("<Type>"+perts[i].getType()+"</Type>");
+				envelopMap.get(cellId).append("<Value>"+perts[i].getValue()+"</Value>");
+				envelopMap.get(cellId).append("</Customization>");
+			}
+			for(String cellId:envelopMap.keySet()){
+				profileBuilder.append(envelopMap.get(cellId).toString()+"\n<Customizations>");
+			}
+		}
+		profileBuilder.append("</EnvironmentCustomization>");
+		
+		profileBuilder.append("<AlgorithmSettings>");
+		profileBuilder.append("<Weights>");		
+		if((obj.getWeights()!=null)&&(obj.getWeights().getWeightList()!=null)){
+			Weight[] weights=obj.getWeights().getWeightList();
+			for(int i=0;i<weights.length;i++) profileBuilder.append(weightToXML(weights[i]));
+		}	
+		profileBuilder.append("</Weights>");
+		profileBuilder.append("<Threshold>"+obj.getThreshold()+"</Threshold>");
+		profileBuilder.append("<Source>"+projectCitation+"</Source>");
+		profileBuilder.append("</AlgorithmSettings>");
+		
+		profileBuilder.append("</AquaMap>");
+		
+		
+		
+		return profileBuilder.toString();
 	}
 	
 	
-	public String makeJobProfile(Job job){		
-		StringBuilder profileBuilder=new StringBuilder();
+	public static String makeJobProfile(Job job){		
+		StringBuilder profileBuilder=new StringBuilder(xmlHeader);
 		profileBuilder.append("<JOB>");
 		profileBuilder.append("<Name>"+job.getName()+"</Name>");
 		profileBuilder.append("<Author>"+job.getAuthor()+"</Author>");
@@ -201,91 +335,87 @@ public class JobUtils {
 		profileBuilder.append("</SelectedSpecies>");
 		
 		profileBuilder.append("<EnvelopCustomization>");
-		PerturbationArray envCustomArray=job.getEnvelopCustomization();
-		if(envCustomArray!=null){
-			Map<String,Map<String,String[]>> perturbationMapping=new HashMap<String, Map<String,String[]>>();
-			for(Perturbation pert:envCustomArray.getPerturbationList()){				
-				String id=pert.getToPerturbId();
-				if(!perturbationMapping.containsKey(id)) perturbationMapping.put(id, new HashMap<String, String[]>());
-				perturbationMapping.get(id).put(pert.getField(),new String[] {String.valueOf(pert.getValue()),pert.getType()});			
+		if((job.getEnvelopCustomization()!=null)&&(job.getEnvelopCustomization().getPerturbationList()!=null)){
+			Perturbation[] perts=job.getEnvelopCustomization().getPerturbationList();
+			Map <String,StringBuilder> envelopMap=new HashMap<String, StringBuilder>();
+			for(int i=0;i<perts.length;i++){
+				String specId=perts[i].getToPerturbId();
+				if(!envelopMap.containsKey(specId)) 
+						envelopMap.put(specId, new StringBuilder("<SpeciesId>"+specId+"</SpeciesId>\n<Customizations>"));
+				envelopMap.get(specId).append("<Customization>");
+				envelopMap.get(specId).append("<FieldName>"+perts[i].getField()+"</FieldName>");
+				envelopMap.get(specId).append("<Type>"+perts[i].getType()+"</Type>");
+				envelopMap.get(specId).append("<Value>"+perts[i].getValue()+"</Value>");
+				envelopMap.get(specId).append("</Customization>");
 			}
-			for(String id: perturbationMapping.keySet()){
-				profileBuilder.append("<"+DBCostants.SpeciesID+">"+id+"</"+DBCostants.SpeciesID+">");
-				profileBuilder.append("<Customizations>");
-				for(String field:perturbationMapping.get(id).keySet()){
-					profileBuilder.append("<Customization>");
-					profileBuilder.append("<FieldName>"+field+"</FieldName>");
-					profileBuilder.append("<Type>"+perturbationMapping.get(id).get(field)[1]+"</Type>");
-					profileBuilder.append("<Value>"+perturbationMapping.get(id).get(field)[0]+"</Value>");
-					profileBuilder.append("</Customization>");
-				}
-				profileBuilder.append("</Customizations>");
+			for(String specId:envelopMap.keySet()){
+				profileBuilder.append(envelopMap.get(specId).toString()+"\n<Customizations>");
 			}
-		}		
+		}
 		profileBuilder.append("</EnvelopCustomization>");
 		
 		profileBuilder.append("<SelectedAreas>");
-		AreasArray selectedAreas=job.getSelectedAreas();
-		if(selectedAreas!=null){
-		for(Area area:selectedAreas.getAreasList()) profileBuilder.append(areaToXML(area));
+		if((job.getSelectedAreas()!=null)&&(job.getSelectedAreas().getAreasList()!=null)){
+			Area[] areas=job.getSelectedAreas().getAreasList();
+			for(int i=0;i<areas.length;i++) profileBuilder.append(areaToXML(areas[i]));
 		}
 		profileBuilder.append("</SelectedAreas>");
 		
 		profileBuilder.append("<CellExclusion>");
-		CellArray selectedCells=job.getExcludedCells();
-		if(selectedCells!=null){
-		for(Cell cell:selectedCells.getCellList()) profileBuilder.append(cellToXML(cell));
-		}
+		if((job.getExcludedCells()!=null)&&(job.getExcludedCells().getCellList()!=null)){
+			Cell[] cells=job.getExcludedCells().getCellList();
+			for(int i=0;i<cells.length;i++) profileBuilder.append(cellToXML(cells[i]));
+		}		
 		profileBuilder.append("</CellExclusion>");
 		
 		profileBuilder.append("<EnvironmentCustomization>");
-		PerturbationArray environmentCustomArray=job.getEnvironmentCustomization();
-		if(environmentCustomArray!=null){
-			Map<String,Map<String,String[]>> perturbationMapping=new HashMap<String, Map<String,String[]>>();
-			for(Perturbation pert:environmentCustomArray.getPerturbationList()){				
-				String id=pert.getToPerturbId();
-				if(!perturbationMapping.containsKey(id)) perturbationMapping.put(id, new HashMap<String, String[]>());
-				perturbationMapping.get(id).put(pert.getField(),new String[] {String.valueOf(pert.getValue()),pert.getType()});			
+		
+		if((job.getEnvironmentCustomization()!=null)&&(job.getEnvironmentCustomization().getPerturbationList()!=null)){
+			Perturbation[] perts=job.getEnvironmentCustomization().getPerturbationList();
+			Map <String,StringBuilder> envelopMap=new HashMap<String, StringBuilder>();
+			for(int i=0;i<perts.length;i++){
+				String cellId=perts[i].getToPerturbId();
+				if(!envelopMap.containsKey(cellId)) 
+						envelopMap.put(cellId, new StringBuilder("<cSquareCode>"+cellId+"</cSquareCode>\n<Customizations>"));
+				envelopMap.get(cellId).append("<Customization>");
+				envelopMap.get(cellId).append("<FieldName>"+perts[i].getField()+"</FieldName>");
+				envelopMap.get(cellId).append("<Type>"+perts[i].getType()+"</Type>");
+				envelopMap.get(cellId).append("<Value>"+perts[i].getValue()+"</Value>");
+				envelopMap.get(cellId).append("</Customization>");
 			}
-			for(String id: perturbationMapping.keySet()){
-				profileBuilder.append("<"+DBCostants.cSquareCode+">"+id+"</"+DBCostants.cSquareCode+">");
-				profileBuilder.append("<Customizations>");
-				for(String field:perturbationMapping.get(id).keySet()){
-					profileBuilder.append("<Customization>");
-					profileBuilder.append("<FieldName>"+field+"</FieldName>");
-					profileBuilder.append("<Type>"+perturbationMapping.get(id).get(field)[1]+"</Type>");
-					profileBuilder.append("<Value>"+perturbationMapping.get(id).get(field)[0]+"</Value>");
-					profileBuilder.append("</Customization>");
-				}
-				profileBuilder.append("</Customizations>");
+			for(String cellId:envelopMap.keySet()){
+				profileBuilder.append(envelopMap.get(cellId).toString()+"\n<Customizations>");
 			}
-		}		
+		}
 		profileBuilder.append("</EnvironmentCustomization>");
 		
 		
 		
 		profileBuilder.append("<AlgorithmSettings>");
-			profileBuilder.append("<Weights>");
-			WeightArray weights=job.getWeights();
-			if(weights!=null)
-				for(Weight weight:weights.getWeightList()) profileBuilder.append(weightToXML(weight));
-			profileBuilder.append("</Weights>");
+		profileBuilder.append("<Weights>");		
+		if((job.getWeights()!=null)&&(job.getWeights().getWeightList()!=null)){
+			Weight[] weights=job.getWeights().getWeightList();
+			for(int i=0;i<weights.length;i++) profileBuilder.append(weightToXML(weights[i]));
+		}	
+		profileBuilder.append("</Weights>");
 			//profileBuilder.append("<Threshold>"+threshold+"</Threshold>");
 			//profileBuilder.append("<Source>"+job.get+"</Source>");
 		profileBuilder.append("</AlgorithmSettings>");
 		
 		
-		profileBuilder.append("<AquaMapsObjects>");
-		AquaMapArray aquamapsArray=job.getAquaMapList();
-		if(aquamapsArray!=null)
-			//TODO call make AquaMapsObject profile
-		for(AquaMap obj:aquamapsArray.getAquaMapList()) profileBuilder.append(obj.getName());
+		profileBuilder.append("<AquaMapsObjects>");				
+		if((job.getAquaMapList()!=null)&&(job.getAquaMapList().getAquaMapList()!=null)){
+			AquaMap[] objs=job.getAquaMapList().getAquaMapList();
+			for(int i=0;i<objs.length;i++) profileBuilder.append(makeAquaMapProfile(objs[i]));
+		}	
+		profileBuilder.append("</Weights>");
 		profileBuilder.append("<AquaMapsObjects>");
 		
 		profileBuilder.append("<RelatedResources>");
-		StringArray strings=job.getRelatedResources();
-		if(strings!=null)			
-		for(String val:strings.getStringList())profileBuilder.append("<Related>"+val+"</Related>");
+		if((job.getRelatedResources()!=null)&&(job.getRelatedResources().getStringList()!=null)){
+			String[] resources=job.getRelatedResources().getStringList();
+			for(int i=0;i<resources.length;i++) profileBuilder.append("<Resource>"+resources[i]+"</Resource>");
+		}
 		profileBuilder.append("</RelatedResources>");
 		profileBuilder.append("</JOB>");
 		

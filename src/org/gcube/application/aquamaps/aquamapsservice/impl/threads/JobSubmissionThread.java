@@ -126,7 +126,7 @@ public class JobSubmissionThread extends Thread {
 		}catch (SQLException e) {
 			try {
 				generationStatus.setStatus(JobGenerationDetails.Status.Error);	
-			} catch (SQLException e1) {logger.error("Unaxpected Error",e);}
+			} catch (Exception e1) {logger.error("Unaxpected Error",e);}
 			logger.error("SQLException Occurred while performing Job "+generationStatus.getToPerform().getName(), e);
 			rollback();
 		} catch (InstantiationException e) {
@@ -139,7 +139,7 @@ public class JobSubmissionThread extends Thread {
 			logger.error("unable to Publish maps",e);
 			try {
 				generationStatus.setStatus(JobGenerationDetails.Status.Error);				
-			} catch (SQLException e1) {logger.error("Unaxpected Error",e);}
+			} catch (Exception e1) {logger.error("Unaxpected Error",e);}
 		}
 
 		finally{

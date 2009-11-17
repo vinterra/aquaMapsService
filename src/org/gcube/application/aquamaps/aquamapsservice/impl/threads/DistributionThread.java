@@ -23,7 +23,7 @@ public class DistributionThread extends Thread {
 		// TODO implement generation - publishing
 		try {
 			generationDetails.setAquaMapStatus(JobGenerationDetails.Status.Completed, selectedAquaMap);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage() );			
 		}
 	}

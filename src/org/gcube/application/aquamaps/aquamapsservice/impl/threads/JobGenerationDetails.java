@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -95,8 +96,8 @@ public class JobGenerationDetails {
 		
 		status=Status.Pending;
 	}
-	public void setStatus(Status status) throws SQLException {		
-		JobUtils.updateStatus(status, toPerform.getId(), connection);
+	public void setStatus(Status status) throws IOException, Exception {		
+		JobUtils.updateStatus(this, connection,status);
 		this.status = status;
 	}
 	public Status getStatus() {
@@ -114,9 +115,8 @@ public class JobGenerationDetails {
 	public Connection getConnection() {
 		return connection;
 	}
-	public void setAquaMapStatus(Status status,int index) throws SQLException{
-		JobUtils.updateAquaMapStatus(status, toPerform.getAquaMapList().getAquaMapList(index).getId(), connection);
-		toPerform.getAquaMapList().getAquaMapList(index).setStatus(status.toString());
+	public void setAquaMapStatus(Status status,int index) throws Exception{
+		JobUtils.updateAquaMapStatus(this, toPerform.getAquaMapList().getAquaMapList(index), connection,status);		
 		if(toPerformBiodiversity.containsKey(index)) toPerformBiodiversity.put(index, status);
 		else toPerformDistribution.put(index, status);
 	}
