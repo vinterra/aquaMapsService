@@ -137,7 +137,24 @@
 			</xsd:sequence>
 			</xsd:complexType>
 			
+			
+			<xsd:complexType name="file">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string"/>
+					<xsd:element name="type" type="xsd:string"/>
+					<xsd:element name="url" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
 			<!-- Arrays -->
+			
+			<xsd:complexType name="fileArray">
+				<xsd:sequence>
+				<xsd:element name="fileList" type="tns:file" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		
+			
 			<xsd:complexType name="aquaMapArray">
 				<xsd:sequence>
 					<xsd:element name="aquaMapList" type="tns:AquaMap"
@@ -216,7 +233,7 @@
 			</xsd:complexType>
 
 			<!-- Request / Response Types-->
-
+			
 
 			<xsd:complexType name="getPhylogenyRequestType">
 				<xsd:sequence>
@@ -314,6 +331,9 @@
 				
 			<!-- Request / Response elements -->
 
+			<xsd:element name="getRelatedFilesRequest" type="xsd:string"/>
+			<xsd:element name="getRelatedFilesResponse" type="tns:fileArray"/>
+			
 			<xsd:element name="getJobListRequest" type="xsd:string"/>
 			<xsd:element name="getJobListResponse" type="xsd:string"/>
 			
@@ -389,6 +409,14 @@
 	</types>
 
 	<!-- message part -->
+	
+	<message name="GetRelatedFilesRequest">
+	<part name="request" element="tns:getRelatedFilesRequest"/>
+	</message>
+	<message name="GetRelatedFilesResponse">
+	<part name="response" element="tns:getRelatedFilesResponse"/>
+	</message>
+	
 	
 	<message name="GetAquaMapsListRequest">
 	<part name="request" element="tns:getAquaMapsListRequest"/>
@@ -506,6 +534,12 @@
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
+		
+		<wsdl:operation name="getRelatedFilesRequest">
+			<input message="tns:GetRelatedFilesRequest" />
+			<output message="tns:GetRelatedFilesResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>		
 		
 		<wsdl:operation name="getJobList">
 			<input message="tns:GetJobListRequest" />
