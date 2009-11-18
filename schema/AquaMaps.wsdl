@@ -535,7 +535,7 @@
 
 		<!-- operation part -->
 		
-		<wsdl:operation name="getRelatedFilesRequest">
+		<wsdl:operation name="getRelatedFiles">
 			<input message="tns:GetRelatedFilesRequest" />
 			<output message="tns:GetRelatedFilesResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
