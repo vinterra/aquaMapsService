@@ -13,32 +13,44 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
  */
 public class HSPECGenerator {
 
+	public HSPECGenerator(String hcafStaticTable, String hcafDynamicTable, String hspenTable,
+			String hspecTable, String occurenceCellsTable,
+			double sstWeight, double depthWeight, double salinityWeight,
+			double primaryProductsWeight, double seaIceConcentrationWeight) {
+		super();
+		this.hcafViewTable = "HCAF"+uuidGen.nextUUID().replace("-", "_");
+		this.hcafDynamicTable=hcafDynamicTable;
+		this.hcafStaticTable=hcafStaticTable;
+		this.hspenTable = hspenTable;
+		this.hspecTable = hspecTable;
+		this.resultsTable = resultsTable;
+		this.occurenceCellsTable = occurenceCellsTable;
+		this.sstWeight = sstWeight;
+		this.depthWeight = depthWeight;
+		this.salinityWeight = salinityWeight;
+		this.primaryProductsWeight = primaryProductsWeight;
+		this.seaIceConcentrationWeight = seaIceConcentrationWeight;
+		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
+	}
+
 	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-	private String hcafTable;
+	private String hcafViewTable;
+	private String hcafStaticTable;
+	private String hcafDynamicTable;
 	private String hspenTable;
 	private String hspecTable;
 	private String resultsTable;
 	private String occurenceCellsTable;
 	
-	/**
-	 * constructor
-	 * 
-	 * @param hcafTable
-	 * @param hspenTable
-	 * @param hspecTable
-	 * @param occurenceCellsTable
-	 */
-	public HSPECGenerator(String hcafTable, String hspenTable,
-			String hspecTable, String occurenceCellsTable) {
-		super();
-		this.hcafTable = hcafTable;
-		this.hspenTable = hspenTable;
-		this.hspecTable = hspecTable;
-		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
-		this.occurenceCellsTable= occurenceCellsTable;
-	}
+	private double sstWeight;
+	private double depthWeight;
+	private double salinityWeight;
+	private double primaryProductsWeight;
+	private double seaIceConcentrationWeight;
 	
 	
+	
+		
 	/**
 	 * 
 	 * @return
@@ -46,6 +58,7 @@ public class HSPECGenerator {
 	 */
 	public String generate() throws Exception{
 		DBSession session= DBSession.openSession();
+		session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");
 		session.createLikeTable(this.resultsTable, this.hspecTable);
 		ResultSet hspenRes= session.executeQuery("SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
 				"DepthPrefMax,TempMin,TempMax,TempPrefMin,TempPrefMax,SalinityMin,SalinityMax,SalinityPrefMin,SalinityPrefMax,PrimProdMin," +
@@ -53,8 +66,8 @@ public class HSPECGenerator {
 				"LandDistPrefMax FROM "+this.hspenTable);
 		
 		//I can execute it here cause it not depends on hspen
-		ResultSet hcafRes=session.executeQuery("SELECT CsquareCode,OceanArea,CenterLat,CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
-				"SalinityBMean,PrimProdMean,IceConAnn,LandDist	FROM "+this.hcafTable+" WHERE OceanArea > 0");
+		ResultSet hcafRes=session.executeQuery("SELECT CsquareCode,OceanArea,CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
+				"SalinityBMean,PrimProdMean,IceConAnn,LandDist,EEZFirst,LME	FROM "+this.hcafViewTable+" WHERE OceanArea > 0");
 		
 		//looping on HSPEN
 		while (hspenRes.next()){
@@ -70,12 +83,12 @@ public class HSPECGenerator {
 				Double salinityValue= this.getSalinity(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
 				Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("ProdPrefMax"));
 				Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
-				Double totalCountProbability= landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
+				Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
 				
 				boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 				boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
 				if (inFAO && inBox && totalCountProbability!=0){
-					session.executeUpdate("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"',");
+					session.executeUpdate("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')");
 					i++;
 				}
 			}
@@ -90,19 +103,21 @@ public class HSPECGenerator {
 					Double salinityValue= this.getSalinity(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
 					Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("ProdPrefMax"));
 					Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
-					Double totalCountProbability= landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
+					Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
 
 					boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 					boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
 
 					if (inFAO && !inBox && totalCountProbability!=0)
-						session.executeUpdate("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"',");
+						session.executeUpdate("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')");
 					
 				}
 			}
 
 			
 		}
+		session.executeUpdate("DROP TABLE "+this.hcafViewTable);
+		session.close();
 		return this.resultsTable;
 	}
 		
@@ -114,9 +129,9 @@ public class HSPECGenerator {
 			else if (north!=null) bounduary.passedN=true;
 			else if (south!=null) bounduary.passedS=true;
 			else{
-				ResultSet rsBond=session.executeQuery("Select distinct Max("+this.hcafTable+".CenterLat) AS maxCLat, Min("+this.hcafTable+".CenterLat) AS minCLat" +
-						" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafTable+".CsquareCode" +
-						" Where ((("+this.hcafTable+".OceanArea > 0))) AND "+this.occurenceCellsTable+".SpeciesID = '"+speciesId+"' AND "+this.occurenceCellsTable+".GoodCell <> 0");
+				ResultSet rsBond=session.executeQuery("Select distinct Max("+this.hcafViewTable+".CenterLat) AS maxCLat, Min("+this.hcafViewTable+".CenterLat) AS minCLat" +
+						" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+						" Where ((("+this.hcafViewTable+".OceanArea > 0))) AND "+this.occurenceCellsTable+".SpeciesID = '"+speciesId+"' AND "+this.occurenceCellsTable+".GoodCell <> 0");
 				rsBond.next();
 				double maxCLat=rsBond.getDouble("maxCLat");
 				double minCLat=rsBond.getDouble("minCLat");
@@ -249,14 +264,14 @@ public class HSPECGenerator {
 	public Double getSeaIceConcentration(Double hcafIceConAnn,Double hspenIceConMin,Double hspenIceConPrefMin, Double hspenIceConMax,Double hspenIceConPrefMax, String speciesId, DBSession session) throws Exception{
 		if(hspenIceConMin == 0){
 			Double sumIce = 0.0, meanIce = 0.0, adjVal = -1.0;
-			ResultSet iceConRes=session.executeQuery("SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafTable+".IceConAnn" +
-					" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafTable+".CsquareCode" +
-					" WHERE (  (("+this.hcafTable+".OceanArea)>0))" +
+			ResultSet iceConRes=session.executeQuery("SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
+					" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+					" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
 					" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesId+ "'" +
-					" and "+this.hcafTable+".IceConAnn <> -9999" +
-					" and "+this.hcafTable+".IceConAnn is not null" +
+					" and "+this.hcafViewTable+".IceConAnn <> -9999" +
+					" and "+this.hcafViewTable+".IceConAnn is not null" +
 					" and "+this.occurenceCellsTable+".goodcell = -1" +
-					" order by "+this.hcafTable+".IceConAnn");
+					" order by "+this.hcafViewTable+".IceConAnn");
 			int recordCount=0;
 			while (iceConRes.next()){
 				sumIce+=iceConRes.getDouble("IceConAnn");

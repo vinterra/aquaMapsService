@@ -18,7 +18,7 @@ public class DBCostants {
 	public static final String HSPEN="hspen";
 	public static final String HSPEC="hcaf_species_native";
 	public static final String speciesOccurSum="speciesoccursum";
-	
+	public static final String OCCURRENCE_CELLS="occurrencecells";
 	
 	public static final String FAOType="FAO";
 	public static final String EEZType="EEZ";
