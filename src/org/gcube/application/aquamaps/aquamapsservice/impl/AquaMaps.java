@@ -61,6 +61,12 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 	
+	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
+		return null;
+	}
+	
+	
+	
 	public String getAquaMapsList(String jobId)throws GCUBEFault{
 		logger.trace("Serving getAquaMapsList");
 		String toReturn="";
