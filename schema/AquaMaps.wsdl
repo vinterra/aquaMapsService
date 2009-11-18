@@ -331,6 +331,9 @@
 				
 			<!-- Request / Response elements -->
 
+			<xsd:element name="getProfileRequest" type="xsd:string"/>
+			<xsd:element name="getProfileResponse" type="xsd:string"/>
+
 			<xsd:element name="getRelatedFilesRequest" type="xsd:string"/>
 			<xsd:element name="getRelatedFilesResponse" type="tns:fileArray"/>
 			
@@ -409,6 +412,14 @@
 	</types>
 
 	<!-- message part -->
+	
+	
+	<message name="GetProfileRequest">
+	<part name="request" element="tns:getProfileRequest"/>
+	</message>
+	<message name="GetProfileResponse">
+	<part name="response" element="tns:getProfileResponse"/>
+	</message>
 	
 	<message name="GetRelatedFilesRequest">
 	<part name="request" element="tns:getRelatedFilesRequest"/>
@@ -534,6 +545,13 @@
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
+		
+		<wsdl:operation name="getProfile">
+			<input message="tns:GetProfileRequest" />
+			<output message="tns:GetProfileResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>		
+		
 		
 		<wsdl:operation name="getRelatedFiles">
 			<input message="tns:GetRelatedFilesRequest" />
