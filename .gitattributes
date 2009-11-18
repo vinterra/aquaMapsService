@@ -13,6 +13,8 @@ schema/AquaMaps.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/AreaPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThread.java -text
@@ -26,3 +28,4 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/util/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/DataTranslation.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
+test/testClient/TestHSPENGenerator.java -text

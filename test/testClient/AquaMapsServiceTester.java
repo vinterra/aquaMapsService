@@ -10,7 +10,7 @@ import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLoc
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 
 public class AquaMapsServiceTester {
-/*
+
 	private static final String SERVICE_URI="http://wn02.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 	public static AquaMapsPortType getPortType(ASLSession session) throws Exception{
@@ -69,6 +69,6 @@ public class AquaMapsServiceTester {
 	}
 
 	
-	*/
+	
 	
 }
