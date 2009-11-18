@@ -144,6 +144,7 @@ public class DBCostants {
 	
 	public static final String JobStatusUpdating="UPDATE JOBS SET status=? WHERE searchID=?";
 	
+	public static final String profileRetrieval="Select Path from Files where owner=? and type='xml'";
 	
 
 	public static final String JobList="select * from JOBS where author = ?";

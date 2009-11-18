@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,6 +15,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmission
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.*;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -32,6 +34,37 @@ public class AquaMaps extends GCUBEPortType {
 		return null;
 	}
 
+	public String getProfile(String id)throws GCUBEFault{
+		logger.trace("getting profile for owner id : "+id);
+		String toReturn="";
+		try{
+		Class.forName(DBCostants.JDBCClassName).newInstance();
+		Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+		PreparedStatement ps=conn.prepareStatement(DBCostants.profileRetrieval);
+		ps.setInt(1, Integer.parseInt(id));		
+		ResultSet rs=ps.executeQuery();
+		if(rs.first()){
+			String path=rs.getString(1);
+			String publicBasePath=ServiceContext.getContext().getWebServiceURL();
+			String realPath=ServiceContext.getContext().getPersistenceRoot()+File.separator+
+				ServiceContext.getContext().getHttpServerBasePath()+File.separator+path.substring(publicBasePath.length());
+			toReturn=ServiceUtils.fileToString(realPath);
+		}
+		rs.close();
+		ps.close();
+		conn.close();
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getjobList");
+			logger.trace("Raised Exception", e);			
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}
+		return toReturn;
+	}
+	
+	
+	
 	public String submitJob(Job req)throws GCUBEFault{
 		JobSubmissionThread thread=new JobSubmissionThread(req);
 		thread.start();
@@ -62,7 +95,33 @@ public class AquaMaps extends GCUBEPortType {
 	}
 	
 	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
-		return null;
+		logger.trace("getting file List for owner id : "+owner);
+		FileArray toReturn=null;
+		try{
+		Class.forName(DBCostants.JDBCClassName).newInstance();
+		Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+		Statement stmt=conn.createStatement();		
+		ResultSet rs=stmt.executeQuery("Select * from Files where owner = "+owner);
+		ArrayList<org.gcube.application.aquamaps.stubs.File> files=new ArrayList<org.gcube.application.aquamaps.stubs.File>();
+		while(rs.next()){
+			org.gcube.application.aquamaps.stubs.File f=new org.gcube.application.aquamaps.stubs.File();
+			f.setName(rs.getString(4));
+			f.setType(rs.getString(5));
+			f.setUrl(rs.getString(3));
+			files.add(f);			
+		}
+		toReturn=new FileArray(files.toArray(new org.gcube.application.aquamaps.stubs.File[files.size()]));
+		rs.close();
+		stmt.close();
+		conn.close();
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getjobList");
+			logger.trace("Raised Exception", e);			
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}
+		return toReturn;
 	}
 	
 	
