@@ -37,7 +37,7 @@ public class DBSession {
 	public static DBSession openSession() throws Exception{
 		//put all of them in a configuration file
 		Class.forName("com.mysql.jdbc.Driver");
-		String url = "jdbc:mysql://localhost:3306/aquamps_DB";
+		String url = "jdbc:mysql://localhost:3306/aquamaps_DB";
 		Connection conn= DriverManager.getConnection(url, "root" , "mybohemian");
 		conn.setAutoCommit(true);
 		return new DBSession(conn);

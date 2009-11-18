@@ -66,12 +66,12 @@ public class HSPECGenerator {
 				"LandDistPrefMax FROM "+this.hspenTable);
 		
 		//I can execute it here cause it not depends on hspen
-		ResultSet hcafRes=session.executeQuery("SELECT CsquareCode,OceanArea,CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
+		ResultSet hcafRes=session.executeQuery("SELECT CsquareCode,OceanArea,CenterLat,CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
 				"SalinityBMean,PrimProdMean,IceConAnn,LandDist,EEZFirst,LME	FROM "+this.hcafViewTable+" WHERE OceanArea > 0");
 		
 		//looping on HSPEN
 		while (hspenRes.next()){
-			Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLat"),hspenRes.getDouble("WMostLat"), hspenRes.getString("SpeciesID"), session);
+			Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLong"),hspenRes.getDouble("WMostLong"), hspenRes.getString("SpeciesID"), session);
 			hcafRes.beforeFirst();
 						
 			int i =0;
