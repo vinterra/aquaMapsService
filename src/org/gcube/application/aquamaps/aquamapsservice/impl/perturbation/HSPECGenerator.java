@@ -34,7 +34,8 @@ public class HSPECGenerator {
 		this.seaIceConcentrationWeight =1.0;
 		this.sstWeight =1.0;
 				
-		if (details.getToPerform().getWeights().getWeightList()!=null)
+
+		if ((details.getToPerform().getWeights()!=null)&&(details.getToPerform().getWeights().getWeightList()!=null))
 			for (Weight weight:details.getToPerform().getWeights().getWeightList()){
 				if(weight.getParameterName().compareTo("Primary Production")==0) this.primaryProductsWeight=weight.getChosenWeight();
 				if(weight.getParameterName().compareTo("Sea Surface Temp.")==0) this.sstWeight=  weight.getChosenWeight();

@@ -12,15 +12,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.axis.components.uuid.UUIDGen;
+import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Perturbation;
+import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobSubmissionThread extends Thread {
 
-	//private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	private static final GCUBELog logger=new GCUBELog(JobSubmissionThread.class);
 	private static final int waitTime=10*1000;
 	//private static final float defaultAlgorithmWeight=1;
@@ -66,14 +69,24 @@ public class JobSubmissionThread extends Thread {
 			}
 				
 			//Create and run Species envelop perturbationThreads for specified customization 
-			Perturbation[] enveloptPerturbation=null;
+			
+			//SpeciesPerturbationThread
+			
+			filterSpecies();
+			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
+				entry.setValue(JobGenerationDetails.SpeciesStatus.toGenerate);
+			
+	/*		Perturbation[] enveloptPerturbation=null;
 			if(generationStatus.getToPerform().getEnvelopCustomization()!=null)
 					enveloptPerturbation=generationStatus.getToPerform().getEnvelopCustomization().getPerturbationList();
 			for(String speciesId:generationStatus.getSpeciesHandling().keySet()){
 				boolean isSpeciesToCustom=false;
 				if((enveloptPerturbation!=null)&&(enveloptPerturbation.length>0))
 					for(Perturbation pert: enveloptPerturbation)
-						if(pert.getToPerturbId().equals(speciesId)) isSpeciesToCustom=true;
+						if(pert.getToPerturbId().equals(speciesId)) {
+							isSpeciesToCustom=true;
+							break;
+						}
 				if(isSpeciesToCustom)						
 					{
 					SpeciesPerturbationThread speciesThread=new SpeciesPerturbationThread(waitingGroup,generationStatus,speciesId);
@@ -84,7 +97,7 @@ public class JobSubmissionThread extends Thread {
 					generationStatus.setHspenTable(DBCostants.HSPEN);
 				}
 			}
-			
+		*/	
 			//Create and run Simulation Thread for every selected species
 			
 			boolean speciesOk=false;
@@ -102,14 +115,6 @@ public class JobSubmissionThread extends Thread {
 				SimulationThread simT=new SimulationThread(waitingGroup,generationStatus);
 				simT.start();
 			
-			
-			
-		 
-
-
-
-			
-
 //			JobUtils.updateStatus(JobStatus.Generating, jobID, DBCostants.UNASSIGNED, conn);
 			
 			//Create and run Suitable area map generation
@@ -179,7 +184,7 @@ public class JobSubmissionThread extends Thread {
 		String myJob = "INSERT INTO submitted(title, author, date, status,isAquaMap) VALUES('"+
 							generationStatus.getToPerform().getName()+"', '"+
 							generationStatus.getToPerform().getAuthor()+"', '"+
-							myData+"', '"+generationStatus.getStatus().toString()+"', '"+false+"')";
+							myData+"', '"+generationStatus.getStatus().toString()+"', "+false+")";
 		logger.trace("Going to execute : "+myJob);
 		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
 		ResultSet rs=stmt.getGeneratedKeys();
@@ -193,7 +198,7 @@ public class JobSubmissionThread extends Thread {
 							aquaMapObj.getName()+"', '"+
 							aquaMapObj.getAuthor()+"', '"+
 							myData+"', '"+JobGenerationDetails.Status.Pending+"', '"+
-							jobId+"', '"+ aquaMapObj.getType()+"', '"+true+"')";
+							jobId+"', '"+ aquaMapObj.getType()+"', "+true+")";
 			Statement aquaStatement=conn.createStatement();
 			logger.trace("Going to execute : "+myAquaMapObj);
 			aquaStatement.execute(myAquaMapObj,Statement.RETURN_GENERATED_KEYS);
@@ -221,19 +226,28 @@ public class JobSubmissionThread extends Thread {
 		//TODO implement rollback operations	
 	}
 
-/*	public void publish()throws Exception{
-		String basePath=JobUtils.publish(request.getHspec().getName(), getName().replaceAll(" ", ""), new ArrayList<File>(toPublishPaths.values()));
-		logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-		PreparedStatement ps =conn.prepareStatement(DBCostants.mapInsertion);
-		for(String mapName:toPublishPaths.keySet()){
-			ps.setString(1, jobID);
-			ps.setString(2, toPublishPaths.get(mapName).getName());
-			ps.setString(3,mapName);
-			ps.execute();
-		}
-		logger.trace(this.getName()+" "+toPublishPaths.size()+" file information inserted in DB");
-		JobUtils.updateStatus(JobStatus.Completed, jobID, basePath, conn);
-		logger.trace(this.getName()+" Job status updated");
+	public void filterSpecies() throws SQLException{
+		logger.trace("Filtering species...");
+		generationStatus.setHspenTable("H"+(uuidGen.nextUUID()).replaceAll("-", "_"));
+		String speciesListTable="s"+(uuidGen.nextUUID()).replaceAll("-", "_");
+		Statement stmt=generationStatus.getConnection().createStatement();
+		
+		String creationSQL="CREATE TABLE  "+speciesListTable+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
+		
+		stmt.execute(creationSQL);
+		
+		StringBuilder insertingQuery=new StringBuilder("Insert into "+speciesListTable+" values ");
+		Specie[] species=generationStatus.getToPerform().getSelectedSpecies().getSpeciesList();
+		for(int i= 0;i<species.length;i++)
+			insertingQuery.append("('"+species[i].getId()+"')"+((i<species.length-1)?" , ":""));
+		
+		stmt.execute(insertingQuery.toString());		
+		
+		stmt.execute("Create table "+generationStatus.getHspenTable()+" AS Select "+DBCostants.HSPEN+".* from "+DBCostants.HSPEN+","+speciesListTable+" where "+
+				DBCostants.HSPEN+"."+DBCostants.SpeciesID+" = "+speciesListTable+"."+DBCostants.SpeciesID);
+		
+		logger.trace("Filtering complete");
 	}
-*/
+	
+	
 }

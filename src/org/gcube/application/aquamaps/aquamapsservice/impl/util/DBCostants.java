@@ -187,4 +187,7 @@ public class DBCostants {
 	}
 	public static final String mySQLServerUri="jdbc:mysql://localhost:3306/aquamaps_DB?user=root&password=mybohemian";
 	public static final String JDBCClassName="com.mysql.jdbc.Driver";
+	
+	
+	
 }

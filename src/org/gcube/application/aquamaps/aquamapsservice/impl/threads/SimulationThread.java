@@ -9,7 +9,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class SimulationThread extends Thread {
 	JobGenerationDetails generationDetails;
 	//String speciesId;
-	private static final GCUBELog logger=new GCUBELog(DistributionThread.class);
+	private static final GCUBELog logger=new GCUBELog(SimulationThread.class);
 	public SimulationThread(ThreadGroup group,JobGenerationDetails details) {
 		super(group,"Simulation_"+details.getToPerform().getName());
 		generationDetails=details;
@@ -17,8 +17,9 @@ public class SimulationThread extends Thread {
 
 	public void run() {
 		// TODO Implement simulation data generation
-		HSPECGenerator generator= new HSPECGenerator(DBCostants.HCAF_S, DBCostants.HCAF_D, DBCostants.HSPEN,DBCostants.HSPEC, DBCostants.OCCURRENCE_CELLS,1.0,1.0,1.0,1.0,1.0);
+		
 		try{
+			HSPECGenerator generator= new HSPECGenerator(generationDetails);
 			System.out.println("table generated:"+generator.generate());
 		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
 		

@@ -508,13 +508,13 @@ public class JobUtils {
 		if((details.getToPerform().getSelectedAreas()!=null)&&(details.getToPerform().getSelectedAreas().getAreasList()!=null)
 				&&(details.getToPerform().getSelectedAreas().getAreasList().length>0)){
 			Statement stmt=details.getConnection().createStatement();
-			String areaTmpTable=(uuidGen.nextUUID()).replaceAll("-", "_");
+			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			stmt.execute("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY)");
 			for(Area area: details.getToPerform().getSelectedAreas().getAreasList())			
 				stmt.execute("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"')");
 			
 			logger.trace(" area temp table created");
-			String filteredTable=(uuidGen.nextUUID()).replaceAll("-", "_");
+			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			stmt.execute("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
 			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,details.getHspenTable(),areaTmpTable);
 			logger.trace("Going to use sql query "+filterQuery);

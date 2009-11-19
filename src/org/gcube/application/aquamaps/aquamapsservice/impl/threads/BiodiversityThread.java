@@ -46,7 +46,7 @@ public class BiodiversityThread extends Thread {
 	
 		try {
 	Statement stmt = generationDetails.getConnection().createStatement();
-	String tableName=(uuidGen.nextUUID()).replaceAll("-", "_");
+	String tableName="S"+(uuidGen.nextUUID()).replaceAll("-", "_");
 	PreparedStatement prep=null;
 	String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
 	logger.trace("Going to execute query : "+creationSQL);
