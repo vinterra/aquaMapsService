@@ -148,7 +148,7 @@ public class HSPECGenerator {
 					}
 				}
 				
-				logger.trace("HSOPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
+				logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
 				hspenLoops++;
 			}
 			
@@ -242,6 +242,8 @@ public class HSPECGenerator {
 		if (hspenLayer=='s') tempFld = hcafSSTAnMean;
 		else if (hspenLayer=='b') tempFld = hcafSBTAnMean;
 		
+		logger.trace("SST: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenTempMin+" "+hspenTempMax+" "+hspenTempPrefMin+" "+hspenTempPrefMax+" "+hspenLayer);
+		
 		if (tempFld == -9999 || hspenTempMin == null)return 1.0;
 		if (tempFld < hspenTempMin)return  0.0;
 		if (tempFld >= hspenTempMin && tempFld < hspenTempPrefMin) return  (tempFld - hspenTempMin) / (hspenTempPrefMin - hspenTempMin);
@@ -267,6 +269,8 @@ public class HSPECGenerator {
 		if (hspenLayer=='s') tempFld = hcafSSTAnMean;
 		else if (hspenLayer=='b') tempFld = hcafSBTAnMean;
 
+		logger.trace("SALINITY: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenLayer+" "+hspenSalinityMin+" "+hspenSalinityMax+" "+hspenSalinityPrefMin+" "+hspenSalinityPrefMax);
+		
 		if (tempFld == -9999 || hspenSalinityMin == null ) return 1.0;
 		if (tempFld < hspenSalinityMin)return 0.0;
 		if (tempFld >= hspenSalinityMin && tempFld < hspenSalinityPrefMin)
