@@ -242,12 +242,12 @@ public class HSPECGenerator {
 		if (hspenLayer=='s') tempFld = hcafSSTAnMean;
 		else if (hspenLayer=='b') tempFld = hcafSBTAnMean;
 		
-		logger.trace("SST: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenTempMin+" "+hspenTempMax+" "+hspenTempPrefMin+" "+hspenTempPrefMax+" "+hspenLayer);
+		//logger.trace("SST: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenTempMin+" "+hspenTempMax+" "+hspenTempPrefMin+" "+hspenTempPrefMax+" "+hspenLayer);
 		
 		if (tempFld == -9999 || hspenTempMin == null)return 1.0;
 		if (tempFld < hspenTempMin)return  0.0;
 		if (tempFld >= hspenTempMin && tempFld < hspenTempPrefMin) return  (tempFld - hspenTempMin) / (hspenTempPrefMin - hspenTempMin);
-		if (tempFld >= hspenTempMin && tempFld <= hspenTempPrefMax) return 1.0;
+		if (tempFld >= hspenTempPrefMin && tempFld <= hspenTempPrefMax) return 1.0;
 		if (tempFld > hspenTempPrefMax && tempFld <= hspenTempMax)
 			   return (hspenTempMax - tempFld) / (hspenTempMax - hspenTempPrefMax);
 		else return 0.0;
@@ -269,7 +269,7 @@ public class HSPECGenerator {
 		if (hspenLayer=='s') tempFld = hcafSSTAnMean;
 		else if (hspenLayer=='b') tempFld = hcafSBTAnMean;
 
-		logger.trace("SALINITY: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenLayer+" "+hspenSalinityMin+" "+hspenSalinityMax+" "+hspenSalinityPrefMin+" "+hspenSalinityPrefMax);
+		//logger.trace("SALINITY: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenLayer+" "+hspenSalinityMin+" "+hspenSalinityMax+" "+hspenSalinityPrefMin+" "+hspenSalinityPrefMax);
 		
 		if (tempFld == -9999 || hspenSalinityMin == null ) return 1.0;
 		if (tempFld < hspenSalinityMin)return 0.0;
