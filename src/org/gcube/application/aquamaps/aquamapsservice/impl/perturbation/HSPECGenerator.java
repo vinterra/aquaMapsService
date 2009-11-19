@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.stubs.Weight;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 /**
@@ -16,22 +19,29 @@ public class HSPECGenerator {
 
 	GCUBELog logger= new GCUBELog(HSPECGenerator.class);
 	
-	public HSPECGenerator(String hcafStaticTable, String hcafDynamicTable, String hspenTable,
-			String hspecTable, String occurenceCellsTable,
-			double sstWeight, double depthWeight, double salinityWeight,
-			double primaryProductsWeight, double seaIceConcentrationWeight) {
+	public HSPECGenerator(JobGenerationDetails details) {
 		super();
 		this.hcafViewTable = "HCAF"+uuidGen.nextUUID().replace("-", "_");
-		this.hcafDynamicTable=hcafDynamicTable;
-		this.hcafStaticTable=hcafStaticTable;
-		this.hspenTable = hspenTable;
-		this.hspecTable = hspecTable;
-		this.occurenceCellsTable = occurenceCellsTable;
-		this.sstWeight = sstWeight;
-		this.depthWeight = depthWeight;
-		this.salinityWeight = salinityWeight;
-		this.primaryProductsWeight = primaryProductsWeight;
-		this.seaIceConcentrationWeight = seaIceConcentrationWeight;
+		this.hcafDynamicTable=details.getHcafTable();
+		this.hcafStaticTable=DBCostants.HCAF_S;
+		this.hspenTable = details.getHspenTable();
+		this.hspecTable = details.getHspecTable();
+		this.occurenceCellsTable = DBCostants.OCCURRENCE_CELLS;
+		
+		this.depthWeight = 1.0;
+		this.salinityWeight = 1.0;
+		this.primaryProductsWeight = 1.0;
+		this.seaIceConcentrationWeight =1.0;
+		this.sstWeight =1.0;
+				
+		for (Weight weight:details.getToPerform().getWeights().getWeightList()){
+			if(weight.getParameterName().compareTo("Primary Production")==0) this.primaryProductsWeight=weight.getChosenWeight();
+			if(weight.getParameterName().compareTo("Sea Surface Temp.")==0) this.sstWeight=  weight.getChosenWeight();
+			if(weight.getParameterName().compareTo("Ice Concentration")==0) this.seaIceConcentrationWeight=  weight.getChosenWeight();
+			if(weight.getParameterName().compareTo("Salinity")==0) this.salinityWeight=  weight.getChosenWeight();
+			if(weight.getParameterName().compareTo("Depth")==0) this.depthWeight=  weight.getChosenWeight();
+		}
+				
 		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
 	}
 
