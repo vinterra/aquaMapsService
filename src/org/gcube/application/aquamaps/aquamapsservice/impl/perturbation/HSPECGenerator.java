@@ -34,13 +34,14 @@ public class HSPECGenerator {
 		this.seaIceConcentrationWeight =1.0;
 		this.sstWeight =1.0;
 				
-		for (Weight weight:details.getToPerform().getWeights().getWeightList()){
-			if(weight.getParameterName().compareTo("Primary Production")==0) this.primaryProductsWeight=weight.getChosenWeight();
-			if(weight.getParameterName().compareTo("Sea Surface Temp.")==0) this.sstWeight=  weight.getChosenWeight();
-			if(weight.getParameterName().compareTo("Ice Concentration")==0) this.seaIceConcentrationWeight=  weight.getChosenWeight();
-			if(weight.getParameterName().compareTo("Salinity")==0) this.salinityWeight=  weight.getChosenWeight();
-			if(weight.getParameterName().compareTo("Depth")==0) this.depthWeight=  weight.getChosenWeight();
-		}
+		if (details.getToPerform().getWeights()!=null)
+			for (Weight weight:details.getToPerform().getWeights().getWeightList()){
+				if(weight.getParameterName().compareTo("Primary Production")==0) this.primaryProductsWeight=weight.getChosenWeight();
+				if(weight.getParameterName().compareTo("Sea Surface Temp.")==0) this.sstWeight=  weight.getChosenWeight();
+				if(weight.getParameterName().compareTo("Ice Concentration")==0) this.seaIceConcentrationWeight=  weight.getChosenWeight();
+				if(weight.getParameterName().compareTo("Salinity")==0) this.salinityWeight=  weight.getChosenWeight();
+				if(weight.getParameterName().compareTo("Depth")==0) this.depthWeight=  weight.getChosenWeight();
+			}
 				
 		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
 	}
