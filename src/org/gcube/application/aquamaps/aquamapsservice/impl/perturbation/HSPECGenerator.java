@@ -160,6 +160,8 @@ public class HSPECGenerator {
 			}catch (Exception e){logger.trace("error deleting the hcafTempTable");}
 			session.close();
 		}
+		
+		logger.trace("generation finished");
 		return this.resultsTable;
 	}
 		
