@@ -230,6 +230,8 @@ public class JobUtils {
 	public static String makeAquaMapProfile(AquaMap obj){
 		StringBuilder profileBuilder=new StringBuilder(xmlHeader);
 		profileBuilder.append("<AquaMap>");
+		profileBuilder.append("<Type>"+obj.getType()+"</Type>");
+		profileBuilder.append("<BoundingBox>"+obj.getBoundingBox()+"</Type>");
 		profileBuilder.append("<Name>"+obj.getName()+"</Name>");
 		profileBuilder.append("<Author>"+obj.getAuthor()+"</Author>");
 		profileBuilder.append("<Source>"+obj.getSource()+"</Source>");
