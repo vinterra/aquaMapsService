@@ -211,13 +211,13 @@ public class HSPECGenerator {
 	 */
 	public Double getDepth(Double hcafDepthMax, Double hcafDepthMin, int hspenPelagic, Double hspenMaxDepth,Double hspenMinDepth,Double hspenDepthPrefMax, Double hspenDepthPrefMin ){
 		if (hcafDepthMax == -9999 || hspenMinDepth == null ) return 1.0;
-		if (hcafDepthMax < hspenMinDepth || hspenMinDepth == null ) return 0.0;
+		if (hcafDepthMax < hspenMinDepth) return 0.0;
 		if 	((hcafDepthMax < hspenDepthPrefMin) &&(hcafDepthMax >= hspenMinDepth)) return (hcafDepthMax - hspenMinDepth) / (hspenDepthPrefMin - hspenMinDepth);
 		if (hspenPelagic != 0) {return 1.0;}		
-		if 	(hcafDepthMax >= hspenDepthPrefMin && hcafDepthMin <= hspenDepthPrefMax) return 1.0;        
-		if (hspenDepthPrefMax!=null){
-			if (hcafDepthMin >= hspenDepthPrefMax)
-			{
+		if (hspenDepthPrefMax!=null)
+		{
+			if 	(hcafDepthMax >= hspenDepthPrefMin && hcafDepthMin <= hspenDepthPrefMax) return 1.0;        
+			if (hcafDepthMin >= hspenDepthPrefMax){
 				if 	((hcafDepthMax.intValue()) - hspenDepthPrefMax.intValue() != 0){
 					Double tempdepth=(hspenMaxDepth - hcafDepthMin) / (hspenMaxDepth.intValue() - hspenDepthPrefMax.intValue());
 					return tempdepth<0?0.0:tempdepth;
@@ -276,7 +276,7 @@ public class HSPECGenerator {
 		if (tempFld >= hspenSalinityMin && tempFld < hspenSalinityPrefMin)
 			return (tempFld - hspenSalinityMin) / (hspenSalinityPrefMin - hspenSalinityMin);
 		if (tempFld >= hspenSalinityPrefMin && tempFld <= hspenSalinityPrefMax)return 1.0;
-		if (tempFld > hspenSalinityPrefMax && tempFld <= hspenSalinityMin)
+		if (tempFld > hspenSalinityPrefMax && tempFld <= hspenSalinityMax)
 			return (hspenSalinityMax - tempFld) / (hspenSalinityMax - hspenSalinityPrefMax);
         else return 0.0;
 	}
