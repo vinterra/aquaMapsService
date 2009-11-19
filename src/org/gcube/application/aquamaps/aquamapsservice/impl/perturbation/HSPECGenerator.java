@@ -25,8 +25,10 @@ public class HSPECGenerator {
 		this.hcafDynamicTable=details.getHcafTable();
 		this.hcafStaticTable=DBCostants.HCAF_S;
 		this.hspenTable = details.getHspenTable();
-		this.hspecTable = details.getHspecTable();
+		this.hspecTable = DBCostants.HSPEC;
 		this.occurenceCellsTable = DBCostants.OCCURRENCE_CELLS;
+		
+		
 		
 		this.depthWeight = 1.0;
 		this.salinityWeight = 1.0;
