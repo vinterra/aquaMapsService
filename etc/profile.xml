@@ -17,6 +17,7 @@
 						<Service>
 							<Class>Application</Class>
 							<Name>AquaMaps</Name>
+							<Version>1.0.0</Version>
 						</Service>
 						<Package>AquaMaps-stubs</Package>
 						<Version>1.0.0</Version>
