@@ -202,7 +202,7 @@ public class JobUtils {
 	public static void updateStatus(JobGenerationDetails generationDetails,Connection c,JobGenerationDetails.Status status)throws SQLException, IOException, Exception{
 		Job toUpdate=generationDetails.getToPerform();
 		toUpdate.setStatus(status.toString());
-		PreparedStatement ps=c.prepareStatement(DBCostants.JobStatusUpdating);
+		PreparedStatement ps=c.prepareStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, toUpdate.getStatus());		
 		ps.setInt(2,Integer.parseInt(toUpdate.getId()));
 		ps.execute();		
@@ -213,7 +213,7 @@ public class JobUtils {
 	
 	public static void updateAquaMapStatus(JobGenerationDetails generationDetails,AquaMap toUpdate,Connection c,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
 		toUpdate.setStatus(status.toString());
-		PreparedStatement ps=c.prepareStatement(DBCostants.AquaMapStatusUpdating);
+		PreparedStatement ps=c.prepareStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, status.toString());
 		ps.setInt(2,Integer.parseInt(toUpdate.getId()));		
 		ps.execute();		

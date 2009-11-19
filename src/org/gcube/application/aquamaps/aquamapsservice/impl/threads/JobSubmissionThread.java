@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
@@ -86,10 +87,21 @@ public class JobSubmissionThread extends Thread {
 			
 			//Create and run Simulation Thread for every selected species
 			
-			for(String speciesId:generationStatus.getSpeciesHandling().keySet()){
-				SimulationThread t=new SimulationThread(waitingGroup,generationStatus,speciesId);
-				t.start();
+			boolean speciesOk=false;
+			
+			while(!speciesOk){
+				speciesOk=true;
+				for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
+					if(!entry.getValue().equals(JobGenerationDetails.SpeciesStatus.toGenerate)){
+						speciesOk=false;
+						break;
+					}
 			}
+			
+			
+				SimulationThread simT=new SimulationThread(waitingGroup,generationStatus);
+				simT.start();
+			
 			
 			
 		 
@@ -164,10 +176,10 @@ public class JobSubmissionThread extends Thread {
 		Statement stmt=conn.createStatement();
 		
 		String myData = String.valueOf(anno)+"-"+String.valueOf(mese)+"-"+String.valueOf(giorno);
-		String myJob = "INSERT INTO JOBS(title, author, date, status) VALUES('"+
+		String myJob = "INSERT INTO submitted(title, author, date, status,isAquaMap) VALUES('"+
 							generationStatus.getToPerform().getName()+"', '"+
 							generationStatus.getToPerform().getAuthor()+"', '"+
-							myData+"', '"+generationStatus.getStatus().toString()+"')";
+							myData+"', '"+generationStatus.getStatus().toString()+"', '"+false+"')";
 		logger.trace("Going to execute : "+myJob);
 		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
 		ResultSet rs=stmt.getGeneratedKeys();
@@ -177,11 +189,11 @@ public class JobSubmissionThread extends Thread {
 		stmt.close();	
 		try{
 		for(AquaMap aquaMapObj:generationStatus.getToPerform().getAquaMapList().getAquaMapList()){
-			String myAquaMapObj="INSERT INTO AquaMaps(title, author, date, status,jobId,type) VALUES('"+
+			String myAquaMapObj="INSERT INTO submitted(title, author, date, status,jobId,type,isAquaMap) VALUES('"+
 							aquaMapObj.getName()+"', '"+
 							aquaMapObj.getAuthor()+"', '"+
 							myData+"', '"+JobGenerationDetails.Status.Pending+"', '"+
-							jobId+"', '"+ aquaMapObj.getType()+"')";
+							jobId+"', '"+ aquaMapObj.getType()+"', '"+true+"')";
 			Statement aquaStatement=conn.createStatement();
 			logger.trace("Going to execute : "+myAquaMapObj);
 			aquaStatement.execute(myAquaMapObj,Statement.RETURN_GENERATED_KEYS);

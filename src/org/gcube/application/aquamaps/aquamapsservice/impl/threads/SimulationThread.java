@@ -8,13 +8,11 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SimulationThread extends Thread {
 	JobGenerationDetails generationDetails;
-	String speciesId;
+	//String speciesId;
 	private static final GCUBELog logger=new GCUBELog(DistributionThread.class);
-	public SimulationThread(ThreadGroup group,JobGenerationDetails details,String selectedSpecies) {
-		super(group,"Simulation_"+selectedSpecies+"_"+details.getToPerform().getName());
+	public SimulationThread(ThreadGroup group,JobGenerationDetails details) {
+		super(group,"Simulation_"+details.getToPerform().getName());
 		generationDetails=details;
-		speciesId=selectedSpecies;
-
 	}
 
 	public void run() {
@@ -32,7 +30,7 @@ public class SimulationThread extends Thread {
 		}catch(SQLException e){
 			logger.error(e.getMessage());
 		}
-		generationDetails.getSpeciesHandling().put(speciesId, JobGenerationDetails.SpeciesStatus.Ready);
+		//generationDetails.getSpeciesHandling().put(speciesId, JobGenerationDetails.SpeciesStatus.Ready);
 	
 	}
 

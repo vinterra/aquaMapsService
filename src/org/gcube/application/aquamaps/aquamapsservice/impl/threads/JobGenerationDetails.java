@@ -32,9 +32,9 @@ public class JobGenerationDetails {
 	private String hspenTable;
 	private String hspecTable;
 	private String hcafTable;	
-	private Job toPerform;
+	private Job toPerform; 
 	public Map<Integer, Status> getToPerformBiodiversity() {
-		return toPerformBiodiversity;
+		return toPerformBiodiversity; 
 	}
 	public void setToPerformBiodiversity(Map<Integer, Status> toPerformBiodiversity) {
 		this.toPerformBiodiversity = toPerformBiodiversity;
