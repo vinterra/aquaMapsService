@@ -19,6 +19,13 @@ public class SimulationThread extends Thread {
 
 	public void run() {
 		// TODO Implement simulation data generation
+		HSPECGenerator generator= new HSPECGenerator(DBCostants.HCAF_S, DBCostants.HCAF_D, DBCostants.HSPEN,DBCostants.HSPEC, DBCostants.OCCURRENCE_CELLS,1.0,1.0,1.0,1.0,1.0);
+		try{
+			System.out.println("table generated:"+generator.generate());
+		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
+		
+		
+		
 		generationDetails.setHspecTable(DBCostants.HSPEC);
 		try{
 			generationDetails.setHspecTable(JobUtils.filterByArea(generationDetails));
@@ -26,10 +33,7 @@ public class SimulationThread extends Thread {
 			logger.error(e.getMessage());
 		}
 		generationDetails.getSpeciesHandling().put(speciesId, JobGenerationDetails.SpeciesStatus.Ready);
-		/*HSPECGenerator generator= new HSPECGenerator(DBCostants.HCAF_S, DBCostants.HCAF_D, DBCostants.HSPEN,DBCostants.HSPEC, DBCostants.OCCURRENCE_CELLS,1.0,1.0,1.0,1.0,1.0);
-		try{
-			System.out.println("table generated:"+generator.generate());
-		}catch(Exception e){e.printStackTrace();}*/
+	
 	}
 
 }
