@@ -71,19 +71,26 @@ public class HSPECGenerator {
 	public String generate() throws Exception{
 		DBSession session= DBSession.openSession();
 		try{
+			long startGeneration= System.currentTimeMillis();
 			session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");
 			session.createLikeTable(this.resultsTable, this.hspecTable);
 			ResultSet hspenRes= session.executeQuery("SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
 					"DepthPrefMax,TempMin,TempMax,TempPrefMin,TempPrefMax,SalinityMin,SalinityMax,SalinityPrefMin,SalinityPrefMax,PrimProdMin," +
 					"PrimProdMax,PrimProdPrefMin,PrimProdPrefMax,IceConMin,IceConMax,IceConPrefMin,IceConPrefMax,LandDistMin,LandDistMax,LandDistPrefMin," +
 					"LandDistPrefMax FROM "+this.hspenTable);
-
+			logger.trace("HSPEN query took "+(System.currentTimeMillis()-startGeneration));
+			
 			//I can execute it here cause it not depends on hspen
+			long startHcafQuery= System.currentTimeMillis();
 			ResultSet hcafRes=session.executeQuery("SELECT CsquareCode,OceanArea,CenterLat,CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
 					"SalinityBMean,PrimProdMean,IceConAnn,LandDist,EEZFirst,LME	FROM "+this.hcafViewTable+" WHERE OceanArea > 0");
-
+			logger.trace("HCAF query took "+(System.currentTimeMillis()-startHcafQuery));
+			
 			//looping on HSPEN
+			int hspenLoops=1;
 			while (hspenRes.next()){
+				long startHspenLoop= System.currentTimeMillis();
+				
 				Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLong"),hspenRes.getDouble("WMostLong"), hspenRes.getString("SpeciesID"), session);
 				hcafRes.beforeFirst();
 
@@ -101,9 +108,12 @@ public class HSPECGenerator {
 					boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 					boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
 					if (inFAO && inBox && totalCountProbability!=0){
-						session.executeUpdate("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')");
+						String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
+						logger.trace(insertQuery);
+						session.executeUpdate(insertQuery);
 						i++;
 					}
+					logger.trace("looping on href for filter1");
 				}
 
 				if (i>0) /*no entry inserted in hspec*/{
@@ -121,13 +131,17 @@ public class HSPECGenerator {
 						boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 						boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
 
-						if (inFAO && !inBox && totalCountProbability!=0)
-							session.executeUpdate("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')");
-
+						if (inFAO && !inBox && totalCountProbability!=0){
+							String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
+							logger.trace("executing insertQuery "+insertQeury);
+							session.executeUpdate(insertQeury);
+						}	
+						logger.trace("looping on href for filter2");
 					}
 				}
-
-
+				
+				logger.trace("HSOPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
+				hspenLoops++;
 			}
 			
 		}catch (Exception e) {
