@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.sql.SQLException;
+import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.perturbation.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
@@ -20,17 +21,22 @@ public class SimulationThread extends Thread {
 		
 		try{
 			HSPECGenerator generator= new HSPECGenerator(generationDetails);
-			System.out.println("table generated:"+generator.generate());
+			String hspec=generator.generate();
+			System.out.println("table generated:"+hspec);
+			generationDetails.setHspecTable(hspec);
+			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
+				entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);
+			
 		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
 		
 		
 		
-		generationDetails.setHspecTable(DBCostants.HSPEC);
-		try{
+		
+	/*	try{
 			generationDetails.setHspecTable(JobUtils.filterByArea(generationDetails));
 		}catch(SQLException e){
 			logger.error(e.getMessage());
-		}
+		}*/
 		//generationDetails.getSpeciesHandling().put(speciesId, JobGenerationDetails.SpeciesStatus.Ready);
 	
 	}

@@ -73,6 +73,7 @@ public class JobSubmissionThread extends Thread {
 			//SpeciesPerturbationThread
 			
 			filterSpecies();
+			//generationStatus.setHspenTable(DBCostants.HSPEN);
 			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
 				entry.setValue(JobGenerationDetails.SpeciesStatus.toGenerate);
 			
@@ -192,6 +193,8 @@ public class JobSubmissionThread extends Thread {
 		String jobId=String.valueOf(rs.getInt(1));
 		generationStatus.getToPerform().setId(jobId);
 		stmt.close();	
+		JobUtils.updateProfile(generationStatus.getToPerform().getName(), generationStatus.getToPerform().getId(), JobUtils.makeJobProfile(generationStatus.getToPerform()),
+				generationStatus.getFirstLevelDirName(), generationStatus.getSecondLevelDirName(), generationStatus.getConnection());
 		try{
 		for(AquaMap aquaMapObj:generationStatus.getToPerform().getAquaMapList().getAquaMapList()){
 			String myAquaMapObj="INSERT INTO submitted(title, author, date, status,jobId,type,isAquaMap) VALUES('"+
@@ -206,6 +209,8 @@ public class JobSubmissionThread extends Thread {
 			rsA.first();
 			aquaMapObj.setId(String.valueOf(rsA.getInt(1)));
 			aquaStatement.close();
+			JobUtils.updateProfile(aquaMapObj.getName(), aquaMapObj.getId(), JobUtils.makeAquaMapProfile(aquaMapObj),
+					generationStatus.getFirstLevelDirName(), generationStatus.getSecondLevelDirName(), generationStatus.getConnection());
 		}
 		conn.commit();
 		
