@@ -94,7 +94,8 @@
 			</xsd:complexType>
 
 			<xsd:complexType name="AquaMap">
-				<xsd:sequence>					
+				<xsd:sequence>	
+					<xsd:element name="boundingBox" type="xsd:string"/>				
 					<xsd:element name="name" type="xsd:string"/>
 					<xsd:element name="author" type="xsd:string"/>
 					<xsd:element name="date" type="xsd:string"/>
