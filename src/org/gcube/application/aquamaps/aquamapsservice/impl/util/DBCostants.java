@@ -7,13 +7,14 @@ import org.gcube.application.aquamaps.stubs.Filter;
 import org.gcube.application.aquamaps.stubs.FilterArray;
 import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.globus.mds.glue.JobType;
 
 public class DBCostants {
 
 	private static GCUBELog logger= new GCUBELog(DBCostants.class);
 	
 	public static final String HCAF_S="HCAF_S";
-	public static final String JOB_Table="JOBS";
+	public static final String JOB_Table="submitted";
 	public static final String HCAF_D="HCAF_D";
 	public static final String HSPEN="hspen";
 	public static final String HSPEC="hcaf_species_native";
@@ -142,16 +143,16 @@ public class DBCostants {
 	}
 	
 	
-	public static final String JobStatusUpdating="UPDATE JOBS SET status=? WHERE searchID=?";
+	public static final String submittedStatusUpdating="UPDATE "+JOB_Table+"SET status=? WHERE searchID=?";
 	
 	public static final String profileRetrieval="Select Path from Files where owner=? and type='xml'";
 	
 
-	public static final String JobList="select * from JOBS where author = ?";
+	public static final String JobList="select * from "+JOB_Table+" where author = ? AND isAquaMap=false";
 	
-	public static final String AquaMapsList="SELECT * from AquaMaps where jobId=?";
+	public static final String AquaMapsList="SELECT * from submitted where jobId=?";
 	
-	public static final String AquaMapStatusUpdating="UPDATE AquaMaps SET status=? WHERE searchID=?";
+//	public static final String AquaMapStatusUpdating="UPDATE submitted SET status=? WHERE searchID=?";
 	
 	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";
 	
