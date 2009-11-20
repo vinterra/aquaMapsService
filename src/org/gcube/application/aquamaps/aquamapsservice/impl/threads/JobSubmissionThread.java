@@ -160,7 +160,7 @@ public class JobSubmissionThread extends Thread {
 		}
 
 		finally{
-			cleanTmp();
+			//cleanTmp();
 		}
 	}
 
@@ -251,7 +251,7 @@ public class JobSubmissionThread extends Thread {
 		Specie[] species=generationStatus.getToPerform().getSelectedSpecies().getSpeciesList();
 		for(int i= 0;i<species.length;i++)
 			insertingQuery.append("('"+species[i].getId()+"')"+((i<species.length-1)?" , ":""));
-		
+		logger.trace("Inserting query : "+insertingQuery.toString());
 		stmt.execute(insertingQuery.toString());		
 		
 		stmt.execute("Create table "+generationStatus.getHspenTable()+" AS Select "+DBCostants.HSPEN+".* from "+DBCostants.HSPEN+","+speciesListTable+" where "+

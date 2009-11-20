@@ -92,7 +92,7 @@ public class DataTranslation {
 		completePhylogenyQuery.put("Class", "Select distinct speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class from speciesoccursum ORDER BY speciesoccursum.Class");
 		completePhylogenyQuery.put("Order", "Select distinct speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class, speciesoccursum.Order from speciesoccursum ORDER BY speciesoccursum.Order");
 		completePhylogenyQuery.put("Family", "Select distinct speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class, speciesoccursum.Order, speciesoccursum.Family from speciesoccursum ORDER BY speciesoccursum.Family ");
-		completePhylogenyQuery.put("SPECIESID", "Select speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class, speciesoccursum.Order, speciesoccursum.Family, speciesoccursum.SPECIESID  from speciesoccursum ORDER BY speciesoccursum.SPECIESID ");
+		completePhylogenyQuery.put(DBCostants.SpeciesID, "Select speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class, speciesoccursum.Order, speciesoccursum.Family, speciesoccursum.SPECIESID  from speciesoccursum ORDER BY speciesoccursum.SPECIESID ");
 	
 		completeResourceListQuery.put("JOBS", "select JOBS.*, Meta_HSPEC.title As sourceName from JOBS, Meta_HSPEC where Meta_HSPEC.searchId = JOBS.sourceId");
 		completeResourceListQuery.put("Meta_HCaf", "select * from Meta_HCaf");

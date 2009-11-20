@@ -246,7 +246,7 @@ public class JobUtils {
 			for(int i=0;i<perts.length;i++){
 				String specId=perts[i].getToPerturbId();
 				if(!envelopMap.containsKey(specId)) 
-						envelopMap.put(specId, new StringBuilder("<SpeciesId>"+specId+"</SpeciesId>\n<Customizations>"));
+						envelopMap.put(specId, new StringBuilder("<"+DBCostants.SpeciesID+">"+specId+"</"+DBCostants.SpeciesID+">\n<Customizations>"));
 				envelopMap.get(specId).append("<Customization>");
 				envelopMap.get(specId).append("<FieldName>"+perts[i].getField()+"</FieldName>");
 				envelopMap.get(specId).append("<Type>"+perts[i].getType()+"</Type>");
@@ -337,7 +337,7 @@ public class JobUtils {
 			for(int i=0;i<perts.length;i++){
 				String specId=perts[i].getToPerturbId();
 				if(!envelopMap.containsKey(specId)) 
-						envelopMap.put(specId, new StringBuilder("<SpeciesId>"+specId+"</SpeciesId>\n<Customizations>"));
+						envelopMap.put(specId, new StringBuilder("<"+DBCostants.SpeciesID+">"+specId+"</"+DBCostants.SpeciesID+">\n<Customizations>"));
 				envelopMap.get(specId).append("<Customization>");
 				envelopMap.get(specId).append("<FieldName>"+perts[i].getField()+"</FieldName>");
 				envelopMap.get(specId).append("<Type>"+perts[i].getType()+"</Type>");
