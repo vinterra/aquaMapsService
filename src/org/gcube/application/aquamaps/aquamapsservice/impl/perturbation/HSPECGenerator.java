@@ -119,9 +119,13 @@ public class HSPECGenerator {
 						session.executeUpdate(insertQuery);
 						i++;
 					}
-					logger.trace("looping on href for filter1");
+								
+					//logger.trace("looping on href for filter1");
 				}
 
+				logger.trace("inserted "+i+" entries for "+hspenRes.getString("SpeciesID")+" species id");
+				
+				int k=0;
 				if (i>0) /*no entry inserted in hspec*/{
 					hcafRes.beforeFirst();
 					//looping on HCAF filter2
@@ -143,11 +147,12 @@ public class HSPECGenerator {
 							String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
 							logger.trace("executing insertQuery "+insertQeury);
 							session.executeUpdate(insertQeury);
+							k++;
 						}	
 						//logger.trace("looping on href for filter2");
 					}
 				}
-				
+				logger.trace("inserted "+k+" entries whit inbox false for "+hspenRes.getString("SpeciesID")+" species id");
 				logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
 				hspenLoops++;
 			}
