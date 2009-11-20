@@ -121,9 +121,9 @@ public class HSPECGenerator {
 					boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 					boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
 					
-					if (inFAO && (totalCountProbability>0)){
+					/*if (inFAO && (totalCountProbability>0)){
 						logger.trace("this is good for filter 2 "+inBox);
-					}
+					}*/
 					
 					//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
 					if (inFAO && inBox && totalCountProbability>0){
@@ -139,7 +139,7 @@ public class HSPECGenerator {
 				logger.trace("inserted "+i+" entries for "+hspenRes.getString("SpeciesID")+" species id");
 				
 				int k=0;
-				if (i>0) /*no entry inserted in hspec*/{
+				if (i==0) /*no entry inserted in hspec*/{
 					hcafRes.beforeFirst();
 					//looping on HCAF filter2
 					while (hcafRes.next()){
