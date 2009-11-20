@@ -112,7 +112,7 @@ public class HSPECGenerator {
 					
 					boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 					boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
-					logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
+					//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
 					if (inFAO && inBox && totalCountProbability!=0){
 						String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
 						logger.trace("executing insertQuery "+insertQuery);
@@ -134,17 +134,17 @@ public class HSPECGenerator {
 						Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
 						Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
 
-						logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
+						//logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
 						boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 						boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
 						
-						logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
+						//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
 						if (inFAO && !inBox && totalCountProbability!=0){
 							String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
 							logger.trace("executing insertQuery "+insertQeury);
 							session.executeUpdate(insertQeury);
 						}	
-						logger.trace("looping on href for filter2");
+						//logger.trace("looping on href for filter2");
 					}
 				}
 				
