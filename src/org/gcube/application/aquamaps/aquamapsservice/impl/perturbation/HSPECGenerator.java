@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.perturbation;
 
 import java.sql.ResultSet;
+import java.text.DecimalFormat;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
@@ -78,6 +79,7 @@ public class HSPECGenerator {
 		DBSession session= DBSession.openSession();
 		try{
 			long startGeneration= System.currentTimeMillis();
+			DecimalFormat formatter = new DecimalFormat("0.00");
 			session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");
 			session.createLikeTable(this.resultsTable, this.hspecTable);
 			String queryhspen="SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
@@ -127,7 +129,7 @@ public class HSPECGenerator {
 					
 					//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
 					if (inFAO && inBox && totalCountProbability>0){
-						String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
+						String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
 						logger.trace("executing insertQuery "+insertQuery);
 						session.executeUpdate(insertQuery);
 						i++;
@@ -158,7 +160,7 @@ public class HSPECGenerator {
 						
 						//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
 						if (inFAO && !inBox && totalCountProbability!=0){
-							String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+totalCountProbability+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
+							String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
 							logger.trace("executing insertQuery "+insertQeury);
 							session.executeUpdate(insertQeury);
 							k++;
