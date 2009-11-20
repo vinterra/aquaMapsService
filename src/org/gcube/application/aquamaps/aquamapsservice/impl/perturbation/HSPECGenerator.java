@@ -107,6 +107,8 @@ public class HSPECGenerator {
 				Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLong"),hspenRes.getDouble("WMostLong"), hspenRes.getString("SpeciesID"), session);
 				hcafRes.beforeFirst();
 
+				Double preparedSeaIce= prepareSeaIceForSpecies(hspenRes.getString("SpeciesID"));
+				
 				int i =0;
 				//looping on HCAF filter1
 				while (hcafRes.next()){
@@ -115,7 +117,7 @@ public class HSPECGenerator {
 					Double depthValue= this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"));
 					Double salinityValue= this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
 					Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax"));
-					Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
+					Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
 					Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
 
 					
@@ -155,7 +157,7 @@ public class HSPECGenerator {
 						Double depthValue= this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"));
 						Double salinityValue= this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
 						Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax"));
-						Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
+						Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
 						Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
 
 						//logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
@@ -327,25 +329,13 @@ public class HSPECGenerator {
         else return 0.0;
 	}
 	
-	/**
-	 * 
-	 * @param hcafIceConAnn
-	 * @param hspenIceConMin
-	 * @param hspenIceConPrefMin
-	 * @param hspenIceConMax
-	 * @param hspenIceConPrefMax
-	 * @param speciesId
-	 * @param session
-	 * @return
-	 * @throws Exception
-	 */
-	public Double getSeaIceConcentration(Double hcafIceConAnn,Double hspenIceConMin,Double hspenIceConPrefMin, Double hspenIceConMax,Double hspenIceConPrefMax, String speciesId, DBSession session) throws Exception{
+	private Double prepareSeaIceForSpecies(String speciesID){
 		if(hspenIceConMin == 0){
 			Double sumIce = 0.0, meanIce = 0.0, adjVal = -1.0;
 			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
 			" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
 			" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
-			" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesId+ "'" +
+			" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesID+ "'" +
 			" and "+this.hcafViewTable+".IceConAnn <> -9999" +
 			" and "+this.hcafViewTable+".IceConAnn is not null" +
 			" and "+this.occurenceCellsTable+".goodcell = -1" +
@@ -362,9 +352,24 @@ public class HSPECGenerator {
 			if(recordCount != 0)	{meanIce = sumIce / recordCount;}
 			else				{meanIce = 0.0;}
 			
-			hspenIceConMin = adjVal + meanIce;
-		}
+			return adjVal + meanIce;
+		}else return -9999.0;
 		
+	}
+	
+	/**
+	 * 
+	 * @param hcafIceConAnn
+	 * @param hspenIceConMin
+	 * @param hspenIceConPrefMin
+	 * @param hspenIceConMax
+	 * @param hspenIceConPrefMax
+	 * @param speciesId
+	 * @param session
+	 * @return
+	 * @throws Exception
+	 */
+	public Double getSeaIceConcentration(Double hcafIceConAnn,Double hspenIceConMin,Double hspenIceConPrefMin, Double hspenIceConMax,Double hspenIceConPrefMax, String speciesId, DBSession session) throws Exception{
 		if(hcafIceConAnn != null){
 			if (hcafIceConAnn < hspenIceConMin) return 0.0;
 			if ((hcafIceConAnn >= hspenIceConMin) && (hcafIceConAnn < hspenIceConPrefMin)	)
