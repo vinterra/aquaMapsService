@@ -151,8 +151,6 @@ public class DBCostants {
 	
 	public static final String AquaMapsList="SELECT * from submitted where jobId=? AND isAquaMap= true";
 	
-//	public static final String AquaMapStatusUpdating="UPDATE submitted SET status=? WHERE searchID=?";
-	
 	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";
 	
 	public static final String speciesEnvelop="Select * from "+HSPEN+" where "+SpeciesID+" = ?";
