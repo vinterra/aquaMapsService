@@ -80,16 +80,21 @@ public class HSPECGenerator {
 			long startGeneration= System.currentTimeMillis();
 			session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");
 			session.createLikeTable(this.resultsTable, this.hspecTable);
-			ResultSet hspenRes= session.executeQuery("SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
-					"DepthPrefMax,TempMin,TempMax,TempPrefMin,TempPrefMax,SalinityMin,SalinityMax,SalinityPrefMin,SalinityPrefMax,PrimProdMin," +
-					"PrimProdMax,PrimProdPrefMin,PrimProdPrefMax,IceConMin,IceConMax,IceConPrefMin,IceConPrefMax,LandDistMin,LandDistMax,LandDistPrefMin," +
-					"LandDistPrefMax FROM "+this.hspenTable);
+			String queryhspen="SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
+			"DepthPrefMax,TempMin,TempMax,TempPrefMin,TempPrefMax,SalinityMin,SalinityMax,SalinityPrefMin,SalinityPrefMax,PrimProdMin," +
+			"PrimProdMax,PrimProdPrefMin,PrimProdPrefMax,IceConMin,IceConMax,IceConPrefMin,IceConPrefMax,LandDistMin,LandDistMax,LandDistPrefMin," +
+			"LandDistPrefMax FROM "+this.hspenTable;
+			logger.trace("species qeury is "+queryhspen);
+			ResultSet hspenRes= session.executeQuery(queryhspen);
+						
 			logger.trace("HSPEN query took "+(System.currentTimeMillis()-startGeneration));
 			
 			//I can execute it here cause it not depends on hspen
 			long startHcafQuery= System.currentTimeMillis();
-			ResultSet hcafRes=session.executeQuery("SELECT CsquareCode,OceanArea,CenterLat,CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
-					"SalinityBMean,PrimProdMean,IceConAnn,LandDist,EEZFirst,LME	FROM "+this.hcafViewTable+" WHERE OceanArea > 0");
+			String hspecQuery= "SELECT CsquareCode,OceanArea,CenterLat,CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
+			"SalinityBMean,PrimProdMean,IceConAnn,LandDist,EEZFirst,LME	FROM "+this.hcafViewTable+" WHERE OceanArea > 0";
+			logger.trace("hspec query is "+hspecQuery);
+			ResultSet hcafRes=session.executeQuery(hspecQuery);
 			logger.trace("HCAF query took "+(System.currentTimeMillis()-startHcafQuery));
 			
 			//looping on HSPEN
