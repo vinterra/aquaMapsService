@@ -116,7 +116,7 @@ public class HSPECGenerator {
 					Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
 					Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
 
-					//logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
+					logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
 					
 					boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 					boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
