@@ -17,7 +17,21 @@ import org.gcube.common.core.utils.logging.GCUBELog;
  */
 public class HSPECGenerator {
 
-	GCUBELog logger= new GCUBELog(HSPECGenerator.class);
+	private static GCUBELog logger= new GCUBELog(HSPECGenerator.class);
+	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	private String hcafViewTable;
+	private String hcafStaticTable;
+	private String hcafDynamicTable;
+	private String hspenTable;
+	private String hspecTable;
+	private String resultsTable;
+	private String occurenceCellsTable;
+	
+	private double sstWeight;
+	private double depthWeight;
+	private double salinityWeight;
+	private double primaryProductsWeight;
+	private double seaIceConcentrationWeight;
 	
 	public HSPECGenerator(JobGenerationDetails details) {
 		super();
@@ -46,22 +60,11 @@ public class HSPECGenerator {
 			}
 				
 		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
+		
+		logger.trace("Weights: "+this.depthWeight+" "+this.salinityWeight+" "+this.primaryProductsWeight+" "+this.seaIceConcentrationWeight+" "+this.sstWeight);
 	}
 
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-	private String hcafViewTable;
-	private String hcafStaticTable;
-	private String hcafDynamicTable;
-	private String hspenTable;
-	private String hspecTable;
-	private String resultsTable;
-	private String occurenceCellsTable;
 	
-	private double sstWeight;
-	private double depthWeight;
-	private double salinityWeight;
-	private double primaryProductsWeight;
-	private double seaIceConcentrationWeight;
 	
 	
 	
@@ -321,14 +324,17 @@ public class HSPECGenerator {
 	public Double getSeaIceConcentration(Double hcafIceConAnn,Double hspenIceConMin,Double hspenIceConPrefMin, Double hspenIceConMax,Double hspenIceConPrefMax, String speciesId, DBSession session) throws Exception{
 		if(hspenIceConMin == 0){
 			Double sumIce = 0.0, meanIce = 0.0, adjVal = -1.0;
-			ResultSet iceConRes=session.executeQuery("SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
-					" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
-					" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
-					" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesId+ "'" +
-					" and "+this.hcafViewTable+".IceConAnn <> -9999" +
-					" and "+this.hcafViewTable+".IceConAnn is not null" +
-					" and "+this.occurenceCellsTable+".goodcell = -1" +
-					" order by "+this.hcafViewTable+".IceConAnn");
+			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
+			" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+			" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
+			" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesId+ "'" +
+			" and "+this.hcafViewTable+".IceConAnn <> -9999" +
+			" and "+this.hcafViewTable+".IceConAnn is not null" +
+			" and "+this.occurenceCellsTable+".goodcell = -1" +
+			" order by "+this.hcafViewTable+".IceConAnn";
+			logger.trace("Sea Ice Concentration query: "+query);
+			
+			ResultSet iceConRes=session.executeQuery(query);
 			int recordCount=0;
 			while (iceConRes.next()){
 				sumIce+=iceConRes.getDouble("IceConAnn");
