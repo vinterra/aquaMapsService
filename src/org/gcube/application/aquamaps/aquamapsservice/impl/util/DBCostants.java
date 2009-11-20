@@ -43,7 +43,7 @@ public class DBCostants {
 	}
 	public static String clusteringDistributionQuery(String hspecName){
 		String query= "Select "+cSquareCode+", "+probability+"  FROM "+hspecName+" where "+
-				hspecName+"."+SpeciesID+"=? AND "+probability+" > 0.5 ORDER BY "+probability+" DESC";
+				hspecName+"."+SpeciesID+"=? AND "+probability+" > ? ORDER BY "+probability+" DESC";
 		logger.trace("clusteringDistributionQuery: "+query);
 		return query;
 	}
@@ -143,7 +143,7 @@ public class DBCostants {
 	}
 	
 	
-	public static final String submittedStatusUpdating="UPDATE "+JOB_Table+"SET status=? WHERE searchID=?";
+	public static final String submittedStatusUpdating="UPDATE "+JOB_Table+" SET status=? WHERE searchID=?";
 	
 	public static final String profileRetrieval="Select Path from Files where owner=? and type='xml'";
 	
