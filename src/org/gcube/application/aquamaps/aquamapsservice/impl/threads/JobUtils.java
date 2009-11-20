@@ -514,8 +514,10 @@ public class JobUtils {
 				stmt.execute("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"')");
 			
 			logger.trace(" area temp table created");
+			details.getToDropTableList().add(areaTmpTable);
 			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			stmt.execute("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
+			details.getToDropTableList().add(filteredTable);
 			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,details.getHspenTable(),areaTmpTable);
 			logger.trace("Going to use sql query "+filterQuery);
 			Statement filterStmt=details.getConnection().createStatement();

@@ -51,6 +51,7 @@ public class BiodiversityThread extends Thread {
 	String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
 	logger.trace("Going to execute query : "+creationSQL);
 	stmt.execute(creationSQL);
+	generationDetails.getToDropTableList().add(tableName);
 	stmt.close();
 	for(String specId: speciesIds){	
 		stmt = generationDetails.getConnection().createStatement();
