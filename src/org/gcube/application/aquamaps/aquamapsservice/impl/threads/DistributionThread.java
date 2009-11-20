@@ -46,7 +46,7 @@ public class DistributionThread extends Thread {
 			String clusteringQuery=DBCostants.clusteringDistributionQuery(generationDetails.getHspecTable());
 			logger.trace("Gonna use query "+clusteringQuery);
 			PreparedStatement ps= generationDetails.getConnection().prepareStatement(clusteringQuery);
-			ps.setInt(1,Integer.parseInt(species.getId()));
+			ps.setString(1,species.getId());
 			ps.setFloat(2,toPerform.getThreshold());
 			
 			ResultSet rs=ps.executeQuery();
