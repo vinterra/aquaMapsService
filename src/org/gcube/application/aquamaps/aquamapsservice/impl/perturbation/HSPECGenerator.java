@@ -107,7 +107,7 @@ public class HSPECGenerator {
 				Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLong"),hspenRes.getDouble("WMostLong"), hspenRes.getString("SpeciesID"), session);
 				hcafRes.beforeFirst();
 
-				Double preparedSeaIce= prepareSeaIceForSpecies(hspenRes.getString("SpeciesID"),hspenRes.getDouble("IceConMin"));
+				Double preparedSeaIce= prepareSeaIceForSpecies(hspenRes.getString("SpeciesID"),hspenRes.getDouble("IceConMin"),session);
 				
 				int i =0;
 				//looping on HCAF filter1
@@ -329,7 +329,7 @@ public class HSPECGenerator {
         else return 0.0;
 	}
 	
-	private Double prepareSeaIceForSpecies(String speciesID, Double hspenIceConMin){
+	private Double prepareSeaIceForSpecies(String speciesID, Double hspenIceConMin, DBSession session) throws Exception{
 		if(hspenIceConMin == 0){
 			Double sumIce = 0.0, meanIce = 0.0, adjVal = -1.0;
 			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
