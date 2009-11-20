@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,20 @@ public class JobGenerationDetails {
 	private String hspecTable;
 	private String hcafTable;	
 	private Job toPerform; 
+	
+	private List<String> toDropTableList=new ArrayList<String>();
+	/**
+	 * @return the toDropTableList
+	 */
+	public List<String> getToDropTableList() {
+		return toDropTableList;
+	}
+	/**
+	 * @param toDropTableList the toDropTableList to set
+	 */
+	public void setToDropTableList(List<String> toDropTableList) {
+		this.toDropTableList = toDropTableList;
+	}
 	public Map<Integer, Status> getToPerformBiodiversity() {
 		return toPerformBiodiversity; 
 	}

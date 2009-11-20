@@ -17,7 +17,6 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
-import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -224,7 +223,14 @@ public class JobSubmissionThread extends Thread {
 	}
 
 	public void cleanTmp(){
-		//TODO implement cleaning
+		for(String tableName:generationStatus.getToDropTableList()){
+			try{
+				Statement stmt=generationStatus.getConnection().createStatement();
+				stmt.execute("Drop table "+tableName);
+			}catch(SQLException e){
+				logger.error("Unable to drop table : "+tableName);
+			}
+		}
 	}
 
 	public void rollback(){
@@ -240,7 +246,7 @@ public class JobSubmissionThread extends Thread {
 		String creationSQL="CREATE TABLE  "+speciesListTable+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
 		
 		stmt.execute(creationSQL);
-		
+		generationStatus.getToDropTableList().add(speciesListTable);
 		StringBuilder insertingQuery=new StringBuilder("Insert into "+speciesListTable+" values ");
 		Specie[] species=generationStatus.getToPerform().getSelectedSpecies().getSpeciesList();
 		for(int i= 0;i<species.length;i++)
@@ -250,7 +256,7 @@ public class JobSubmissionThread extends Thread {
 		
 		stmt.execute("Create table "+generationStatus.getHspenTable()+" AS Select "+DBCostants.HSPEN+".* from "+DBCostants.HSPEN+","+speciesListTable+" where "+
 				DBCostants.HSPEN+"."+DBCostants.SpeciesID+" = "+speciesListTable+"."+DBCostants.SpeciesID);
-		
+		generationStatus.getToDropTableList().add(generationStatus.getHspenTable());
 		logger.trace("Filtering complete");
 	}
 	

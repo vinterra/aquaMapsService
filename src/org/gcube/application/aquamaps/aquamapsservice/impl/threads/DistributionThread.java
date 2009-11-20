@@ -1,14 +1,10 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.File;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Specie;
@@ -20,7 +16,6 @@ public class DistributionThread extends Thread {
 	private static final GCUBELog logger=new GCUBELog(DistributionThread.class);
 	int selectedAquaMap;
 	private static final int waitTime=10*1000;
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	
 	public DistributionThread(ThreadGroup group,JobGenerationDetails details,int index) {
 		super(group,"SAG_AquaMapObj:"+details.getToPerform().getAquaMapList().getAquaMapList(index).getName());	
