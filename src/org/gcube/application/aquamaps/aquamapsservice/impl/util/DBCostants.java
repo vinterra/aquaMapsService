@@ -7,7 +7,6 @@ import org.gcube.application.aquamaps.stubs.Filter;
 import org.gcube.application.aquamaps.stubs.FilterArray;
 import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.globus.mds.glue.JobType;
 
 public class DBCostants {
 
