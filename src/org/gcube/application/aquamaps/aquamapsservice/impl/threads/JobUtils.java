@@ -24,22 +24,16 @@ import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
-import org.gcube.application.aquamaps.stubs.AquaMapArray;
 import org.gcube.application.aquamaps.stubs.Area;
-import org.gcube.application.aquamaps.stubs.AreasArray;
 import org.gcube.application.aquamaps.stubs.Cell;
-import org.gcube.application.aquamaps.stubs.CellArray;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Perturbation;
-import org.gcube.application.aquamaps.stubs.PerturbationArray;
 import org.gcube.application.aquamaps.stubs.Resource;
 import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.application.aquamaps.stubs.SpeciesArray;
-import org.gcube.application.aquamaps.stubs.StringArray;
 import org.gcube.application.aquamaps.stubs.Weight;
-import org.gcube.application.aquamaps.stubs.WeightArray;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -231,7 +225,7 @@ public class JobUtils {
 		StringBuilder profileBuilder=new StringBuilder(xmlHeader);
 		profileBuilder.append("<AquaMap>");
 		profileBuilder.append("<Type>"+obj.getType()+"</Type>");
-		profileBuilder.append("<BoundingBox>"+obj.getBoundingBox()+"</Type>");
+		profileBuilder.append("<BoundingBox>"+obj.getBoundingBox()+"</BoundingBox>");
 		profileBuilder.append("<Name>"+obj.getName()+"</Name>");
 		profileBuilder.append("<Author>"+obj.getAuthor()+"</Author>");
 		profileBuilder.append("<Source>"+obj.getSource()+"</Source>");
@@ -408,7 +402,7 @@ public class JobUtils {
 		profileBuilder.append("<AquaMapsObjects>");				
 		if((job.getAquaMapList()!=null)&&(job.getAquaMapList().getAquaMapList()!=null)){
 			AquaMap[] objs=job.getAquaMapList().getAquaMapList();
-			for(int i=0;i<objs.length;i++) profileBuilder.append(makeAquaMapProfile(objs[i]));
+			for(int i=0;i<objs.length;i++) profileBuilder.append(makeAquaMapProfile(objs[i]).substring(xmlHeader.length()));
 		}	
 		profileBuilder.append("</Weights>");
 		profileBuilder.append("<AquaMapsObjects>");
