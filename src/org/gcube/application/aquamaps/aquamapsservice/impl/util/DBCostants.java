@@ -133,7 +133,7 @@ public class DBCostants {
 			filter.append("( "+codesFilter.toString()+")");			
 		}
 		
-		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" , "+selHspen:"");
+		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesID+" = "+selHspen+"."+SpeciesID:"");
 		String query= "Select "+speciesOccurSum+".* "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		String count= "Select count("+speciesOccurSum+"."+SpeciesID+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		logger.trace("filterSpecies: "+query);

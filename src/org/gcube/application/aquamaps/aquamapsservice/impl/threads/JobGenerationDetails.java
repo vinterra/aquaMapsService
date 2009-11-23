@@ -15,7 +15,7 @@ import org.gcube.application.aquamaps.stubs.Specie;
 public class JobGenerationDetails {
 
 	public static final String Biodiversity="Biodiversity";
-	public static final String SuitableArea="SuitableArea";
+	public static final String SpeciesDistribution="SpeciesDistribution";
 	
 	public enum SpeciesStatus{
 		toCustomize,toGenerate,Ready
@@ -122,7 +122,7 @@ public class JobGenerationDetails {
 		return ((toPerform.getHspec()!=null)?toPerform.getHspec().getName():"onTheFly");
 	}
 	public String getSecondLevelDirName(){
-		return (toPerform.getName());
+		return (toPerform.getId());
 	}
 	public void setConnection(Connection connection) {
 		this.connection = connection;

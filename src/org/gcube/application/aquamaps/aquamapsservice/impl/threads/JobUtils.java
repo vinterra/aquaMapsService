@@ -59,45 +59,59 @@ public class JobUtils {
 		StringBuilder csq_str4 = new StringBuilder();
 		StringBuilder csq_str5 = new StringBuilder();
 		if(rs.first()){			
-			int max=rs.getInt(maxIndex);
+			/*double max=rs.getDouble(maxIndex)*100;
 			double r1 = Math.round(Math.pow(10,(Math.log10(max)/5)));
 			double r2 = Math.round(Math.pow(10,(2*Math.log10(max)/5)));
 			double r3 = Math.round(Math.pow(10,(3*Math.log10(max)/5)));
-			double r4 = Math.round(Math.pow(10,(4*Math.log10(max)/5)));
+			double r4 = Math.round(Math.pow(10,(4*Math.log10(max)/5)));*/
+			double max=rs.getDouble(maxIndex);
+			double clusteringRatio;
+			if((max>1)) clusteringRatio=Math.round(max/5);
+			else clusteringRatio=max/5;
+			double r1= clusteringRatio;
+			double r2= clusteringRatio*2;
+			double r3= clusteringRatio*3;
+			double r4= clusteringRatio*4;
+			
+			logger.debug("Clustering by "+r1+" , "+r2+" , "+r3+" , "+r4);
+			
+			
 			do{
-				if((rs.getDouble(probabilityIndex)>0)&&(rs.getDouble(probabilityIndex)<=r1)){
+				double currentValue=rs.getDouble(probabilityIndex);
+				String toAppendCode=rs.getString(toClusterIndex);
+				if((currentValue>0)&&(currentValue<=r1)){
 					if(csq_str1.length()>1){
-						csq_str1.append("|"+rs.getString(toClusterIndex));
+						csq_str1.append("|"+toAppendCode);
 					}else{
-						csq_str1.append(rs.getString(toClusterIndex));
+						csq_str1.append(toAppendCode);
 					}
 				}else{
-					if((rs.getDouble(probabilityIndex)>r1)&&(rs.getDouble(probabilityIndex)<=r2)){
+					if((currentValue>r1)&&(currentValue<=r2)){
 						if(csq_str2.length()>1){
-							csq_str2.append("|"+rs.getString(toClusterIndex));
+							csq_str2.append("|"+toAppendCode);
 						}else{
-							csq_str2.append(rs.getString(toClusterIndex));
+							csq_str2.append(toAppendCode);
 						}
 					}else{
-						if((rs.getDouble(probabilityIndex)>r2)&&(rs.getDouble(probabilityIndex)<=r3)){
+						if((currentValue>r2)&&(currentValue<=r3)){
 							if(csq_str3.length()>1){
-								csq_str3.append("|"+rs.getString(toClusterIndex));
+								csq_str3.append("|"+toAppendCode);
 							}else{
-								csq_str3.append(rs.getString(toClusterIndex));
+								csq_str3.append(toAppendCode);
 							}
 						}else{
-							if((rs.getDouble(probabilityIndex)>r3)&&(rs.getDouble(probabilityIndex)<=r4)){
+							if((currentValue>r3)&&(currentValue<=r4)){
 								if(csq_str4.length()>1){
-									csq_str4.append("|"+rs.getString(toClusterIndex));
+									csq_str4.append("|"+toAppendCode);
 								}else{
-									csq_str4.append(rs.getString(toClusterIndex));
+									csq_str4.append(toAppendCode);
 								}
 							}else{
-								if(rs.getDouble(probabilityIndex)>r4){
+								if(currentValue>r4){
 									if(csq_str5.length()>1){
-										csq_str5.append("|"+rs.getString(toClusterIndex));
+										csq_str5.append("|"+toAppendCode);
 									}else{
-										csq_str5.append(rs.getString(toClusterIndex));
+										csq_str5.append(toAppendCode);
 									}
 								}
 							}
@@ -427,7 +441,7 @@ public class JobUtils {
 		doc.append("<Type>"+toParse.getType()+"</Type>");
 		doc.append("<Attributes>");
 		FieldArray fields=toParse.getAdditionalField();
-		if(fields!=null)
+		if((fields!=null)&&(fields.getFields()!=null))
 		for(Field field:fields.getFields())
 			doc.append(fieldToXML(field));
 		doc.append("</Attributes>");		
@@ -461,7 +475,7 @@ public class JobUtils {
 		toReturn.append("<name>"+area.getName()+"</name>");
 		toReturn.append("<Attributes>");
 		FieldArray fields=area.getAdditionalField();
-		if(fields!=null)
+		if((fields!=null)&&(fields.getFields()!=null))
 		for(Field field:fields.getFields())
 			toReturn.append(fieldToXML(field));
 		toReturn.append("</Attributes>");
@@ -475,7 +489,7 @@ public class JobUtils {
 		toReturn.append("<"+DBCostants.cSquareCode+">"+cell.getCode()+"</"+DBCostants.cSquareCode+">");
 		toReturn.append("<Attributes>");
 		FieldArray fields=cell.getAdditionalField();
-		if(fields!=null)
+		if((fields!=null)&&(fields.getFields()!=null))
 		for(Field field:fields.getFields())
 			toReturn.append(fieldToXML(field));
 		toReturn.append("</Attributes>");
@@ -488,7 +502,7 @@ public class JobUtils {
 		toReturn.append("<"+DBCostants.SpeciesID+">"+spec.getId()+"</"+DBCostants.SpeciesID+">");
 		toReturn.append("<Attributes>");
 		FieldArray fields=spec.getAdditionalField();
-		if(fields!=null)
+		if((fields!=null)&&(fields.getFields()!=null))
 		for(Field field:fields.getFields())
 			toReturn.append(fieldToXML(field));
 		toReturn.append("</Attributes>");
