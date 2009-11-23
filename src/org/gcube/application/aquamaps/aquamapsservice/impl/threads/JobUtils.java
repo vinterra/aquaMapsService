@@ -106,6 +106,8 @@ public class JobUtils {
 				}
 			}while(rs.next());
 		}else return null;
+		logger.trace("Clustering complete : cluster 1 size "+csq_str1.length()+"cluster 2 size "+csq_str2.length()+
+				"cluster 3 size "+csq_str3.length()+"cluster 4 size "+csq_str4.length()+"cluster 5 size "+csq_str5.length());
 		return new StringBuilder[]{csq_str1,csq_str2,csq_str3,csq_str4,csq_str5};
 	}
 

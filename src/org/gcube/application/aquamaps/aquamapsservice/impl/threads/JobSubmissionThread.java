@@ -160,7 +160,7 @@ public class JobSubmissionThread extends Thread {
 		}
 
 		finally{
-			//cleanTmp();
+			cleanTmp();
 		}
 	}
 
