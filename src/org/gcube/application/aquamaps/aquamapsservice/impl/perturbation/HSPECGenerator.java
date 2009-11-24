@@ -63,7 +63,7 @@ public class HSPECGenerator {
 			}
 				
 		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
-		//details.setHspecTable(this.resultsTable);
+		details.setHspecTable(this.resultsTable);
 		logger.trace("Weights: "+this.depthWeight+" "+this.salinityWeight+" "+this.primaryProductsWeight+" "+this.seaIceConcentrationWeight+" "+this.sstWeight);
 	}
 
@@ -169,7 +169,7 @@ public class HSPECGenerator {
 				}
 				logger.trace("inserted "+k+" entries whit inbox false for "+hspenRes.getString("SpeciesID")+" species id");
 				logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
-				//this.details.getSpeciesHandling().put(hspenRes.getString("SpeciesID"), SpeciesStatus.Ready);
+				this.details.getSpeciesHandling().put(hspenRes.getString("SpeciesID"), SpeciesStatus.Ready);
 				hspenLoops++;
 			}
 			
@@ -186,7 +186,7 @@ public class HSPECGenerator {
 			session.close();
 		}
 		
-		logger.trace("generation of "+this.details.getToPerform().getName()+" finished in "+((System.currentTimeMillis()-generationStart)/1000));
+		logger.trace("generation of "+this.details.getToPerform().getName()+" finished in "+((System.currentTimeMillis()-generationStart)/1000)+"secs");
 		return this.resultsTable;
 	}
 		
