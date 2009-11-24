@@ -114,37 +114,24 @@ public class HSPECGenerator {
 				int i =0;
 				//looping on HCAF filter1
 				while (hcafRes.next()){
-					Double landValue=1.0; //to understand why is not calculated
-					Double sstValue=this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]);
-					Double depthValue= this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"));
-					Double salinityValue= this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
-					Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax"));
-					Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
-					Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
-
-					
-					
 					boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 					boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
-					
-					/*if (inFAO && (totalCountProbability>0)){
-						logger.trace("this is good for filter 2 "+inBox);
-					}*/
-					if (totalCountProbability>1){
-						logger.trace("----------------------------------");
-						logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
-						logger.trace(hspenRes.getString("SpeciesID")+" "+hcafRes.getString("CsquareCode"));
-						logger.trace("----------------------------------");
-						//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
+					if (inFAO && inBox){
+						Double landValue=1.0; //to understand why is not calculated
+						Double sstValue=this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]);
+						Double depthValue= this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"));
+						Double salinityValue= this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
+						Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax"));
+						Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
+						Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
+
+						if (totalCountProbability>0){
+							String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
+							//logger.trace("executing insertQuery "+insertQuery);
+							session.executeUpdate(insertQuery);
+							i++;
+						}
 					}
-					if (inFAO && inBox && totalCountProbability>0){
-						String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
-						//logger.trace("executing insertQuery "+insertQuery);
-						session.executeUpdate(insertQuery);
-						i++;
-					}
-								
-					//logger.trace("looping on href for filter1");
 				}
 
 				logger.trace("inserted "+i+" entries for "+hspenRes.getString("SpeciesID")+" species id");
@@ -154,27 +141,24 @@ public class HSPECGenerator {
 					hcafRes.beforeFirst();
 					//looping on HCAF filter2
 					while (hcafRes.next()){
-						Double landValue=1.0; //to understand why is not calculated
-						Double sstValue=this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]);
-						Double depthValue= this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"));
-						Double salinityValue= this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
-						Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax"));
-						Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
-						Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
-
-						//logger.trace(" sst:"+sstValue+" depth:"+depthValue+" salinity:"+salinityValue+" PP:"+primaryProductsValue+" sIC:"+seaIceConcentration );
 						boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
 						boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
-											
-						
-						//logger.trace("inFAO:"+inFAO+" inBOX:"+inBox+" total probability:"+totalCountProbability);
-						if (inFAO && !inBox && totalCountProbability!=0){
-							String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
-							//logger.trace("executing insertQuery "+insertQeury);
-							session.executeUpdate(insertQeury);
-							k++;
-						}	
-						//logger.trace("looping on href for filter2");
+						if (inFAO && !inBox){
+							Double landValue=1.0; //to understand why is not calculated
+							Double sstValue=this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]);
+							Double depthValue= this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"));
+							Double salinityValue= this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax"));
+							Double primaryProductsValue= this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax"));
+							Double seaIceConcentration= this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session);
+							Double totalCountProbability= landValue*(sstValue*this.sstWeight)*(depthValue*this.depthWeight)*(salinityValue*this.salinityWeight)*(primaryProductsValue*this.primaryProductsWeight)*(seaIceConcentration*this.seaIceConcentrationWeight);
+
+							if (totalCountProbability!=0){
+								String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
+								//logger.trace("executing insertQuery "+insertQeury);
+								session.executeUpdate(insertQeury);
+								k++;
+							}	
+						}
 					}
 				}
 				logger.trace("inserted "+k+" entries whit inbox false for "+hspenRes.getString("SpeciesID")+" species id");
@@ -272,9 +256,7 @@ public class HSPECGenerator {
 		Double tempFld=-9999.0;
 		if (hspenLayer=='s') tempFld = hcafSSTAnMean;
 		else if (hspenLayer=='b') tempFld = hcafSBTAnMean;
-		
-		//logger.trace("SST: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenTempMin+" "+hspenTempMax+" "+hspenTempPrefMin+" "+hspenTempPrefMax+" "+hspenLayer);
-		
+						
 		if (tempFld == -9999 || hspenTempMin == null)return 1.0;
 		if (tempFld < hspenTempMin)return  0.0;
 		if (tempFld >= hspenTempMin && tempFld < hspenTempPrefMin) return  (tempFld - hspenTempMin) / (hspenTempPrefMin - hspenTempMin);
@@ -299,9 +281,7 @@ public class HSPECGenerator {
 		Double tempFld=-9999.0;
 		if (hspenLayer=='s') tempFld = hcafSalinityMean;
 		else if (hspenLayer=='b') tempFld = hcafSalinityBMean;
-
-		//logger.trace("SALINITY: "+tempFld+" "+hcafSSTAnMean+" "+hcafSBTAnMean+" "+hspenLayer+" "+hspenSalinityMin+" "+hspenSalinityMax+" "+hspenSalinityPrefMin+" "+hspenSalinityPrefMax);
-		
+				
 		if (tempFld == -9999 || hspenSalinityMin == null ) return 1.0;
 		if (tempFld < hspenSalinityMin)return 0.0;
 		if (tempFld >= hspenSalinityMin && tempFld < hspenSalinityPrefMin)
