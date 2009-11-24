@@ -24,6 +24,7 @@ public class SimulationThread extends Thread {
 			//String hspec=generator.generate();
 			//System.out.println("table generated:"+hspec);
 			generationDetails.setHspecTable(DBCostants.HSPEC);
+			//generationDetails.setHspecTable(hspec);
 			//generationDetails.getToDropTableList().add(hspec);
 			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
 				entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);
