@@ -127,7 +127,7 @@ public class AquaMaps extends GCUBEPortType {
 	
 	
 	public String getAquaMapsList(String jobId)throws GCUBEFault{
-		logger.trace("Serving getAquaMapsList");
+		logger.trace("Serving getAquaMapsList for job Id : "+jobId);
 		String toReturn="";
 		try{
 		Class.forName(DBCostants.JDBCClassName).newInstance();
