@@ -79,6 +79,7 @@ public class HSPECGenerator {
 	 */
 	public String generate() throws Exception{
 		DBSession session= DBSession.openSession();
+		long generationStart= System.currentTimeMillis();
 		try{
 			long startGeneration= System.currentTimeMillis();
 			DecimalFormat formatter = new DecimalFormat("0.00");
@@ -180,7 +181,7 @@ public class HSPECGenerator {
 			session.close();
 		}
 		
-		logger.trace("generation finished");
+		logger.trace("generation of "+this.details.getToPerform().getName()+" finished in "+((System.currentTimeMillis()-generationStart)/1000));
 		return this.resultsTable;
 	}
 		
