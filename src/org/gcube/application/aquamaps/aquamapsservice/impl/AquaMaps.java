@@ -269,7 +269,7 @@ public class AquaMaps extends GCUBEPortType {
 			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
 			Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("Select * from "+DBCostants.speciesOccurSum+
-						((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
+						((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
 			Statement stmtCount=conn.createStatement();
 			ResultSet rsCount=stmtCount.executeQuery("Select count("+DBCostants.SpeciesID+") from "+DBCostants.speciesOccurSum);
 			rsCount.first();
@@ -309,7 +309,7 @@ public class AquaMaps extends GCUBEPortType {
 		Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(queries[0]+
-					((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
+				((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
 		Statement stmtCount=conn.createStatement();
 		ResultSet rsCount=stmtCount.executeQuery(queries[1]);
 		rsCount.first();

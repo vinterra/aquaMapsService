@@ -20,11 +20,11 @@ public class SimulationThread extends Thread {
 		// TODO Implement simulation data generation
 		
 		try{
-			HSPECGenerator generator= new HSPECGenerator(generationDetails);
-			String hspec=generator.generate();
-			System.out.println("table generated:"+hspec);
-			generationDetails.setHspecTable(hspec);
-			generationDetails.getToDropTableList().add(hspec);
+			//HSPECGenerator generator= new HSPECGenerator(generationDetails);
+			//String hspec=generator.generate();
+			//System.out.println("table generated:"+hspec);
+			generationDetails.setHspecTable(DBCostants.HSPEC);
+			//generationDetails.getToDropTableList().add(hspec);
 			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
 				entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);
 			
