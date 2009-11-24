@@ -7,6 +7,7 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.Weight;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -27,6 +28,7 @@ public class HSPECGenerator {
 	private String hspecTable;
 	private String resultsTable;
 	private String occurenceCellsTable;
+	private JobGenerationDetails details;
 	
 	private double sstWeight;
 	private double depthWeight;
@@ -43,7 +45,7 @@ public class HSPECGenerator {
 		this.hspecTable = DBCostants.HSPEC;
 		this.occurenceCellsTable = DBCostants.OCCURRENCE_CELLS;
 		
-		
+		this.details=details;
 		this.depthWeight = 1.0;
 		this.salinityWeight = 1.0;
 		this.primaryProductsWeight = 1.0;
@@ -177,6 +179,7 @@ public class HSPECGenerator {
 				}
 				logger.trace("inserted "+k+" entries whit inbox false for "+hspenRes.getString("SpeciesID")+" species id");
 				logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
+				this.details.getSpeciesHandling().put(hspenRes.getString("SpeciesID"), SpeciesStatus.Ready);
 				hspenLoops++;
 			}
 			
