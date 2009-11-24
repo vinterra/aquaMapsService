@@ -63,7 +63,7 @@ public class HSPECGenerator {
 			}
 				
 		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
-		
+		details.setHspecTable(this.resultsTable);
 		logger.trace("Weights: "+this.depthWeight+" "+this.salinityWeight+" "+this.primaryProductsWeight+" "+this.seaIceConcentrationWeight+" "+this.sstWeight);
 	}
 
