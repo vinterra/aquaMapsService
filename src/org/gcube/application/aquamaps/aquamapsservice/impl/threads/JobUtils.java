@@ -270,7 +270,7 @@ public class JobUtils {
 				envelopMap.get(specId).append("</Customization>");
 			}
 			for(String specId:envelopMap.keySet()){
-				profileBuilder.append(envelopMap.get(specId).toString()+"\n<Customizations>");
+				profileBuilder.append(envelopMap.get(specId).toString()+"\n</Customizations>");
 			}
 		}
 		profileBuilder.append("</EnvelopCustomization>");
@@ -305,7 +305,7 @@ public class JobUtils {
 				envelopMap.get(cellId).append("</Customization>");
 			}
 			for(String cellId:envelopMap.keySet()){
-				profileBuilder.append(envelopMap.get(cellId).toString()+"\n<Customizations>");
+				profileBuilder.append(envelopMap.get(cellId).toString()+"\n</Customizations>");
 			}
 		}
 		profileBuilder.append("</EnvironmentCustomization>");

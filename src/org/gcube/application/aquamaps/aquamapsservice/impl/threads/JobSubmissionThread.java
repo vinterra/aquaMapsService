@@ -128,11 +128,12 @@ public class JobSubmissionThread extends Thread {
 				t.start();
 			}
 			
+			
 			while(waitingGroup.activeCount()>0){
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}
-				logger.trace(this.getName()+" waiting for "+waitingGroup.activeCount()+" generation Process(es) ");
+				logger.trace(this.getName()+" waiting for "+waitingGroup.activeCount()+" generation Process(es) ");			
 				logger.trace(waitingGroup.toString());
 			}
 			generationStatus.setStatus(JobGenerationDetails.Status.Completed);

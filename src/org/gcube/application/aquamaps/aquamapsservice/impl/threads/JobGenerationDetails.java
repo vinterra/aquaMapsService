@@ -136,7 +136,7 @@ public class JobGenerationDetails {
 		else toPerformDistribution.put(index, status);
 	}
 	public boolean isSpeciesListReady(List<String> speciesIdList){
-		for(String id:speciesIdList){
+		for(String id:speciesIdList){			
 			if(!speciesHandling.get(id).equals(SpeciesStatus.Ready)) return false;			
 		}
 		return true;
