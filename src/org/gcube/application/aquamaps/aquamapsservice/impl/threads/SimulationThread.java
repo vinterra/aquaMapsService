@@ -5,6 +5,9 @@ import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.perturbation.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.stubs.AreasArray;
+import org.gcube.application.aquamaps.stubs.Weight;
+import org.gcube.application.aquamaps.stubs.WeightArray;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SimulationThread extends Thread {
@@ -20,15 +23,27 @@ public class SimulationThread extends Thread {
 		// TODO Implement simulation data generation
 		
 		try{
-			//HSPECGenerator generator= new HSPECGenerator(generationDetails);
-			//String hspec=generator.generate();
-			//System.out.println("table generated:"+hspec);
-			generationDetails.setHspecTable(DBCostants.HSPEC);
-			//generationDetails.setHspecTable(hspec);
-			//generationDetails.getToDropTableList().add(hspec);
-			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
-				entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);
-			
+			WeightArray weights=generationDetails.getToPerform().getWeights(); 
+			boolean needToGenerate=false;
+			if((weights!=null)&&(weights.getWeightList()!=null)){
+				for(Weight w:weights.getWeightList())
+					if(w.getChosenWeight()<1) {
+						needToGenerate=true;
+						break;
+					}
+			}			
+			if(needToGenerate){
+				HSPECGenerator generator= new HSPECGenerator(generationDetails);
+				String hspec=generator.generate();
+				System.out.println("table generated:"+hspec);				
+				generationDetails.setHspecTable(hspec);
+				generationDetails.getToDropTableList().add(hspec);
+			}else{
+				generationDetails.setHspecTable(DBCostants.HSPEC);
+				for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
+					entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);
+				
+			}			
 		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
 		
 		

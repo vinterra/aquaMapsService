@@ -72,6 +72,7 @@ public class JobSubmissionThread extends Thread {
 			//SpeciesPerturbationThread
 			
 			filterSpecies();
+			//generationStatus.setHspecTable(JobUtils.filterByArea(generationStatus));
 			//generationStatus.setHspenTable(DBCostants.HSPEN);
 			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
 				entry.setValue(JobGenerationDetails.SpeciesStatus.toGenerate);
