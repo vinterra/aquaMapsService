@@ -50,7 +50,7 @@ public class DBCostants {
 	public static String filterCellByAreaQuery(String newName,String sourceTable,String tempName){
 		String query= "Insert into "+newName+" (Select * from "+sourceTable+	
 				 " where "+DBCostants.cSquareCode+" in "+
-				 	" (Select "+DBCostants.cSquareCode+" from "+DBCostants.HCAF_S+ ", "+tempName+
+				 	" (Select "+DBCostants.HCAF_S+"."+DBCostants.cSquareCode+" from "+DBCostants.HCAF_S+ " , "+tempName+				 	
 								" where "+HCAF_S+"."+cell_FAO+" = "+tempName+"."+areaCode+
 								" OR "+HCAF_S+"."+cell_EEZ+" = "+tempName+"."+areaCode+
 								" OR "+HCAF_S+"."+cell_LME+" = "+tempName+"."+areaCode+"))";
