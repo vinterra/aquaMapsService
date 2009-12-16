@@ -52,27 +52,30 @@ public class JobUtils {
  * @return
  * @throws SQLException
  */
-	public static StringBuilder[] clusterize(ResultSet rs,int maxIndex,int toClusterIndex,int probabilityIndex) throws SQLException{
+	public static StringBuilder[] clusterize(ResultSet rs,int maxIndex,int toClusterIndex,int probabilityIndex,boolean bioDiversity) throws SQLException{
 		StringBuilder csq_str1 = new StringBuilder();
 		StringBuilder csq_str2 = new StringBuilder();
 		StringBuilder csq_str3 = new StringBuilder();
 		StringBuilder csq_str4 = new StringBuilder();
 		StringBuilder csq_str5 = new StringBuilder();
-		if(rs.first()){			
-			/*double max=rs.getDouble(maxIndex)*100;
-			double r1 = Math.round(Math.pow(10,(Math.log10(max)/5)));
-			double r2 = Math.round(Math.pow(10,(2*Math.log10(max)/5)));
-			double r3 = Math.round(Math.pow(10,(3*Math.log10(max)/5)));
-			double r4 = Math.round(Math.pow(10,(4*Math.log10(max)/5)));*/
-			double max=rs.getDouble(maxIndex);
-			double clusteringRatio;
-			if((max>1)) clusteringRatio=Math.round(max/5);
-			else clusteringRatio=max/5;
-			double r1= clusteringRatio;
-			double r2= clusteringRatio*2;
-			double r3= clusteringRatio*3;
-			double r4= clusteringRatio*4;
-			
+		if(rs.first()){	
+			double max=0;
+			double r1=0;
+			double r2=0;
+			double r3=0;
+			double r4=0;
+			if(bioDiversity){
+				max=rs.getDouble(maxIndex);
+				r1 = Math.round(Math.pow(10,(Math.log10(max)/5)));
+				r2 = Math.round(Math.pow(10,(2*Math.log10(max)/5)));
+				r3 = Math.round(Math.pow(10,(3*Math.log10(max)/5)));
+				r4 = Math.round(Math.pow(10,(4*Math.log10(max)/5)));}
+			else{								
+				r1= 0.2;
+				r2= 0.4;
+				r3= 0.6;
+				r4= 0.8;
+			}
 			logger.debug("Clustering by "+r1+" , "+r2+" , "+r3+" , "+r4);
 			
 			
@@ -511,6 +514,15 @@ public class JobUtils {
 	}
 	
 	
+	/**
+	 * returns a new HSPEC table name filtering selected HSPEC against Area selection if any
+	 * 
+	 * @param details
+	 * @return
+	 * @throws SQLException
+	 */
+	
+	
 	public static String filterByArea(JobGenerationDetails details)throws SQLException{
 		String toReturn;		
 		logger.trace(" filtering simulation data on area selection for job "+details.getToPerform().getName());
@@ -519,16 +531,16 @@ public class JobUtils {
 				&&(details.getToPerform().getSelectedAreas().getAreasList().length>0)){
 			Statement stmt=details.getConnection().createStatement();
 			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
-			stmt.execute("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY)");
+			stmt.execute("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
 			for(Area area: details.getToPerform().getSelectedAreas().getAreasList())			
-				stmt.execute("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"')");
+				stmt.execute("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
 			
 			logger.trace(" area temp table created");
 			details.getToDropTableList().add(areaTmpTable);
 			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			stmt.execute("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
 			details.getToDropTableList().add(filteredTable);
-			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,details.getHspenTable(),areaTmpTable);
+			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,details.getHspecTable(),areaTmpTable);
 			logger.trace("Going to use sql query "+filterQuery);
 			Statement filterStmt=details.getConnection().createStatement();
 			filterStmt.execute(filterQuery);

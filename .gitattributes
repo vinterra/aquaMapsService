@@ -29,4 +29,3 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/util/DataTranslation.jav
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
-test/testClient/TestHSPENGenerator.java -text

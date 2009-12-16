@@ -16,9 +16,9 @@ public class DBCostants {
 	public static final String JOB_Table="submitted";
 	public static final String HCAF_D="HCAF_D";
 	public static final String HSPEN="hspen";
-	public static final String HSPEC="hcaf_species_native";
+	public static final String HSPEC="HSPEC";
 	public static final String speciesOccurSum="speciesoccursum";
-	public static final String OCCURRENCE_CELLS="occurrencecells";
+	public static final String GOOD_CELLS="occurrenceCells";
 	
 	public static final String FAOType="FAO";
 	public static final String EEZType="EEZ";
@@ -48,12 +48,10 @@ public class DBCostants {
 	}
 	
 	public static String filterCellByAreaQuery(String newName,String sourceTable,String tempName){
-		String query= "Insert into "+newName+" (Select * from "+sourceTable+	
-				 " where "+DBCostants.cSquareCode+" in "+
-				 	" (Select "+DBCostants.HCAF_S+"."+DBCostants.cSquareCode+" from "+DBCostants.HCAF_S+ " , "+tempName+				 	
-								" where "+HCAF_S+"."+cell_FAO+" = "+tempName+"."+areaCode+
-								" OR "+HCAF_S+"."+cell_EEZ+" = "+tempName+"."+areaCode+
-								" OR "+HCAF_S+"."+cell_LME+" = "+tempName+"."+areaCode+"))";
+		String query= "Insert into "+newName+" (Select "+sourceTable+".* from "+sourceTable+" , "+tempName+	
+		" where (("+tempName+".type ='"+FAOType+"')AND("+sourceTable+"."+cell_FAO+" = "+tempName+"."+areaCode+
+		")) OR (("+tempName+".type ='"+EEZType+"')AND( find_in_set("+tempName+"."+areaCode+" , "+sourceTable+"."+cell_EEZ+")) )"+
+		" OR (("+tempName+".type ='"+LMEType+"')AND( "+sourceTable+"."+cell_LME+" = "+tempName+"."+areaCode+")) )";
 		logger.trace("filterCellByAreaQuery: "+query);
 		return query;
 	}
@@ -146,8 +144,10 @@ public class DBCostants {
 	
 	public static final String profileRetrieval="Select Path from Files where owner=? and type='xml'";
 	
+	
+	
 
-	public static final String JobList="select * from "+JOB_Table+" where author = ? AND isAquaMap=false";
+	public static final String JobList="select * from "+JOB_Table+" where author = ?";
 	
 	public static final String AquaMapsList="SELECT * from submitted where jobId=? AND isAquaMap= true";
 	

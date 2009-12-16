@@ -43,7 +43,7 @@ public class HSPECGenerator {
 		this.hcafStaticTable=DBCostants.HCAF_S;
 		this.hspenTable = details.getHspenTable();
 		this.hspecTable = DBCostants.HSPEC;
-		this.occurenceCellsTable = DBCostants.OCCURRENCE_CELLS;
+		this.occurenceCellsTable = DBCostants.GOOD_CELLS;
 		
 		this.details=details;
 		this.depthWeight = 1.0;

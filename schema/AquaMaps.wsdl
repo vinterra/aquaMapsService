@@ -235,6 +235,14 @@
 
 			<!-- Request / Response Types-->
 			
+			
+			<xsd:complexType name="getOccurrenceCellsRequestType">
+				<xsd:sequence>					
+					<xsd:element name="speciesID" type="xsd:string"/>
+					<xsd:element name="limit" type ="xsd:int"/>
+					<xsd:element name="offset" type ="xsd:int"/>
+				</xsd:sequence>
+			</xsd:complexType>
 
 			<xsd:complexType name="getPhylogenyRequestType">
 				<xsd:sequence>
@@ -332,6 +340,11 @@
 				
 			<!-- Request / Response elements -->
 
+
+			<xsd:element name="getOccurrenceCellsRequest" type="tns:getOccurrenceCellsRequestType"/>
+			<xsd:element name="getOccurrenceCellsResponse" type="xsd:string"/>
+
+
 			<xsd:element name="getProfileRequest" type="xsd:string"/>
 			<xsd:element name="getProfileResponse" type="xsd:string"/>
 
@@ -414,6 +427,12 @@
 
 	<!-- message part -->
 	
+	<message name="GetOccurrenceCellsRequest">
+	<part name="request" element="tns:getOccurrenceCellsRequest"/>
+	</message>
+	<message name="GetOccurrenceCellsResponse">
+	<part name="response" element="tns:getOccurrenceCellsResponse"/>
+	</message>
 	
 	<message name="GetProfileRequest">
 	<part name="request" element="tns:getProfileRequest"/>
@@ -546,6 +565,14 @@
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
+		
+		
+		<wsdl:operation name="getOccurrenceCells">
+			<input message="tns:GetOccurrenceCellsRequest" />
+			<output message="tns:GetOccurrenceCellsResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
+		
 		
 		<wsdl:operation name="getProfile">
 			<input message="tns:GetProfileRequest" />

@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBUtils;
@@ -63,7 +64,21 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 	
-	
+	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
+		String speciesId=request.getSpeciesID();
+		try{
+		DBSession session=DBSession.openSession();
+		ResultSet rs=session.executeQuery("select occurrenceCells.* , HCAF_D.DepthMean, HCAF_D.SSTAnMean, HCAF_D.SBTAnMean, HCAF_D.SalinityBMean, HCAF_D.SalinityMean, HCAF_D.PrimProdMean, HCAF_D.IceConAnn  from HCAF_D inner join occurrenceCells on HCAF_D.CsquareCode = occurrenceCells.CsquareCode where occurrenceCells.SpeciesID = '"+speciesId+"'");		
+		return DBUtils.toJSon(rs,request.getOffset(),request.getOffset()+request.getLimit());
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getjobList");
+			logger.trace("Raised Exception", e);			
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}
+		return "";
+	}
 	
 	public String submitJob(Job req)throws GCUBEFault{
 		JobSubmissionThread thread=new JobSubmissionThread(req);
@@ -200,6 +215,23 @@ public class AquaMaps extends GCUBEPortType {
 		return new FieldArray(array.toArray(new Field[array.size()]));
 	}
 
+	public String getGoodCells(String speciesId)throws GCUBEFault{
+		logger.trace("Serving getGoodCell for species ID : " +speciesId);
+		try{
+			Class.forName(DBCostants.JDBCClassName).newInstance();
+			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+			PreparedStatement ps=conn.prepareStatement(DBCostants.cellEnvironment);
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getCellEnvironment");
+			logger.trace("Raised Exception", e);
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}		
+		return "";
+	}
+	
+	
 	public String getSelectedCells(GetSelectedCellsRequestType req)throws GCUBEFault{				
 		String toReturn="";
 		int limit=req.getLimit();

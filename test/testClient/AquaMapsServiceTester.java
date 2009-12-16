@@ -5,6 +5,8 @@ import org.apache.axis.message.addressing.EndpointReferenceType;
 
 import org.gcube.application.aquamaps.stubs.*;
 import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
+import org.gcube.application.framework.core.session.ASLSession;
+import org.gcube.application.framework.core.session.SessionManager;
 //import org.gcube.application.framework.core.session.ASLSession;
 //import org.gcube.application.framework.core.session.SessionManager;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
