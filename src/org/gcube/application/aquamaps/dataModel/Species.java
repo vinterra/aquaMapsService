@@ -86,6 +86,13 @@ public class Species {
 		public static final String IceCon="IceConcentration";
 		public static final String LandDist="LandDistance";
 		public static final String PrimProd="PrimaryProduction";
+		
+		public static final String FAOAreaM="FAOAreas";
+		public static final String NMostLat="NMostLat";
+		public static final String SMostLat="SMostLat";
+		public static final String EMostLong="EMostLong";
+		public static final String WMostLong="WMostLong";
+		public static final String Layer="Layer";
 	}
 	
 	private String id;

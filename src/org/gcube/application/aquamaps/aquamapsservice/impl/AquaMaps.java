@@ -10,13 +10,17 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.dataModel.Species;
+import org.gcube.application.aquamaps.dataModel.util.FromResultSetToObject;
 import org.gcube.application.aquamaps.stubs.*;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -35,6 +39,43 @@ public class AquaMaps extends GCUBEPortType {
 		return null;
 	}
 
+	public FieldArray calculateEnvelopefromCellSelection(CalculateEnvelopefromCellSelectionRequestType request)throws GCUBEFault{
+		ArrayList<Field> array=new ArrayList<Field>();		
+		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
+		try{
+			Class.forName(DBCostants.JDBCClassName).newInstance();
+			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+			PreparedStatement ps = conn.prepareStatement(DBCostants.completeSpeciesById);			
+			ps.setString(1, request.getSpeciesID());
+			ResultSet rs = ps.executeQuery();
+			Species spec=FromResultSetToObject.getSpecies(rs).get(0);
+			ps=conn.prepareStatement(DBCostants.completeCellById);
+			List<org.gcube.application.aquamaps.dataModel.Cell> toAnalyze=new ArrayList<org.gcube.application.aquamaps.dataModel.Cell>(); 
+			for(Cell cell: request.getCells().getCellList()){
+				ps.setString(1, cell.getCode());
+				rs=ps.executeQuery();
+				toAnalyze.addAll(FromResultSetToObject.getCell(rs));
+			}
+			SpEnvelope envelope=new SpEnvelope();
+			envelope.reCalculate(spec, toAnalyze);
+			for(org.gcube.application.aquamaps.dataModel.Field f:spec.attributesList){
+				Field toAdd=new Field();
+				toAdd.setName(f.getName());
+				toAdd.setType(f.getType().toString());
+				toAdd.setValue(f.getValue());
+				array.add(toAdd);
+			}
+			conn.close();
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve calculateEnvelopefromCellSelection");
+			logger.trace("Raised Exception", e);
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+		}
+		return new FieldArray(array.toArray(new Field[array.size()]));
+	}
+	
 	public String getProfile(String id)throws GCUBEFault{
 		logger.trace("getting profile for owner id : "+id);
 		String toReturn="";

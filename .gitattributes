@@ -14,6 +14,14 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvCostants.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvEngine.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_LandDist.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_PrimProd.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Salinity.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_SeaIce.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Temp.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/env/SpEnvelope.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/AreaPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
@@ -39,5 +47,6 @@ src/org/gcube/application/aquamaps/dataModel/Job.java -text
 src/org/gcube/application/aquamaps/dataModel/Perturbation.java -text
 src/org/gcube/application/aquamaps/dataModel/Resource.java -text
 src/org/gcube/application/aquamaps/dataModel/Species.java -text
+src/org/gcube/application/aquamaps/dataModel/util/FromResultSetToObject.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text

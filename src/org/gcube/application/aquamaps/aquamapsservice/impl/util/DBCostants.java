@@ -70,6 +70,10 @@ public class DBCostants {
 		else return "=";
 	}
 	
+	
+	public static final String completeSpeciesById="Select * from "+speciesOccurSum+" INNER JOIN "+HSPEN+" ON "+speciesOccurSum+"."+SpeciesID+"="+HSPEN+"."+SpeciesID+" where "+speciesOccurSum+"."+SpeciesID+" = ? ";
+	public static final String completeCellById="Select * from "+HCAF_S+" INNER JOIN "+HCAF_D+" ON "+HCAF_S+"."+cSquareCode+"="+HCAF_D+"."+cSquareCode+" where "+HCAF_S+"."+cSquareCode+" = ? ";
+	
 	public static final String profileUpdate="Update Files set Path=? where owner=? and type ='XML'";
 	
 	

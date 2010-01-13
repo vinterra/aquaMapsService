@@ -235,7 +235,13 @@
 
 			<!-- Request / Response Types-->
 			
-			
+			<xsd:complexType name="calculateEnvelopefromCellSelectionRequestType">
+				<xsd:sequence>
+					<xsd:element name="speciesID" type="xsd:string"/>
+					<xsd:element name="cells" type="tns:cellArray"/>
+				</xsd:sequence>				
+			</xsd:complexType>
+						
 			<xsd:complexType name="getOccurrenceCellsRequestType">
 				<xsd:sequence>					
 					<xsd:element name="speciesID" type="xsd:string"/>
@@ -340,6 +346,8 @@
 				
 			<!-- Request / Response elements -->
 
+			<xsd:element name="calculateEnvelopefromCellSelectionRequest" type ="tns:calculateEnvelopefromCellSelectionRequestType"/>
+			<xsd:element name="calculateEnvelopefromCellSelectionResponse" type="tns:fieldArray" />
 
 			<xsd:element name="getOccurrenceCellsRequest" type="tns:getOccurrenceCellsRequestType"/>
 			<xsd:element name="getOccurrenceCellsResponse" type="xsd:string"/>
@@ -426,6 +434,13 @@
 	</types>
 
 	<!-- message part -->
+	<message name="CalculateEnvelopefromCellSelectionRequest">
+		<part name="request" element="tns:calculateEnvelopefromCellSelectionRequest" />
+	</message>
+	<message name="CalculateEnvelopefromCellSelectionResponse">
+		<part name="response" element="tns:calculateEnvelopefromCellSelectionResponse" />
+	</message>
+	
 	
 	<message name="GetOccurrenceCellsRequest">
 	<part name="request" element="tns:getOccurrenceCellsRequest"/>
@@ -566,6 +581,12 @@
 
 		<!-- operation part -->
 		
+			
+		<wsdl:operation name="calculateEnvelopefromCellSelection">
+			<input message="tns:CalculateEnvelopefromCellSelectionRequest" />
+			<output message="tns:CalculateEnvelopefromCellSelectionResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
 		
 		<wsdl:operation name="getOccurrenceCells">
 			<input message="tns:GetOccurrenceCellsRequest" />
