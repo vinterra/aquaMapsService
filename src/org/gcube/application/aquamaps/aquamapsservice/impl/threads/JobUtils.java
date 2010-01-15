@@ -23,6 +23,7 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.dataModel.util.StubsToModel;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.Cell;
@@ -313,13 +314,7 @@ public class JobUtils {
 		}
 		profileBuilder.append("</EnvironmentCustomization>");
 		
-		profileBuilder.append("<AlgorithmSettings>");
-		profileBuilder.append("<Weights>");		
-		if((obj.getWeights()!=null)&&(obj.getWeights().getWeightList()!=null)){
-			Weight[] weights=obj.getWeights().getWeightList();
-			for(int i=0;i<weights.length;i++) profileBuilder.append(weightToXML(weights[i]));
-		}	
-		profileBuilder.append("</Weights>");
+		profileBuilder.append("<AlgorithmSettings>");		
 		profileBuilder.append("<Threshold>"+obj.getThreshold()+"</Threshold>");
 		profileBuilder.append("<Source>"+projectCitation+"</Source>");
 		profileBuilder.append("</AlgorithmSettings>");
@@ -329,6 +324,8 @@ public class JobUtils {
 		
 		
 		return profileBuilder.toString();
+		
+		
 	}
 	
 	
@@ -407,12 +404,12 @@ public class JobUtils {
 		
 		
 		profileBuilder.append("<AlgorithmSettings>");
-		profileBuilder.append("<Weights>");		
+		/*profileBuilder.append("<Weights>");		
 		if((job.getWeights()!=null)&&(job.getWeights().getWeightList()!=null)){
 			Weight[] weights=job.getWeights().getWeightList();
 			for(int i=0;i<weights.length;i++) profileBuilder.append(weightToXML(weights[i]));
 		}	
-		profileBuilder.append("</Weights>");
+		profileBuilder.append("</Weights>");*/
 			//profileBuilder.append("<Threshold>"+threshold+"</Threshold>");
 			//profileBuilder.append("<Source>"+job.get+"</Source>");
 		profileBuilder.append("</AlgorithmSettings>");
@@ -466,7 +463,7 @@ public class JobUtils {
 		doc.append("<Field>");
 		doc.append("<Type>"+"float"+"</Type>");
 		doc.append("<Name>"+weight.getParameterName()+"</Name>");
-		doc.append("<Value>"+weight.getChosenWeight()+"</Value>");
+		//doc.append("<Value>"+weight.getChosenWeight()+"</Value>");
 		doc.append("</Field>");
 		return doc.toString();
 	}

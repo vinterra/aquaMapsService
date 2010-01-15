@@ -41,7 +41,7 @@ public class AquaMapsServiceTester {
 		obj.setThreshold((float) 0.5);
 		obj.setType("Biodiversity");
 		Weight w=new Weight();		
-		obj.setWeights(new WeightArray(new Weight[]{w,w,w,w}));
+		//obj.setWeights(new WeightArray(new Weight[]{w,w,w,w}));
 		job.setAquaMapList(new AquaMapArray(new AquaMap[]{obj}));
 		job.setAuthor(obj.getAuthor());
 		job.setEnvelopCustomization(obj.getEnvelopCustomization());

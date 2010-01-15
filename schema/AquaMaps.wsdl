@@ -31,7 +31,14 @@
 			<xsd:complexType name="weight">
 				<xsd:sequence>
 					<xsd:element name="parameterName" type="xsd:string" />
-					<xsd:element name="chosenWeight" type="xsd:float" />
+					<xsd:element name="chosenWeight" type="xsd:boolean" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="envelopeWeights">
+				<xsd:sequence>
+					<xsd:element name="speciesId" type="xsd:string" />
+					<xsd:element name="weights" type ="tns:weightArray"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -111,7 +118,7 @@
 					<xsd:element name="excludedCells" type="tns:cellArray"/>
 					<xsd:element name="environmentCustomization" type="tns:perturbationArray"/>
 					<xsd:element name="threshold" type="xsd:float"/>
-					<xsd:element name="weights" type="tns:weightArray"/>	
+					<xsd:element name="weights" type="tns:envelopeWeightArray"/>	
 					<xsd:element name="status" type="xsd:string"/>				
 				</xsd:sequence>
 			</xsd:complexType>
@@ -131,7 +138,7 @@
 				<xsd:element name="selectedAreas" type="tns:areasArray"/>
 					<xsd:element name="excludedCells" type="tns:cellArray"/>
 					<xsd:element name="environmentCustomization" type="tns:perturbationArray"/>					
-					<xsd:element name="weights" type="tns:weightArray"/>
+					<xsd:element name="weights" type="tns:envelopeWeightArray"/>	
 					<xsd:element name="author" type="xsd:string"/>
 					<xsd:element name="date" type="xsd:string"/>
 					<xsd:element name="relatedResources" type="tns:stringArray"/>					
@@ -194,6 +201,13 @@
 			<xsd:complexType name="weightArray">
 				<xsd:sequence>
 					<xsd:element name="weightList" type="tns:weight"
+						minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="envelopeWeightArray">
+				<xsd:sequence>
+					<xsd:element name="envelopeWeightList" type="tns:envelopeWeights"
 						minOccurs="0" maxOccurs="unbounded" />
 				</xsd:sequence>
 			</xsd:complexType>

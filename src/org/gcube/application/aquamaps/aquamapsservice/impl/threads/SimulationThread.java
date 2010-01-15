@@ -1,13 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
-import java.sql.SQLException;
 import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.perturbation.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
-import org.gcube.application.aquamaps.stubs.AreasArray;
-import org.gcube.application.aquamaps.stubs.Weight;
-import org.gcube.application.aquamaps.stubs.WeightArray;
+import org.gcube.application.aquamaps.stubs.EnvelopeWeightArray;
+import org.gcube.application.aquamaps.stubs.PerturbationArray;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SimulationThread extends Thread {
@@ -23,16 +21,20 @@ public class SimulationThread extends Thread {
 		// TODO Implement simulation data generation
 		
 		try{
-			WeightArray weights=generationDetails.getToPerform().getWeights(); 
-			boolean needToGenerate=false;
+			EnvelopeWeightArray weights=generationDetails.getToPerform().getWeights(); 
+			PerturbationArray envelopePert=generationDetails.getToPerform().getEnvelopCustomization();
+			PerturbationArray environPert=generationDetails.getToPerform().getEnvironmentCustomization();
+			/*boolean needToGenerate=false;
 			if((weights!=null)&&(weights.getWeightList()!=null)){
 				for(Weight w:weights.getWeightList())
 					if(w.getChosenWeight()<1) {
 						needToGenerate=true;
 						break;
 					}
-			}			
-			if(needToGenerate){
+			}*/			
+			if(((weights!=null)&&(weights.getEnvelopeWeightList()!=null)&&(weights.getEnvelopeWeightList().length>0))||
+				((envelopePert!=null)&&(envelopePert.getPerturbationList()!=null)&&(envelopePert.getPerturbationList().length>0))||
+				((environPert!=null)&&(environPert.getPerturbationList()!=null)&&(environPert.getPerturbationList().length>0))){
 				HSPECGenerator generator= new HSPECGenerator(generationDetails);
 				String hspec=generator.generate();
 				System.out.println("table generated:"+hspec);				
