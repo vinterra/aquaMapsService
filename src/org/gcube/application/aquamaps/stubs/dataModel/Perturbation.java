@@ -8,18 +8,18 @@ public class Perturbation {
 	}
 	
 private Type type;
-private Float perturbationValue;
+private String perturbationValue;
 public Perturbation() {
-	this(Type.ASSIGN, new Float(0));
+	this(Type.ASSIGN, "0");
 }
-	public Perturbation(Type toSetType,Float perturbation) {
+	public Perturbation(Type toSetType,String perturbation) {
 		type=toSetType;
 		perturbationValue=perturbation;
 	}
 	public Type getType() {
 		return type;
 	}
-	public float getPerturbationValue() {
+	public String getPerturbationValue() {
 		return perturbationValue;
 	}
 	

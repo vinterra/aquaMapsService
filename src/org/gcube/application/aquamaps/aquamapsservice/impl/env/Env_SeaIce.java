@@ -3,8 +3,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.env;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.dataModel.Cell;
-import org.gcube.application.aquamaps.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.Cell;
+import org.gcube.application.aquamaps.stubs.dataModel.Species;
 
 //###################################################################################
 //This file re-computes the sea ice concentration values (Min, PrefMin, Max, PrefMax 

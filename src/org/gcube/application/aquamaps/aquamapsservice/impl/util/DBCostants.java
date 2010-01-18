@@ -8,6 +8,8 @@ import org.gcube.application.aquamaps.stubs.FilterArray;
 import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
+import com.sun.msv.grammar.xmlschema.OccurrenceExp;
+
 public class DBCostants {
 
 	private static GCUBELog logger= new GCUBELog(DBCostants.class);
@@ -23,6 +25,7 @@ public class DBCostants {
 	public static final String FAOType="FAO";
 	public static final String EEZType="EEZ";
 	public static final String LMEType="LME";
+	public static final String FaoAreaM="FaoAreaM";
 	
 	public static final String cSquareCode="cSquareCode";
 	public static final String probability="probability"; 
@@ -70,6 +73,19 @@ public class DBCostants {
 		else return "=";
 	}
 	
+	public static String calculateGoodCells(boolean useFaoRestriction, boolean useBoundingBoxRestriction, String FaoRestriction,
+			float n,float s, float w, float e){
+		StringBuilder toReturn=new StringBuilder("Select * from "+GOOD_CELLS);
+		
+		if(useFaoRestriction)
+			toReturn.append(" where find_in_set("+FaoAreaM+" , '"+FaoRestriction.replace(" ", "")+"')");
+		if(useBoundingBoxRestriction){
+			if(!useFaoRestriction)toReturn.append(" where ");
+			else toReturn.append(" AND ");
+			toReturn.append(" (CenterLat<"+n+") AND (CenterLat>"+s+") AND (CenterLong<"+w+") AND (CenterLong>"+e+")");
+		}
+		return toReturn.toString();
+	}
 	
 	public static final String completeSpeciesById="Select * from "+speciesOccurSum+" INNER JOIN "+HSPEN+" ON "+speciesOccurSum+"."+SpeciesID+"="+HSPEN+"."+SpeciesID+" where "+speciesOccurSum+"."+SpeciesID+" = ? ";
 	public static final String completeCellById="Select * from "+HCAF_S+" INNER JOIN "+HCAF_D+" ON "+HCAF_S+"."+cSquareCode+"="+HCAF_D+"."+cSquareCode+" where "+HCAF_S+"."+cSquareCode+" = ? ";

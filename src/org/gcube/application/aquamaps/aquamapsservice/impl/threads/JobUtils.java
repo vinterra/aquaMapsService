@@ -23,7 +23,6 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
-import org.gcube.application.aquamaps.dataModel.util.StubsToModel;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.Cell;
@@ -35,6 +34,7 @@ import org.gcube.application.aquamaps.stubs.Resource;
 import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.application.aquamaps.stubs.SpeciesArray;
 import org.gcube.application.aquamaps.stubs.Weight;
+import org.gcube.application.aquamaps.stubs.dataModel.util.StubsToModel;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
