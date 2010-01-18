@@ -48,5 +48,12 @@ src/org/gcube/application/aquamaps/stubs/dataModel/Msg.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/Perturbation.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/Resource.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/Species.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/FromResultSetToObject.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/ModelCostants.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/ModelToStubs.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/Parsers.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/StubsToModel.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/Tags.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/XMLUtils.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
