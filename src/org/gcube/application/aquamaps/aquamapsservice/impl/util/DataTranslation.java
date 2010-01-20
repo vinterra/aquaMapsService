@@ -11,6 +11,7 @@ import java.util.Set;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.Filter;
+import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.Resource;
 
 public class DataTranslation {
@@ -57,7 +58,8 @@ public class DataTranslation {
 		hspenFields.add("landdistmin");
 		hspenFields.add("landdistmax");
 		hspenFields.add("primprodmin");
-		hspenFields.add("primprodmax");		
+		hspenFields.add("primprodmax");
+		hspenFields.add("depthmean");
 		
 		completeFieldNamesMap.put("DepthMin", "hspen.DepthMin>=");
 		completeFieldNamesMap.put("DepthMax", "hspen.DepthMax<=");
@@ -152,6 +154,8 @@ public class DataTranslation {
 		}
 		return toReturn;
 	}
+
+	
 	
 	
 	

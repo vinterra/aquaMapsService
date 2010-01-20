@@ -22,7 +22,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobSubmissionThread extends Thread {
 
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	
 	private static final GCUBELog logger=new GCUBELog(JobSubmissionThread.class);
 	private static final int waitTime=10*1000;
 	//private static final float defaultAlgorithmWeight=1;
@@ -71,7 +71,7 @@ public class JobSubmissionThread extends Thread {
 			
 			//SpeciesPerturbationThread
 			
-			filterSpecies();
+			//filterSpecies();
 			
 			//generationStatus.setHspenTable(DBCostants.HSPEN);
 			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
@@ -239,28 +239,7 @@ public class JobSubmissionThread extends Thread {
 		//TODO implement rollback operations	
 	}
 
-	public void filterSpecies() throws SQLException{
-		logger.trace("Filtering species...");
-		generationStatus.setHspenTable("H"+(uuidGen.nextUUID()).replaceAll("-", "_"));
-		String speciesListTable="s"+(uuidGen.nextUUID()).replaceAll("-", "_");
-		Statement stmt=generationStatus.getConnection().createStatement();
-		
-		String creationSQL="CREATE TABLE  "+speciesListTable+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
-		
-		stmt.execute(creationSQL);
-		generationStatus.getToDropTableList().add(speciesListTable);
-		StringBuilder insertingQuery=new StringBuilder("Insert into "+speciesListTable+" values ");
-		Specie[] species=generationStatus.getToPerform().getSelectedSpecies().getSpeciesList();
-		for(int i= 0;i<species.length;i++)
-			insertingQuery.append("('"+species[i].getId()+"')"+((i<species.length-1)?" , ":""));
-		logger.trace("Inserting query : "+insertingQuery.toString());
-		stmt.execute(insertingQuery.toString());		
-		
-		stmt.execute("Create table "+generationStatus.getHspenTable()+" AS Select "+DBCostants.HSPEN+".* from "+DBCostants.HSPEN+","+speciesListTable+" where "+
-				DBCostants.HSPEN+"."+DBCostants.SpeciesID+" = "+speciesListTable+"."+DBCostants.SpeciesID);
-		generationStatus.getToDropTableList().add(generationStatus.getHspenTable());
-		logger.trace("Filtering complete");
-	}
+	
 	
 	
 }

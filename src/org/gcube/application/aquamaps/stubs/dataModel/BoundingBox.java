@@ -2,11 +2,10 @@ package org.gcube.application.aquamaps.stubs.dataModel;
 
 
 public class BoundingBox {
-	private double N=90;
-	private double S=90;
-	private double W=180;
-	private double E=180;
-	
+	double N=90;
+	double S=-90;
+	double W=180;
+	double E=-180;
 	public BoundingBox() {		
 	}
 	
@@ -37,21 +36,21 @@ public class BoundingBox {
 	public String toString(){
 		return String.valueOf(N)+","+
 		String.valueOf(S)+","+
-		String.valueOf(E)+","+
-		String.valueOf(W);
+		String.valueOf(W)+","+
+		String.valueOf(E);
 	}
 	
 	/**
 	 * Sets comma separated coordinates  
 	 * 
-	 * @param str coordinates order : N , S , E , W 
+	 * @param str coordinates order : N , S , W , E 
 	 */
 	
 	public void parse(String str){			
 		String[] values= str.split(",");
 		N=Double.parseDouble(values[0]);
 		S=Double.parseDouble(values[1]);
-		E=Double.parseDouble(values[2]);
-		W=Double.parseDouble(values[3]);		
+		W=Double.parseDouble(values[2]);
+		E=Double.parseDouble(values[3]);		
 	}
 }

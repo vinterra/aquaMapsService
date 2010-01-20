@@ -157,7 +157,7 @@ public class HSPECGenerator {
 														
 							Double landValue=(landWeight)?1.0:1.0; //to understand why is not calculated
 							Double sstValue=(sstWeight)?this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]):1.0;
-							Double depthValue=(depthWeight)?this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin")):1.0;
+							Double depthValue=(depthWeight)?this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"),hspenRes.getInt("MeanDepth"),hcafRes.getDouble("DepthMean")):1.0;
 							Double salinityValue=(salinityWeight)?this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax")):1.0;
 							Double primaryProductsValue=(primaryProductionWeight)?this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax")):1.0;
 							Double seaIceConcentration=(seaIceConcentrationWeight)?this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session):1.0;
@@ -187,7 +187,7 @@ public class HSPECGenerator {
 								
 								Double landValue=(landWeight)?1.0:1.0; //to understand why is not calculated
 								Double sstValue=(sstWeight)?this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]):1.0;
-								Double depthValue=(depthWeight)?this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin")):1.0;
+								Double depthValue=(depthWeight)?this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"),hspenRes.getInt("MeanDepth"),hcafRes.getDouble("DepthMean")):1.0;
 								Double salinityValue=(salinityWeight)?this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax")):1.0;
 								Double primaryProductsValue=(primaryProductionWeight)?this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax")):1.0;
 								Double seaIceConcentration=(seaIceConcentrationWeight)?this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session):1.0;
@@ -266,7 +266,13 @@ public class HSPECGenerator {
 	 * @param hspenDepthPrefMin
 	 * @return depth
 	 */
-	public Double getDepth(Double hcafDepthMax, Double hcafDepthMin, int hspenPelagic, Double hspenMaxDepth,Double hspenMinDepth,Double hspenDepthPrefMax, Double hspenDepthPrefMin ){
+	public Double getDepth(Double hcafDepthMax, Double hcafDepthMin, int hspenPelagic, Double hspenMaxDepth,Double hspenMinDepth,Double hspenDepthPrefMax, Double hspenDepthPrefMin, int hspenMeanDepth, Double hcafDepthMean ){
+		// Check on hspenMeanDepth added from HSPEC version 2 (used from release 1.7)
+		if(hspenMinDepth == null) return 1.0;
+		if(hspenMeanDepth == 1) {
+			hcafDepthMax = hcafDepthMean;
+			hcafDepthMin = hcafDepthMean;
+		}
 		if (hcafDepthMax == -9999 || hspenMinDepth == null ) return 1.0;
 		if (hcafDepthMax < hspenMinDepth) return 0.0;
 		if 	((hcafDepthMax < hspenDepthPrefMin) &&(hcafDepthMax >= hspenMinDepth)) return (hcafDepthMax - hspenMinDepth) / (hspenDepthPrefMin - hspenMinDepth);

@@ -1,11 +1,14 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
+import java.util.List;
+
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.Filter;
 import org.gcube.application.aquamaps.stubs.FilterArray;
 import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
+import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 import com.sun.msv.grammar.xmlschema.OccurrenceExp;
@@ -75,14 +78,12 @@ public class DBCostants {
 	
 	public static String calculateGoodCells(boolean useFaoRestriction, boolean useBoundingBoxRestriction, String FaoRestriction,
 			float n,float s, float w, float e){
-		StringBuilder toReturn=new StringBuilder("Select * from "+GOOD_CELLS);
+		StringBuilder toReturn=new StringBuilder("Select * from "+GOOD_CELLS+" where "+SpeciesID+"= ? ");
 		
 		if(useFaoRestriction)
-			toReturn.append(" where find_in_set("+FaoAreaM+" , '"+FaoRestriction.replace(" ", "")+"')");
+			toReturn.append(" AND (find_in_set("+FaoAreaM+" , '"+FaoRestriction.replace(" ", "")+"'))");
 		if(useBoundingBoxRestriction){
-			if(!useFaoRestriction)toReturn.append(" where ");
-			else toReturn.append(" AND ");
-			toReturn.append(" (CenterLat<"+n+") AND (CenterLat>"+s+") AND (CenterLong<"+w+") AND (CenterLong>"+e+")");
+			toReturn.append("AND (CenterLat<"+n+") AND (CenterLat>"+s+") AND (CenterLong<"+w+") AND (CenterLong>"+e+")");
 		}
 		return toReturn.toString();
 	}
@@ -205,6 +206,17 @@ public class DBCostants {
 	public static final String mySQLServerUri="jdbc:mysql://localhost:3306/aquamaps_DB?user=root&password=mybohemian";
 	public static final String JDBCClassName="com.mysql.jdbc.Driver";
 	
-	
+	public static String perturbationUpdate(String hspenTable,List<Perturbation> toSetList, String speciesId) throws Exception{
+		StringBuilder toReturn=new StringBuilder();
+		toReturn.append("UPDATE "+hspenTable+" SET ");
+		for(int i=0;i<toSetList.size();i++){
+			Perturbation pert=toSetList.get(i);			
+			toReturn.append(getCompleteName(HSPEN, pert.getField().toLowerCase())+" = "+
+					pert.getValue());	
+			if(i<toSetList.size()-1) toReturn.append(" , ");
+		}
+		toReturn.append(" WHERE "+SpeciesID+"= '"+speciesId+"'");
+		return toReturn.toString();
+	}
 	
 }

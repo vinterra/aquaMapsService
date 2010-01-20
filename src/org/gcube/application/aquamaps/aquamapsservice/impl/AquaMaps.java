@@ -21,10 +21,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.AreasArray;
+import org.gcube.application.aquamaps.stubs.CalculateEnvelopeRequestType;
 import org.gcube.application.aquamaps.stubs.CalculateEnvelopefromCellSelectionRequestType;
-import org.gcube.application.aquamaps.stubs.CalculateGoodCellsRequestType;
 import org.gcube.application.aquamaps.stubs.Cell;
-import org.gcube.application.aquamaps.stubs.CellArray;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.FileArray;
@@ -43,7 +42,6 @@ import org.gcube.application.aquamaps.stubs.SearchBy2FiltersRequestType;
 import org.gcube.application.aquamaps.stubs.SearchByFilterRequestType;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
 import org.gcube.application.aquamaps.stubs.dataModel.util.FromResultSetToObject;
-import org.gcube.application.aquamaps.stubs.dataModel.util.ModelToStubs;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -62,19 +60,57 @@ public class AquaMaps extends GCUBEPortType {
 	}
 
 
-	public CellArray calculateGoodCells(CalculateGoodCellsRequestType req)throws GCUBEFault{
-		logger.trace("Serving calculateGoodCells");
-
+	public FieldArray calculateEnvelope(CalculateEnvelopeRequestType req)throws GCUBEFault{
+		logger.trace("Serving calculateEnvelope");		
 		try{
 			DBSession session=DBSession.openSession();
 			String query =DBCostants.calculateGoodCells(req.isUseFAO(), req.isUseBounding(), req.getFaoAreas(), req.getBoundingNorth(),	 req.getBoundingSouth(), req.getBoundingWest(), req.getBoundingEast());
 			logger.trace("submitting query "+query);
-			ResultSet rs=session.executeQuery(query);		
-			List<Cell> foundCells=new ArrayList<Cell>();
-			for(org.gcube.application.aquamaps.stubs.dataModel.Cell c : FromResultSetToObject.getCell(rs))
-				foundCells.add(ModelToStubs.translateToServer(c));
+			PreparedStatement ps = session.preparedStatement(query);
+			ps.setString(1, req.getSpeciesID());
+			ResultSet rs=ps.executeQuery();			
+			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> foundCells =FromResultSetToObject.getCell(rs);
 			logger.trace("found "+foundCells.size()+" cells");
-			return new CellArray(foundCells.toArray(new Cell[foundCells.size()]));			
+			
+			ps=session.preparedStatement(DBCostants.completeCellById);
+			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> toAnalyze=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Cell>(); 
+			for(org.gcube.application.aquamaps.stubs.dataModel.Cell cell: foundCells){
+				ps.setString(1, cell.getCode());
+				rs=ps.executeQuery();
+				toAnalyze.addAll(FromResultSetToObject.getCell(rs));
+			}			
+			//String returnValue=DBUtils.toJSon(rs);
+			/*String fileName=(new GregorianCalendar()).getTimeInMillis()+".json";
+			logger.trace("saving to "+fileName);
+			File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+"ResultSetFiles");
+			dir.mkdirs();			
+			File file=new File(dir.getAbsolutePath(),fileName);
+			//file.mkdirs();
+			FileWriter writer=new FileWriter(file);
+			writer.write(returnValue);
+			writer.close();
+			logger.trace("done");*/
+			if(toAnalyze.size()<10) return null;
+			ps = session.preparedStatement(DBCostants.completeSpeciesById);			
+			ps.setString(1, req.getSpeciesID());
+			rs = ps.executeQuery();
+			Species spec=FromResultSetToObject.getSpecies(rs).get(0);
+			if(req.isUseBottomSeaTempAndSalinity())
+				spec.getFieldbyName(Species.Tags.Layer).setValue("b");
+			else spec.getFieldbyName(Species.Tags.Layer).setValue("u");
+			SpEnvelope envelope=new SpEnvelope();
+			envelope.reCalculate(spec, toAnalyze);
+			ArrayList<Field> array=new ArrayList<Field>();
+			for(org.gcube.application.aquamaps.stubs.dataModel.Field f:spec.attributesList){
+				Field toAdd=new Field();
+				toAdd.setName(f.getName());
+				toAdd.setType(f.getType().toString());
+				toAdd.setValue(f.getValue());
+				array.add(toAdd);
+			}
+			session.close();		
+			logger.trace("re-calculation complete");
+			return new FieldArray(array.toArray(new Field[array.size()]));
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getjobList");
 			logger.trace("Raised Exception", e);
@@ -83,7 +119,7 @@ public class AquaMaps extends GCUBEPortType {
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
 			throw new GCUBEFault();
-		}				
+		}
 	}
 
 	public FieldArray calculateEnvelopefromCellSelection(CalculateEnvelopefromCellSelectionRequestType request)throws GCUBEFault{
@@ -96,9 +132,9 @@ public class AquaMaps extends GCUBEPortType {
 			ps.setString(1, request.getSpeciesID());
 			ResultSet rs = ps.executeQuery();
 			Species spec=FromResultSetToObject.getSpecies(rs).get(0);
-			if(request.isUseBottomSeaTempAndSalinity())
+			/*if(request.isUseBottomSeaTempAndSalinity())
 				spec.getFieldbyName(Species.Tags.Layer).setValue("b");
-			else spec.getFieldbyName(Species.Tags.Layer).setValue("u");
+			else spec.getFieldbyName(Species.Tags.Layer).setValue("u");*/
 			
 			ps=conn.prepareStatement(DBCostants.completeCellById);
 			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> toAnalyze=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Cell>(); 
