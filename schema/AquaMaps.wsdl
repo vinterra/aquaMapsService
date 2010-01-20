@@ -249,23 +249,24 @@
 
 			<!-- Request / Response Types-->
 			
-			<xsd:complexType name="calculateGoodCellsRequestType">
-				<xsd:sequence>					
+			<xsd:complexType name="calculateEnvelopeRequestType">
+				<xsd:sequence>		
+				<xsd:element name="speciesID" type="xsd:string"/>			
 					<xsd:element name="FaoAreas" type ="xsd:string"/>
 					<xsd:element name="BoundingNorth" type="xsd:float"/>
 					<xsd:element name="BoundingSouth" type="xsd:float"/>
 					<xsd:element name="BoundingEast" type="xsd:float"/>
 					<xsd:element name="BoundingWest" type="xsd:float"/>
 					<xsd:element name="useFAO" type="xsd:boolean"/>
-					<xsd:element name="useBounding" type="xsd:boolean"/>					
+					<xsd:element name="useBounding" type="xsd:boolean"/>
+					<xsd:element name="useBottomSeaTempAndSalinity" type="xsd:boolean"/>					
 				</xsd:sequence>
 			</xsd:complexType>
 			
 			<xsd:complexType name="calculateEnvelopefromCellSelectionRequestType">
 				<xsd:sequence>
 					<xsd:element name="speciesID" type="xsd:string"/>					
-					<xsd:element name="cells" type="tns:cellArray"/>
-					<xsd:element name="useBottomSeaTempAndSalinity" type="xsd:boolean"/>					
+					<xsd:element name="cells" type="tns:cellArray"/>										
 				</xsd:sequence>				
 			</xsd:complexType>
 						
@@ -374,8 +375,9 @@
 				
 				
 			<!-- Request / Response elements -->
-			<xsd:element name="calculateGoodCellsRequest" type="tns:calculateGoodCellsRequestType"/>
-			<xsd:element name="calculateGoodCellsResponse" type ="tns:cellArray"/>
+			
+			<xsd:element name="calculateEnvelopeRequest" type ="tns:calculateEnvelopeRequestType"/>
+			<xsd:element name="calculateEnvelopeResponse" type="tns:fieldArray" />
 			
 			<xsd:element name="calculateEnvelopefromCellSelectionRequest" type ="tns:calculateEnvelopefromCellSelectionRequestType"/>
 			<xsd:element name="calculateEnvelopefromCellSelectionResponse" type="tns:fieldArray" />
@@ -466,11 +468,11 @@
 
 	<!-- message part -->
 	
-	<message name="CalculateGoodCellsRequest">
-	<part name="request" element="tns:calculateGoodCellsRequest"/>
+	<message name="CalculateEnvelopeRequest">
+		<part name="request" element="tns:calculateEnvelopeRequest" />
 	</message>
-	<message name="CalculateGoodCellsResponse">
-	<part name="response" element="tns:calculateGoodCellsResponse"/>
+	<message name="CalculateEnvelopeResponse">
+		<part name="response" element="tns:calculateEnvelopeResponse" />
 	</message>
 	
 	<message name="CalculateEnvelopefromCellSelectionRequest">
@@ -620,9 +622,10 @@
 
 		<!-- operation part -->
 		
-		<wsdl:operation name="calculateGoodCells">
-			<input message="tns:CalculateGoodCellsRequest" />
-			<output message="tns:CalculateGoodCellsResponse" />
+		
+		<wsdl:operation name="calculateEnvelope">
+			<input message="tns:CalculateEnvelopeRequest" />
+			<output message="tns:CalculateEnvelopeResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
 			
