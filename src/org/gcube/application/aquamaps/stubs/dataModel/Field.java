@@ -1,5 +1,8 @@
 package org.gcube.application.aquamaps.stubs.dataModel;
 
+import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
+import org.w3c.dom.Element;
+
 
 public class Field {
 
@@ -51,4 +54,14 @@ public class Field {
 		return doc.toString();
 	}
 	
+	public static Field parseField(Element el){
+		Field toReturn=new Field();
+		Element typeElement=(Element) el.getElementsByTagName("Type").item(0);
+		toReturn.setType(Field.Type.valueOf(XMLUtils.getTextContent(typeElement)));
+		Element nameElement=(Element) el.getElementsByTagName("Name").item(0);
+		toReturn.setName(XMLUtils.getTextContent(nameElement));
+		Element valueElement=(Element) el.getElementsByTagName("Value").item(0);
+		toReturn.setValue(XMLUtils.getTextContent(valueElement));
+		return toReturn;
+	}
 }

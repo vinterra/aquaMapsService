@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject.Tags;
+
 public class Job {
 	
 	
@@ -90,21 +92,28 @@ public class Job {
 		for(Species spec:selectedSpecies) profileBuilder.append(spec.toXML());
 		profileBuilder.append("</SelectedSpecies>");
 		
-		profileBuilder.append("<EnvelopeCustomization>");
-		for(String specId:envelopeCustomization.keySet()){
-			//TODO weights
-			profileBuilder.append("<"+Species.Tags.ID+">"+specId+"</"+Species.Tags.ID+">");
-			profileBuilder.append("<Customizations>");
-			for(String fieldName:envelopeCustomization.get(specId).keySet()){
-				profileBuilder.append("<Customization>");
-				profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
-				profileBuilder.append("<Type>"+envelopeCustomization.get(specId).get(fieldName).getType()+"</Type>");
-				profileBuilder.append("<Value>"+envelopeCustomization.get(specId).get(fieldName).getPerturbationValue()+"</Value>");
-				profileBuilder.append("</Customization>");
-			}
-			profileBuilder.append("</Customizations>");
+		profileBuilder.append("<"+Tags.envelopeCustomization+">");
+		for(Species spec:selectedSpecies){
+			String specId=spec.getId();
+			if((envelopeWeights.containsKey(specId))||(envelopeCustomization.containsKey(specId))){
+				profileBuilder.append("<"+Tags.customizationSet+" "+Species.Tags.ID+" =\""+specId+"\">");
+				if(envelopeWeights.containsKey(specId)){
+					profileBuilder.append("<Weights>");
+					for(Field field:envelopeWeights.get(specId)) profileBuilder.append(field.toXML());
+					profileBuilder.append("</Weights>");
+				}
+				if(envelopeCustomization.containsKey(specId))
+					for(String fieldName:envelopeCustomization.get(specId).keySet()){
+						profileBuilder.append("<"+Tags.customization+">");
+						profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
+						profileBuilder.append("<Type>"+envelopeCustomization.get(specId).get(fieldName).getType()+"</Type>");
+						profileBuilder.append("<Value>"+envelopeCustomization.get(specId).get(fieldName).getPerturbationValue()+"</Value>");
+						profileBuilder.append("</"+Tags.customization+">");
+					}
+				profileBuilder.append("</"+Tags.customizationSet+">");				
+			}			
 		}
-		profileBuilder.append("</EnvelopeCustomization>");
+		profileBuilder.append("</"+Tags.envelopeCustomization+">");
 		
 		profileBuilder.append("<SelectedAreas>");
 		for(Area area:selectedAreas) profileBuilder.append(area.toXML());
@@ -114,19 +123,19 @@ public class Job {
 		for(Cell cell: cellExclusion) profileBuilder.append(cell.toXML());
 		profileBuilder.append("</CellExclusion>");
 		
-		profileBuilder.append("<EnvironmentCustomization>");
-		for(String cellId:environmentCustomization.keySet()){
-			profileBuilder.append("<"+Cell.Tags.ID+">"+cellId+"</"+Cell.Tags.ID+">");
-			profileBuilder.append("<Customizations>");
-			for(String fieldName:environmentCustomization.get(cellId).keySet()){				
+		profileBuilder.append("<"+Tags.environementCustomization+">");
+		for(String cellId:environmentCustomization.keySet()){			
+			profileBuilder.append("<"+Tags.customizationSet+" "+Cell.Tags.ID+" = \""+cellId+"\">");
+			for(String fieldName:environmentCustomization.get(cellId).keySet()){
+				profileBuilder.append("<"+Tags.customization+">");
 				profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
 				profileBuilder.append("<Type>"+environmentCustomization.get(cellId).get(fieldName).getType()+"</Type>");
 				profileBuilder.append("<Value>"+environmentCustomization.get(cellId).get(fieldName).getPerturbationValue()+"</Value>");
-				profileBuilder.append("</Customization>");
+				profileBuilder.append("</"+Tags.customization+">");
 			}
-			profileBuilder.append("</Customizations>");
+			profileBuilder.append("</"+Tags.customizationSet+">");
 		}
-		profileBuilder.append("</EnvironmentCustomization>");
+		profileBuilder.append("</"+Tags.environementCustomization+">");
 		
 		
 		

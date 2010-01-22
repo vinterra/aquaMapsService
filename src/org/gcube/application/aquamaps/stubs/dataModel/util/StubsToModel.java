@@ -173,8 +173,8 @@ public class StubsToModel {
 		return toReturn;
 	}
 	
-/*	public static org.gcube.application.aquamaps.dataModel.AquaMapsObject translateToClient(AquaMap obj){
-		 org.gcube.application.aquamaps.dataModel.AquaMapsObject toReturn=new  org.gcube.application.aquamaps.dataModel.AquaMapsObject();
+	public static org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject translateToClient(AquaMap obj){
+		 org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject toReturn=new  org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject();
 		 toReturn.setAuthor(obj.getAuthor());
 		 toReturn.getBoundingBox().parse(obj.getBoundingBox());
 		 toReturn.setCreator(obj.getCreator());
@@ -182,20 +182,20 @@ public class StubsToModel {
 		 if((obj.getEnvelopCustomization()!=null)&&(obj.getEnvelopCustomization().getPerturbationList()!=null)){
 			 for(Perturbation p : obj.getEnvelopCustomization().getPerturbationList()){
 				 if(!toReturn.getEnvelopeCustomization().containsKey(p.getToPerturbId()))
-					  toReturn.getEnvelopeCustomization().put(p.getToPerturbId(), new HashMap<String, org.gcube.application.aquamaps.dataModel.Perturbation>());				
+					  toReturn.getEnvelopeCustomization().put(p.getToPerturbId(), new HashMap<String, org.gcube.application.aquamaps.stubs.dataModel.Perturbation>());				
 				 toReturn.getEnvelopeCustomization().get(p.getToPerturbId()).put(p.getField(), translateToClient(p));
 			 }
 		 }
 		 if((obj.getEnvironmentCustomization()!=null)&&(obj.getEnvironmentCustomization().getPerturbationList()!=null)){
 			 for(Perturbation p : obj.getEnvironmentCustomization().getPerturbationList()){
 				 if(!toReturn.getEnvironmentCustomization().containsKey(p.getToPerturbId()))
-					  toReturn.getEnvironmentCustomization().put(p.getToPerturbId(), new HashMap<String, org.gcube.application.aquamaps.dataModel.Perturbation>());				
+					  toReturn.getEnvironmentCustomization().put(p.getToPerturbId(), new HashMap<String, org.gcube.application.aquamaps.stubs.dataModel.Perturbation>());				
 				 toReturn.getEnvironmentCustomization().get(p.getToPerturbId()).put(p.getField(), translateToClient(p));
 			 }
 		 }
 		 if((obj.getWeights()!=null)&&(obj.getWeights().getEnvelopeWeightList()!=null)){
 			 for(EnvelopeWeights w : obj.getWeights().getEnvelopeWeightList()){
-				 List<org.gcube.application.aquamaps.dataModel.Field> list = new ArrayList<org.gcube.application.aquamaps.dataModel.Field>();
+				 List<org.gcube.application.aquamaps.stubs.dataModel.Field> list = new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Field>();
 				 if((w.getWeights()!=null)&&(w.getWeights().getWeightList()!=null))
 					 for(Weight weight : w.getWeights().getWeightList())
 						 list.add(translateToClient(weight));
@@ -209,8 +209,26 @@ public class StubsToModel {
 		 }
 		 toReturn.setId(obj.getId());
 		 toReturn.setName(obj.getName());
+		 if((obj.getSelectedAreas()!=null)&&(obj.getSelectedAreas().getAreasList()!=null)){
+			 List<org.gcube.application.aquamaps.stubs.dataModel.Area> toAddAreas=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Area>();
+			 for(Area a : obj.getSelectedAreas().getAreasList())
+				 toAddAreas.add(translateToClient(a));
+			 toReturn.addAreas(toAddAreas);
+		 }
+		 if((obj.getSelectedSpecies()!=null)&&(obj.getSelectedSpecies().getSpeciesList()!=null)){
+			 List<org.gcube.application.aquamaps.stubs.dataModel.Species> toAddSpecies=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Species>();
+			 for(Specie s : obj.getSelectedSpecies().getSpeciesList())
+				 toAddSpecies.add(translateToClient(s));
+			 toReturn.addSpecies(toAddSpecies);
+		 }
+		 toReturn.setSource(obj.getSource());
+		 toReturn.setStatus(obj.getSource());
+		 toReturn.setThreshold(obj.getThreshold());
+		 toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject.Type.valueOf(obj.getType()));
+		 
+		 return toReturn;
 		 //TODO Change stubs
-		 FileArray files=obj.getRelatedResources()
+		/* FileArray files=obj.getRelatedResources()
 		 if((files!=null)&&(files.getFileList()!=null)){
 				for(File f:files.getFileList()){
 					if(f.getType().equalsIgnoreCase("xml")) toUpdate.setProfileUrl(f.getUrl());
@@ -220,8 +238,8 @@ public class StubsToModel {
 		 toReturn.setProfileUrl(obj.get)
 		 toReturn.setPublisher(obj.getPublisher());
 		 toReturn.setRelatedResources(relatedResources)
-		 if()toReturn.setSelectedAreas(selectedAreas)
-	}*/
+		 if()toReturn.setSelectedAreas(selectedAreas)*/
+	}
 	
 	public static org.gcube.application.aquamaps.stubs.dataModel.Perturbation translateToClient(Perturbation obj){
 		 org.gcube.application.aquamaps.stubs.dataModel.Perturbation.Type type=org.gcube.application.aquamaps.stubs.dataModel.Perturbation.Type.valueOf(obj.getType());

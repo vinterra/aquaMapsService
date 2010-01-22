@@ -3,6 +3,10 @@ package org.gcube.application.aquamaps.stubs.dataModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 public class Species {
 
 	public static class Tags{
@@ -172,12 +176,16 @@ public class Species {
 		return true;
 	}
 	
-	/*public boolean equals(Object obj) {
-		if(!(obj instanceof Species)) return false;
-		Species toCheck=(Species) obj;
-		return(toCheck.getId().equals(this.getId()));
-	
-	}*/
+	public static Species parseSpecies(Element el){
+		Species toReturn=new Species();
+		Element idEl=(Element) el.getElementsByTagName(Species.Tags.ID).item(0);
+		toReturn.setId(XMLUtils.getTextContent(idEl));
+		NodeList fieldNodes=el.getElementsByTagName("Field");
+		for(int i=0;i<fieldNodes.getLength();i++){
+			toReturn.addField(Field.parseField((Element)fieldNodes.item(i)));
+		}
+		return toReturn;
+	}
 	
 	
 	
