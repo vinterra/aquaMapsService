@@ -3,13 +3,12 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Specie;
@@ -45,22 +44,21 @@ public class BiodiversityThread extends Thread {
 		}
 	
 		try {
-	Statement stmt = generationDetails.getConnection().createStatement();
+	
 	String tableName="S"+(uuidGen.nextUUID()).replaceAll("-", "_");
 	PreparedStatement prep=null;
 	String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
 	logger.trace("Going to execute query : "+creationSQL);
-	stmt.execute(creationSQL);
-	generationDetails.getToDropTableList().add(tableName);
-	stmt.close();
-	for(String specId: speciesIds){	
-		stmt = generationDetails.getConnection().createStatement();
-		stmt.execute("INSERT INTO "+tableName+" VALUES('"+specId+"')");
+	DBSession session=generationDetails.getConnection();
+	session.executeUpdate(creationSQL);
+	generationDetails.getToDropTableList().add(tableName);	
+	for(String specId: speciesIds){
+		session.executeUpdate("INSERT INTO "+tableName+" VALUES('"+specId+"')");
 		logger.trace("INSERT INTO "+tableName+" VALUES('"+specId+"')");
-		stmt.close();}
+		;}
 	logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
 	
-	prep=generationDetails.getConnection().prepareStatement(DBCostants.clusteringBiodiversityQuery(generationDetails.getHspecTable(),tableName));				
+	prep=session.preparedStatement(DBCostants.clusteringBiodiversityQuery(generationDetails.getHspecTable(),tableName));				
 	prep.setFloat(1,toPerform.getThreshold());
 	ResultSet rs=prep.executeQuery();
 	
@@ -83,7 +81,7 @@ public class BiodiversityThread extends Thread {
 			if(app.size()>0){
 				String basePath=JobUtils.publish(generationDetails.getFirstLevelDirName(), generationDetails.getSecondLevelDirName(), app.values());
 				logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-				PreparedStatement ps =generationDetails.getConnection().prepareStatement(DBCostants.fileInsertion);
+				PreparedStatement ps =generationDetails.getConnection().preparedStatement(DBCostants.fileInsertion);
 				
 				for(String mapName:app.keySet()){
 					ps.setBoolean(1,true);
@@ -99,9 +97,8 @@ public class BiodiversityThread extends Thread {
 			}
 		}
 	}	
-		stmt = generationDetails.getConnection().createStatement();
-		stmt.execute("DROP TABLE "+tableName);
-		stmt.close();
+		
+		session.executeUpdate("DROP TABLE "+tableName);		
 		generationDetails.setAquaMapStatus(JobGenerationDetails.Status.Completed, selectedAquaMap);
 	} catch (Exception e) {
 		logger.error(e.getMessage());

@@ -25,6 +25,13 @@ public class DBSession {
 	
 	private Connection connection;
 	
+	/**
+	 * @return the connection
+	 */
+	public Connection getConnection() {
+		return connection;
+	}
+
 	public static enum ENGINE{MyISAM, InnoDB};
 	
 	public static enum ALTER_OPERATION{MODIFY, ADD};

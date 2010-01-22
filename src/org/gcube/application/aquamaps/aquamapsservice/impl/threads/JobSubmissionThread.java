@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
@@ -30,11 +31,7 @@ public class JobSubmissionThread extends Thread {
 	
 	JobGenerationDetails generationStatus;
 	
-	//String speciesTmpTable=null;
-	//String areaTmpTable=null;
-	//String simulationDataTable=DBCostants.HSPEC; //Default HSPEC
-	Connection conn;
-	//String jobID=null;
+	
 	Map<String,File> toPublishPaths=new HashMap<String, File>();
 	ThreadGroup waitingGroup;
 	
@@ -50,11 +47,9 @@ public class JobSubmissionThread extends Thread {
 
 	public void run() {	
 		try{
-			logger.trace("Creating connection to DB");
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			conn.setAutoCommit(false);
-			generationStatus.setConnection(conn);
+			DBSession session=DBSession.openSession();
+			session.disableAutoCommit();
+			generationStatus.setConnection(session);
 			insertNewJob();
 			
 			// Create and run Area Perturbation Thread
@@ -140,7 +135,7 @@ public class JobSubmissionThread extends Thread {
 			generationStatus.setStatus(JobGenerationDetails.Status.Completed);
 			
 
-			conn.commit();
+			generationStatus.getConnection().commit();
 			logger.trace(this.getName()+" job "+generationStatus.getToPerform().getName()+" completed");
 		}catch (SQLException e) {
 			try {
@@ -180,7 +175,7 @@ public class JobSubmissionThread extends Thread {
 		int mese = cal.get(Calendar.MONTH);
 		int anno = cal.get(Calendar.YEAR);
 		
-		Statement stmt=conn.createStatement();
+		
 		
 		String myData = String.valueOf(anno)+"-"+String.valueOf(mese)+"-"+String.valueOf(giorno);
 		String myJob = "INSERT INTO submitted(title, author, date, status,isAquaMap) VALUES('"+
@@ -188,6 +183,7 @@ public class JobSubmissionThread extends Thread {
 							generationStatus.getToPerform().getAuthor()+"', '"+
 							myData+"', '"+generationStatus.getStatus().toString()+"', "+false+")";
 		logger.trace("Going to execute : "+myJob);
+		Statement stmt =generationStatus.getConnection().getConnection().createStatement();
 		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
 		ResultSet rs=stmt.getGeneratedKeys();
 		rs.first();
@@ -203,7 +199,7 @@ public class JobSubmissionThread extends Thread {
 							aquaMapObj.getAuthor()+"', '"+
 							myData+"', '"+JobGenerationDetails.Status.Pending+"', '"+
 							jobId+"', '"+ aquaMapObj.getType()+"', "+true+")";
-			Statement aquaStatement=conn.createStatement();
+			Statement aquaStatement=generationStatus.getConnection().getConnection().createStatement();
 			logger.trace("Going to execute : "+myAquaMapObj);
 			aquaStatement.execute(myAquaMapObj,Statement.RETURN_GENERATED_KEYS);
 			ResultSet rsA=aquaStatement.getGeneratedKeys();
@@ -213,7 +209,7 @@ public class JobSubmissionThread extends Thread {
 			JobUtils.updateProfile(aquaMapObj.getName(), aquaMapObj.getId(), JobUtils.makeAquaMapProfile(aquaMapObj),
 					generationStatus.getFirstLevelDirName(), generationStatus.getSecondLevelDirName(), generationStatus.getConnection());
 		}
-		conn.commit();
+		generationStatus.getConnection().commit();
 		
 		}catch(NullPointerException e ){
 			logger.error("Exception while inserting aquamaps object(s) ",e);
@@ -227,7 +223,7 @@ public class JobSubmissionThread extends Thread {
 	public void cleanTmp(){
 		for(String tableName:generationStatus.getToDropTableList()){
 			try{
-				Statement stmt=generationStatus.getConnection().createStatement();
+				Statement stmt=generationStatus.getConnection().getConnection().createStatement();
 				stmt.execute("Drop table "+tableName);
 			}catch(SQLException e){
 				logger.error("Unable to drop table : "+tableName);

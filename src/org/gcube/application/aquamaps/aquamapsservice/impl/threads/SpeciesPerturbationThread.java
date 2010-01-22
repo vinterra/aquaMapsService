@@ -49,7 +49,7 @@ public SpeciesPerturbationThread(ThreadGroup group,JobGenerationDetails details)
 		
 		// ***************** Perturbation
 		int progressCount=0;		
-		Statement stmt=generationDetails.getConnection().createStatement();
+		Statement stmt=generationDetails.getConnection().getConnection().createStatement();
 		for(String speciesId : generationDetails.getSpeciesHandling().keySet()){
 			if(toPerformPerturbations.containsKey(speciesId)){ 
 				//Species to Perturb
@@ -82,7 +82,7 @@ public SpeciesPerturbationThread(ThreadGroup group,JobGenerationDetails details)
 		logger.trace("Filtering species...");
 		generationDetails.setHspenTable("H"+(uuidGen.nextUUID()).replaceAll("-", "_"));
 		String speciesListTable="s"+(uuidGen.nextUUID()).replaceAll("-", "_");
-		Statement stmt=generationDetails.getConnection().createStatement();
+		Statement stmt=generationDetails.getConnection().getConnection().createStatement();
 		
 		String creationSQL="CREATE TABLE  "+speciesListTable+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
 		

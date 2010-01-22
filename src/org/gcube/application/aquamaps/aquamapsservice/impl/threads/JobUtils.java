@@ -9,11 +9,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,6 +20,7 @@ import java.util.Map;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
@@ -34,7 +33,6 @@ import org.gcube.application.aquamaps.stubs.Resource;
 import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.application.aquamaps.stubs.SpeciesArray;
 import org.gcube.application.aquamaps.stubs.Weight;
-import org.gcube.application.aquamaps.stubs.dataModel.util.StubsToModel;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -186,7 +184,7 @@ public class JobUtils {
 
 	}
 	
-	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir,Connection c) throws Exception{
+	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir,DBSession c) throws Exception{
 		Collection<File> toUpdateProfile=new ArrayList<File>();
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+resName);
 		dir.mkdirs();
@@ -198,12 +196,12 @@ public class JobUtils {
 		toUpdateProfile.add(file);
 		String path=publish(firstLevelDir,secondLevelDir,toUpdateProfile);
 		logger.trace("Profile for "+resName+" created, gonna update DB");
-		PreparedStatement ps=c.prepareStatement(DBCostants.profileUpdate);
+		PreparedStatement ps=c.preparedStatement(DBCostants.profileUpdate);
 		ps.setString(1, path+file.getName());
 		ps.setInt(2, Integer.parseInt(resId));		
 		if(ps.executeUpdate()==0){
 			logger.trace("Entry not found for profile, gonna create it");
-			PreparedStatement pps =c.prepareStatement(DBCostants.fileInsertion);
+			PreparedStatement pps =c.preparedStatement(DBCostants.fileInsertion);
 				pps.setBoolean(1,true);
 				pps.setString(2,"Metadata");
 				pps.setString(3, path+file.getName());
@@ -213,10 +211,10 @@ public class JobUtils {
 		}
 	}
 	
-	public static void updateStatus(JobGenerationDetails generationDetails,Connection c,JobGenerationDetails.Status status)throws SQLException, IOException, Exception{
+	public static void updateStatus(JobGenerationDetails generationDetails,DBSession c,JobGenerationDetails.Status status)throws SQLException, IOException, Exception{
 		Job toUpdate=generationDetails.getToPerform();
 		toUpdate.setStatus(status.toString());
-		PreparedStatement ps=c.prepareStatement(DBCostants.submittedStatusUpdating);
+		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, toUpdate.getStatus());		
 		ps.setInt(2,Integer.parseInt(toUpdate.getId()));
 		ps.execute();		
@@ -225,9 +223,9 @@ public class JobUtils {
 	}
 	
 	
-	public static void updateAquaMapStatus(JobGenerationDetails generationDetails,AquaMap toUpdate,Connection c,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
+	public static void updateAquaMapStatus(JobGenerationDetails generationDetails,AquaMap toUpdate,DBSession c,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
 		toUpdate.setStatus(status.toString());
-		PreparedStatement ps=c.prepareStatement(DBCostants.submittedStatusUpdating);
+		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, status.toString());
 		ps.setInt(2,Integer.parseInt(toUpdate.getId()));		
 		ps.execute();		
@@ -520,27 +518,26 @@ public class JobUtils {
 	 */
 	
 	
-	public static String filterByArea(JobGenerationDetails details)throws SQLException{
+	public static String filterByArea(JobGenerationDetails details)throws Exception{
 		String toReturn;		
 		logger.trace(" filtering simulation data on area selection for job "+details.getToPerform().getName());
 		
 		if((details.getToPerform().getSelectedAreas()!=null)&&(details.getToPerform().getSelectedAreas().getAreasList()!=null)
 				&&(details.getToPerform().getSelectedAreas().getAreasList().length>0)){
-			Statement stmt=details.getConnection().createStatement();
+			DBSession conn = details.getConnection();
 			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
-			stmt.execute("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
+			conn.executeUpdate("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
 			for(Area area: details.getToPerform().getSelectedAreas().getAreasList())			
-				stmt.execute("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
+				conn.executeUpdate("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
 			
 			logger.trace(" area temp table created");
 			details.getToDropTableList().add(areaTmpTable);
 			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
-			stmt.execute("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
+			conn.executeUpdate("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
 			details.getToDropTableList().add(filteredTable);
 			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,details.getHspecTable(),areaTmpTable);
-			logger.trace("Going to use sql query "+filterQuery);
-			Statement filterStmt=details.getConnection().createStatement();
-			filterStmt.execute(filterQuery);
+			logger.trace("Going to use sql query "+filterQuery);			
+			conn.executeQuery(filterQuery);
 			/*ps.setString(1, filteredTable);
 			ps.setString(2, areaTmpTable);
 			ps.setString(3, areaTmpTable+".code");
@@ -549,7 +546,7 @@ public class JobUtils {
 			ps.execute();*/
 			
 			logger.trace(" table filtered, dropping area temp table");
-			stmt.execute("drop table "+areaTmpTable);
+			conn.executeUpdate("drop table "+areaTmpTable);
 			
 			toReturn=filteredTable;
 		}else {

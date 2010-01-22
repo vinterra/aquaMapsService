@@ -1,13 +1,12 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Specie;
@@ -24,7 +23,7 @@ public class JobGenerationDetails {
 	public enum Status {
 		Pending,Simulating,Generating,Publishing,Completed,Error
 		}
-	private Connection connection;
+	private DBSession connection;
 	private Map<Integer,Status> toPerformBiodiversity=new HashMap<Integer, Status>();
 	private Map<Integer,Status> toPerformDistribution=new HashMap<Integer, Status>();
 	private Map<String,SpeciesStatus> speciesHandling=new HashMap<String, SpeciesStatus>();
@@ -124,10 +123,10 @@ public class JobGenerationDetails {
 	public String getSecondLevelDirName(){
 		return (toPerform.getId());
 	}
-	public void setConnection(Connection connection) {
+	public void setConnection(DBSession connection) {
 		this.connection = connection;
 	}
-	public Connection getConnection() {
+	public DBSession getConnection() {
 		return connection;
 	}
 	public void setAquaMapStatus(Status status,int index) throws Exception{

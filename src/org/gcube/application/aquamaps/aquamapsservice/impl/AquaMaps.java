@@ -2,13 +2,10 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
 import java.rmi.RemoteException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,9 +123,9 @@ public class AquaMaps extends GCUBEPortType {
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps = conn.prepareStatement(DBCostants.completeSpeciesById);			
+			
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps = conn.preparedStatement(DBCostants.completeSpeciesById);			
 			ps.setString(1, request.getSpeciesID());
 			ResultSet rs = ps.executeQuery();
 			Species spec=FromResultSetToObject.getSpecies(rs).get(0);
@@ -136,7 +133,7 @@ public class AquaMaps extends GCUBEPortType {
 				spec.getFieldbyName(Species.Tags.Layer).setValue("b");
 			else spec.getFieldbyName(Species.Tags.Layer).setValue("u");*/
 			
-			ps=conn.prepareStatement(DBCostants.completeCellById);
+			ps=conn.preparedStatement(DBCostants.completeCellById);
 			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> toAnalyze=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Cell>(); 
 			for(Cell cell: request.getCells().getCellList()){
 				ps.setString(1, cell.getCode());
@@ -167,9 +164,8 @@ public class AquaMaps extends GCUBEPortType {
 		logger.trace("getting profile for owner id : "+id);
 		String toReturn="";
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps=conn.prepareStatement(DBCostants.profileRetrieval);
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps=conn.preparedStatement(DBCostants.profileRetrieval);
 			ps.setInt(1, Integer.parseInt(id));		
 			ResultSet rs=ps.executeQuery();
 			if(rs.first()){
@@ -218,9 +214,8 @@ public class AquaMaps extends GCUBEPortType {
 		logger.trace("Serving get JobList for author : "+author);
 		String toReturn="";
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps=conn.prepareStatement(DBCostants.JobList);
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps=conn.preparedStatement(DBCostants.JobList);
 			ps.setString(1, author);		
 			ResultSet rs=ps.executeQuery();
 			toReturn=DBUtils.toJSon(rs);
@@ -241,10 +236,8 @@ public class AquaMaps extends GCUBEPortType {
 		logger.trace("getting file List for owner id : "+owner);
 		FileArray toReturn=null;
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			Statement stmt=conn.createStatement();		
-			ResultSet rs=stmt.executeQuery("Select * from Files where owner = "+owner);
+			DBSession conn = DBSession.openSession();			
+			ResultSet rs=conn.executeQuery("Select * from Files where owner = "+owner);
 			ArrayList<org.gcube.application.aquamaps.stubs.File> files=new ArrayList<org.gcube.application.aquamaps.stubs.File>();
 			while(rs.next()){
 				org.gcube.application.aquamaps.stubs.File f=new org.gcube.application.aquamaps.stubs.File();
@@ -254,8 +247,7 @@ public class AquaMaps extends GCUBEPortType {
 				files.add(f);			
 			}
 			toReturn=new FileArray(files.toArray(new org.gcube.application.aquamaps.stubs.File[files.size()]));
-			rs.close();
-			stmt.close();
+			rs.close();			
 			conn.close();
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getjobList");
@@ -273,9 +265,8 @@ public class AquaMaps extends GCUBEPortType {
 		logger.trace("Serving getAquaMapsList for job Id : "+jobId);
 		String toReturn="";
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps=conn.prepareStatement(DBCostants.AquaMapsList);		
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsList);		
 			ps.setInt(1, Integer.parseInt(jobId));
 			ResultSet rs=ps.executeQuery();
 			toReturn=DBUtils.toJSon(rs);
@@ -299,9 +290,8 @@ public class AquaMaps extends GCUBEPortType {
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving getSpeciesEnvelop for speciesID : "+speciesId);
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps=conn.prepareStatement(DBCostants.speciesEnvelop);
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps=conn.preparedStatement(DBCostants.speciesEnvelop);
 			ps.setString(1, speciesId);
 			ResultSet rs = ps.executeQuery();
 			if(rs.first())			
@@ -323,9 +313,8 @@ public class AquaMaps extends GCUBEPortType {
 		ArrayList<Field> array=new ArrayList<Field>();
 		logger.trace("Serving getCellEnvironment for cellCode : "+code);
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps=conn.prepareStatement(DBCostants.cellEnvironment);
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
 			ps.setString(1, code);
 			ResultSet rs = ps.executeQuery();
 			if(rs.first())			
@@ -346,9 +335,8 @@ public class AquaMaps extends GCUBEPortType {
 	public String getGoodCells(String speciesId)throws GCUBEFault{
 		logger.trace("Serving getGoodCell for species ID : " +speciesId);
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			PreparedStatement ps=conn.prepareStatement(DBCostants.cellEnvironment);
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getCellEnvironment");
 			logger.trace("Raised Exception", e);
@@ -369,13 +357,12 @@ public class AquaMaps extends GCUBEPortType {
 		AreasArray areas=req.getAreas();
 		logger.trace("Serving getSelectedCells ");
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
+			DBSession conn = DBSession.openSession();
 			Area[] selection=areas.getAreasList();
 			String[] queries=DBCostants.cellFiltering(selection, DBCostants.HCAF_S);
 			logger.trace("Gonna use query : "+queries[0]);
-			PreparedStatement ps=conn.prepareStatement(queries[0]+((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+limit+" OFFSET "+offset);
-			PreparedStatement psCount=conn.prepareStatement(queries[1]);
+			PreparedStatement ps=conn.preparedStatement(queries[0]+((sortColumn!=null)?" order by "+sortColumn+" "+sortDirection:"")+" LIMIT "+limit+" OFFSET "+offset);
+			PreparedStatement psCount=conn.preparedStatement(queries[1]);
 			if((selection!=null)&&(selection.length>0))			
 				for(int i=0;i<selection.length;i++){
 					ps.setInt(i+1, Integer.parseInt(selection[i].getCode()));
@@ -425,20 +412,18 @@ public class AquaMaps extends GCUBEPortType {
 		String sortDirection=req.getSortDirection();
 
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("Select * from "+DBCostants.speciesOccurSum+
+			DBSession conn = DBSession.openSession();			
+			ResultSet rs = conn.executeQuery("Select * from "+DBCostants.speciesOccurSum+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
-			Statement stmtCount=conn.createStatement();
-			ResultSet rsCount=stmtCount.executeQuery("Select count("+DBCostants.SpeciesID+") from "+DBCostants.speciesOccurSum);
+			
+			ResultSet rsCount=conn.executeQuery("Select count("+DBCostants.SpeciesID+") from "+DBCostants.speciesOccurSum);
 			rsCount.first();
 			int count=rsCount.getInt(1);
 			toReturn= DBUtils.toJSon(rs,count);
 			rsCount.close();
-			stmtCount.close();
+			
 			rs.close();
-			stmt.close();
+			
 			conn.close();			
 		}catch(Exception e){
 			logger.error("Errors while performing operation",e);
@@ -465,20 +450,19 @@ public class AquaMaps extends GCUBEPortType {
 			logger.trace("Gonna use query :"+queries[0]);
 			String sortColumn=req.getSortColumn();
 			String sortDirection=req.getSortDirection();
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(queries[0]+
+			DBSession conn = DBSession.openSession();
+			
+			ResultSet rs = conn.executeQuery(queries[0]+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
-			Statement stmtCount=conn.createStatement();
-			ResultSet rsCount=stmtCount.executeQuery(queries[1]);
+		
+			ResultSet rsCount=conn.executeQuery(queries[1]);
 			rsCount.first();
 			int count=rsCount.getInt(1);
 			toReturn= DBUtils.toJSon(rs,count);
 			rsCount.close();
-			stmtCount.close();
+			
 			rs.close();
-			stmt.close();
+			
 			conn.close();		
 		}catch(Exception e){
 			logger.error("Exception occurred : "+e.getMessage());
@@ -575,10 +559,8 @@ public class AquaMaps extends GCUBEPortType {
 		}
 
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(myQuery);
+			DBSession conn = DBSession.openSession();
+			ResultSet rs = conn.executeQuery(myQuery);
 			rs.next();
 			toReturn=DataTranslation.getResourceFromResultSet(rs,rs.getMetaData(),myResource.getType());
 
@@ -592,8 +574,7 @@ public class AquaMaps extends GCUBEPortType {
 				Field[] fields=toReturn.getAdditionalField().getFields();
 				fields[fields.length-1]=relatedField;
 			}			
-			rs.close();
-			stmt.close();
+			rs.close();			
 			conn.close();
 		}catch(Exception e){
 			logger.error("Errors while performing operation",e);	
@@ -602,10 +583,10 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 
-	private String getJobMaps(String jobId,Connection  c)throws SQLException{
-		Statement stmt=c.createStatement();
+	private String getJobMaps(String jobId,DBSession  c)throws Exception{
+		
 		String query = "Select Path, nameHuman from Maps Where Jobs="+jobId;
-		ResultSet rsJ = stmt.executeQuery(query);
+		ResultSet rsJ = c.executeQuery(query);
 		return DBUtils.toJSon(rsJ);
 	}
 
@@ -617,10 +598,8 @@ public class AquaMaps extends GCUBEPortType {
 		String query = DataTranslation.completeResourceListQuery.get(req.getType());
 
 		try{
-			Class.forName(DBCostants.JDBCClassName).newInstance();
-			Connection conn = DriverManager.getConnection(DBCostants.mySQLServerUri);
-			Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
+			DBSession conn = DBSession.openSession();
+			ResultSet rs = conn.executeQuery(query);
 
 			ResultSetMetaData metaData=rs.getMetaData();
 			while(rs.next()){
@@ -637,7 +616,7 @@ public class AquaMaps extends GCUBEPortType {
 			}
 
 			rs.close();
-			stmt.close();
+			
 			conn.close();
 		}catch(Exception e){
 			logger.error("Errors while performing getResourceList operation",e);

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Specie;
@@ -38,9 +39,10 @@ public class DistributionThread extends Thread {
 		}
 		
 		try {
+			DBSession session=generationDetails.getConnection();
 			String clusteringQuery=DBCostants.clusteringDistributionQuery(generationDetails.getHspecTable());
 			logger.trace("Gonna use query "+clusteringQuery);
-			PreparedStatement ps= generationDetails.getConnection().prepareStatement(clusteringQuery);
+			PreparedStatement ps= session.preparedStatement(clusteringQuery);
 			ps.setString(1,species.getId());
 			ps.setFloat(2,toPerform.getThreshold());
 			
@@ -65,7 +67,7 @@ public class DistributionThread extends Thread {
 					if(app.size()>0){
 						String basePath=JobUtils.publish(generationDetails.getFirstLevelDirName(), generationDetails.getSecondLevelDirName(), app.values());
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-						PreparedStatement pps =generationDetails.getConnection().prepareStatement(DBCostants.fileInsertion);
+						PreparedStatement pps =session.preparedStatement(DBCostants.fileInsertion);
 						
 						for(String mapName:app.keySet()){
 							pps.setBoolean(1,true);
