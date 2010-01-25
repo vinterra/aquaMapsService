@@ -41,11 +41,11 @@ public class SimulationThread extends Thread {
 				generationDetails.setHspecTable(hspec);
 				generationDetails.getToDropTableList().add(hspec);
 			}else{
-				generationDetails.setHspecTable(DBCostants.HSPEC);
-				generationDetails.setHspecTable(JobUtils.filterByArea(generationDetails));
-				for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
-					entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);				
+				generationDetails.setHspecTable(DBCostants.HSPEC);							
 			}			
+			generationDetails.setHspecTable(JobUtils.filterByArea(generationDetails));
+			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationDetails.getSpeciesHandling().entrySet())
+				entry.setValue(JobGenerationDetails.SpeciesStatus.Ready);	
 		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
 		
 		

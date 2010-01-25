@@ -51,7 +51,7 @@ public class DistributionThread extends Thread {
 			String header=toPerform.getName();
 			String header_map = header+"_maps";
 			StringBuilder[] csq_str;
-			csq_str=JobUtils.clusterize(rs, 2, 1, 2,true);
+			csq_str=JobUtils.clusterize(rs, 2, 1, 2,false);
 			if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 			else {
 				File clusterFile=JobUtils.createClusteringFile(toPerform, csq_str, header, header_map, generationDetails.getToPerform()+File.separator+"clustering");
