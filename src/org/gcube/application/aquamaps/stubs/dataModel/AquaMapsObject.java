@@ -29,7 +29,7 @@ public class AquaMapsObject {
 		public static final String species="coverage.species";
 		public static final String environementCustomization="EnvironmentCustomization";
 		public static final String customization="Customization";
-		public static final String customizationSet="Customization";
+		public static final String customizationSet="CustomizationSet";
 		public static final String envelopeCustomization="EnvelopeCustomization";
 	}
 
@@ -346,9 +346,9 @@ public class AquaMapsObject {
 					Map<String,Perturbation> toPutMap=new HashMap<String, Perturbation>();
 					for(int j=0;j<customizations.getLength();j++){
 						Element customization=(Element) customizations.item(j);
-						Element fieldName=(Element) customization.getElementsByTagName("FieldName");
-						Element type=(Element) customization.getElementsByTagName("Type");
-						Element value=(Element) customization.getElementsByTagName("Value");
+						Element fieldName=(Element) customization.getElementsByTagName("FieldName").item(0);
+						Element type=(Element) customization.getElementsByTagName("Type").item(0);
+						Element value=(Element) customization.getElementsByTagName("Value").item(0);
 						Perturbation pert=new Perturbation(Perturbation.Type.valueOf(XMLUtils.getTextContent(type)),
 								XMLUtils.getTextContent(value));
 						toPutMap.put(XMLUtils.getTextContent(fieldName), pert);
