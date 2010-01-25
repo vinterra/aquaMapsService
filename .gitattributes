@@ -4,11 +4,13 @@
 /.project -text
 /build.xml -text
 etc/build.properties -text
+etc/dbprop.properties -text
 etc/deploy-jndi-config.xml -text
 etc/deploy-server.wsdd -text
 etc/profile.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
+/install.sh -text
 schema/AquaMaps.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text

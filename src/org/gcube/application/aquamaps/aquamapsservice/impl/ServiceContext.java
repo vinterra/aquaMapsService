@@ -3,10 +3,12 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Properties;
 
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
@@ -34,6 +36,8 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	
 	private String webServerUrl=null;
+	private String dbUsername;
+	private String dbPassword;
 	
 	protected void onReady() throws Exception{
 		
@@ -67,12 +71,32 @@ public class ServiceContext extends GCUBEServiceContext {
 	
 	}
 	
+	/**
+     * {@inheritDoc}
+     */
+	public void onInitialisation(){
+		try{
+			Properties prop= new Properties();
+			prop.load(new FileInputStream(this.getFile("dbprop.properties", false)));
+			this.dbUsername=prop.getProperty("dbusername","");
+			this.dbPassword=prop.getProperty("dbpassword","");
+		}catch(Exception e){logger.error("error getting DB credential ",e);}
+	}
+	
 	public String getWebServiceURL(){
 		return this.webServerUrl;
 	}
 
 	public String getHttpServerBasePath() {
 		return httpServerBasePath;
+	}
+
+	public String getDbUsername() {
+		return dbUsername;
+	}
+
+	public String getDbPassword() {
+		return dbPassword;
 	}
 		
 }

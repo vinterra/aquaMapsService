@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -45,7 +47,7 @@ public class DBSession {
 		//put all of them in a configuration file
 		Class.forName("com.mysql.jdbc.Driver");
 		String url = "jdbc:mysql://localhost:3306/aquamaps_DB";
-		Connection conn= DriverManager.getConnection(url, "root" , "mybohemian");
+		Connection conn= DriverManager.getConnection(url, ServiceContext.getContext().getDbUsername() , ServiceContext.getContext().getDbPassword());
 		conn.setAutoCommit(true);
 		return new DBSession(conn);
 	}
