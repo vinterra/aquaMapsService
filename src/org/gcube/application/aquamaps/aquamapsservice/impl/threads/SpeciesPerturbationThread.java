@@ -48,7 +48,7 @@ public SpeciesPerturbationThread(ThreadGroup group,JobGenerationDetails details)
 		filterSpecies();
 		
 		// ***************** Perturbation
-		int progressCount=0;		
+		//int progressCount=0;		
 		Statement stmt=generationDetails.getConnection().getConnection().createStatement();
 		for(String speciesId : generationDetails.getSpeciesHandling().keySet()){
 			if(toPerformPerturbations.containsKey(speciesId)){ 
