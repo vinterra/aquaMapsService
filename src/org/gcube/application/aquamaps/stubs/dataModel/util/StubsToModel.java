@@ -1,9 +1,8 @@
 package org.gcube.application.aquamaps.stubs.dataModel.util;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
@@ -11,8 +10,6 @@ import org.gcube.application.aquamaps.stubs.Cell;
 import org.gcube.application.aquamaps.stubs.EnvelopeWeights;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
-import org.gcube.application.aquamaps.stubs.File;
-import org.gcube.application.aquamaps.stubs.FileArray;
 import org.gcube.application.aquamaps.stubs.Filter;
 import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.Resource;
@@ -192,7 +189,7 @@ public class StubsToModel {
 					  toReturn.getEnvironmentCustomization().put(p.getToPerturbId(), new HashMap<String, org.gcube.application.aquamaps.stubs.dataModel.Perturbation>());				
 				 toReturn.getEnvironmentCustomization().get(p.getToPerturbId()).put(p.getField(), translateToClient(p));
 			 }
-		 }
+		 }		 
 		 if((obj.getWeights()!=null)&&(obj.getWeights().getEnvelopeWeightList()!=null)){
 			 for(EnvelopeWeights w : obj.getWeights().getEnvelopeWeightList()){
 				 List<org.gcube.application.aquamaps.stubs.dataModel.Field> list = new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Field>();
@@ -209,6 +206,7 @@ public class StubsToModel {
 		 }
 		 toReturn.setId(obj.getId());
 		 toReturn.setName(obj.getName());
+		 toReturn.setPublisher(obj.getPublisher());		
 		 if((obj.getSelectedAreas()!=null)&&(obj.getSelectedAreas().getAreasList()!=null)){
 			 List<org.gcube.application.aquamaps.stubs.dataModel.Area> toAddAreas=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Area>();
 			 for(Area a : obj.getSelectedAreas().getAreasList())

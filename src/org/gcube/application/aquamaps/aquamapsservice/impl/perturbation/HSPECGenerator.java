@@ -100,7 +100,7 @@ public class HSPECGenerator {
 			session.createLikeTable(this.resultsTable, this.hspecTable);
 			String queryhspen="SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
 			"DepthPrefMax,TempMin,TempMax,TempPrefMin,TempPrefMax,SalinityMin,SalinityMax,SalinityPrefMin,SalinityPrefMax,PrimProdMin," +
-			"PrimProdMax,PrimProdPrefMin,PrimProdPrefMax,IceConMin,IceConMax,IceConPrefMin,IceConPrefMax,LandDistMin,LandDistMax,LandDistPrefMin," +
+			"PrimProdMax,PrimProdPrefMin,PrimProdPrefMax,IceConMin,IceConMax,IceConPrefMin,IceConPrefMax,LandDistMin,LandDistMax,LandDistPrefMin,DepthMean" +
 			"LandDistPrefMax FROM "+this.hspenTable;
 			logger.trace("species qeury is "+queryhspen);
 			ResultSet hspenRes= session.executeQuery(queryhspen);

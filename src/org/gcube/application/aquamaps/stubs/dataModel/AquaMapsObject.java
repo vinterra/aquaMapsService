@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -22,7 +23,7 @@ public class AquaMapsObject {
 		public static final String title="title";
 		public static final String creator="creator";
 		public static final String date="date.created";
-		public static final String publisher="publisher";
+		public static final String publisher="publisher";		
 		public static final String source="source";
 		public static final String type="type";
 		public static final String species="coverage.species";
@@ -185,10 +186,30 @@ public class AquaMapsObject {
 		profileBuilder.append("<AquaMap>");
 		profileBuilder.append("<Name>"+name+"</Name>");
 		profileBuilder.append("<Author>"+author+"</Author>");
+		profileBuilder.append("<BoundingBox>"+boundingBox.toString()+"</BoundingBox>");
+		profileBuilder.append("<Creator>"+creator+"</Creator>");
+		profileBuilder.append("<Identifier>"+id+"</Identifier>");
+		profileBuilder.append("<Publisher>"+publisher+"</Publisher>");		
 		profileBuilder.append("<Source>"+source+"</Source>");
 		profileBuilder.append("<Status>"+status+"</Status>");
 		profileBuilder.append("<Type>"+type.toString()+"</Type>");
 		profileBuilder.append("<date>"+date+"</date>");
+		
+		profileBuilder.append("<RelatedResources>");
+		for(Entry<String,String> entry : relatedResources.entrySet()){
+			profileBuilder.append("<Resource>");
+			 profileBuilder.append("<Name>"+entry.getKey()+"</Name>");
+			 profileBuilder.append("<Url>"+entry.getValue()+"</Url>");
+			profileBuilder.append("</Resource>");
+		}
+		profileBuilder.append("<Resource>");
+		 profileBuilder.append("<Name>Profile</Name>");
+		 profileBuilder.append("<Url>"+profileUrl+"</Url>");
+		profileBuilder.append("</Resource>");		
+		profileBuilder.append("</RelatedResources>");
+		
+		
+		
 		profileBuilder.append("<SelectedSpecies>");
 		for(Species spec:selectedSpecies) profileBuilder.append(spec.toXML());
 		profileBuilder.append("</SelectedSpecies>");
@@ -291,7 +312,9 @@ public class AquaMapsObject {
 		toReturn.getBoundingBox().parse(XMLUtils.getTextContent(bbElement));
 		Element thresholdElement=(Element) doc.getElementsByTagName("Threshold").item(0);
 		toReturn.setThreshold(Float.parseFloat(XMLUtils.getTextContent(thresholdElement)));
-
+		
+		
+		
 		NodeList speciesNodes=doc.getElementsByTagName("Species");
 		ArrayList<Species> specList=new ArrayList<Species>(); 
 		for(int i=0;i<speciesNodes.getLength();i++){

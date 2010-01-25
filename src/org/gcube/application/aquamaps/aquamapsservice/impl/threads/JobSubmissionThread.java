@@ -64,14 +64,15 @@ public class JobSubmissionThread extends Thread {
 				
 			//Create and run Species envelop perturbationThreads for specified customization 
 			
-			//SpeciesPerturbationThread
+			SpeciesPerturbationThread specThread=new SpeciesPerturbationThread(waitingGroup,generationStatus);
+			specThread.start();
 			
 			//filterSpecies();
 			
 			//generationStatus.setHspenTable(DBCostants.HSPEN);
-			for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
+		/*	for(Entry<String,JobGenerationDetails.SpeciesStatus> entry:generationStatus.getSpeciesHandling().entrySet())
 				entry.setValue(JobGenerationDetails.SpeciesStatus.toGenerate);
-			
+			*/
 	/*		Perturbation[] enveloptPerturbation=null;
 			if(generationStatus.getToPerform().getEnvelopCustomization()!=null)
 					enveloptPerturbation=generationStatus.getToPerform().getEnvelopCustomization().getPerturbationList();
