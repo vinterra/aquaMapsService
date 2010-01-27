@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -20,6 +21,13 @@ public class ServiceUtils {
 			filebuf.close(); // chiude il file 
 		
 		return ret;
+	}
+	
+	public static void deleteFile(String path) throws IOException {
+		File f=new File(path);
+		File dir = f.getParentFile();
+		f.delete();
+		if(dir.list().length==0)dir.delete(); 
 	}
 	
 }

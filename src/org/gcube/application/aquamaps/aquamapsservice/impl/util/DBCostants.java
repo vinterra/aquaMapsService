@@ -168,15 +168,17 @@ public class DBCostants {
 	
 	
 
-	public static final String JobList="select * from "+JOB_Table+" where author = ?";
+	public static final String JobListPerAuthor="select * from "+JOB_Table+" where author = ?";
 	
-	public static final String AquaMapsList="SELECT * from submitted where jobId=? AND isAquaMap= true";
+	public static final String AquaMapsListPerJob="SELECT * from submitted where jobId=? AND isAquaMap= true";
 	
 	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";
 	
 	public static final String speciesEnvelop="Select * from "+HSPEN+" where "+SpeciesID+" = ?";
 	
 	public static final String cellEnvironment="Select * from "+HCAF_D+" where "+cSquareCode+" = ?";
+	
+	public static final String submittedRetrieval="Select * from "+JOB_Table+" where searchId = ?";
 	
 	public static final String cellFilter(String areaType){
 		return ((areaType.equals(LMEType))?cell_LME+" = ?":(areaType.equals(FAOType))?cell_FAO+" = ?":
@@ -205,6 +207,11 @@ public class DBCostants {
 	}
 	public static final String mySQLServerUri="jdbc:mysql://localhost:3306/aquamaps_DB?user=root&password=mybohemian";
 	public static final String JDBCClassName="com.mysql.jdbc.Driver";
+	
+	
+	public static final String fileRetrievalByOwner="Select * from Files where owner = ?";
+	public static final String fileDeletingByOwner="Delete from Files where owner = ?";
+	public static final String deleteSubmittedById="Delete from "+JOB_Table+" where searchId= ?";
 	
 	public static String perturbationUpdate(String hspenTable,List<Perturbation> toSetList, String speciesId) throws Exception{
 		StringBuilder toReturn=new StringBuilder();

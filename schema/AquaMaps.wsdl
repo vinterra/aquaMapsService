@@ -376,6 +376,9 @@
 				
 			<!-- Request / Response elements -->
 			
+			<xsd:element name="deleteSubmittedRequest" type="xsd:string"/>
+			<xsd:element name="deleteSubmittedResponse" type="xsd:int"/>
+			
 			<xsd:element name="calculateEnvelopeRequest" type ="tns:calculateEnvelopeRequestType"/>
 			<xsd:element name="calculateEnvelopeResponse" type="tns:fieldArray" />
 			
@@ -467,6 +470,13 @@
 	</types>
 
 	<!-- message part -->
+	
+	<message name="DeleteSubmittedRequest">
+		<wsdl:part name="request" element="tns:deleteSubmittedRequest"/>
+	</message>
+	<message name="DeleteSubmittedResponse">
+		<wsdl:part name="response" element="tns:deleteSubmittedResponse"/>
+	</message>
 	
 	<message name="CalculateEnvelopeRequest">
 		<part name="request" element="tns:calculateEnvelopeRequest" />
@@ -622,6 +632,11 @@
 
 		<!-- operation part -->
 		
+		<wsdl:operation name="deleteSubmitted">
+			<input message="tns:DeleteSubmittedRequest" />
+			<output message="tns:DeleteSubmittedResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
 		
 		<wsdl:operation name="calculateEnvelope">
 			<input message="tns:CalculateEnvelopeRequest" />

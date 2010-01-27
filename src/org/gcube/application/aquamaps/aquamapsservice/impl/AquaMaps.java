@@ -56,7 +56,76 @@ public class AquaMaps extends GCUBEPortType {
 		return null;
 	}
 
-
+	public int deleteSubmitted(String submittedId)throws GCUBEFault{
+		logger.trace("Deleting submitted : "+submittedId);
+		try{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps1=session.preparedStatement(DBCostants.submittedRetrieval);
+		ps1.setInt(1, Integer.parseInt(submittedId));
+		ResultSet rs1=ps1.executeQuery();
+		int toReturn=0;
+		if(rs1.first()){
+			logger.trace("found submitted ..");
+			PreparedStatement psFiles=session.preparedStatement(DBCostants.fileRetrievalByOwner);
+			PreparedStatement psDeleteFiles=session.preparedStatement(DBCostants.fileDeletingByOwner);
+			PreparedStatement psDeleteSubmitted=session.preparedStatement(DBCostants.deleteSubmittedById);
+			if(!rs1.getBoolean("isAquaMap")){
+				logger.trace("going to delete AquaMaps for the selected job..");
+				PreparedStatement psAquaMaps=session.preparedStatement(DBCostants.AquaMapsListPerJob);
+				psAquaMaps.setInt(1,Integer.parseInt(submittedId));
+				ResultSet rsAquaMaps=psAquaMaps.executeQuery();				
+				while(rsAquaMaps.next()){
+					String aquamapsId=rsAquaMaps.getString("searchId");					
+					String path=rsAquaMaps.getString("resourcePath");
+					if(path!=null){
+						logger.trace("deleting files for aquamaps from path : "+path);
+						psFiles.setInt(1, Integer.parseInt(aquamapsId));
+						ResultSet rsFiles=psFiles.executeQuery();
+						while(rsFiles.next()){
+							String[] urlParts=rsFiles.getString("Path").split("/");
+							ServiceUtils.deleteFile(path+File.pathSeparator+urlParts[urlParts.length-1]);
+							logger.trace("deleted file "+rsFiles.getString("nameHuman"));
+						}						
+					}
+					psDeleteFiles.setInt(1,Integer.parseInt(aquamapsId));
+					psDeleteFiles.executeUpdate();
+					psDeleteSubmitted.setInt(1,Integer.parseInt(aquamapsId));					
+					toReturn+=psDeleteSubmitted.executeUpdate();
+				}
+				logger.trace("deleted "+toReturn+" AquaMap Objects");				
+			}
+			String toDeletePath=rs1.getString("resourcePath");
+			if(toDeletePath!=null){
+				logger.trace("deleting files for selected from path : "+toDeletePath);
+				psFiles.setInt(1, Integer.parseInt(submittedId));
+				ResultSet rsFiles=psFiles.executeQuery();
+				while(rsFiles.next()){
+					String[] urlParts=rsFiles.getString("Path").split("/");
+					ServiceUtils.deleteFile(toDeletePath+File.pathSeparator+urlParts[urlParts.length-1]);
+					logger.trace("deleted file "+rsFiles.getString("nameHuman"));
+				}						
+			}
+			psDeleteFiles.setInt(1,Integer.parseInt(submittedId));
+			psDeleteFiles.executeUpdate();
+			psDeleteSubmitted.setInt(1,Integer.parseInt(submittedId));
+			toReturn+=psDeleteSubmitted.executeUpdate();
+		}
+		logger.trace("Total deleted submitted count : "+toReturn);
+		return toReturn;
+		}catch(SQLException e){
+			logger.error("SQLException, unable to serve getjobList");
+			logger.trace("Raised Exception", e);
+			throw new GCUBEFault();
+		} catch (Exception e){
+			logger.error("General Exception, unable to contact DB");
+			logger.trace("Raised Exception", e);
+			throw new GCUBEFault();
+		}
+	}
+	
+	
+	
+	
 	public FieldArray calculateEnvelope(CalculateEnvelopeRequestType req)throws GCUBEFault{
 		logger.trace("Serving calculateEnvelope");		
 		try{
@@ -215,7 +284,7 @@ public class AquaMaps extends GCUBEPortType {
 		String toReturn="";
 		try{
 			DBSession conn = DBSession.openSession();
-			PreparedStatement ps=conn.preparedStatement(DBCostants.JobList);
+			PreparedStatement ps=conn.preparedStatement(DBCostants.JobListPerAuthor);
 			ps.setString(1, author);		
 			ResultSet rs=ps.executeQuery();
 			toReturn=DBUtils.toJSon(rs);
@@ -266,7 +335,7 @@ public class AquaMaps extends GCUBEPortType {
 		String toReturn="";
 		try{
 			DBSession conn = DBSession.openSession();
-			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsList);		
+			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsListPerJob);		
 			ps.setInt(1, Integer.parseInt(jobId));
 			ResultSet rs=ps.executeQuery();
 			toReturn=DBUtils.toJSon(rs);
