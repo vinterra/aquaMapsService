@@ -11,7 +11,7 @@
 			<Main>
 				<Description>Aquamaps Stateless Service</Description>
 				<Name>AquaMaps-Service</Name>
-				<Version>1.0.0</Version>
+				<Version>1.0.2</Version>
 				<GHNRequirements>
 					<Requirement category="Site"  requirement="string" value="java1.5" operator="le"/>
 				</GHNRequirements>
@@ -26,7 +26,7 @@
 							<Version>1.0.0</Version>
 						</Service>
 						<Package>AquaMaps-stubs</Package>
-						<Version>1.0.0</Version>
+						<Version>1.0.2</Version>
 						<Scope level="GHN"/>
 						<Optional>false</Optional>
 					</Dependency>
@@ -62,7 +62,7 @@
 			<Software>
 				<Description>Aquamaps stubs</Description>
 				<Name>AquaMaps-stubs</Name>
-				<Version>1.0.0</Version>
+				<Version>1.0.2</Version>
 				<Files><File>org.gcube.application.aquamaps.stubs.jar</File></Files>
 			</Software>
 		</Packages>
