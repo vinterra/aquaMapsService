@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
@@ -37,6 +38,7 @@ public class JobSubmissionThread extends Thread {
 	
 	public JobSubmissionThread(Job toPerform) {
 		super(toPerform.getName()+"_thread");
+		this.setPriority(MIN_PRIORITY);
 		generationStatus=new JobGenerationDetails(toPerform);
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName()+
 				" with "+generationStatus.getToPerformBiodiversity().size()+" Biodiversity AquaMaps and "+
@@ -56,7 +58,7 @@ public class JobSubmissionThread extends Thread {
 			if((generationStatus.getToPerform().getEnvironmentCustomization()!=null) && 
 					(generationStatus.getToPerform().getEnvironmentCustomization().getPerturbationList()!=null)){
 					AreaPerturbationThread areaThread=new AreaPerturbationThread(waitingGroup,generationStatus);
-					areaThread.start();
+					ThreadManager.getExecutor().execute(areaThread);
 			}else{
 				generationStatus.setAreaReady(true);
 				generationStatus.setHcafTable(DBCostants.HCAF_D);
@@ -65,7 +67,7 @@ public class JobSubmissionThread extends Thread {
 			//Create and run Species envelop perturbationThreads for specified customization 
 			
 			SpeciesPerturbationThread specThread=new SpeciesPerturbationThread(waitingGroup,generationStatus);
-			specThread.start();
+			ThreadManager.getExecutor().execute(specThread);
 			
 			//filterSpecies();
 			
@@ -110,19 +112,19 @@ public class JobSubmissionThread extends Thread {
 			
 			
 				SimulationThread simT=new SimulationThread(waitingGroup,generationStatus);
-				simT.start();
+				ThreadManager.getExecutor().execute(simT);
 			
 //			JobUtils.updateStatus(JobStatus.Generating, jobID, DBCostants.UNASSIGNED, conn);
 			
 			//Create and run Suitable area map generation
 			for(int index:generationStatus.getToPerformDistribution().keySet()){					
 					DistributionThread t=new DistributionThread(waitingGroup,generationStatus,index);
-					t.start();
+					ThreadManager.getExecutor().execute(t);
 				}
 			//Create and run biodiversity map generation
 			for(int index:generationStatus.getToPerformBiodiversity().keySet()){					
 				BiodiversityThread t=new BiodiversityThread(waitingGroup,generationStatus,index);
-				t.start();
+				ThreadManager.getExecutor().execute(t);
 			}
 			
 			

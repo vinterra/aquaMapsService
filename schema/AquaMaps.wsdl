@@ -249,6 +249,18 @@
 
 			<!-- Request / Response Types-->
 			
+			<xsd:complexType name="getAquaMapsPerUserRequestType">
+				<xsd:sequence>					
+					<xsd:element name="userID" type="xsd:string"/>
+					<xsd:element name="sortColumn" type="xsd:string"/>
+					<xsd:element name="sortDirection" type="xsd:string"/>
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			
+			
 			<xsd:complexType name="calculateEnvelopeRequestType">
 				<xsd:sequence>		
 				<xsd:element name="speciesID" type="xsd:string"/>			
@@ -379,6 +391,11 @@
 			<xsd:element name="deleteSubmittedRequest" type="xsd:string"/>
 			<xsd:element name="deleteSubmittedResponse" type="xsd:int"/>
 			
+			<xsd:element name="getAquaMapsPerUserRequest" type="tns:getAquaMapsPerUserRequestType"/>
+			<xsd:element name="getAquaMapsPerUserResponse" type="xsd:string"/>
+			
+			
+			
 			<xsd:element name="calculateEnvelopeRequest" type ="tns:calculateEnvelopeRequestType"/>
 			<xsd:element name="calculateEnvelopeResponse" type="tns:fieldArray" />
 			
@@ -470,6 +487,16 @@
 	</types>
 
 	<!-- message part -->
+	
+	
+	
+	<message name="GetAquaMapsPerUserRequest">
+		<wsdl:part name="request" element="tns:getAquaMapsPerUserRequest"/>
+	</message>
+	<message name="GetAquaMapsPerUserResponse">
+		<wsdl:part name="response" element="tns:getAquaMapsPerUserResponse"/>
+	</message>
+	
 	
 	<message name="DeleteSubmittedRequest">
 		<wsdl:part name="request" element="tns:deleteSubmittedRequest"/>
@@ -631,6 +658,14 @@
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
+	
+		
+		<wsdl:operation name="getAquaMapsPerUser">
+			<input message="tns:GetAquaMapsPerUserRequest" />
+			<output message="tns:GetAquaMapsPerUserResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
+		
 		
 		<wsdl:operation name="deleteSubmitted">
 			<input message="tns:DeleteSubmittedRequest" />

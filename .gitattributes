@@ -15,6 +15,7 @@ schema/AquaMaps.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvCostants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvEngine.java -text

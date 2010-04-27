@@ -25,6 +25,7 @@ import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.FileArray;
 import org.gcube.application.aquamaps.stubs.GenerateMapRequestType;
+import org.gcube.application.aquamaps.stubs.GetAquaMapsPerUserRequestType;
 import org.gcube.application.aquamaps.stubs.GetOccurrenceCellsRequestType;
 import org.gcube.application.aquamaps.stubs.GetPhylogenyRequestType;
 import org.gcube.application.aquamaps.stubs.GetResourceListRequestType;
@@ -47,6 +48,10 @@ import org.gcube.common.core.types.VOID;
 public class AquaMaps extends GCUBEPortType {
 
 
+
+
+
+
 	protected GCUBEServiceContext getServiceContext() {		
 		return ServiceContext.getContext();
 	}
@@ -59,59 +64,59 @@ public class AquaMaps extends GCUBEPortType {
 	public int deleteSubmitted(String submittedId)throws GCUBEFault{
 		logger.trace("Deleting submitted : "+submittedId);
 		try{
-		DBSession session=DBSession.openSession();
-		PreparedStatement ps1=session.preparedStatement(DBCostants.submittedRetrieval);
-		ps1.setInt(1, Integer.parseInt(submittedId));
-		ResultSet rs1=ps1.executeQuery();
-		int toReturn=0;
-		if(rs1.first()){
-			logger.trace("found submitted ..");
-			PreparedStatement psFiles=session.preparedStatement(DBCostants.fileRetrievalByOwner);
-			PreparedStatement psDeleteFiles=session.preparedStatement(DBCostants.fileDeletingByOwner);
-			PreparedStatement psDeleteSubmitted=session.preparedStatement(DBCostants.deleteSubmittedById);
-			if(!rs1.getBoolean("isAquaMap")){
-				logger.trace("going to delete AquaMaps for the selected job..");
-				PreparedStatement psAquaMaps=session.preparedStatement(DBCostants.AquaMapsListPerJob);
-				psAquaMaps.setInt(1,Integer.parseInt(submittedId));
-				ResultSet rsAquaMaps=psAquaMaps.executeQuery();				
-				while(rsAquaMaps.next()){
-					String aquamapsId=rsAquaMaps.getString("searchId");					
-					String path=rsAquaMaps.getString("resourcePath");
-					if(path!=null){
-						logger.trace("deleting files for aquamaps from path : "+path);
-						psFiles.setInt(1, Integer.parseInt(aquamapsId));
-						ResultSet rsFiles=psFiles.executeQuery();
-						while(rsFiles.next()){
-							String[] urlParts=rsFiles.getString("Path").split("/");
-							ServiceUtils.deleteFile(path+File.pathSeparator+urlParts[urlParts.length-1]);
-							logger.trace("deleted file "+rsFiles.getString("nameHuman"));
-						}						
+			DBSession session=DBSession.openSession();
+			PreparedStatement ps1=session.preparedStatement(DBCostants.submittedRetrieval);
+			ps1.setInt(1, Integer.parseInt(submittedId));
+			ResultSet rs1=ps1.executeQuery();
+			int toReturn=0;
+			if(rs1.first()){
+				logger.trace("found submitted ..");
+				PreparedStatement psFiles=session.preparedStatement(DBCostants.fileRetrievalByOwner);
+				PreparedStatement psDeleteFiles=session.preparedStatement(DBCostants.fileDeletingByOwner);
+				PreparedStatement psDeleteSubmitted=session.preparedStatement(DBCostants.deleteSubmittedById);
+				if(!rs1.getBoolean("isAquaMap")){
+					logger.trace("going to delete AquaMaps for the selected job..");
+					PreparedStatement psAquaMaps=session.preparedStatement(DBCostants.AquaMapsListPerJob);
+					psAquaMaps.setInt(1,Integer.parseInt(submittedId));
+					ResultSet rsAquaMaps=psAquaMaps.executeQuery();				
+					while(rsAquaMaps.next()){
+						String aquamapsId=rsAquaMaps.getString("searchId");					
+						String path=rsAquaMaps.getString("resourcePath");
+						if(path!=null){
+							logger.trace("deleting files for aquamaps from path : "+path);
+							psFiles.setInt(1, Integer.parseInt(aquamapsId));
+							ResultSet rsFiles=psFiles.executeQuery();
+							while(rsFiles.next()){
+								String[] urlParts=rsFiles.getString("Path").split("/");
+								ServiceUtils.deleteFile(path+File.pathSeparator+urlParts[urlParts.length-1]);
+								logger.trace("deleted file "+rsFiles.getString("nameHuman"));
+							}						
+						}
+						psDeleteFiles.setInt(1,Integer.parseInt(aquamapsId));
+						psDeleteFiles.executeUpdate();
+						psDeleteSubmitted.setInt(1,Integer.parseInt(aquamapsId));					
+						toReturn+=psDeleteSubmitted.executeUpdate();
 					}
-					psDeleteFiles.setInt(1,Integer.parseInt(aquamapsId));
-					psDeleteFiles.executeUpdate();
-					psDeleteSubmitted.setInt(1,Integer.parseInt(aquamapsId));					
-					toReturn+=psDeleteSubmitted.executeUpdate();
+					logger.trace("deleted "+toReturn+" AquaMap Objects");				
 				}
-				logger.trace("deleted "+toReturn+" AquaMap Objects");				
+				String toDeletePath=rs1.getString("resourcePath");
+				if(toDeletePath!=null){
+					logger.trace("deleting files for selected from path : "+toDeletePath);
+					psFiles.setInt(1, Integer.parseInt(submittedId));
+					ResultSet rsFiles=psFiles.executeQuery();
+					while(rsFiles.next()){
+						String[] urlParts=rsFiles.getString("Path").split("/");
+						ServiceUtils.deleteFile(toDeletePath+File.pathSeparator+urlParts[urlParts.length-1]);
+						logger.trace("deleted file "+rsFiles.getString("nameHuman"));
+					}						
+				}
+				psDeleteFiles.setInt(1,Integer.parseInt(submittedId));
+				psDeleteFiles.executeUpdate();
+				psDeleteSubmitted.setInt(1,Integer.parseInt(submittedId));
+				toReturn+=psDeleteSubmitted.executeUpdate();
 			}
-			String toDeletePath=rs1.getString("resourcePath");
-			if(toDeletePath!=null){
-				logger.trace("deleting files for selected from path : "+toDeletePath);
-				psFiles.setInt(1, Integer.parseInt(submittedId));
-				ResultSet rsFiles=psFiles.executeQuery();
-				while(rsFiles.next()){
-					String[] urlParts=rsFiles.getString("Path").split("/");
-					ServiceUtils.deleteFile(toDeletePath+File.pathSeparator+urlParts[urlParts.length-1]);
-					logger.trace("deleted file "+rsFiles.getString("nameHuman"));
-				}						
-			}
-			psDeleteFiles.setInt(1,Integer.parseInt(submittedId));
-			psDeleteFiles.executeUpdate();
-			psDeleteSubmitted.setInt(1,Integer.parseInt(submittedId));
-			toReturn+=psDeleteSubmitted.executeUpdate();
-		}
-		logger.trace("Total deleted submitted count : "+toReturn);
-		return toReturn;
+			logger.trace("Total deleted submitted count : "+toReturn);
+			return toReturn;
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getjobList");
 			logger.trace("Raised Exception", e);
@@ -122,10 +127,10 @@ public class AquaMaps extends GCUBEPortType {
 			throw new GCUBEFault();
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	public FieldArray calculateEnvelope(CalculateEnvelopeRequestType req)throws GCUBEFault{
 		logger.trace("Serving calculateEnvelope");		
 		try{
@@ -137,7 +142,7 @@ public class AquaMaps extends GCUBEPortType {
 			ResultSet rs=ps.executeQuery();			
 			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> foundCells =FromResultSetToObject.getCell(rs);
 			logger.trace("found "+foundCells.size()+" cells");
-			
+
 			ps=session.preparedStatement(DBCostants.completeCellById);
 			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> toAnalyze=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Cell>(); 
 			for(org.gcube.application.aquamaps.stubs.dataModel.Cell cell: foundCells){
@@ -192,7 +197,7 @@ public class AquaMaps extends GCUBEPortType {
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
 		try{
-			
+
 			DBSession conn = DBSession.openSession();
 			PreparedStatement ps = conn.preparedStatement(DBCostants.completeSpeciesById);			
 			ps.setString(1, request.getSpeciesID());
@@ -201,7 +206,7 @@ public class AquaMaps extends GCUBEPortType {
 			/*if(request.isUseBottomSeaTempAndSalinity())
 				spec.getFieldbyName(Species.Tags.Layer).setValue("b");
 			else spec.getFieldbyName(Species.Tags.Layer).setValue("u");*/
-			
+
 			ps=conn.preparedStatement(DBCostants.completeCellById);
 			List<org.gcube.application.aquamaps.stubs.dataModel.Cell> toAnalyze=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.Cell>(); 
 			for(Cell cell: request.getCells().getCellList()){
@@ -275,7 +280,7 @@ public class AquaMaps extends GCUBEPortType {
 
 	public String submitJob(Job req)throws GCUBEFault{
 		JobSubmissionThread thread=new JobSubmissionThread(req);
-		thread.start();
+		ThreadManager.getExecutor().execute(thread);
 		return "";
 	}
 
@@ -484,15 +489,15 @@ public class AquaMaps extends GCUBEPortType {
 			DBSession conn = DBSession.openSession();			
 			ResultSet rs = conn.executeQuery("Select * from "+DBCostants.speciesOccurSum+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
-			
+
 			ResultSet rsCount=conn.executeQuery("Select count("+DBCostants.SpeciesID+") from "+DBCostants.speciesOccurSum);
 			rsCount.first();
 			int count=rsCount.getInt(1);
 			toReturn= DBUtils.toJSon(rs,count);
 			rsCount.close();
-			
+
 			rs.close();
-			
+
 			conn.close();			
 		}catch(Exception e){
 			logger.error("Errors while performing operation",e);
@@ -520,18 +525,18 @@ public class AquaMaps extends GCUBEPortType {
 			String sortColumn=req.getSortColumn();
 			String sortDirection=req.getSortDirection();
 			DBSession conn = DBSession.openSession();
-			
+
 			ResultSet rs = conn.executeQuery(queries[0]+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
-		
+
 			ResultSet rsCount=conn.executeQuery(queries[1]);
 			rsCount.first();
 			int count=rsCount.getInt(1);
 			toReturn= DBUtils.toJSon(rs,count);
 			rsCount.close();
-			
+
 			rs.close();
-			
+
 			conn.close();		
 		}catch(Exception e){
 			logger.error("Exception occurred : "+e.getMessage());
@@ -653,7 +658,7 @@ public class AquaMaps extends GCUBEPortType {
 	}
 
 	private String getJobMaps(String jobId,DBSession  c)throws Exception{
-		
+
 		String query = "Select Path, nameHuman from Maps Where Jobs="+jobId;
 		ResultSet rsJ = c.executeQuery(query);
 		return DBUtils.toJSon(rsJ);
@@ -685,7 +690,7 @@ public class AquaMaps extends GCUBEPortType {
 			}
 
 			rs.close();
-			
+
 			conn.close();
 		}catch(Exception e){
 			logger.error("Errors while performing getResourceList operation",e);
@@ -710,5 +715,40 @@ public class AquaMaps extends GCUBEPortType {
 		return null;
 	}
 
+
+	public String getAquaMapsPerUser(GetAquaMapsPerUserRequestType arg0)throws GCUBEFault{
+
+		String sortColumn=arg0.getSortColumn();
+		String sortDir=arg0.getSortDirection();
+		int offset=arg0.getOffset();
+		int limit=arg0.getLimit();
+		String user=arg0.getUserID();
+		String toReturn="{\"data\":[],\"totalcount\":0}";
+		try{
+			DBSession conn = DBSession.openSession();
+			String query=DBCostants.JobListPerAuthor+((sortColumn!=null)?" order by "+sortColumn+" "+sortDir:"")+" LIMIT "+limit+" OFFSET "+offset;
+			String countQuery="Select count(*) from "+DBCostants.JOB_Table+" where isAquaMap = true AND author = ? ";
+			PreparedStatement ps=conn.preparedStatement(query);
+			PreparedStatement psCount=conn.preparedStatement(countQuery);
+			ps.setString(1, user);
+			psCount.setString(1, user);
+			ResultSet rsCount=psCount.executeQuery();
+			if(rsCount.next()){
+				int totalCount=rsCount.getInt(1);
+				if(totalCount>0){
+					ResultSet rs=ps.executeQuery();
+					toReturn=DBUtils.toJSon(rs,totalCount);
+					rs.close();
+					ps.close();					
+				}
+			}
+			rsCount.close();
+			psCount.close();
+			conn.close();			
+		}catch(Exception e ){
+			logger.error("Exception while trying to serve -getAquaMapsPerUser : user = "+user+" sort ("+sortColumn+","+sortDir+") "+offset+"-"+limit,e);
+		}
+		return toReturn;
+	}
 
 }
