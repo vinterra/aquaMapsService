@@ -751,4 +751,17 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 
+	public VOID markSaved(String id)throws GCUBEFault{
+		try{
+			DBSession conn = DBSession.openSession();
+			PreparedStatement ps= conn.preparedStatement(DBCostants.markSaved);
+			ps.setString(1,id);
+			ps.execute();
+		}catch(Exception e){
+			logger.error("Unable to mark as saved submitted id "+id,e);
+			throw new GCUBEFault();
+		}
+		return null;
+	}
+	
 }

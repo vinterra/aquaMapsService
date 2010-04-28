@@ -391,10 +391,11 @@
 			<xsd:element name="deleteSubmittedRequest" type="xsd:string"/>
 			<xsd:element name="deleteSubmittedResponse" type="xsd:int"/>
 			
+			<xsd:element name="markSavedRequest" type="xsd:string"/>
+			<xsd:element name="markSavedResponse" type="coretypes:VOID"/>
+			
 			<xsd:element name="getAquaMapsPerUserRequest" type="tns:getAquaMapsPerUserRequestType"/>
 			<xsd:element name="getAquaMapsPerUserResponse" type="xsd:string"/>
-			
-			
 			
 			<xsd:element name="calculateEnvelopeRequest" type ="tns:calculateEnvelopeRequestType"/>
 			<xsd:element name="calculateEnvelopeResponse" type="tns:fieldArray" />
@@ -495,6 +496,15 @@
 	</message>
 	<message name="GetAquaMapsPerUserResponse">
 		<wsdl:part name="response" element="tns:getAquaMapsPerUserResponse"/>
+	</message>
+	
+	
+	
+	<message name="MarkSavedRequest">
+		<wsdl:part name="request" element="tns:markSavedRequest"/>
+	</message>
+	<message name="MarkSavedResponse">
+		<wsdl:part name="response" element="tns:markSavedResponse"/>
 	</message>
 	
 	
@@ -666,6 +676,12 @@
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
 		
+		
+		<wsdl:operation name="markSaved">
+			<input message="tns:MarkSavedRequest" />
+			<output message="tns:MarkSavedResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
 		
 		<wsdl:operation name="deleteSubmitted">
 			<input message="tns:DeleteSubmittedRequest" />

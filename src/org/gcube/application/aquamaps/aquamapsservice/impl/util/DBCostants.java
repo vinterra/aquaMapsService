@@ -226,4 +226,5 @@ public class DBCostants {
 		return toReturn.toString();
 	}
 	
+	public static final String markSaved="Update "+JOB_Table+" set saved = true where searchId=?";
 }
