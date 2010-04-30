@@ -176,9 +176,14 @@ public class JobUtils {
 	    		logger.debug("the file "+file.getName() +" doesn't exists");
 	    		continue;
 	    	}
-	    	boolean success = file.renameTo(new File(dir, file.getName()));
+	    	
+	    	File dest=new File(dir, file.getName());
+	    	boolean success = file.renameTo(dest);
 	    	if (!success) {
 	    		logger.error("Error publishing file "+file.getName());
+	    	}else {
+	    		boolean deleted=file.delete();
+	    		if(!deleted)logger.error("Error deleting temp file "+file.getName());
 	    	}
 	    }
 	    logger.debug(ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir);
