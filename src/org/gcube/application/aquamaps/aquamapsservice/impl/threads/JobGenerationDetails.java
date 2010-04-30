@@ -11,6 +11,8 @@ import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Specie;
 
+import com.sun.swing.internal.plaf.synth.resources.synth;
+
 public class JobGenerationDetails {
 
 	public static final String Biodiversity="Biodiversity";
@@ -137,6 +139,15 @@ public class JobGenerationDetails {
 	public boolean isSpeciesListReady(List<String> speciesIdList){
 		for(String id:speciesIdList){			
 			if(!speciesHandling.get(id).equals(SpeciesStatus.Ready)) return false;			
+		}
+		return true;
+	}
+	public synchronized boolean isCompleted(){
+		for(Status s : toPerformBiodiversity.values()){
+			if(!(s.equals(Status.Completed)||s.equals(Status.Error)))return false;
+		}
+		for(Status s : toPerformDistribution.values()){
+			if(!(s.equals(Status.Completed)||s.equals(Status.Error)))return false;
 		}
 		return true;
 	}

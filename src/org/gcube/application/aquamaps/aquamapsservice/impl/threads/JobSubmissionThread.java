@@ -1,8 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,14 +10,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
-import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobSubmissionThread extends Thread {
@@ -128,13 +123,14 @@ public class JobSubmissionThread extends Thread {
 			}
 			
 			
-			while(waitingGroup.activeCount()>0){
+			while(!generationStatus.isCompleted()){
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}
-				logger.trace(this.getName()+" waiting for "+waitingGroup.activeCount()+" generation Process(es) ");			
+				logger.trace(this.getName()+" waiting for  generation Process(es) ");			
 				logger.trace(waitingGroup.toString());
 			}
+			logger.warn("Job should be complete here");
 			generationStatus.setStatus(JobGenerationDetails.Status.Completed);
 			
 
