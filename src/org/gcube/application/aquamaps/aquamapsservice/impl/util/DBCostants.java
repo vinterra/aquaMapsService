@@ -168,7 +168,7 @@ public class DBCostants {
 	
 	
 
-	public static final String JobListPerAuthor="select * from "+JOB_Table+" where author = ? AND isAquaMap= true";
+	public static final String AquaMapsListPerAuthor="select * from "+JOB_Table+" where author = ? AND isAquaMap= ?";
 	
 	public static final String AquaMapsListPerJob="SELECT * from submitted where jobId=? AND isAquaMap= true";
 	

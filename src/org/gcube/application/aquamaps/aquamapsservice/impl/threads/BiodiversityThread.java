@@ -71,7 +71,7 @@ public class BiodiversityThread extends Thread {
 		File clusterFile=JobUtils.createClusteringFile(toPerform, csq_str, header, header_map, generationDetails.getToPerform()+File.separator+"clustering");
 		logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile.getAbsolutePath());
 		int result=JobUtils.generateImages(clusterFile.getAbsolutePath());
-		logger.trace(this.getName()+" Perl execution exit message :"+result);
+		logger.trace(this.getName()+" Perl execution exit message :"+result);		
 		if(result!=0) logger.error("No images were generated");
 		else {
 			Map<String,File> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",toPerform.getName());

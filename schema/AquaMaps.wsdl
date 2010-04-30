@@ -256,6 +256,8 @@
 					<xsd:element name="sortDirection" type="xsd:string"/>
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="aquamaps" type="xsd:boolean"/>
+					<xsd:element name="jobId" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 			
@@ -388,10 +390,10 @@
 				
 			<!-- Request / Response elements -->
 			
-			<xsd:element name="deleteSubmittedRequest" type="xsd:string"/>
+			<xsd:element name="deleteSubmittedRequest" type="tns:stringArray"/>
 			<xsd:element name="deleteSubmittedResponse" type="xsd:int"/>
 			
-			<xsd:element name="markSavedRequest" type="xsd:string"/>
+			<xsd:element name="markSavedRequest" type="tns:stringArray"/>
 			<xsd:element name="markSavedResponse" type="coretypes:VOID"/>
 			
 			<xsd:element name="getAquaMapsPerUserRequest" type="tns:getAquaMapsPerUserRequestType"/>

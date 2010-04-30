@@ -149,7 +149,8 @@ public class JobUtils {
 			logger.trace("Perl process exited");
 		}
 		p.destroy();
-		
+		File f= new File(file);
+		if(!f.delete())logger.warn("Unable to delete clustering file "+file);
 		return p.exitValue(); 
 	}
 	

@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ThreadManager {
 
-	private static BlockingQueue<Runnable> queue =  new ArrayBlockingQueue<Runnable>(100, true);
-	private static ThreadPoolExecutor executor= new ThreadPoolExecutor(30, 50, 60, TimeUnit.MILLISECONDS, queue);
+	private static BlockingQueue<Runnable> queue =  new ArrayBlockingQueue<Runnable>(ServiceContext.getContext().getQueueSize(), true);
+	private static ThreadPoolExecutor executor= new ThreadPoolExecutor(ServiceContext.getContext().getCoreSize(), ServiceContext.getContext().getMaxSize(), ServiceContext.getContext().getWaitIdleTime(), TimeUnit.MILLISECONDS, queue);
 	
 	static{
 		executor.prestartAllCoreThreads();

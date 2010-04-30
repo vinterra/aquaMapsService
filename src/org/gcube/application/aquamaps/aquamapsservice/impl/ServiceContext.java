@@ -38,6 +38,10 @@ public class ServiceContext extends GCUBEServiceContext {
 	private String webServerUrl=null;
 	private String dbUsername;
 	private String dbPassword;
+	private int queueSize;
+	private int coreSize;
+	private int maxSize;
+	private long waitIdleTime;
 	
 	protected void onReady() throws Exception{
 		
@@ -81,6 +85,14 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.dbUsername=prop.getProperty("dbusername","");
 			this.dbPassword=prop.getProperty("dbpassword","");
 		}catch(Exception e){logger.error("error getting DB credential ",e);}
+		try{
+			Properties prop= new Properties();
+			prop.load(new FileInputStream(this.getFile("pool.properties", false)));
+			this.coreSize=Integer.parseInt(prop.getProperty("coreSize","30"));
+			this.queueSize=Integer.parseInt(prop.getProperty("queueSize","1000"));
+			this.maxSize=Integer.parseInt(prop.getProperty("maxSize","50"));
+			this.waitIdleTime=Long.parseLong(prop.getProperty("waitIdleTime","30000"));
+		}catch(Exception e){logger.fatal("error getting Thread Pool settings ",e);}
 	}
 	
 	public String getWebServiceURL(){
@@ -97,6 +109,62 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	public String getDbPassword() {
 		return dbPassword;
+	}
+
+	/**
+	 * @return the queueSize
+	 */
+	public int getQueueSize() {
+		return queueSize;
+	}
+
+	/**
+	 * @param queueSize the queueSize to set
+	 */
+	public void setQueueSize(int queueSize) {
+		this.queueSize = queueSize;
+	}
+
+	/**
+	 * @return the coreSize
+	 */
+	public int getCoreSize() {
+		return coreSize;
+	}
+
+	/**
+	 * @param coreSize the coreSize to set
+	 */
+	public void setCoreSize(int coreSize) {
+		this.coreSize = coreSize;
+	}
+
+	/**
+	 * @return the maxSize
+	 */
+	public int getMaxSize() {
+		return maxSize;
+	}
+
+	/**
+	 * @param maxSize the maxSize to set
+	 */
+	public void setMaxSize(int maxSize) {
+		this.maxSize = maxSize;
+	}
+
+	/**
+	 * @return the waitIdleTime
+	 */
+	public long getWaitIdleTime() {
+		return waitIdleTime;
+	}
+
+	/**
+	 * @param waitIdleTime the waitIdleTime to set
+	 */
+	public void setWaitIdleTime(long waitIdleTime) {
+		this.waitIdleTime = waitIdleTime;
 	}
 		
 }
