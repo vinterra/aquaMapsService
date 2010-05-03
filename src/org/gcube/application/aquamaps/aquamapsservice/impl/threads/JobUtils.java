@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -19,6 +20,8 @@ import java.util.Map;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
@@ -164,27 +167,36 @@ public class JobUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String publish(String firstLevelDir, String secondLevelDir, Collection<File> files) throws Exception{
+	public static String publish(String firstLevelDir, String secondLevelDir, Collection<String> filesPath) throws Exception{
 		// Destination directory
 	    File dir = new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+ServiceContext.getContext().getHttpServerBasePath()+
 	    			File.separator+firstLevelDir+File.separator+secondLevelDir+File.separator);
 	    logger.debug("path: "+dir.getAbsolutePath());
 	    dir.mkdirs();
 	    // Move file to new directory
-	    for (File file: files){
+	    for (String path : filesPath){
+	    	File file=new File(path);
 	    	if (!file.exists()){
 	    		logger.debug("the file "+file.getName() +" doesn't exists");
 	    		continue;
 	    	}
-	    	
 	    	File dest=new File(dir, file.getName());
-	    	boolean success = file.renameTo(dest);
-	    	if (!success) {
-	    		logger.error("Error publishing file "+file.getName());
-	    	}else {
-	    		boolean deleted=file.delete();
-	    		if(!deleted)logger.error("Error deleting temp file "+file.getName());
+	    	
+	    	//Using ioutils
+	    	try{
+	    	FileUtils.copyFile(file,dest);
+	    	FileUtils.forceDelete(file);
+//	    	logger.debug(path + "successfully moved to "+dest.getAbsolutePath());
+	    	}catch(Exception e){
+	    		logger.error("Unable to move (copy and delete) "+path,e);
 	    	}
+//	    	boolean success = file.renameTo(dest);
+//	    	if (!success) {
+//	    		logger.error("Error publishing file "+file.getName());
+//	    	}else {
+//	    		boolean deleted=file.delete();
+//	    		if(!deleted)logger.error("Error deleting temp file "+file.getName());
+//	    	}
 	    }
 	    logger.debug(ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir);
 	    return ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir+"/";
@@ -192,7 +204,7 @@ public class JobUtils {
 	}
 	
 	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir,DBSession c) throws Exception{
-		Collection<File> toUpdateProfile=new ArrayList<File>();
+		Collection<String> toUpdateProfile=new ArrayList<String>();
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+resName);
 		dir.mkdirs();
 		File file=new File(dir.getAbsolutePath(),resName+".xml");
@@ -200,7 +212,7 @@ public class JobUtils {
 		FileWriter writer=new FileWriter(file);
 		writer.write(resProfile);
 		writer.close();
-		toUpdateProfile.add(file);
+		toUpdateProfile.add(file.getAbsolutePath());
 		String path=publish(firstLevelDir,secondLevelDir,toUpdateProfile);
 		logger.trace("Profile for "+resName+" created, gonna update DB");
 		PreparedStatement ps=c.preparedStatement(DBCostants.profileUpdate);
@@ -378,7 +390,7 @@ public class JobUtils {
 		return toReturn;
 	}
 	
-	public static File createClusteringFile(AquaMap object,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
+	public static String createClusteringFile(AquaMap object,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
 		
 		String to_out = "color=FFFF84 fill=Y color2=FFDE6B fill2=Y color3=FFAD6B fill3=Y color4=FF6B6B fill4=Y color5=DE4242 fill5=Y "+
 		((csq_str[0].toString().compareTo("")!=0)?" csq="+csq_str[0].toString():" csq=0000:000:0")+
@@ -398,66 +410,67 @@ public class JobUtils {
 		PrintStream myOutput = new PrintStream(myStream);
 
 		myOutput.print(to_out);
-		return file;
+		String toReturn=file.getAbsolutePath();		
+		return toReturn;
 	}
 	
-	public static Map<String,File> getToPublishList(String basePath,String aquamapName){
-		Map<String,File> toReturn=new HashMap<String, File>();
+	public static Map<String,String> getToPublishList(String basePath,String aquamapName){
+		Map<String,String> toReturn=new HashMap<String, String>();
 		File f1 = new File(basePath+"csq_map127.0.0.1_"+aquamapName+"_map_pic.jpg");
 		if (f1.exists())
-			toReturn.put(aquamapName+" Earth",f1);			
+			toReturn.put(aquamapName+" Earth",f1.getAbsolutePath());			
 				
 		File f2 = new File(basePath+aquamapName+"/"+aquamapName+"_afr.jpg");
 		if (f2.exists())
-			toReturn.put(aquamapName+" Continent View : Africa", f2);						
+			toReturn.put(aquamapName+" Continent View : Africa", f2.getAbsolutePath());						
 				
 		File f3 = new File(basePath+aquamapName+"/"+aquamapName+"_asia.jpg");
 		if (f3.exists())
-			toReturn.put(aquamapName+" Continent View : Asia", f3);			
+			toReturn.put(aquamapName+" Continent View : Asia", f3.getAbsolutePath());			
 				
 		File f4 = new File(basePath+aquamapName+"/"+aquamapName+"_aus.jpg");
 		if (f4.exists())
-			toReturn.put(aquamapName+" Continent View : Australia", f4);			
+			toReturn.put(aquamapName+" Continent View : Australia", f4.getAbsolutePath());			
 				
 		File f5 = new File(basePath+aquamapName+"/"+aquamapName+"_eur.jpg");
 		if (f5.exists())			
-			toReturn.put(aquamapName+" Continent View : Europa", f5);
+			toReturn.put(aquamapName+" Continent View : Europa", f5.getAbsolutePath());
 				
 		File f6 = new File(basePath+aquamapName+"/"+aquamapName+"_nAm.jpg");
 		if (f6.exists())			
-			toReturn.put(aquamapName+" Continent View : North America", f6);
+			toReturn.put(aquamapName+" Continent View : North America", f6.getAbsolutePath());
 		
 		File f7 = new File(basePath+aquamapName+"/"+aquamapName+"_sAm.jpg");
 		if (f7.exists())			
-			toReturn.put(aquamapName+" Continent View : South America", f7);
+			toReturn.put(aquamapName+" Continent View : South America", f7.getAbsolutePath());
 		
 		File f8 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapAtlan.jpg");
 		if (f8.exists())			
-			toReturn.put(aquamapName+" Ocean View : Atlantic", f8);
+			toReturn.put(aquamapName+" Ocean View : Atlantic", f8.getAbsolutePath());
 		
 		File f9 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapI.jpg");
 		if (f9.exists())
-			toReturn.put(aquamapName+" Ocean View : Indian", f9);			
+			toReturn.put(aquamapName+" Ocean View : Indian", f9.getAbsolutePath());			
 		
 		File f10 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapN.jpg");
 		if (f10.exists())			
-			toReturn.put(aquamapName+" Pole View : Artic", f10);
+			toReturn.put(aquamapName+" Pole View : Artic", f10.getAbsolutePath());
 		
 		File f11= new File(basePath+aquamapName+"/"+aquamapName+"_xmapNAtlan.jpg");
 		if (f11.exists())			
-			toReturn.put(aquamapName+" Ocean View : North Atlantic", f11);
+			toReturn.put(aquamapName+" Ocean View : North Atlantic", f11.getAbsolutePath());
 				
 		File f12= new File(basePath+aquamapName+"/"+aquamapName+"_xmapP.jpg");
 		if (f12.exists())
-			toReturn.put(aquamapName+" Ocean View : Pacific", f12);			
+			toReturn.put(aquamapName+" Ocean View : Pacific", f12.getAbsolutePath());			
 		
 		File f13= new File(basePath+aquamapName+"/"+aquamapName+"_xmapS.jpg");
 		if (f13.exists())			
-			toReturn.put(aquamapName+" Pole View : Antarctic", f13);
+			toReturn.put(aquamapName+" Pole View : Antarctic", f13.getAbsolutePath());
 				
 		File f14= new File(basePath+aquamapName+"/"+aquamapName+"_xmapSAtlan.jpg");
 		if (f14.exists())	
-			toReturn.put(aquamapName+" Ocean View : South Atlantic", f14);
+			toReturn.put(aquamapName+" Ocean View : South Atlantic", f14.getAbsolutePath());
 		
 		return toReturn;
 	}

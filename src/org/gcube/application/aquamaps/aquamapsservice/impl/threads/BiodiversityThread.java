@@ -68,13 +68,13 @@ public class BiodiversityThread extends Thread {
 	csq_str=JobUtils.clusterize(rs, 2, 1, 2,true);
 	if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 	else {
-		File clusterFile=JobUtils.createClusteringFile(toPerform, csq_str, header, header_map, generationDetails.getToPerform()+File.separator+"clustering");
-		logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile.getAbsolutePath());
-		int result=JobUtils.generateImages(clusterFile.getAbsolutePath());
+		String clusterFile=JobUtils.createClusteringFile(toPerform, csq_str, header, header_map, generationDetails.getToPerform()+File.separator+"clustering");
+		logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
+		int result=JobUtils.generateImages(clusterFile);
 		logger.trace(this.getName()+" Perl execution exit message :"+result);		
 		if(result!=0) logger.error("No images were generated");
 		else {
-			Map<String,File> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",toPerform.getName());
+			Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",toPerform.getName());
 						
 			
 			logger.trace(this.getName()+" found "+app.size()+" files to publish");
@@ -84,9 +84,10 @@ public class BiodiversityThread extends Thread {
 				PreparedStatement ps =generationDetails.getConnection().preparedStatement(DBCostants.fileInsertion);
 				
 				for(String mapName:app.keySet()){
+					File f= new File(app.get(mapName));
 					ps.setBoolean(1,true);
 					ps.setString(2,mapName);
-					ps.setString(3, basePath+app.get(mapName).getName());
+					ps.setString(3, basePath+f.getName());
 					ps.setString(4,"IMG");
 					ps.setString(5,toPerform.getId());
 					ps.execute();
