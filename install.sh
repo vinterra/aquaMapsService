@@ -1,7 +1,7 @@
 #! /bin/sh
 
-TSDBUSERNAME=$(sed '/^\#/d' $GLOBUS_LOCATION/etc/org.gcube.contentmanagement.timeseriesservice/dbprop.properties | grep 'dbusername'  | tail -n 1 | sed 's/^.*=//;s/^[[:space:]]*//;s/[[:space:]]*$//')
-TSDBPASSWORD=$(sed '/^\#/d' $GLOBUS_LOCATION/etc/org.gcube.contentmanagement.timeseriesservice/dbprop.properties | grep 'dbpassword'  | tail -n 1 | sed 's/^.*=//;s/^[[:space:]]*//;s/[[:space:]]*$//')
+TSDBUSERNAME=$(sed '/^\#/d' $GLOBUS_LOCATION/etc/org.gcube.application.aquamaps/dbprop.properties | grep 'dbusername'  | tail -n 1 | sed 's/^.*=//;s/^[[:space:]]*//;s/[[:space:]]*$//')
+TSDBPASSWORD=$(sed '/^\#/d' $GLOBUS_LOCATION/etc/org.gcube.application.aquamaps/dbprop.properties | grep 'dbpassword'  | tail -n 1 | sed 's/^.*=//;s/^[[:space:]]*//;s/[[:space:]]*$//')
 
 echo $TSDBUSERNAME
 echo $TSDBPASSWORD
