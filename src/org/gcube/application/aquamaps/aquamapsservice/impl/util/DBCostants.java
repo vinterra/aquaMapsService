@@ -11,12 +11,11 @@ import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import com.sun.msv.grammar.xmlschema.OccurrenceExp;
-
 public class DBCostants {
 
 	private static GCUBELog logger= new GCUBELog(DBCostants.class);
-	
+	public static final String toDropTables="tempTables";
+	public static final String selectedSpecies="selectedSpecies";
 	public static final String HCAF_S="HCAF_S";
 	public static final String JOB_Table="submitted";
 	public static final String HCAF_D="HCAF_D";
@@ -48,7 +47,7 @@ public class DBCostants {
 	}
 	public static String clusteringDistributionQuery(String hspecName){
 		String query= "Select "+cSquareCode+", "+probability+"  FROM "+hspecName+" where "+
-				hspecName+"."+SpeciesID+"=? AND "+probability+" > ? ORDER BY "+probability+" DESC";
+				hspecName+"."+SpeciesID+"=?  ORDER BY "+probability+" DESC";
 		logger.trace("clusteringDistributionQuery: "+query);
 		return query;
 	}

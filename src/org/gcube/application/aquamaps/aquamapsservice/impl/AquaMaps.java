@@ -120,6 +120,7 @@ public class AquaMaps extends GCUBEPortType {
 						toReturn+=psDeleteSubmitted.executeUpdate();
 					}
 				}
+				session.close();
 				logger.trace("Total deleted submitted count : "+toReturn);
 				
 			}catch(SQLException e){
@@ -273,7 +274,9 @@ public class AquaMaps extends GCUBEPortType {
 		try{
 			DBSession session=DBSession.openSession();
 			ResultSet rs=session.executeQuery("select occurrenceCells.* , HCAF_D.DepthMean, HCAF_D.SSTAnMean, HCAF_D.SBTAnMean, HCAF_D.SalinityBMean, HCAF_D.SalinityMean, HCAF_D.PrimProdMean, HCAF_D.IceConAnn  from HCAF_D inner join occurrenceCells on HCAF_D.CsquareCode = occurrenceCells.CsquareCode where occurrenceCells.SpeciesID = '"+speciesId+"'");		
-			return DBUtils.toJSon(rs,request.getOffset(),request.getOffset()+request.getLimit());
+			String toReturn= DBUtils.toJSon(rs,request.getOffset(),request.getOffset()+request.getLimit());
+			session.close();
+			return toReturn;
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getjobList");
 			logger.trace("Raised Exception", e);			
@@ -285,9 +288,15 @@ public class AquaMaps extends GCUBEPortType {
 	}
 
 	public String submitJob(Job req)throws GCUBEFault{
+		try{
+			logger.trace("Serving submit job "+req.getName());
 		JobSubmissionThread thread=new JobSubmissionThread(req);
 		ThreadManager.getExecutor().execute(thread);
-		return "";
+		return String.valueOf(thread.getId());
+		}catch(Exception e){
+			logger.error("Unable to execute Job "+req.getName(), e);
+			throw new GCUBEFault("Unable to execute, please try again later");
+		}
 	}
 
 	public String getJobList(String author)throws GCUBEFault{
@@ -417,6 +426,7 @@ public class AquaMaps extends GCUBEPortType {
 		try{
 			DBSession conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
+			conn.close();
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getCellEnvironment");
 			logger.trace("Raised Exception", e);
@@ -788,6 +798,7 @@ public class AquaMaps extends GCUBEPortType {
 					logger.error("Unable to mark "+id+" as saved",e1);
 				}
 			}
+			conn.close();
 		}catch(Exception e){
 			logger.error(e);
 			throw new GCUBEFault();

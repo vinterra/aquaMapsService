@@ -33,7 +33,8 @@ public class HSPECGenerator {
 	private String hspecTable;
 	private String resultsTable;
 	private String occurenceCellsTable;
-	private JobGenerationDetails details;
+	private int jobId;
+//	private JobGenerationDetails details;
 	private Map<String,WeightArray> weights=new HashMap<String, WeightArray>(); 
 	
 /*	private double sstWeight;
@@ -42,16 +43,16 @@ public class HSPECGenerator {
 	private double primaryProductsWeight;
 	private double seaIceConcentrationWeight;
 	*/
-	public HSPECGenerator(JobGenerationDetails details) {
+	public HSPECGenerator(int jobId,String HCAF_D,String HCAF_S,String HSPEN,EnvelopeWeightArray envelopeWeights) {
 		super();
 		this.hcafViewTable = "HCAF"+uuidGen.nextUUID().replace("-", "_");
-		this.hcafDynamicTable=details.getHcafTable();
-		this.hcafStaticTable=DBCostants.HCAF_S;
-		this.hspenTable = details.getHspenTable();
+		this.hcafDynamicTable=HCAF_D;
+		this.hcafStaticTable=HCAF_S;
+		this.hspenTable = HSPEN;
 		this.hspecTable = DBCostants.HSPEC;
 		this.occurenceCellsTable = DBCostants.GOOD_CELLS;
+		this.jobId=jobId;
 		
-		this.details=details;
 		/*this.depthWeight = 1.0;
 		this.salinityWeight = 1.0;
 		this.primaryProductsWeight = 1.0;
@@ -68,7 +69,7 @@ public class HSPECGenerator {
 				if(weight.getParameterName().compareTo("Depth")==0) this.depthWeight=  weight.getChosenWeight();
 			}
 			*/	
-		EnvelopeWeightArray envelopeWeights=details.getToPerform().getWeights();
+		
 		if((envelopeWeights!=null)&&(envelopeWeights.getEnvelopeWeightList()!=null)&&(envelopeWeights.getEnvelopeWeightList().length>0)){
 			for(EnvelopeWeights envW : envelopeWeights.getEnvelopeWeightList()){
 				weights.put(envW.getSpeciesId(), envW.getWeights());
@@ -76,7 +77,8 @@ public class HSPECGenerator {
 		}
 		
 		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
-		details.setHspecTable(this.resultsTable);
+//		JobGenerationDetails.set
+//		details.setHspecTable(this.resultsTable);
 		//logger.trace("Weights: "+this.depthWeight+" "+this.salinityWeight+" "+this.primaryProductsWeight+" "+this.seaIceConcentrationWeight+" "+this.sstWeight);
 	}
 
@@ -205,10 +207,9 @@ public class HSPECGenerator {
 				}
 				logger.trace("inserted "+k+" entries whit inbox false for "+hspenRes.getString("SpeciesID")+" species id");
 				logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
-				this.details.getSpeciesHandling().put(hspenRes.getString("SpeciesID"), SpeciesStatus.Ready);
+				JobGenerationDetails.updateSpeciesStatus(jobId,new String[]{hspenRes.getString("SpeciesID")}, SpeciesStatus.Ready);
 				hspenLoops++;
-			}
-			
+			}			
 		}catch (Exception e) {
 			logger.error("error in generate method",e);
 			try{
@@ -222,7 +223,7 @@ public class HSPECGenerator {
 			session.close();
 		}
 		
-		logger.trace("generation of "+this.details.getToPerform().getName()+" finished in "+((System.currentTimeMillis()-generationStart)/1000)+"secs");
+		logger.trace("generation of jobId:"+jobId+" finished in "+((System.currentTimeMillis()-generationStart)/1000)+"secs");
 		return this.resultsTable;
 	}
 		

@@ -3,7 +3,6 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -21,20 +20,18 @@ import java.util.Map;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
+import org.gcube.application.aquamaps.stubs.AreasArray;
 import org.gcube.application.aquamaps.stubs.Cell;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.Job;
-import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.Resource;
 import org.gcube.application.aquamaps.stubs.Specie;
-import org.gcube.application.aquamaps.stubs.SpeciesArray;
 import org.gcube.application.aquamaps.stubs.Weight;
 import org.gcube.application.aquamaps.stubs.dataModel.util.StubsToModel;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -203,7 +200,8 @@ public class JobUtils {
 
 	}
 	
-	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir,DBSession c) throws Exception{
+	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir) throws Exception{
+		DBSession c=DBSession.openSession();
 		Collection<String> toUpdateProfile=new ArrayList<String>();
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+resName);
 		dir.mkdirs();
@@ -228,28 +226,23 @@ public class JobUtils {
 				pps.setString(5,resId);
 				pps.execute();			
 		}
-	}
-	
-	public static void updateStatus(JobGenerationDetails generationDetails,DBSession c,JobGenerationDetails.Status status)throws SQLException, IOException, Exception{
-		Job toUpdate=generationDetails.getToPerform();
-		toUpdate.setStatus(status.toString());
-		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
-		ps.setString(1, toUpdate.getStatus());		
-		ps.setInt(2,Integer.parseInt(toUpdate.getId()));
-		ps.execute();		
-		updateProfile(toUpdate.getName(),toUpdate.getId(),makeJobProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
-		logger.trace("done Job status updateing status : "+status.toString());
+		c.close();
 	}
 	
 	
-	public static void updateAquaMapStatus(JobGenerationDetails generationDetails,AquaMap toUpdate,DBSession c,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
-		toUpdate.setStatus(status.toString());
+	
+	
+	public static void updateAquaMapStatus(int aquamapsId,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
+//		toUpdate.setStatus(status.toString());
+		DBSession c=DBSession.openSession();
 		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, status.toString());
-		ps.setInt(2,Integer.parseInt(toUpdate.getId()));		
-		ps.execute();		
-		updateProfile(toUpdate.getName(),toUpdate.getId(),makeAquaMapProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
+		ps.setInt(2,aquamapsId);		
+		ps.execute();	
+		c.close();
+//		updateProfile(toUpdate.getName(),toUpdate.getId(),makeAquaMapProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
 		logger.trace("done AquaMap status updateing status : "+status.toString());
+		
 	}
 	
 
@@ -351,24 +344,24 @@ public class JobUtils {
 	 */
 	
 	
-	public static String filterByArea(JobGenerationDetails details)throws Exception{
+	public static String filterByArea(int jobId,AreasArray areaSelection,String hspec)throws Exception{
 		String toReturn;		
-		logger.trace(" filtering simulation data on area selection for job "+details.getToPerform().getName());
+		logger.trace(" filtering simulation data on area selection for jobId:"+jobId);
 		
-		if((details.getToPerform().getSelectedAreas()!=null)&&(details.getToPerform().getSelectedAreas().getAreasList()!=null)
-				&&(details.getToPerform().getSelectedAreas().getAreasList().length>0)){
-			DBSession conn = details.getConnection();
+		if((areaSelection!=null)&&(areaSelection.getAreasList()!=null)
+				&&(areaSelection.getAreasList().length>0)){
+			DBSession conn = DBSession.openSession();
 			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
-			for(Area area: details.getToPerform().getSelectedAreas().getAreasList())			
+			for(Area area: areaSelection.getAreasList())			
 				conn.executeUpdate("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
 			
 			logger.trace(" area temp table created");
-			details.getToDropTableList().add(areaTmpTable);
+			JobGenerationDetails.addToDropTableList(jobId,areaTmpTable);
 			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
-			details.getToDropTableList().add(filteredTable);
-			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,details.getHspecTable(),areaTmpTable);
+			JobGenerationDetails.addToDropTableList(jobId,filteredTable);
+			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,hspec,areaTmpTable);
 			logger.trace("Going to use sql query "+filterQuery);			
 			conn.executeQuery(filterQuery);
 			/*ps.setString(1, filteredTable);
@@ -380,17 +373,17 @@ public class JobUtils {
 			
 			logger.trace(" table filtered, dropping area temp table");
 			conn.executeUpdate("drop table "+areaTmpTable);
-			
+			conn.close();
 			toReturn=filteredTable;
 		}else {
-			toReturn=details.getHspecTable();
-			logger.trace(details.getToPerform().getName()+" no area selected");
+			toReturn=hspec;
+			logger.trace(jobId+" no area selected");
 		}
-		logger.trace("area filtering completed for job "+details.getToPerform().getName());
+		logger.trace("area filtering completed for jobid"+jobId);
 		return toReturn;
 	}
 	
-	public static String createClusteringFile(AquaMap object,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
+	public static String createClusteringFile(String objectName,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
 		
 		String to_out = "color=FFFF84 fill=Y color2=FFDE6B fill2=Y color3=FFAD6B fill3=Y color4=FF6B6B fill4=Y color5=DE4242 fill5=Y "+
 		((csq_str[0].toString().compareTo("")!=0)?" csq="+csq_str[0].toString():" csq=0000:000:0")+
@@ -401,7 +394,7 @@ public class JobUtils {
 		" header="+header+" enlarge=7200 title="+header_map+
 		" dilate=N cSub popup=Y landmask=1 filedesc=map_pic legend=  mapsize=large";
 
-		String fileName=object.getName()+"_clustering";
+		String fileName=objectName+"_clustering";
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+dirName);
 		dir.mkdirs();
 		File file=new File(dir.getAbsolutePath(),fileName);

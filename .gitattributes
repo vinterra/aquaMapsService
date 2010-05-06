@@ -18,6 +18,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -te
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSessionTest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvCostants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvEngine.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_LandDist.java -text
@@ -59,3 +60,4 @@ src/org/gcube/application/aquamaps/stubs/dataModel/util/Tags.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/util/XMLUtils.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
+test/testClient/DBConnectionTest.java -text

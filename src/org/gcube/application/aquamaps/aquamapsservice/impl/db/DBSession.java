@@ -9,6 +9,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.dbcp.ConnectionFactory;
+import org.apache.commons.dbcp.DriverManagerConnectionFactory;
+import org.apache.commons.dbcp.PoolableConnectionFactory;
+import org.apache.commons.dbcp.PoolingDriver;
+import org.apache.commons.pool.impl.GenericObjectPool;
+import org.apache.commons.pool.impl.StackKeyedObjectPoolFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -23,7 +29,31 @@ import org.gcube.common.core.utils.logging.GCUBELog;
  */
 public class DBSession {
 	
-	private GCUBELog logger= new GCUBELog(DBSession.class);
+	private static GCUBELog logger= new GCUBELog(DBSession.class);
+	
+	private static GenericObjectPool connectionPool; 
+	private static ConnectionFactory connectionFactory;
+	private static PoolableConnectionFactory poolableConnectionFactory;
+	private static PoolingDriver driver;
+	
+	
+	static{
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		connectionPool = new GenericObjectPool(null);
+		connectionPool.setMaxActive(30);		
+		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
+//		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/prova",  "root","rootpwd");
+		poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,
+				new StackKeyedObjectPoolFactory(),null,false,true);
+		driver = new PoolingDriver();
+		driver.registerPool("thePool",connectionPool);
+	}
+	
 	
 	private Connection connection;
 	
@@ -45,11 +75,20 @@ public class DBSession {
 	 */
 	public static DBSession openSession() throws Exception{
 		//put all of them in a configuration file
-		Class.forName("com.mysql.jdbc.Driver");
-		String url = "jdbc:mysql://localhost:3306/aquamaps_DB";
-		Connection conn= DriverManager.getConnection(url, ServiceContext.getContext().getDbUsername() , ServiceContext.getContext().getDbPassword());
-		conn.setAutoCommit(true);
-		return new DBSession(conn);
+		
+		
+		
+//		Class.forName("com.mysql.jdbc.Driver");
+//		String url = "jdbc:mysql://localhost:3306/aquamaps_DB";
+//		Connection conn= DriverManager.getConnection(url, ServiceContext.getContext().getDbUsername() , ServiceContext.getContext().getDbPassword());
+//		conn.setAutoCommit(true);
+//		return new DBSession(conn);
+		
+		
+		
+		Connection conn=DriverManager.getConnection("jdbc:apache:commons:dbcp:thePool");
+		return new DBSession(conn);		
+		
 	}
 	
 	private DBSession(Connection conn){

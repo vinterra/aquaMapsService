@@ -1,22 +1,19 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.stubs.AquaMap;
-import org.gcube.application.aquamaps.stubs.Job;
-import org.gcube.application.aquamaps.stubs.Specie;
-
-import com.sun.swing.internal.plaf.synth.resources.synth;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobGenerationDetails {
-
-	public static final String Biodiversity="Biodiversity";
-	public static final String SpeciesDistribution="SpeciesDistribution";
+	private static GCUBELog logger= new GCUBELog(JobGenerationDetails.class);
+//	public static final String Biodiversity="Biodiversity";
+//	public static final String SpeciesDistribution="SpeciesDistribution";
 	
 	public enum SpeciesStatus{
 		toCustomize,toGenerate,Ready
@@ -24,131 +21,130 @@ public class JobGenerationDetails {
 	
 	public enum Status {
 		Pending,Simulating,Generating,Publishing,Completed,Error
-		}
-	private DBSession connection;
-	private Map<Integer,Status> toPerformBiodiversity=new HashMap<Integer, Status>();
-	private Map<Integer,Status> toPerformDistribution=new HashMap<Integer, Status>();
-	private Map<String,SpeciesStatus> speciesHandling=new HashMap<String, SpeciesStatus>();
-	private boolean areaReady=false;
-	private Status status;
-	private String hspenTable;
-	private String hspecTable;
-	private String hcafTable;	
-	private Job toPerform; 
+	}
+	private enum Sources{
+		HCAF,HSPEC,HSPEN
+	}
 	
-	private List<String> toDropTableList=new ArrayList<String>();
-	/**
-	 * @return the toDropTableList
-	 */
-	public List<String> getToDropTableList() {
-		return toDropTableList;
+	
+	private static void updateSource(Sources sourceField,String source,int jobId)throws Exception{
+		DBSession session= DBSession.openSession();
+		PreparedStatement ps= session.preparedStatement("Update submitted set "+sourceField.toString()+" = ? where searchId = ?");
+		ps.setString(1, source);
+		ps.setInt(2,jobId);
+		ps.execute();
+		session.close();
+	}	
+	private static String getSource(Sources source,int jobId)throws Exception{
+		DBSession session= DBSession.openSession();
+		PreparedStatement ps= session.preparedStatement("Select "+source.toString()+" from submitted where searchId = ?");
+		ps.setInt(1, jobId);
+		ResultSet rs =ps.executeQuery();
+		rs.first();
+		String toReturn=rs.getString(1);
+		session.close();
+		return toReturn;
 	}
-	/**
-	 * @param toDropTableList the toDropTableList to set
-	 */
-	public void setToDropTableList(List<String> toDropTableList) {
-		this.toDropTableList = toDropTableList;
+	
+	public synchronized static void setHCAFTable(String HCAFId,int jobId)throws Exception{
+		updateSource(Sources.HCAF,HCAFId,jobId);
 	}
-	public Map<Integer, Status> getToPerformBiodiversity() {
-		return toPerformBiodiversity; 
+	
+	public synchronized static void setHSPENTable(String HCAFId,int jobId)throws Exception{
+		updateSource(Sources.HSPEN,HCAFId,jobId);
 	}
-	public void setToPerformBiodiversity(Map<Integer, Status> toPerformBiodiversity) {
-		this.toPerformBiodiversity = toPerformBiodiversity;
+	public synchronized static void setHSPECTable(String HCAFId,int jobId)throws Exception{
+		updateSource(Sources.HSPEC,HCAFId,jobId);
 	}
-	public Map<Integer, Status> getToPerformDistribution() {
-		return toPerformDistribution;
+	
+	public synchronized static String getHCAFTable(int jobId)throws Exception{
+		return getSource(Sources.HCAF, jobId);
 	}
-	public void setToPerformDistribution(Map<Integer, Status> toPerformDistribution) {
-		this.toPerformDistribution = toPerformDistribution;
+	
+	public synchronized static String getHSPENTable(int jobId)throws Exception{
+		return getSource(Sources.HSPEN, jobId);		
 	}
-	public Map<String, SpeciesStatus> getSpeciesHandling() {
-		return speciesHandling;
+	
+	public synchronized static String getHSPECTable(int jobId)throws Exception{
+		return getSource(Sources.HSPEC, jobId);
 	}
-	public void setSpeciesHandling(Map<String, SpeciesStatus> speciesHandling) {
-		this.speciesHandling = speciesHandling;
+	public synchronized static void addToDropTableList(int jobId,String tableName)throws Exception{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.toDropTables+" (jobId,tableName) VALUE(?,?)");
+		ps.setInt(1, jobId);
+		ps.setString(2, tableName);
+		ps.execute();
+		session.close();
 	}
-	public boolean isAreaReady() {
-		return areaReady;
+	
+	public synchronized static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
+		DBSession session=DBSession.openSession();
+//		toUpdate.setStatus(status.toString());
+		PreparedStatement ps=session.preparedStatement(DBCostants.submittedStatusUpdating);
+		ps.setString(1, status.toString());		
+		ps.setInt(2,jobId);
+		ps.execute();		
+//		updateProfile(toUpdate.getName(),toUpdate.getId(),makeJobProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
+		logger.trace("done Job status updateing status : "+status.toString());
+		session.close();
 	}
-	public void setAreaReady(boolean areaReady) {
-		this.areaReady = areaReady;
-	}
-	public String getHspenTable() {
-		return hspenTable;
-	}
-	public void setHspenTable(String hspenTable) {
-		this.hspenTable = hspenTable;
-	}
-	public String getHspecTable() {
-		return hspecTable;
-	}
-	public void setHspecTable(String hspecTable) {
-		this.hspecTable = hspecTable;
-	}
-	public String getHcafTable() {
-		return hcafTable;
-	}
-	public void setHcafTable(String hcafTable) {
-		this.hcafTable = hcafTable;
-	}
-	public Job getToPerform() {
-		return toPerform;
-	}
-	public void setToPerform(Job toPerform) {
-		this.toPerform = toPerform;
-	}
-	public JobGenerationDetails(Job toPerform) {
-		this.toPerform=toPerform;
-		//init Aquamap Status List
-		for(int i=0;i<toPerform.getAquaMapList().getAquaMapList().length;i++){
-			AquaMap obj=toPerform.getAquaMapList().getAquaMapList(i);
-			if(obj.getType().toString().equalsIgnoreCase(Biodiversity))
-				toPerformBiodiversity.put(i, Status.Pending);
-			else toPerformDistribution.put(i, Status.Pending);
+	public synchronized static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps=session.preparedStatement("Update "+DBCostants.selectedSpecies+" set status = ? where jobId=? AND speciesId=?");
+		ps.setString(1, status.toString());
+		ps.setInt(2, jobId);
+		for(String specId:speciesId){
+			ps.setString(3,specId);
+			ps.execute();
 		}
-		//init SpeciesHandling 
-		for(Specie spec:toPerform.getSelectedSpecies().getSpeciesList())
-			speciesHandling.put(spec.getId(), SpeciesStatus.toCustomize);
-		
-		status=Status.Pending;
+		session.close();
 	}
-	public void setStatus(Status status) throws IOException, Exception {		
-		JobUtils.updateStatus(this, connection,status);
-		this.status = status;
-	}
-	public Status getStatus() {
-		return status;
-	}
-	public String getFirstLevelDirName(){
-		return ((toPerform.getHspec()!=null)?toPerform.getHspec().getName():"onTheFly");
-	}
-	public String getSecondLevelDirName(){
-		return (toPerform.getId());
-	}
-	public void setConnection(DBSession connection) {
-		this.connection = connection;
-	}
-	public DBSession getConnection() {
-		return connection;
-	}
-	public void setAquaMapStatus(Status status,int index) throws Exception{
-		JobUtils.updateAquaMapStatus(this, toPerform.getAquaMapList().getAquaMapList(index), connection,status);		
-		if(toPerformBiodiversity.containsKey(index)) toPerformBiodiversity.put(index, status);
-		else toPerformDistribution.put(index, status);
-	}
-	public boolean isSpeciesListReady(List<String> speciesIdList){
-		for(String id:speciesIdList){			
-			if(!speciesHandling.get(id).equals(SpeciesStatus.Ready)) return false;			
+	public synchronized static String[] getSpeciesByStatus(int jobId,SpeciesStatus status)throws Exception{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=? AND status=?");
+		ps.setInt(1, jobId);
+		ps.setString(2,status.toString());
+		ResultSet rs=ps.executeQuery();
+		ArrayList<String> toReturn=new ArrayList<String>(); 
+		while(rs.next()){
+			toReturn.add(rs.getString("speciesId"));
 		}
-		return true;
+		session.close();
+		return toReturn.toArray(new String[toReturn.size()]);
 	}
-	public synchronized boolean isCompleted(){
-		for(Status s : toPerformBiodiversity.values()){
-			if(!(s.equals(Status.Completed)||s.equals(Status.Error)))return false;
+	public synchronized static boolean isJobComplete(int jobId) throws Exception{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps =session.preparedStatement("Select count(*) from submitted where jobId=? AND status!=? AND status!=?");
+		ps.setInt(1, jobId);
+		ps.setString(2, Status.Error.toString());
+		ps.setString(3, Status.Completed.toString());
+		ResultSet rs=ps.executeQuery();
+		boolean toReturn=rs.getInt(1)==0;
+		session.close();
+		return toReturn;
+	}
+	public synchronized static void cleanTemp(int jobId)throws Exception{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps=session.preparedStatement("Select tableName from "+DBCostants.toDropTables+" where jobId=?");
+		ps.setInt(1, jobId);
+		ResultSet rs=ps.executeQuery();
+		while(rs.next()){
+			String table=rs.getString(1);
+			session.executeUpdate("DROP TABLE "+table+" IF EXISTS");
 		}
-		for(Status s : toPerformDistribution.values()){
-			if(!(s.equals(Status.Completed)||s.equals(Status.Error)))return false;
+		session.close();
+	}
+	public synchronized static boolean isSpeciesListReady(int jobId,String[] toCheck)throws Exception{
+		DBSession session=DBSession.openSession();
+		PreparedStatement ps=session.preparedStatement("Select status from "+DBCostants.selectedSpecies+" where jobId =? and speciesId=?");
+		ps.setInt(1, jobId);
+		for(String id:toCheck){
+			ps.setString(2, id);
+			ResultSet rs =ps.executeQuery();
+			if(!(rs.getString("status").equalsIgnoreCase(SpeciesStatus.Ready.toString())))
+					return false;
 		}
+		session.close();
 		return true;
 	}
 }
