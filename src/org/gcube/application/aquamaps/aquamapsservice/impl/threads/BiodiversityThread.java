@@ -66,12 +66,12 @@ public class BiodiversityThread extends Thread {
 				logger.trace("INSERT INTO "+tableName+" VALUES('"+specId+"')");
 				;}
 			logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
-
+			HSPECName=JobGenerationDetails.getHSPECTable(jobId);
 			prep=session.preparedStatement(DBCostants.clusteringBiodiversityQuery(HSPECName,tableName));				
 			prep.setFloat(1,threshold);
 			ResultSet rs=prep.executeQuery();
 
-			String header=aquamapsName;
+			String header=jobId+"_"+aquamapsName;
 			String header_map = header+"_maps";
 			StringBuilder[] csq_str;
 			csq_str=JobUtils.clusterize(rs, 2, 1, 2,true);
@@ -84,13 +84,13 @@ public class BiodiversityThread extends Thread {
 			
 			if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 			else {
-				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+"_"+aquamapsName+File.separator+"clustering");
+				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
 				logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
 				int result=JobUtils.generateImages(clusterFile);
 				logger.trace(this.getName()+" Perl execution exit message :"+result);		
 				if(result!=0) logger.error("No images were generated");
 				else {
-					Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",jobId+"_"+aquamapsName);
+					Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
 
 
 					logger.trace(this.getName()+" found "+app.size()+" files to publish");
@@ -110,7 +110,7 @@ public class BiodiversityThread extends Thread {
 							ps.execute();
 						}
 
-						session.close();
+//						session.close();
 						logger.trace(this.getName()+" "+app.size()+" file information inserted in DB");
 					}
 				}
@@ -119,11 +119,17 @@ public class BiodiversityThread extends Thread {
 			//		session.executeUpdate("DROP TABLE "+tableName);		
 			JobUtils.updateAquaMapStatus(aquamapsId, Status.Completed);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(),e);
 			try {
 				JobUtils.updateAquaMapStatus(aquamapsId, Status.Error);
 			} catch (Exception e1) {
 				logger.error("Unable to handle previous error! : "+e1.getMessage());
+			}
+		}finally{
+			try{
+			session.close();
+			}catch(Exception e){
+				logger.error("Unexpected Error, unable to close session");
 			}
 		}
 	}

@@ -64,9 +64,10 @@ public class AquaMaps extends GCUBEPortType {
 
 	public int deleteSubmitted(StringArray submittedIds)throws GCUBEFault{
 		int toReturn=0;
+		DBSession session = null;
 		if((submittedIds!=null)&&(submittedIds.getStringList()!=null)&&(submittedIds.getStringList().length>0))
 			try{
-				DBSession session=DBSession.openSession();
+				session=DBSession.openSession();
 				PreparedStatement ps1=session.preparedStatement(DBCostants.submittedRetrieval);				
 				for(String submittedId:submittedIds.getStringList()){
 					logger.trace("Deleting submitted : "+submittedId);
@@ -120,7 +121,7 @@ public class AquaMaps extends GCUBEPortType {
 						toReturn+=psDeleteSubmitted.executeUpdate();
 					}
 				}
-				session.close();
+//				session.close();
 				logger.trace("Total deleted submitted count : "+toReturn);
 				
 			}catch(SQLException e){
@@ -131,6 +132,13 @@ public class AquaMaps extends GCUBEPortType {
 				logger.error("General Exception, unable to contact DB");
 				logger.trace("Raised Exception", e);
 				throw new GCUBEFault();
+			}finally{
+				try {
+					session.close();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			return toReturn;
 	}
@@ -139,9 +147,10 @@ public class AquaMaps extends GCUBEPortType {
 
 
 	public FieldArray calculateEnvelope(CalculateEnvelopeRequestType req)throws GCUBEFault{
-		logger.trace("Serving calculateEnvelope");		
+		logger.trace("Serving calculateEnvelope");
+		DBSession session = null;
 		try{
-			DBSession session=DBSession.openSession();
+			session=DBSession.openSession();
 			String query =DBCostants.calculateGoodCells(req.isUseFAO(), req.isUseBounding(), req.getFaoAreas(), req.getBoundingNorth(),	 req.getBoundingSouth(), req.getBoundingWest(), req.getBoundingEast());
 			logger.trace("submitting query "+query);
 			PreparedStatement ps = session.preparedStatement(query);
@@ -186,7 +195,7 @@ public class AquaMaps extends GCUBEPortType {
 				toAdd.setValue(f.getValue());
 				array.add(toAdd);
 			}
-			session.close();		
+//			session.close();		
 			logger.trace("re-calculation complete");
 			return new FieldArray(array.toArray(new Field[array.size()]));
 		}catch(SQLException e){
@@ -197,15 +206,23 @@ public class AquaMaps extends GCUBEPortType {
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
 			throw new GCUBEFault();
+		}finally{
+			try {
+				session.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 
 	public FieldArray calculateEnvelopefromCellSelection(CalculateEnvelopefromCellSelectionRequestType request)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
+		DBSession conn=null;
 		try{
 
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps = conn.preparedStatement(DBCostants.completeSpeciesById);			
 			ps.setString(1, request.getSpeciesID());
 			ResultSet rs = ps.executeQuery();
@@ -237,6 +254,13 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return new FieldArray(array.toArray(new Field[array.size()]));
 	}
@@ -244,8 +268,9 @@ public class AquaMaps extends GCUBEPortType {
 	public String getProfile(String id)throws GCUBEFault{
 		logger.trace("getting profile for owner id : "+id);
 		String toReturn="";
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.profileRetrieval);
 			ps.setInt(1, Integer.parseInt(id));		
 			ResultSet rs=ps.executeQuery();
@@ -265,14 +290,22 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
 
 	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
 		String speciesId=request.getSpeciesID();
+		DBSession session=null;
 		try{
-			DBSession session=DBSession.openSession();
+			session=DBSession.openSession();
 			ResultSet rs=session.executeQuery("select occurrenceCells.* , HCAF_D.DepthMean, HCAF_D.SSTAnMean, HCAF_D.SBTAnMean, HCAF_D.SalinityBMean, HCAF_D.SalinityMean, HCAF_D.PrimProdMean, HCAF_D.IceConAnn  from HCAF_D inner join occurrenceCells on HCAF_D.CsquareCode = occurrenceCells.CsquareCode where occurrenceCells.SpeciesID = '"+speciesId+"'");		
 			String toReturn= DBUtils.toJSon(rs,request.getOffset(),request.getOffset()+request.getLimit());
 			session.close();
@@ -283,6 +316,13 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				session.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return "";
 	}
@@ -302,8 +342,9 @@ public class AquaMaps extends GCUBEPortType {
 	public String getJobList(String author)throws GCUBEFault{
 		logger.trace("Serving get JobList for author : "+author);
 		String toReturn="";
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsListPerAuthor);
 			ps.setString(1, author);		
 			ResultSet rs=ps.executeQuery();
@@ -317,6 +358,13 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
@@ -324,8 +372,9 @@ public class AquaMaps extends GCUBEPortType {
 	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
 		logger.trace("getting file List for owner id : "+owner);
 		FileArray toReturn=null;
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();			
+			conn = DBSession.openSession();			
 			ResultSet rs=conn.executeQuery("Select * from Files where owner = "+owner);
 			ArrayList<org.gcube.application.aquamaps.stubs.File> files=new ArrayList<org.gcube.application.aquamaps.stubs.File>();
 			while(rs.next()){
@@ -344,6 +393,13 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
@@ -353,8 +409,9 @@ public class AquaMaps extends GCUBEPortType {
 	public String getAquaMapsList(String jobId)throws GCUBEFault{
 		logger.trace("Serving getAquaMapsList for job Id : "+jobId);
 		String toReturn="";
+		DBSession conn = null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsListPerJob);		
 			ps.setInt(1, Integer.parseInt(jobId));
 			ResultSet rs=ps.executeQuery();
@@ -371,6 +428,13 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
@@ -378,8 +442,9 @@ public class AquaMaps extends GCUBEPortType {
 	public FieldArray getSpeciesEnvelop(String speciesId)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving getSpeciesEnvelop for speciesID : "+speciesId);
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.speciesEnvelop);
 			ps.setString(1, speciesId);
 			ResultSet rs = ps.executeQuery();
@@ -387,13 +452,20 @@ public class AquaMaps extends GCUBEPortType {
 				array=DataTranslation.resultSetToFields(rs,rs.getMetaData());
 			rs.close();
 			ps.close();
-			conn.close();
+			//conn.close();
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getSpeciesEnvelop");
 			logger.trace("Raised Exception", e);
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return new FieldArray(array.toArray(new Field[array.size()]));
 	}
@@ -401,8 +473,9 @@ public class AquaMaps extends GCUBEPortType {
 	public FieldArray getCellEnvironment(String code)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();
 		logger.trace("Serving getCellEnvironment for cellCode : "+code);
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
 			ps.setString(1, code);
 			ResultSet rs = ps.executeQuery();
@@ -417,14 +490,22 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return new FieldArray(array.toArray(new Field[array.size()]));
 	}
 
 	public String getGoodCells(String speciesId)throws GCUBEFault{
 		logger.trace("Serving getGoodCell for species ID : " +speciesId);
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
 			conn.close();
 		}catch(SQLException e){
@@ -433,7 +514,14 @@ public class AquaMaps extends GCUBEPortType {
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
-		}		
+		}	finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}	
 		return "";
 	}
 
@@ -446,8 +534,9 @@ public class AquaMaps extends GCUBEPortType {
 		String sortDirection=req.getSortDirection();
 		AreasArray areas=req.getAreas();
 		logger.trace("Serving getSelectedCells ");
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			Area[] selection=areas.getAreasList();
 			String[] queries=DBCostants.cellFiltering(selection, DBCostants.HCAF_S);
 			logger.trace("Gonna use query : "+queries[0]);
@@ -466,13 +555,20 @@ public class AquaMaps extends GCUBEPortType {
 			rsCount.close();
 			ps.close();
 			psCount.close();
-			conn.close();
+			
 		}catch(SQLException e){
 			logger.error("SQLException, unable to serve getSelectedCells");
 			logger.trace("Raised Exception", e);
 		} catch (Exception e){
 			logger.error("General Exception, unable to contact DB");
 			logger.trace("Raised Exception", e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
@@ -500,9 +596,9 @@ public class AquaMaps extends GCUBEPortType {
 		}*/
 		String sortColumn=req.getSortColumn();
 		String sortDirection=req.getSortDirection();
-
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();			
+			conn = DBSession.openSession();			
 			ResultSet rs = conn.executeQuery("Select * from "+DBCostants.speciesOccurSum+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
 
@@ -514,10 +610,17 @@ public class AquaMaps extends GCUBEPortType {
 
 			rs.close();
 
-			conn.close();			
+//			conn.close();			
 		}catch(Exception e){
 			logger.error("Errors while performing operation",e);
-		}	
+		}	finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		logger.trace("Served");
 		return toReturn;
 	}
@@ -535,12 +638,13 @@ public class AquaMaps extends GCUBEPortType {
 	public String getSpeciesByFilters(GetSpeciesByFiltersRequestType req) throws GCUBEFault{
 		logger.trace("Serving getSpecies by filters");
 		String toReturn="";
+		DBSession conn=null;
 		try{
 			String[] queries=DBCostants.filterSpecies(req);
 			logger.trace("Gonna use query :"+queries[0]);
 			String sortColumn=req.getSortColumn();
 			String sortDirection=req.getSortDirection();
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 
 			ResultSet rs = conn.executeQuery(queries[0]+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
@@ -553,10 +657,17 @@ public class AquaMaps extends GCUBEPortType {
 
 			rs.close();
 
-			conn.close();		
+//			conn.close();		
 		}catch(Exception e){
 			logger.error("Exception occurred : "+e.getMessage());
 			logger.trace("Errors while performing operation",e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
@@ -647,9 +758,9 @@ public class AquaMaps extends GCUBEPortType {
 				myQuery ="SELECT * FROM "+myResource.getType()+ " WHERE searchId = "+myResource.getId();
 			}
 		}
-
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			ResultSet rs = conn.executeQuery(myQuery);
 			rs.next();
 			toReturn=DataTranslation.getResourceFromResultSet(rs,rs.getMetaData(),myResource.getType());
@@ -665,9 +776,16 @@ public class AquaMaps extends GCUBEPortType {
 				fields[fields.length-1]=relatedField;
 			}			
 			rs.close();			
-			conn.close();
+//			conn.close();
 		}catch(Exception e){
 			logger.error("Errors while performing operation",e);	
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		logger.debug("esco da getresourceInfo");
 		return toReturn;
@@ -686,9 +804,9 @@ public class AquaMaps extends GCUBEPortType {
 		logger.debug("entroin getResourceList");
 		ArrayList<Resource> resources = new ArrayList<Resource>();
 		String query = DataTranslation.completeResourceListQuery.get(req.getType());
-
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			ResultSet rs = conn.executeQuery(query);
 
 			ResultSetMetaData metaData=rs.getMetaData();
@@ -710,6 +828,13 @@ public class AquaMaps extends GCUBEPortType {
 			conn.close();
 		}catch(Exception e){
 			logger.error("Errors while performing getResourceList operation",e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		logger.debug("esco da getResourceList");
@@ -742,8 +867,9 @@ public class AquaMaps extends GCUBEPortType {
 		String toReturn="{\"data\":[],\"totalcount\":0}";
 		boolean isAquaMaps=arg0.isAquamaps();
 		String jobId=arg0.getJobId();
+		DBSession conn=null;
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			String jobFilter=((jobId!=null)&&isAquaMaps)?" AND jobId=? ":"";
 			/*
 			 * query parameters 
@@ -778,17 +904,25 @@ public class AquaMaps extends GCUBEPortType {
 			}
 			rsCount.close();
 			psCount.close();
-			conn.close();			
+//			conn.close();			
 		}catch(Exception e ){
 			logger.error("Exception while trying to serve -getAquaMapsPerUser : user = "+user+" sort ("+sortColumn+","+sortDir+") "+offset+"-"+limit,e);
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return toReturn;
 	}
 
 	public VOID markSaved(StringArray ids)throws GCUBEFault{
-		if((ids!=null)&&(ids.getStringList()!=null)&&(ids.getStringList().length>0))
+		DBSession conn=null;
+		if((ids!=null)&&(ids.getStringList()!=null)&&(ids.getStringList().length>0))			
 		try{
-			DBSession conn = DBSession.openSession();
+			conn = DBSession.openSession();
 			PreparedStatement ps= conn.preparedStatement(DBCostants.markSaved);
 			for(String id:ids.getStringList()){
 				try{
@@ -798,10 +932,17 @@ public class AquaMaps extends GCUBEPortType {
 					logger.error("Unable to mark "+id+" as saved",e1);
 				}
 			}
-			conn.close();
+//			conn.close();
 		}catch(Exception e){
 			logger.error(e);
 			throw new GCUBEFault();
+		}finally{
+			try {
+				conn.close();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}

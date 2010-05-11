@@ -50,7 +50,7 @@ public class SpeciesPerturbationThread extends Thread {
 
 
 	public void run() {		
-
+		DBSession session=null;
 		try{
 
 			logger.trace("Filtering species...");
@@ -76,7 +76,7 @@ public class SpeciesPerturbationThread extends Thread {
 
 			// ***************** Perturbation
 			//int progressCount=0;	
-			DBSession session=DBSession.openSession();
+			session=DBSession.openSession();
 			Statement stmt=session.getConnection().createStatement();
 			for(Entry<String,List<Perturbation>> entry:toPerformPerturbations.entrySet()){
 				String query=null;
@@ -99,7 +99,13 @@ public class SpeciesPerturbationThread extends Thread {
 			} catch (Exception e1) {logger.error("Unaxpected Error",e);}
 			logger.error("SQLException Occurred while performing JobId:"+jobId, e);
 			//rollback();
-		}
+		}finally{
+			try{
+				session.close();
+				}catch(Exception e){
+					logger.error("Unexpected Error, unable to close session");
+				}
+			}
 
 		//generationDetails.setHspenTable(DBCostants.HSPEN);
 	}

@@ -149,7 +149,7 @@ public class JobSubmissionThread extends Thread {
 		}
 
 		finally{
-			cleanTmp();
+			cleanTmp();			
 		}
 	}
 
@@ -175,7 +175,9 @@ public class JobSubmissionThread extends Thread {
 		toPerform.getAuthor()+"', '"+
 		myData+"', '"+JobGenerationDetails.Status.Pending+"', "+false+")";
 		logger.trace("Going to execute : "+myJob);
-		DBSession session=DBSession.openSession();
+		DBSession session=null;
+		try{
+		session=DBSession.openSession();
 		session.disableAutoCommit();
 		Statement stmt =session.getConnection().createStatement();
 		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
@@ -250,6 +252,11 @@ public class JobSubmissionThread extends Thread {
 			session.close();
 		logger.trace("New Job created with Id "+jobId);
 		return jobId;
+		}catch (Exception e){
+			throw e;
+		}finally {
+			session.close();
+		}
 	}
 
 	public void cleanTmp(){

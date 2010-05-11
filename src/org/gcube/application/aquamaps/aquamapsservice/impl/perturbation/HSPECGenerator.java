@@ -93,9 +93,10 @@ public class HSPECGenerator {
 	 * @throws Exception
 	 */
 	public String generate() throws Exception{
-		DBSession session= DBSession.openSession();
+		DBSession session = null;
 		long generationStart= System.currentTimeMillis();
 		try{
+			session=DBSession.openSession();
 			long startGeneration= System.currentTimeMillis();
 			DecimalFormat formatter = new DecimalFormat("0.00");
 			session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME,d.DepthMean FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");

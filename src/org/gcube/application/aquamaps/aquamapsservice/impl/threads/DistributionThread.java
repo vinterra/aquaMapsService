@@ -43,7 +43,7 @@ public class DistributionThread extends Thread {
 				logger.trace("waiting for "+speciesId[0]+" to Be ready");
 			}
 
-
+			HSPECName=JobGenerationDetails.getHSPECTable(jobId);
 			session=DBSession.openSession();
 			String clusteringQuery=DBCostants.clusteringDistributionQuery(HSPECName);
 			logger.trace("Gonna use query "+clusteringQuery);
@@ -53,7 +53,7 @@ public class DistributionThread extends Thread {
 
 			ResultSet rs=ps.executeQuery();
 
-			String header=aquamapsName;
+			String header=jobId+"_"+aquamapsName;
 			String header_map = header+"_maps";
 			StringBuilder[] csq_str;
 			csq_str=JobUtils.clusterize(rs, 2, 1, 2,false);
@@ -62,13 +62,13 @@ public class DistributionThread extends Thread {
 			
 			if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 			else {
-				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+"_"+aquamapsName+File.separator+"clustering");
+				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
 				logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
 				int result=JobUtils.generateImages(clusterFile);
 				logger.trace(this.getName()+" Perl execution exit message :"+result);
 				if(result!=0) logger.error("No images were generated");
 				else {
-					Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",aquamapsName);
+					Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
 
 
 					logger.trace(this.getName()+" found "+app.size()+" files to publish");
@@ -96,7 +96,7 @@ public class DistributionThread extends Thread {
 
 			JobUtils.updateAquaMapStatus(aquamapsId,Status.Completed);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error(e.getMessage(),e);
 			try {
 				JobUtils.updateAquaMapStatus(aquamapsId, Status.Error);
 			} catch (Exception e1) {
