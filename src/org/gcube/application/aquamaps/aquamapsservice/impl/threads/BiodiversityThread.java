@@ -8,6 +8,8 @@ import java.util.Map;
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -67,6 +69,7 @@ public class BiodiversityThread extends Thread {
 				;}
 			logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
 			HSPECName=JobGenerationDetails.getHSPECTable(jobId);
+			JobUtils.updateAquaMapStatus(aquamapsId, Status.Simulating);
 			prep=session.preparedStatement(DBCostants.clusteringBiodiversityQuery(HSPECName,tableName));				
 			prep.setFloat(1,threshold);
 			ResultSet rs=prep.executeQuery();
@@ -86,7 +89,9 @@ public class BiodiversityThread extends Thread {
 			else {
 				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
 				logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
-				int result=JobUtils.generateImages(clusterFile);
+				JobUtils.updateAquaMapStatus(aquamapsId, Status.Publishing);
+				int result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
+//				JobUtils.generateImages(clusterFile);
 				logger.trace(this.getName()+" Perl execution exit message :"+result);		
 				if(result!=0) logger.error("No images were generated");
 				else {

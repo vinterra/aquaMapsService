@@ -60,35 +60,35 @@ public class JobGenerationDetails {
 		}
 	}
 
-	public synchronized static void setHCAFTable(String HCAFId,int jobId)throws Exception{
+	public static void setHCAFTable(String HCAFId,int jobId)throws Exception{
 		String toSet=(HCAFId==null)?DBCostants.HCAF_D:HCAFId;
 		updateSource(Sources.HCAF,toSet,jobId);
 	}
 
-	public synchronized static void setHSPENTable(String HCAFId,int jobId)throws Exception{
+	public static void setHSPENTable(String HCAFId,int jobId)throws Exception{
 		String toSet=(HCAFId==null)?DBCostants.HSPEN:HCAFId;
 		updateSource(Sources.HSPEN,toSet,jobId);
 	}
-	public synchronized static void setHSPECTable(String HCAFId,int jobId)throws Exception{
+	public static void setHSPECTable(String HCAFId,int jobId)throws Exception{
 		String toSet=(HCAFId==null)?DBCostants.HSPEC:HCAFId;
 		updateSource(Sources.HSPEC,toSet,jobId);
 	}
 
-	public synchronized static String getHCAFTable(int jobId)throws Exception{
+	public static String getHCAFTable(int jobId)throws Exception{
 		String toReturn= getSource(Sources.HCAF, jobId);
 		return (toReturn==null)?DBCostants.HCAF_D:toReturn;
 	}
 
-	public synchronized static String getHSPENTable(int jobId)throws Exception{
+	public static String getHSPENTable(int jobId)throws Exception{
 		String toReturn= getSource(Sources.HSPEN, jobId);
 		return (toReturn==null)?DBCostants.HSPEN:toReturn;		
 	}
 
-	public synchronized static String getHSPECTable(int jobId)throws Exception{
+	public static String getHSPECTable(int jobId)throws Exception{
 		String toReturn= getSource(Sources.HSPEC, jobId);
 		return (toReturn==null)?DBCostants.HSPEC:toReturn;
 	}
-	public synchronized static void addToDropTableList(int jobId,String tableName)throws Exception{
+	public static void addToDropTableList(int jobId,String tableName)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();
@@ -104,7 +104,7 @@ public class JobGenerationDetails {
 		}
 	}
 
-	public synchronized static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
+	public static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();		
@@ -122,7 +122,7 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-	public synchronized static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
+	public static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();
@@ -140,7 +140,7 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-	public synchronized static String[] getSpeciesByStatus(int jobId,SpeciesStatus status)throws Exception{
+	public static String[] getSpeciesByStatus(int jobId,SpeciesStatus status)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();
@@ -160,7 +160,7 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-	public synchronized static boolean isJobComplete(int jobId) throws Exception{
+	public static boolean isJobComplete(int jobId) throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();		
@@ -179,7 +179,7 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-	public synchronized static void cleanTemp(int jobId)throws Exception{
+	public static void cleanTemp(int jobId)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();
@@ -197,7 +197,7 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-	public synchronized static boolean isSpeciesListReady(int jobId,String[] toCheck)throws Exception{
+	public static boolean isSpeciesListReady(int jobId,String[] toCheck)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();

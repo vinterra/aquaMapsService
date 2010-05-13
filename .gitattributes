@@ -27,6 +27,11 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Salinity.java -t
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_SeaIce.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Temp.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/SpEnvelope.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorTest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/ImageGenerator.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/ImageGeneratorRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/PerlCallsFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/AreaPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text

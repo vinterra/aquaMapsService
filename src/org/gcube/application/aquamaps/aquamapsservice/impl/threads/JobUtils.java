@@ -129,30 +129,9 @@ public class JobUtils {
 	}
 
 
-	synchronized public static int  generateImages(String file) throws IOException{
-		
-
-		Runtime rt  = Runtime.getRuntime();
-		String cmdLine[] = { "/usr/bin/perl", "-w",  System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid"+
-				File.separator+"bin"+File.separator+"cs_mapMod.pl",file};
-		Process p = rt.exec(cmdLine);
-		
-		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
-		String line = null;
-		while ((line = input.readLine())!=null){
-			//logger.debug(line);
-		}
-		
-		try {
-			p.waitFor();
-		} catch (InterruptedException e) {
-			logger.trace("Perl process exited");
-		}
-		p.destroy();
-		File f= new File(file);
-		if(!f.delete())logger.warn("Unable to delete clustering file "+file);
-		return p.exitValue(); 
-	}
+//	public static int generateImages(String File)throws Exception{
+//		throw new Exception("Do not use this method!");
+//	}
 	
 	/**
 	 * publish a certain number of files on the webserver and returns the base URL
