@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
@@ -93,10 +94,10 @@ public class HSPECGenerator {
 	 * @throws Exception
 	 */
 	public String generate() throws Exception{
-		MySqlDBSession session = null;
+		DBSession session = null;
 		long generationStart= System.currentTimeMillis();
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			long startGeneration= System.currentTimeMillis();
 			DecimalFormat formatter = new DecimalFormat("0.00");
 			session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME,d.DepthMean FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");
@@ -229,7 +230,7 @@ public class HSPECGenerator {
 	}
 		
 	
-	private Bounduary getBounduary(Double north, Double south, Double east, Double west, String speciesId, MySqlDBSession session) throws Exception{
+	private Bounduary getBounduary(Double north, Double south, Double east, Double west, String speciesId, DBSession session) throws Exception{
 		Bounduary bounduary= new Bounduary(north, south, east, west);
 		if (north==null || south==null || east==null || west==null){
 			if (north!=null && south==null) bounduary.passedNS=true;
@@ -362,7 +363,7 @@ public class HSPECGenerator {
         else return 0.0;
 	}
 	
-	private Double prepareSeaIceForSpecies(String speciesID, Double hspenIceConMin, MySqlDBSession session) throws Exception{
+	private Double prepareSeaIceForSpecies(String speciesID, Double hspenIceConMin, DBSession session) throws Exception{
 		if(hspenIceConMin == 0){
 			Double sumIce = 0.0, meanIce = 0.0, adjVal = -1.0;
 			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
@@ -402,7 +403,7 @@ public class HSPECGenerator {
 	 * @return
 	 * @throws Exception
 	 */
-	public Double getSeaIceConcentration(Double hcafIceConAnn,Double hspenIceConMin,Double hspenIceConPrefMin, Double hspenIceConMax,Double hspenIceConPrefMax, String speciesId, MySqlDBSession session) throws Exception{
+	public Double getSeaIceConcentration(Double hcafIceConAnn,Double hspenIceConMin,Double hspenIceConPrefMin, Double hspenIceConMax,Double hspenIceConPrefMax, String speciesId, DBSession session) throws Exception{
 		if(hcafIceConAnn != null){
 			if (hcafIceConAnn < hspenIceConMin) return 0.0;
 			if ((hcafIceConAnn >= hspenIceConMin) && (hcafIceConAnn < hspenIceConPrefMin)	)

@@ -21,7 +21,8 @@ import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
@@ -180,7 +181,7 @@ public class JobUtils {
 	}
 	
 	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir) throws Exception{
-		MySqlDBSession c=MySqlDBSession.openSession();
+		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
 		Collection<String> toUpdateProfile=new ArrayList<String>();
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+resName);
 		dir.mkdirs();
@@ -213,7 +214,7 @@ public class JobUtils {
 	
 	public static void updateAquaMapStatus(int aquamapsId,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
 //		toUpdate.setStatus(status.toString());
-		MySqlDBSession c=MySqlDBSession.openSession();
+		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
 		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, status.toString());
 		ps.setInt(2,aquamapsId);		
@@ -329,7 +330,7 @@ public class JobUtils {
 		
 		if((areaSelection!=null)&&(areaSelection.getAreasList()!=null)
 				&&(areaSelection.getAreasList().length>0)){
-			MySqlDBSession conn = MySqlDBSession.openSession();
+			DBSession conn = DBSession.openSession(PoolManager.DBType.mySql);
 			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
 			for(Area area: areaSelection.getAreasList())			

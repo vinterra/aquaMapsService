@@ -16,6 +16,7 @@ import org.apache.commons.dbcp.PoolingDriver;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.commons.pool.impl.StackKeyedObjectPoolFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -27,33 +28,33 @@ import org.gcube.common.core.utils.logging.GCUBELog;
  * @author lucio
  *
  */
-public class MySqlDBSession {
+public class DBSession {
 	
-	private static GCUBELog logger= new GCUBELog(MySqlDBSession.class);
+	private static GCUBELog logger= new GCUBELog(DBSession.class);
 	
-	private static GenericObjectPool connectionPool; 
-	private static ConnectionFactory connectionFactory;
-	private static PoolableConnectionFactory poolableConnectionFactory;
-	private static PoolingDriver driver;
-	
-	
-	static{
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		connectionPool = new GenericObjectPool(null);
-		connectionPool.setMaxActive(30);		
-		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
-//		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/prova",  "root","rootpwd");
-		poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,
-				new StackKeyedObjectPoolFactory(),null,false,true);
-		driver = new PoolingDriver();
-		driver.registerPool("thePool",connectionPool);
-	}
-	
+//	private static GenericObjectPool connectionPool; 
+//	private static ConnectionFactory connectionFactory;
+//	private static PoolableConnectionFactory poolableConnectionFactory;
+//	private static PoolingDriver driver;
+//	
+//	
+//	static{
+//		try {
+//			Class.forName("com.mysql.jdbc.Driver");
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		connectionPool = new GenericObjectPool(null);
+//		connectionPool.setMaxActive(30);		
+//		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
+////		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/prova",  "root","rootpwd");
+//		poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,connectionPool,
+//				new StackKeyedObjectPoolFactory(),null,false,true);
+//		driver = new PoolingDriver();
+//		driver.registerPool("thePool",connectionPool);
+//	}
+//	
 	
 	private Connection connection;
 	
@@ -73,7 +74,7 @@ public class MySqlDBSession {
 	 * @return
 	 * @throws Exception
 	 */
-	public static MySqlDBSession openSession() throws Exception{
+	public static DBSession openSession(DBType type) throws Exception{
 		//put all of them in a configuration file
 		
 		
@@ -86,12 +87,12 @@ public class MySqlDBSession {
 		
 		
 		
-		Connection conn=DriverManager.getConnection("jdbc:apache:commons:dbcp:thePool");
-		return new MySqlDBSession(conn);		
+		Connection conn=PoolManager.getConnection(type);
+		return new DBSession(conn);		
 		
 	}
 	
-	private MySqlDBSession(Connection conn){
+	private DBSession(Connection conn){
 		this.connection= conn;
 	}
 	

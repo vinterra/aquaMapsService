@@ -8,7 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -30,9 +31,9 @@ public class JobGenerationDetails {
 
 
 	private static void updateSource(Sources sourceField,String source,int jobId)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session= MySqlDBSession.openSession();
+			session= DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Update submitted set "+sourceField.toString()+" = ? where searchId = ?");
 			ps.setString(1, source);
 			ps.setInt(2,jobId);
@@ -45,9 +46,9 @@ public class JobGenerationDetails {
 		}
 	}	
 	private static String getSource(Sources source,int jobId)throws Exception{
-		MySqlDBSession session = null;
+		DBSession session = null;
 		try{
-			session= MySqlDBSession.openSession();
+			session= DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Select "+source.toString()+" from submitted where searchId = ?");
 			ps.setInt(1, jobId);
 			ResultSet rs =ps.executeQuery();
@@ -91,9 +92,9 @@ public class JobGenerationDetails {
 		return (toReturn==null)?DBCostants.HSPEC:toReturn;
 	}
 	public static void addToDropTableList(int jobId,String tableName)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.toDropTables+" (jobId,tableName) VALUE(?,?)");
 			ps.setInt(1, jobId);
 			ps.setString(2, tableName);
@@ -106,9 +107,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void addToDeleteTempFolder(int jobId,String folderName)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.tempFolders+" (jobId,folderName) VALUE(?,?)");
 			ps.setInt(1, jobId);
 			ps.setString(2, folderName);
@@ -121,9 +122,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();		
+			session=DBSession.openSession(PoolManager.DBType.mySql);		
 			//		toUpdate.setStatus(status.toString());
 			PreparedStatement ps=session.preparedStatement(DBCostants.submittedStatusUpdating);
 			ps.setString(1, status.toString());		
@@ -139,9 +140,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=session.preparedStatement("Update "+DBCostants.selectedSpecies+" set status = ? where jobId=? AND speciesId=?");
 			ps.setString(1, status.toString());
 			ps.setInt(2, jobId);
@@ -157,9 +158,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static String[] getSpeciesByStatus(int jobId,SpeciesStatus status)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=? AND status=?");
 			ps.setInt(1, jobId);
 			ps.setString(2,status.toString());
@@ -177,9 +178,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static boolean isJobComplete(int jobId) throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();		
+			session=DBSession.openSession(PoolManager.DBType.mySql);		
 			PreparedStatement ps =session.preparedStatement("Select count(*) from submitted where jobId=? AND status!=? AND status!=?");
 			ps.setInt(1, jobId);
 			ps.setString(2, Status.Error.toString());
@@ -196,9 +197,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void cleanTemp(int jobId)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			logger.debug("cleaning tables for : "+jobId);
 			PreparedStatement ps=session.preparedStatement("Select tableName from "+DBCostants.toDropTables+" where jobId=?");
 			ps.setInt(1, jobId);
@@ -244,9 +245,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static boolean isSpeciesListReady(int jobId,String[] toCheck)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=session.preparedStatement("Select status from "+DBCostants.selectedSpecies+" where jobId =? and speciesId=?");
 			ps.setInt(1, jobId);
 			for(String id:toCheck){

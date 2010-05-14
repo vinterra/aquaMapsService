@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
@@ -25,7 +26,7 @@ public class BiodiversityThread extends Thread {
 	private float threshold;
 	private String HSPECName;	
 	private String[] species;
-	private MySqlDBSession session;
+	private DBSession session;
 
 
 	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold) {
@@ -53,7 +54,7 @@ public class BiodiversityThread extends Thread {
 			}
 
 
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			JobUtils.updateAquaMapStatus(aquamapsId, Status.Generating);
 			String tableName="S"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			PreparedStatement prep=null;
@@ -103,7 +104,7 @@ public class BiodiversityThread extends Thread {
 					if(app.size()>0){
 						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-						session=MySqlDBSession.openSession();
+						session=DBSession.openSession(PoolManager.DBType.mySql);
 						PreparedStatement ps =session.preparedStatement(DBCostants.fileInsertion);
 
 						for(String mapName:app.keySet()){

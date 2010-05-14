@@ -9,7 +9,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
@@ -64,10 +65,10 @@ public class AquaMaps extends GCUBEPortType {
 
 	public int deleteSubmitted(StringArray submittedIds)throws GCUBEFault{
 		int toReturn=0;
-		MySqlDBSession session = null;
+		DBSession session = null;
 		if((submittedIds!=null)&&(submittedIds.getStringList()!=null)&&(submittedIds.getStringList().length>0))
 			try{
-				session=MySqlDBSession.openSession();
+				session=DBSession.openSession(PoolManager.DBType.mySql);
 				PreparedStatement ps1=session.preparedStatement(DBCostants.submittedRetrieval);				
 				for(String submittedId:submittedIds.getStringList()){
 					logger.trace("Deleting submitted : "+submittedId);
@@ -148,9 +149,9 @@ public class AquaMaps extends GCUBEPortType {
 
 	public FieldArray calculateEnvelope(CalculateEnvelopeRequestType req)throws GCUBEFault{
 		logger.trace("Serving calculateEnvelope");
-		MySqlDBSession session = null;
+		DBSession session = null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			String query =DBCostants.calculateGoodCells(req.isUseFAO(), req.isUseBounding(), req.getFaoAreas(), req.getBoundingNorth(),	 req.getBoundingSouth(), req.getBoundingWest(), req.getBoundingEast());
 			logger.trace("submitting query "+query);
 			PreparedStatement ps = session.preparedStatement(query);
@@ -219,10 +220,10 @@ public class AquaMaps extends GCUBEPortType {
 	public FieldArray calculateEnvelopefromCellSelection(CalculateEnvelopefromCellSelectionRequestType request)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
 
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps = conn.preparedStatement(DBCostants.completeSpeciesById);			
 			ps.setString(1, request.getSpeciesID());
 			ResultSet rs = ps.executeQuery();
@@ -268,9 +269,9 @@ public class AquaMaps extends GCUBEPortType {
 	public String getProfile(String id)throws GCUBEFault{
 		logger.trace("getting profile for owner id : "+id);
 		String toReturn="";
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.profileRetrieval);
 			ps.setInt(1, Integer.parseInt(id));		
 			ResultSet rs=ps.executeQuery();
@@ -303,9 +304,9 @@ public class AquaMaps extends GCUBEPortType {
 
 	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
 		String speciesId=request.getSpeciesID();
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			ResultSet rs=session.executeQuery("select occurrenceCells.* , HCAF_D.DepthMean, HCAF_D.SSTAnMean, HCAF_D.SBTAnMean, HCAF_D.SalinityBMean, HCAF_D.SalinityMean, HCAF_D.PrimProdMean, HCAF_D.IceConAnn  from HCAF_D inner join occurrenceCells on HCAF_D.CsquareCode = occurrenceCells.CsquareCode where occurrenceCells.SpeciesID = '"+speciesId+"'");		
 			String toReturn= DBUtils.toJSon(rs,request.getOffset(),request.getOffset()+request.getLimit());
 			session.close();
@@ -342,9 +343,9 @@ public class AquaMaps extends GCUBEPortType {
 	public String getJobList(String author)throws GCUBEFault{
 		logger.trace("Serving get JobList for author : "+author);
 		String toReturn="";
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsListPerAuthor);
 			ps.setString(1, author);		
 			ResultSet rs=ps.executeQuery();
@@ -372,9 +373,9 @@ public class AquaMaps extends GCUBEPortType {
 	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
 		logger.trace("getting file List for owner id : "+owner);
 		FileArray toReturn=null;
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();			
+			conn = DBSession.openSession(PoolManager.DBType.mySql);			
 			ResultSet rs=conn.executeQuery("Select * from Files where owner = "+owner);
 			ArrayList<org.gcube.application.aquamaps.stubs.File> files=new ArrayList<org.gcube.application.aquamaps.stubs.File>();
 			while(rs.next()){
@@ -409,9 +410,9 @@ public class AquaMaps extends GCUBEPortType {
 	public String getAquaMapsList(String jobId)throws GCUBEFault{
 		logger.trace("Serving getAquaMapsList for job Id : "+jobId);
 		String toReturn="";
-		MySqlDBSession conn = null;
+		DBSession conn = null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsListPerJob);		
 			ps.setInt(1, Integer.parseInt(jobId));
 			ResultSet rs=ps.executeQuery();
@@ -442,9 +443,9 @@ public class AquaMaps extends GCUBEPortType {
 	public FieldArray getSpeciesEnvelop(String speciesId)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();		
 		logger.trace("Serving getSpeciesEnvelop for speciesID : "+speciesId);
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.speciesEnvelop);
 			ps.setString(1, speciesId);
 			ResultSet rs = ps.executeQuery();
@@ -473,9 +474,9 @@ public class AquaMaps extends GCUBEPortType {
 	public FieldArray getCellEnvironment(String code)throws GCUBEFault{
 		ArrayList<Field> array=new ArrayList<Field>();
 		logger.trace("Serving getCellEnvironment for cellCode : "+code);
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
 			ps.setString(1, code);
 			ResultSet rs = ps.executeQuery();
@@ -503,9 +504,9 @@ public class AquaMaps extends GCUBEPortType {
 
 	public String getGoodCells(String speciesId)throws GCUBEFault{
 		logger.trace("Serving getGoodCell for species ID : " +speciesId);
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.cellEnvironment);
 			conn.close();
 		}catch(SQLException e){
@@ -534,9 +535,9 @@ public class AquaMaps extends GCUBEPortType {
 		String sortDirection=req.getSortDirection();
 		AreasArray areas=req.getAreas();
 		logger.trace("Serving getSelectedCells ");
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			Area[] selection=areas.getAreasList();
 			String[] queries=DBCostants.cellFiltering(selection, DBCostants.HCAF_S);
 			logger.trace("Gonna use query : "+queries[0]);
@@ -596,9 +597,9 @@ public class AquaMaps extends GCUBEPortType {
 		}*/
 		String sortColumn=req.getSortColumn();
 		String sortDirection=req.getSortDirection();
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();			
+			conn = DBSession.openSession(PoolManager.DBType.mySql);			
 			ResultSet rs = conn.executeQuery("Select * from "+DBCostants.speciesOccurSum+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
 
@@ -638,13 +639,13 @@ public class AquaMaps extends GCUBEPortType {
 	public String getSpeciesByFilters(GetSpeciesByFiltersRequestType req) throws GCUBEFault{
 		logger.trace("Serving getSpecies by filters");
 		String toReturn="";
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
 			String[] queries=DBCostants.filterSpecies(req);
 			logger.trace("Gonna use query :"+queries[0]);
 			String sortColumn=req.getSortColumn();
 			String sortDirection=req.getSortDirection();
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 
 			ResultSet rs = conn.executeQuery(queries[0]+
 					((sortColumn!=null)?" order by "+DBCostants.speciesOccurSum+"."+sortColumn+" "+sortDirection:"")+" LIMIT "+req.getLimit()+" OFFSET "+req.getOffset());
@@ -758,9 +759,9 @@ public class AquaMaps extends GCUBEPortType {
 				myQuery ="SELECT * FROM "+myResource.getType()+ " WHERE searchId = "+myResource.getId();
 			}
 		}
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			ResultSet rs = conn.executeQuery(myQuery);
 			rs.next();
 			toReturn=DataTranslation.getResourceFromResultSet(rs,rs.getMetaData(),myResource.getType());
@@ -791,7 +792,7 @@ public class AquaMaps extends GCUBEPortType {
 		return toReturn;
 	}
 
-	private String getJobMaps(String jobId,MySqlDBSession  c)throws Exception{
+	private String getJobMaps(String jobId,DBSession  c)throws Exception{
 
 		String query = "Select Path, nameHuman from Maps Where Jobs="+jobId;
 		ResultSet rsJ = c.executeQuery(query);
@@ -804,9 +805,9 @@ public class AquaMaps extends GCUBEPortType {
 		logger.debug("entroin getResourceList");
 		ArrayList<Resource> resources = new ArrayList<Resource>();
 		String query = DataTranslation.completeResourceListQuery.get(req.getType());
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			ResultSet rs = conn.executeQuery(query);
 
 			ResultSetMetaData metaData=rs.getMetaData();
@@ -867,9 +868,9 @@ public class AquaMaps extends GCUBEPortType {
 		String toReturn="{\"data\":[],\"totalcount\":0}";
 		boolean isAquaMaps=arg0.isAquamaps();
 		String jobId=arg0.getJobId();
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			String jobFilter=((jobId!=null)&&isAquaMaps)?" AND jobId=? ":"";
 			/*
 			 * query parameters 
@@ -919,10 +920,10 @@ public class AquaMaps extends GCUBEPortType {
 	}
 
 	public VOID markSaved(StringArray ids)throws GCUBEFault{
-		MySqlDBSession conn=null;
+		DBSession conn=null;
 		if((ids!=null)&&(ids.getStringList()!=null)&&(ids.getStringList().length>0))			
 		try{
-			conn = MySqlDBSession.openSession();
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= conn.preparedStatement(DBCostants.markSaved);
 			for(String id:ids.getStringList()){
 				try{
