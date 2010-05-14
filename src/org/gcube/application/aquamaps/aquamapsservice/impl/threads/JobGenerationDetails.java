@@ -1,11 +1,13 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -103,7 +105,21 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-
+	public static void addToDeleteTempFolder(int jobId,String folderName)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.openSession();
+			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.tempFolders+" (jobId,folderName) VALUE(?,?)");
+			ps.setInt(1, jobId);
+			ps.setString(2, folderName);
+			ps.execute();
+			//		session.close();
+		}catch (Exception e){
+			throw e;
+		}finally {
+			session.close();
+		}
+	}
 	public static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
 		DBSession session=null;
 		try{
@@ -190,6 +206,29 @@ public class JobGenerationDetails {
 				String table=rs.getString(1);
 				session.executeUpdate("DROP TABLE IF EXISTS "+table);
 			}
+			ps=session.preparedStatement("Delete from "+DBCostants.toDropTables+" where jobId=?");
+			ps.setInt(1, jobId);
+			ps.execute();
+
+			ps=session.preparedStatement("Select folderName from "+DBCostants.tempFolders+" where jobId=?");
+			ps.setInt(1, jobId);
+			rs=ps.executeQuery();
+			while(rs.next()){
+				String folder=rs.getString(1);
+				try{					
+					File tempDir=new File(folder);
+					if(tempDir.exists()){
+						FileUtils.cleanDirectory(tempDir);
+						FileUtils.deleteDirectory(tempDir);
+					}
+
+				}catch(Exception e1){
+					logger.debug("unable to delete temp Folder : "+folder,e1);
+				}
+			}
+			ps=session.preparedStatement("Delete from "+DBCostants.tempFolders+" where jobId=?");
+			ps.setInt(1, jobId);
+			ps.execute();
 			//		session.close();
 		}catch (Exception e){
 			throw e;

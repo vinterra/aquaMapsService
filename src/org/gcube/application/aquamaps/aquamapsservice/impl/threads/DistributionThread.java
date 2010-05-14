@@ -67,6 +67,7 @@ public class DistributionThread extends Thread {
 			if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 			else {
 				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
+				JobGenerationDetails.addToDeleteTempFolder(jobId, header);
 				logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
 				JobUtils.updateAquaMapStatus(aquamapsId,Status.Publishing);
 				int result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));

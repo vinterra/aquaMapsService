@@ -15,6 +15,7 @@ public class DBCostants {
 
 	private static GCUBELog logger= new GCUBELog(DBCostants.class);
 	public static final String toDropTables="tempTables";
+	public static final String tempFolders="tempFolders";
 	public static final String selectedSpecies="selectedSpecies";
 	public static final String HCAF_S="HCAF_S";
 	public static final String JOB_Table="submitted";
