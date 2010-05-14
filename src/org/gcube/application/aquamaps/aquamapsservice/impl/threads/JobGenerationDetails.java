@@ -199,6 +199,7 @@ public class JobGenerationDetails {
 		DBSession session=null;
 		try{
 			session=DBSession.openSession();
+			logger.debug("cleaning tables for : "+jobId);
 			PreparedStatement ps=session.preparedStatement("Select tableName from "+DBCostants.toDropTables+" where jobId=?");
 			ps.setInt(1, jobId);
 			ResultSet rs=ps.executeQuery();
@@ -208,8 +209,8 @@ public class JobGenerationDetails {
 			}
 			ps=session.preparedStatement("Delete from "+DBCostants.toDropTables+" where jobId=?");
 			ps.setInt(1, jobId);
-			ps.execute();
-
+			ps.execute();			
+			logger.debug("cleaning folders for : "+jobId);
 			ps=session.preparedStatement("Select folderName from "+DBCostants.tempFolders+" where jobId=?");
 			ps.setInt(1, jobId);
 			rs=ps.executeQuery();
@@ -229,6 +230,12 @@ public class JobGenerationDetails {
 			ps=session.preparedStatement("Delete from "+DBCostants.tempFolders+" where jobId=?");
 			ps.setInt(1, jobId);
 			ps.execute();
+			logger.debug("cleaning speceisSelection for : "+jobId);
+			ps=session.preparedStatement("Delete from "+DBCostants.selectedSpecies+" where jobId=?");
+			ps.setInt(1, jobId);
+			ps.execute();
+			
+			
 			//		session.close();
 		}catch (Exception e){
 			throw e;
