@@ -22,7 +22,7 @@ public class GeneratorManager {
 	
 	public static int requestGeneration(ImageGeneratorRequest request) throws Exception{
 		
-		ImageGenerator obj=(ImageGenerator) pool.borrowObject();
+		PerlImageGenerator obj=(PerlImageGenerator) pool.borrowObject();
 		obj.setRequest(request);
 		int toReturn= obj.generate();
 		pool.returnObject(obj);

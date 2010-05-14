@@ -8,19 +8,19 @@ import java.io.InputStreamReader;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
-public class ImageGenerator {
-	private static GCUBELog logger= new GCUBELog(ImageGenerator.class);
+public class PerlImageGenerator {
+	private static GCUBELog logger= new GCUBELog(PerlImageGenerator.class);
 	
 
 
 
 	private ImageGeneratorRequest request;
 
-	public ImageGenerator() {
+	public PerlImageGenerator() {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public ImageGenerator(ImageGeneratorRequest req) {		
+	public PerlImageGenerator(ImageGeneratorRequest req) {		
 		request=req;
 	}
 	

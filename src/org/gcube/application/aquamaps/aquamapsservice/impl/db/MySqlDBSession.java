@@ -27,9 +27,9 @@ import org.gcube.common.core.utils.logging.GCUBELog;
  * @author lucio
  *
  */
-public class DBSession {
+public class MySqlDBSession {
 	
-	private static GCUBELog logger= new GCUBELog(DBSession.class);
+	private static GCUBELog logger= new GCUBELog(MySqlDBSession.class);
 	
 	private static GenericObjectPool connectionPool; 
 	private static ConnectionFactory connectionFactory;
@@ -73,7 +73,7 @@ public class DBSession {
 	 * @return
 	 * @throws Exception
 	 */
-	public static DBSession openSession() throws Exception{
+	public static MySqlDBSession openSession() throws Exception{
 		//put all of them in a configuration file
 		
 		
@@ -87,11 +87,11 @@ public class DBSession {
 		
 		
 		Connection conn=DriverManager.getConnection("jdbc:apache:commons:dbcp:thePool");
-		return new DBSession(conn);		
+		return new MySqlDBSession(conn);		
 		
 	}
 	
-	private DBSession(Connection conn){
+	private MySqlDBSession(Connection conn){
 		this.connection= conn;
 	}
 	

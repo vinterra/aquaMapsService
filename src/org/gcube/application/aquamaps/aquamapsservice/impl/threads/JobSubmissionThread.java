@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
@@ -175,9 +175,9 @@ public class JobSubmissionThread extends Thread {
 		toPerform.getAuthor()+"', '"+
 		myData+"', '"+JobGenerationDetails.Status.Pending+"', "+false+")";
 		logger.trace("Going to execute : "+myJob);
-		DBSession session=null;
+		MySqlDBSession session=null;
 		try{
-		session=DBSession.openSession();
+		session=MySqlDBSession.openSession();
 		session.disableAutoCommit();
 		Statement stmt =session.getConnection().createStatement();
 		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);

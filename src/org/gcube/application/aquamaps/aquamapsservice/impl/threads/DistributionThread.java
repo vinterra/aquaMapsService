@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
@@ -21,7 +21,7 @@ public class DistributionThread extends Thread {
 	private String aquamapsName;	
 	private String HSPECName;
 	private String[] speciesId;
-	private DBSession session;
+	private MySqlDBSession session;
 	private int jobId;	
 
 
@@ -47,7 +47,7 @@ public class DistributionThread extends Thread {
 
 			HSPECName=JobGenerationDetails.getHSPECTable(jobId);
 			JobUtils.updateAquaMapStatus(aquamapsId,Status.Simulating);
-			session=DBSession.openSession();
+			session=MySqlDBSession.openSession();
 			
 			String clusteringQuery=DBCostants.clusteringDistributionQuery(HSPECName);
 			logger.trace("Gonna use query "+clusteringQuery);
@@ -82,7 +82,7 @@ public class DistributionThread extends Thread {
 					if(app.size()>0){
 						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-						session=DBSession.openSession();
+						session=MySqlDBSession.openSession();
 						PreparedStatement pps =session.preparedStatement(DBCostants.fileInsertion);
 
 						for(String mapName:app.keySet()){

@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.Perturbation;
@@ -50,7 +50,7 @@ public class SpeciesPerturbationThread extends Thread {
 
 
 	public void run() {		
-		DBSession session=null;
+		MySqlDBSession session=null;
 		try{
 
 			logger.trace("Filtering species...");
@@ -76,7 +76,7 @@ public class SpeciesPerturbationThread extends Thread {
 
 			// ***************** Perturbation
 			//int progressCount=0;	
-			session=DBSession.openSession();
+			session=MySqlDBSession.openSession();
 			Statement stmt=session.getConnection().createStatement();
 			for(Entry<String,List<Perturbation>> entry:toPerformPerturbations.entrySet()){
 				String query=null;
