@@ -221,7 +221,7 @@ public class JobGenerationDetails {
 					if(tempDir.exists()){
 						FileUtils.cleanDirectory(tempDir);
 						FileUtils.deleteDirectory(tempDir);
-					}
+					}else logger.warn("Wrong file name "+folder);
 
 				}catch(Exception e1){
 					logger.debug("unable to delete temp Folder : "+folder,e1);
