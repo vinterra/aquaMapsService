@@ -12,6 +12,7 @@ etc/build.properties -text
 etc/dbprop.properties -text
 etc/deploy-jndi-config.xml -text
 etc/deploy-server.wsdd -text
+etc/geoserver.properties -text
 etc/pool.properties -text
 etc/profile.xml -text
 etc/registration.xml -text
