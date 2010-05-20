@@ -52,7 +52,7 @@ public class PoolManager {
 		mySqlconnectionPool = new GenericObjectPool(null);
 		mySqlconnectionPool.setMaxActive(30);		
 //		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
-		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/prova",  "root","rootpwd");
+		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://wn06.research-infrastructures.eu:3306/aquamaps_DB",  "root", "mybohemian");
 		mySqlpoolableConnectionFactory = new PoolableConnectionFactory(mySqlconnectionFactory,mySqlconnectionPool,
 				new StackKeyedObjectPoolFactory(),null,false,true);
 		mySqldriver = new PoolingDriver();

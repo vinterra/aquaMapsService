@@ -1,18 +1,31 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
-public class ImageGeneratorRequest {
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GISGenerationRequest;
 
-	private String file;
+public class ImageGeneratorRequest implements GenerationRequest{
 
-	public void setFile(String file) {
-		this.file = file;
+	private String clusterfile;
+
+	private GISGenerationRequest groupRequest;
+	
+	
+	public void setClusterFile(String file) {
+		this.clusterfile = file;
 	}
 
-	public String getFile() {
-		return file;
+	public String getClusterFile() {
+		return clusterfile;
 	}
-	public ImageGeneratorRequest(String file){
-		this.file=file;
+	public ImageGeneratorRequest(String clusterfile){
+		setClusterFile(clusterfile);
+	}
+
+	public void setGroupRequest(GISGenerationRequest groupRequest) {
+		this.groupRequest = groupRequest;
+	}
+
+	public GISGenerationRequest getGroupRequest() {
+		return groupRequest;
 	}
 	
 	

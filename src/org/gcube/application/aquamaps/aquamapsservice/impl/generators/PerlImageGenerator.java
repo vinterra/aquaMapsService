@@ -25,7 +25,7 @@ public class PerlImageGenerator {
 	}
 	
 	public int generate() throws IOException{
-		return generateImages(request.getFile());
+		return generateImages(request.getClusterFile());
 		
 //		return dummyProcess(request.getFile());
 	}
