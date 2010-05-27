@@ -35,6 +35,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_SeaIce.java -tex
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Temp.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/SpEnvelope.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/BadRequestException.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GISGeneratorFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorManager.java -text
@@ -46,6 +47,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenera
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GroupGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/LayerGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/AreaPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
