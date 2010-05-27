@@ -26,7 +26,8 @@ public class LayerPubblicationTest {
 		request.setCsvFile(outFile);
 		request.setFeatureLabel("Probability");
 		request.setFeatureDefinition("real");
-		request.setLayerName("LayerCreationTest_withCRS");
+		request.setLayerName("LayerCreationTest_withStyle");
+		request.setDefaultStyle("Species_prob");
 		boolean result=generator.createLayer(request);		
 		System.out.println("generated table :"+result);
 	}

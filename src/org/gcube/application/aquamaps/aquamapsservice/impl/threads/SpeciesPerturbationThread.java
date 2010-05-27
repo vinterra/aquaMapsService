@@ -14,6 +14,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.PerturbationArray;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -23,7 +24,7 @@ public class SpeciesPerturbationThread extends Thread {
 	//JobGenerationDetails generationDetails;
 
 	private static final GCUBELog logger=new GCUBELog(SpeciesPerturbationThread.class);
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
 	//	private PerturbationArray perturbationArray;
 	private int jobId;	
@@ -55,7 +56,7 @@ public class SpeciesPerturbationThread extends Thread {
 		try{
 
 			logger.trace("Filtering species...");
-			String HSPENName="H"+(uuidGen.nextUUID()).replaceAll("-", "_");
+			String HSPENName=ServiceUtils.generateId("H", "");//"H"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			JobGenerationDetails.setHSPENTable(HSPENName,jobId);
 			//			String speciesListTable="s"+(uuidGen.nextUUID()).replaceAll("-", "_");			
 			//

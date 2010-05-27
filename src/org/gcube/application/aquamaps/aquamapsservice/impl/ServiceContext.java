@@ -41,6 +41,32 @@ public class ServiceContext extends GCUBEServiceContext {
 	private int maxSize;
 	private long waitIdleTime;
 	
+	
+	private  String postGis_dbtype;
+	private  String postGis_host;
+	private  String postGis_port;
+	private  String postGis_database;
+	private  String postGis_user; 
+	private  String postGis_passwd;
+	
+	
+	private String worldTable;
+	private String geoServerUrl;
+	private String templateGroup;
+	
+	private String distributionDefaultStyle;
+	
+	private boolean GISMode;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	protected void onReady() throws Exception{
 		
 		
@@ -91,6 +117,21 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.maxSize=Integer.parseInt(prop.getProperty("maxSize","50"));
 			this.waitIdleTime=Long.parseLong(prop.getProperty("waitIdleTime","30000"));
 		}catch(Exception e){logger.fatal("error getting Thread Pool settings ",e);}
+		try{
+			Properties prop= new Properties();
+			prop.load(new FileInputStream(this.getFile("geoserver.properties", false)));
+			this.postGis_database=prop.getProperty("postGis_database","");
+			this.postGis_dbtype=prop.getProperty("postGis_dbtype","");
+			this.postGis_host=prop.getProperty("postGis_host","");
+			this.postGis_passwd=prop.getProperty("postGis_passwd","");
+			this.postGis_port=prop.getProperty("postGis_port","");
+			this.postGis_user=prop.getProperty("postGis_user","");
+			this.geoServerUrl=prop.getProperty("geoServerUrl", "");
+			this.worldTable=prop.getProperty("worldTable", "");
+			this.templateGroup=prop.getProperty("templateGroup", "");
+			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","");
+			this.setGISMode(Boolean.parseBoolean(prop.getProperty("GISMode", "false")));
+		}catch(Exception e){logger.fatal("error getting GeoServer information",e);}
 	}
 	
 	public String getWebServiceURL(){
@@ -163,6 +204,142 @@ public class ServiceContext extends GCUBEServiceContext {
 	 */
 	public void setWaitIdleTime(long waitIdleTime) {
 		this.waitIdleTime = waitIdleTime;
+	}
+
+	/**
+	 * @return the postGis_dbtype
+	 */
+	public String getPostGis_dbtype() {
+		return postGis_dbtype;
+	}
+
+	/**
+	 * @param postGis_dbtype the postGis_dbtype to set
+	 */
+	public void setPostGis_dbtype(String postGis_dbtype) {
+		this.postGis_dbtype = postGis_dbtype;
+	}
+
+	/**
+	 * @return the postGis_host
+	 */
+	public String getPostGis_host() {
+		return postGis_host;
+	}
+
+	/**
+	 * @param postGis_host the postGis_host to set
+	 */
+	public void setPostGis_host(String postGis_host) {
+		this.postGis_host = postGis_host;
+	}
+
+	/**
+	 * @return the postGis_port
+	 */
+	public String getPostGis_port() {
+		return postGis_port;
+	}
+
+	/**
+	 * @param postGis_port the postGis_port to set
+	 */
+	public void setPostGis_port(String postGis_port) {
+		this.postGis_port = postGis_port;
+	}
+
+	/**
+	 * @return the postGis_database
+	 */
+	public String getPostGis_database() {
+		return postGis_database;
+	}
+
+	/**
+	 * @param postGis_database the postGis_database to set
+	 */
+	public void setPostGis_database(String postGis_database) {
+		this.postGis_database = postGis_database;
+	}
+
+	/**
+	 * @return the postGis_user
+	 */
+	public String getPostGis_user() {
+		return postGis_user;
+	}
+
+	/**
+	 * @param postGis_user the postGis_user to set
+	 */
+	public void setPostGis_user(String postGis_user) {
+		this.postGis_user = postGis_user;
+	}
+
+	/**
+	 * @return the postGis_passwd
+	 */
+	public String getPostGis_passwd() {
+		return postGis_passwd;
+	}
+
+	/**
+	 * @param postGis_passwd the postGis_passwd to set
+	 */
+	public void setPostGis_passwd(String postGis_passwd) {
+		this.postGis_passwd = postGis_passwd;
+	}
+
+	public void setGeoServerUrl(String geoServerUrl) {
+		this.geoServerUrl = geoServerUrl;
+	}
+
+	public String getGeoServerUrl() {
+		return geoServerUrl;
+	}
+
+	/**
+	 * @return the worldTable
+	 */
+	public String getWorldTable() {
+		return worldTable;
+	}
+
+	/**
+	 * @param worldTable the worldTable to set
+	 */
+	public void setWorldTable(String worldTable) {
+		this.worldTable = worldTable;
+	}
+
+	/**
+	 * @return the templateGroup
+	 */
+	public String getTemplateGroup() {
+		return templateGroup;
+	}
+
+	/**
+	 * @param templateGroup the templateGroup to set
+	 */
+	public void setTemplateGroup(String templateGroup) {
+		this.templateGroup = templateGroup;
+	}
+
+	public void setDistributionDefaultStyle(String distributionDefaultStyle) {
+		this.distributionDefaultStyle = distributionDefaultStyle;
+	}
+
+	public String getDistributionDefaultStyle() {
+		return distributionDefaultStyle;
+	}
+
+	public void setGISMode(boolean gISMode) {
+		GISMode = gISMode;
+	}
+
+	public boolean isGISMode() {
+		return GISMode;
 	}
 		
 }

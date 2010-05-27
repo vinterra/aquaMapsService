@@ -1,22 +1,15 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
+import java.util.ArrayList;
+
 public class GroupGenerationRequest implements GISGenerationRequest {
 
-	private String[] layers;
+	private ArrayList<String> layers=new ArrayList<String>();
+	private ArrayList<String> styles=new ArrayList<String>();
 	private String name;
 	private String id;
-	/**
-	 * @return the layers
-	 */
-	public String[] getLayers() {
-		return layers;
-	}
-	/**
-	 * @param layers the layers to set
-	 */
-	public void setLayers(String[] layers) {
-		this.layers = layers;
-	}
+	
+	private int submittedId;
 	/**
 	 * @return the name
 	 */
@@ -40,6 +33,42 @@ public class GroupGenerationRequest implements GISGenerationRequest {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+	/**
+	 * @return the layers
+	 */
+	public ArrayList<String> getLayers() {
+		return layers;
+	}
+	/**
+	 * @param layers the layers to set
+	 */
+	public void setLayers(ArrayList<String> layers) {
+		this.layers = layers;
+	}
+	/**
+	 * @return the styles
+	 */
+	public ArrayList<String> getStyles() {
+		return styles;
+	}
+	/**
+	 * @param styles the styles to set
+	 */
+	public void setStyles(ArrayList<String> styles) {
+		this.styles = styles;
+	}
+	/**
+	 * @return the submittedId
+	 */
+	public int getSubmittedId() {
+		return submittedId;
+	}
+	/**
+	 * @param submittedId the submittedId to set
+	 */
+	public void setSubmittedId(int submittedId) {
+		this.submittedId = submittedId;
 	}
 	
 }

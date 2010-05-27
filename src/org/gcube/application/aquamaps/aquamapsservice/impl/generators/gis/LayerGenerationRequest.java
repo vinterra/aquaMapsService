@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
+import java.util.ArrayList;
+
 
 public class LayerGenerationRequest implements GISGenerationRequest {
 
@@ -8,6 +10,12 @@ public class LayerGenerationRequest implements GISGenerationRequest {
 	private String layerName;
 	private String featureDefinition;
 	private int featureSQLType;
+	private String defaultStyle;
+	private ArrayList<String> styles=new ArrayList<String>();
+	
+	private int submittedId;
+	
+	
 	/**
 	 * @return the csvFile
 	 */
@@ -67,6 +75,25 @@ public class LayerGenerationRequest implements GISGenerationRequest {
 	 */
 	public void setFeatureSQLType(int featureSQLType) {
 		this.featureSQLType = featureSQLType;
+	}
+	public void setDefaultStyle(String defaultStyle) {
+		if(styles.size()==0)styles.add(defaultStyle);
+		this.defaultStyle = defaultStyle;
+	}
+	public String getDefaultStyle() {
+		return defaultStyle;
+	}
+	public void setStyles(ArrayList<String> styles) {
+		this.styles = styles;
+	}
+	public ArrayList<String> getStyles() {
+		return styles;
+	}
+	public void setSubmittedId(int submittedId) {
+		this.submittedId = submittedId;
+	}
+	public int getSubmittedId() {
+		return submittedId;
 	} 
 	
 	

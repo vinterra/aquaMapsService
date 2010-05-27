@@ -1,5 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import it.cnr.isti.geoserverInteraction.GeoserverCaller;
+import it.cnr.isti.geoserverInteraction.bean.LayerRest;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -8,8 +11,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.apache.commons.io.FileUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -263,6 +269,63 @@ public class JobGenerationDetails {
 			throw e;
 		}finally {
 			session.close();
+		}
+	}
+	
+	public static void updateGISData(int submittedId,String GeoId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Setting GIS data "+GeoId+" for submitted Id "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Update submitted set gis=? where searchId=?");
+			ps.setString(1, GeoId);
+			ps.setInt(2, submittedId);
+			logger.trace("updated "+ps.executeUpdate()+" entries");
+		}catch(Exception e ){
+			logger.error("Unexpected Error", e);
+			throw e;
+		}finally{
+			session.close();
+		}
+	}
+	
+	public static void createGroup (int jobId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Starting job Id : "+jobId+" layers group creation ..");
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps =session.preparedStatement(DBCostants.AquaMapsListPerJob);
+			ps.setInt(1, jobId);
+			ResultSet rs=ps.executeQuery();
+			logger.trace("Looking for generated layers");
+			ArrayList<String> layers=new ArrayList<String>();
+			while(rs.next()){
+				String objectFeature=rs.getString("gis");
+				if((objectFeature!=null)&&(!objectFeature.equalsIgnoreCase("null")))
+					layers.add(objectFeature);
+			}
+			session.close();
+			if(layers.size()>0){
+				logger.trace("found "+layers.size()+" generated layer(s), looking for related style(s)");
+				GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
+				ArrayList<String> styles=new ArrayList<String>();
+				for(String layerId:layers){
+					LayerRest lRest=caller.getLayer(layerId);
+					styles.add(lRest.getDefaultStyle());
+				}
+				GroupGenerationRequest req=new GroupGenerationRequest();
+				req.setLayers(layers);
+				req.setName(String.valueOf(jobId));
+				req.setStyles(styles);
+				req.setSubmittedId(jobId);
+				if(GeneratorManager.requestGeneration(req))logger.trace("Generation of jobId "+jobId+" layers group complete");
+				else throw new Exception("Unable to generate Group");
+			}else logger.trace("No generated layers found for job Id "+jobId);
+		}catch(Exception e){
+			logger.error("Unable to complete group "+jobId+" generation",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
 		}
 	}
 }

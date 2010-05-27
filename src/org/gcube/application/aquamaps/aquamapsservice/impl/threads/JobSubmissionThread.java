@@ -10,6 +10,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
@@ -37,7 +38,7 @@ public class JobSubmissionThread extends Thread {
 
 	public JobSubmissionThread(Job toPerform) throws Exception{
 		super(toPerform.getName()+"_thread");
-		this.setPriority(MIN_PRIORITY);
+		this.setPriority(MIN_PRIORITY+1);
 		this.toPerform=toPerform;
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName());
 		waitingGroup=new ThreadGroup(toPerform.getName());
@@ -58,6 +59,7 @@ public class JobSubmissionThread extends Thread {
 			if((toPerform.getEnvironmentCustomization()!=null) && 
 					(toPerform.getEnvironmentCustomization().getPerturbationList()!=null)){
 				AreaPerturbationThread areaThread=new AreaPerturbationThread(waitingGroup,jobId,toPerform.getName());
+				areaThread.setPriority(MIN_PRIORITY);
 				ThreadManager.getExecutor().execute(areaThread);
 			}else{
 				//				generationStatus.setAreaReady(true);
@@ -69,6 +71,7 @@ public class JobSubmissionThread extends Thread {
 			SpeciesPerturbationThread specThread=
 				new SpeciesPerturbationThread(waitingGroup,toPerform.getName(),jobId,
 						toPerform.getEnvelopCustomization());
+			specThread.setPriority(MIN_PRIORITY);
 			ThreadManager.getExecutor().execute(specThread);
 
 
@@ -89,6 +92,7 @@ public class JobSubmissionThread extends Thread {
 
 			JobGenerationDetails.updateStatus(jobId, Status.Simulating);
 			SimulationThread simT=new SimulationThread(waitingGroup,toPerform);
+			simT.setPriority(MIN_PRIORITY);
 			ThreadManager.getExecutor().execute(simT);
 
 			//			JobUtils.updateStatus(JobStatus.Generating, jobID, DBCostants.UNASSIGNED, conn);
@@ -111,6 +115,7 @@ public class JobSubmissionThread extends Thread {
 						t=new DistributionThread(waitingGroup,jobId,objId,aquaMapObj.getName());
 						((DistributionThread)t).setRelatedSpeciesId(species);
 					}
+					t.setPriority(MIN_PRIORITY);
 					ThreadManager.getExecutor().execute(t);
 				}else{
 					JobUtils.updateAquaMapStatus(objId, Status.Error);
@@ -124,6 +129,13 @@ public class JobSubmissionThread extends Thread {
 				logger.trace(this.getName()+" waiting for  generation Process(es) ");			
 				logger.trace(waitingGroup.toString());
 			}
+			
+			
+			if(ServiceContext.getContext().isGISMode())
+				JobGenerationDetails.createGroup(jobId);
+			
+			
+			
 			logger.warn("Job should be complete here");
 			JobGenerationDetails.updateStatus(jobId,JobGenerationDetails.Status.Completed);
 

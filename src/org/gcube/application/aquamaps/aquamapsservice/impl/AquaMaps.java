@@ -347,7 +347,8 @@ public class AquaMaps extends GCUBEPortType {
 		try{
 			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(DBCostants.AquaMapsListPerAuthor);
-			ps.setString(1, author);		
+			ps.setString(1, author);	
+			ps.setBoolean(2, false);
 			ResultSet rs=ps.executeQuery();
 			toReturn=DBUtils.toJSon(rs);
 			rs.close();

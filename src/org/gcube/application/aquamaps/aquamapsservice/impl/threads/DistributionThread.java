@@ -5,10 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Map;
 
+import org.apache.tools.ant.util.FileUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -58,6 +62,13 @@ public class DistributionThread extends Thread {
 
 			ResultSet rs=ps.executeQuery();
 
+			String csvFile=null;
+			if(ServiceContext.getContext().isGISMode()){
+				csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
+				FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
+				GenerationUtils.ResultSetToCSVFile(rs, csvFile);				
+			}
+			
 			String header=jobId+"_"+aquamapsName;
 			String header_map = header+"_maps";
 			StringBuilder[] csq_str;
@@ -67,14 +78,17 @@ public class DistributionThread extends Thread {
 			
 			if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 			else {
+				
+				///************************ PERL IMAGES GENERATION AND PUBBLICATION
+				
 				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
 				JobGenerationDetails.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
 				logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
 				JobUtils.updateAquaMapStatus(aquamapsId,Status.Publishing);
-				int result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
+				boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
 //				JobUtils.generateImages(clusterFile);
 				logger.trace(this.getName()+" Perl execution exit message :"+result);
-				if(result!=0) logger.error("No images were generated");
+				if(!result) logger.warn("No images were generated");
 				else {
 					Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
 
@@ -100,8 +114,27 @@ public class DistributionThread extends Thread {
 						logger.trace(this.getName()+" "+app.size()+" file information inserted in DB");
 					}
 				}
+				
+				/// *************************** GIS GENERATION
+				
+				if(ServiceContext.getContext().isGISMode()){
+					LayerGenerationRequest request= new LayerGenerationRequest();
+					request.setCsvFile(csvFile);
+					request.setFeatureLabel("Probability");
+					request.setFeatureDefinition("real");
+					request.setLayerName(speciesId[0]);
+					request.setDefaultStyle(ServiceContext.getContext().getDistributionDefaultStyle());
+					request.setSubmittedId(aquamapsId);
+					logger.trace("submitting Gis layer generation for obj Id :"+aquamapsId);
+					if(GeneratorManager.requestGeneration(request))
+						logger.trace("generated layer for obj Id : "+aquamapsId);
+					else logger.trace("unable to generate layer for obj Id : "+aquamapsId);
+				}
+				
 			}	
 
+
+			
 			JobUtils.updateAquaMapStatus(aquamapsId,Status.Completed);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

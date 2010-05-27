@@ -7,16 +7,20 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import org.gcube.common.core.utils.logging.GCUBELog;
+
 import net.sf.csv4j.CSVWriter;
 
 public class GenerationUtils {
 
+	static GCUBELog logger= new GCUBELog(GenerationUtils.class);
+	
 	public static long ResultSetToCSVFile(ResultSet rs, String outFile)throws IOException,SQLException{
 		final FileWriter fileWriter = new FileWriter(outFile);
 		final CSVWriter csvWriter = new CSVWriter( fileWriter );	
 		//csvWriter.writeLine( new String[] { "column1", "column2", "column3" } );
 		ResultSetMetaData meta=rs.getMetaData();	
-		GeneratorManager.logger.trace("Writing record values ...");
+		logger.trace("Writing record values ...");
 		long count = 0;
 		while(rs.next()){
 			String[] record= new String[meta.getColumnCount()];
@@ -30,8 +34,8 @@ public class GenerationUtils {
 		}
 		fileWriter.close();
 		if((new File(outFile)).exists())
-			GeneratorManager.logger.trace("Wrote "+count+" records");
-		else GeneratorManager.logger.error("File "+outFile+" not created");
+			logger.trace("Wrote "+count+" records");
+		else logger.error("File "+outFile+" not created");
 		return count;
 	}
 

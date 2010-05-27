@@ -5,13 +5,12 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.EnvelopeWeightArray;
 import org.gcube.application.aquamaps.stubs.EnvelopeWeights;
 import org.gcube.application.aquamaps.stubs.Weight;
@@ -26,7 +25,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class HSPECGenerator {
 
 	private static GCUBELog logger= new GCUBELog(HSPECGenerator.class);
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	
 	private String hcafViewTable;
 	private String hcafStaticTable;
 	private String hcafDynamicTable;
@@ -46,7 +45,7 @@ public class HSPECGenerator {
 	*/
 	public HSPECGenerator(int jobId,String HCAF_D,String HCAF_S,String HSPEN,EnvelopeWeightArray envelopeWeights) {
 		super();
-		this.hcafViewTable = "HCAF"+uuidGen.nextUUID().replace("-", "_");
+		this.hcafViewTable = ServiceUtils.generateId("HCAF", "");//"HCAF"+uuidGen.nextUUID().replace("-", "_");
 		this.hcafDynamicTable=HCAF_D;
 		this.hcafStaticTable=HCAF_S;
 		this.hspenTable = HSPEN;
@@ -77,7 +76,7 @@ public class HSPECGenerator {
 			}
 		}
 		
-		this.resultsTable= "HSPEC"+uuidGen.nextUUID().replace("-", "_");
+		this.resultsTable= ServiceUtils.generateId("HSPEC", "");//"HSPEC"+uuidGen.nextUUID().replace("-", "_");
 //		JobGenerationDetails.set
 //		details.setHspecTable(this.resultsTable);
 		//logger.trace("Weights: "+this.depthWeight+" "+this.salinityWeight+" "+this.primaryProductsWeight+" "+this.seaIceConcentrationWeight+" "+this.sstWeight);

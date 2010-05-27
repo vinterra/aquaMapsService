@@ -4,6 +4,7 @@ import it.cnr.isti.geoserverInteraction.GeoserverCaller;
 import it.cnr.isti.geoserverInteraction.bean.BoundsRest;
 import it.cnr.isti.geoserverInteraction.bean.FeatureTypeRest;
 import it.cnr.isti.geoserverInteraction.bean.GroupRest;
+import it.cnr.isti.geoserverInteraction.engine.MakeStyle;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -16,10 +17,12 @@ import java.util.List;
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequestException;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.json.JSONException;
 
@@ -30,12 +33,14 @@ public class GISGenerator {
 	private static GCUBELog logger= new GCUBELog(GISGenerator.class);
 	public static char delimiter=',';
 	public static boolean hasHeader=false;
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	
-	private static String[] columnsAndConstraintDefinition = new String[]{
-		"CsquareCode varchar(10)",
-		"feature float(3,2)"
-	};
+	//DateFormat.getDateInstance(DateFormat.DEFAULT,  Locale.getDefault());
+	
+	
+//	private static String[] columnsAndConstraintDefinition = new String[]{
+//		"CsquareCode varchar(10)",
+//		"feature float(3,2)"
+//	};
 	
 	private static final String crs="GEOGCS[\"WGS 84\", DATUM[\"World Geodetic System 1984\", SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]],"+ 
     "AUTHORITY[\"EPSG\",\"6326\"]], PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]],  UNIT[\"degree\", 0.017453292519943295],"+ 
@@ -44,10 +49,14 @@ public class GISGenerator {
 	
 	long count=0;
 	long lines=0;
-	private static String worldTable="world";
-	private static String geoServerUrl="http://geoserver.d4science-ii.research-infrastructures.eu:8080/geoserver";
+	
+
+	
 	private static String cSquareCode="CsquareCode";
 	private static String cSquareCodeDefinition="varchar(10)";
+	
+	
+	
 	private DBSession session;
 	
 	private String importLayerData(LayerGenerationRequest request)throws Exception{		
@@ -59,7 +68,7 @@ public class GISGenerator {
 		processor.setHasHeader(hasHeader);
 //		final ArrayList<Object[]> data = new ArrayList<Object[]>();
 		logger.trace("Reading from file "+fileName); 
-		String tableName="app"+(uuidGen.nextUUID()).replaceAll("-", "_");
+		String tableName=ServiceUtils.generateId("app", "");//"app"+(uuidGen.nextUUID()).replaceAll("-", "_");
 		
 //		session.createTable(tableName, columnsAndConstraintDefinition, DBSession.ENGINE.InnoDB);
 		session.executeUpdate("Create table "+tableName+" ( "+cSquareCode+" "+cSquareCodeDefinition+" , "+featureLabel+" "+featureDefinition+")");
@@ -90,18 +99,21 @@ public class GISGenerator {
 	}
 	
 	private String createLayerTable(String appTableName,LayerGenerationRequest request)throws Exception{
-		String featureTable="f"+(uuidGen.nextUUID()).replaceAll("-", "_");
+//		String featureTable="f"+(uuidGen.nextUUID()).replaceAll("-", "_");
+		
+		String featureTable=request.getLayerName()+ServiceUtils.getTimeStamp();
+		featureTable=(featureTable.toLowerCase()).replaceAll("-", "_");
 		logger.trace("Creating table "+featureTable);
-		session.executeUpdate("Create table "+featureTable+" AS (Select "+worldTable+".*, app."+request.getFeatureLabel()+
-				" FROM "+appTableName+" AS app inner join "+worldTable+" ON app."+cSquareCode+"="+worldTable+"."+cSquareCode+")");
+		session.executeUpdate("Create table "+featureTable+" AS (Select "+ServiceContext.getContext().getWorldTable()+".*, app."+request.getFeatureLabel()+
+				" FROM "+appTableName+" AS app inner join "+ServiceContext.getContext().getWorldTable()+" ON app."+cSquareCode+"="+ServiceContext.getContext().getWorldTable()+"."+cSquareCode+")");
 		logger.trace(featureTable+" created");
 		logger.trace("going do drop appTable "+appTableName);
 		session.dropTable(appTableName);
 		return featureTable;
 	}
 	
-	private boolean createLayer(String featureTable,String humanName) throws JSONException{		
-		GeoserverCaller caller= new GeoserverCaller(geoServerUrl);
+	private boolean createLayer(String featureTable,LayerGenerationRequest request) throws JSONException{		
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();
 		featureTypeRest.setDatastore("aquamapsdb");
         featureTypeRest.setEnabled(true);
@@ -112,22 +124,34 @@ public class GISGenerator {
         featureTypeRest.setProjectionPolicy("FORCE_DECLARED");
         featureTypeRest.setSrs("EPSG:4326");
         featureTypeRest.setNativeCRS(crs);
-        featureTypeRest.setTitle(humanName);
+        featureTypeRest.setTitle(request.getLayerName());
         featureTypeRest.setWorkspace("aquamaps");   	
-		return caller.addFeatureType(featureTypeRest);
+		if (caller.addFeatureType(featureTypeRest)){
+			try {
+				Thread.sleep(6*1000);
+			} catch (InterruptedException e) {}			
+			return caller.setLayer(featureTypeRest, request.getDefaultStyle(), request.getStyles());			
+		}else return false;
 	}
 	
 	private boolean createGroup(ArrayList<String> list, ArrayList<String> styles, String groupName)throws Exception{	 
-		GeoserverCaller caller=new GeoserverCaller(geoServerUrl);
-		GroupRest g=new GroupRest();
-		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
-        g.setLayers(list);
-        g.setStyles(styles);
+		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());		
+		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getTemplateGroup());
+//		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
+//        g.setLayers(list);
+//        g.setStyles(styles);
+		g.getLayers().addAll(g.getLayers().size()-1, list);
+		g.getStyles().addAll(g.getStyles().size()-1, styles);
         g.setName(groupName);
-        return caller.addLayerGroup(g);
+        return caller.addLayersGroup(g);
 	}
 	
 	
+	public boolean createGroup(GroupGenerationRequest request)throws Exception{
+		boolean result=this.createGroup(request.getLayers(), request.getStyles(), request.getName());
+		if(result) JobGenerationDetails.updateGISData(request.getSubmittedId(), request.getName());		
+		return result;
+	}
 	
 	public boolean createLayer(LayerGenerationRequest request)throws Exception{
 		try{
@@ -136,8 +160,12 @@ public class GISGenerator {
 		String appTableName=this.importLayerData(request);
 		String featureTable=this.createLayerTable(appTableName, request);
 		session.commit();
-		Thread.sleep(4*1000);
-		return this.createLayer(featureTable, request.getLayerName());		
+		try {
+			Thread.sleep(4*1000);
+		} catch (InterruptedException e) {}
+		boolean result= this.createLayer(featureTable, request);
+		if(result) JobGenerationDetails.updateGISData(request.getSubmittedId(), featureTable);		
+		return result;
 		}catch(Exception e){			
 			logger.error("Unable to complete Gis generation for layer "+request.getLayerName());
 			throw e;
@@ -149,5 +177,27 @@ public class GISGenerator {
 				}
 			}		
 	}
+	
+	public boolean copyLayers(String srcName,String destName)throws Exception{
+		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
+		GroupRest src=caller.getLayerGroup(srcName);
+		GroupRest dest=caller.getLayerGroup(destName);
+		dest.getLayers().addAll(0, src.getLayers());
+		return caller.addLayersGroup(dest);
+	}
+	
+	
+	public boolean generateStyle(StyleGenerationRequest req)throws Exception{
+		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
+		String style;
+		if(req.getTypeValue()==Integer.class)
+			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMax()));
+		else if(req.getTypeValue()==Float.class)
+			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMax()));
+		else throw new BadRequestException();
+		return caller.sendStyleSDL(style);
+	}
+	
+	
 	
 }

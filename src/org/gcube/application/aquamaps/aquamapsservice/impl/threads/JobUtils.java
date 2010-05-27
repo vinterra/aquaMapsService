@@ -1,13 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,13 +15,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.AreasArray;
@@ -41,7 +38,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class JobUtils {
 
 	private static GCUBELog logger= new GCUBELog(JobUtils.class);
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	public static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
 	
 /**
@@ -209,6 +206,7 @@ public class JobUtils {
 		c.close();
 	}
 	
+
 	
 	
 	
@@ -331,14 +329,14 @@ public class JobUtils {
 		if((areaSelection!=null)&&(areaSelection.getAreasList()!=null)
 				&&(areaSelection.getAreasList().length>0)){
 			DBSession conn = DBSession.openSession(PoolManager.DBType.mySql);
-			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
+			String areaTmpTable=ServiceUtils.generateId("A", "");//"A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
 			for(Area area: areaSelection.getAreasList())			
 				conn.executeUpdate("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
 			
 			logger.trace(" area temp table created");
 			JobGenerationDetails.addToDropTableList(jobId,areaTmpTable);
-			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
+			String filteredTable=ServiceUtils.generateId("A", "");//"A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
 			JobGenerationDetails.addToDropTableList(jobId,filteredTable);
 			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,hspec,areaTmpTable);
