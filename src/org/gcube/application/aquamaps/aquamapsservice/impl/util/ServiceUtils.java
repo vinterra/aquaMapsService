@@ -41,7 +41,8 @@ public class ServiceUtils {
 	}
 	
 	public static String generateId(String prefix,String suffix){
-		return prefix+(uuidGen.nextUUID()).replaceAll("-", "_")+suffix;
+//		return prefix+(uuidGen.nextUUID()).replaceAll("-", "_")+suffix;
+		return prefix+getTimeStamp().replaceAll("-", "_")+suffix;
 	}
 	public static String getTimeStamp(){
 		return dateFormatter.format(System.currentTimeMillis());

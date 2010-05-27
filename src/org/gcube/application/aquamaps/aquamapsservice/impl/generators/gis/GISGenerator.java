@@ -191,9 +191,9 @@ public class GISGenerator {
 		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
 		String style;
 		if(req.getTypeValue()==Integer.class)
-			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMax()));
+			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMax()));
 		else if(req.getTypeValue()==Float.class)
-			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMax()));
+			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMax()));
 		else throw new BadRequestException();
 		return caller.sendStyleSDL(style);
 	}
