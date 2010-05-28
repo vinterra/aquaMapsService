@@ -146,8 +146,8 @@ public class BiodiversityThread extends Thread {
 				if(ServiceContext.getContext().isGISMode()){
 					StyleGenerationRequest styleReq=new StyleGenerationRequest();
 					styleReq.setAttributeName(attributeName);
-					styleReq.setC1(Color.RED);
-					styleReq.setC2(Color.YELLOW);
+					styleReq.setC1(Color.YELLOW);
+					styleReq.setC2(Color.RED);
 					styleReq.setMax(String.valueOf(maxValue));
 					styleReq.setMin(String.valueOf(minValue));
 					styleReq.setNameStyle(ServiceUtils.generateId(aquamapsName, "style"));

@@ -22,6 +22,7 @@ public class GenerationUtils {
 		ResultSetMetaData meta=rs.getMetaData();	
 		logger.trace("Writing record values ...");
 		long count = 0;
+		rs.beforeFirst();
 		while(rs.next()){
 			String[] record= new String[meta.getColumnCount()];
 			for(int column=0;column<record.length;column++){
