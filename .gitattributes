@@ -18,6 +18,11 @@ etc/profile.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
 /install.sh -text
+lib/commons-codec-1.3.jar -text
+lib/commons-httpclient.jar -text
+lib/csv4j_gcube.jar -text
+lib/geoserverInt.jar -text
+lib/postgresql-8.4-701.jdbc3.jar -text
 schema/AquaMaps.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
