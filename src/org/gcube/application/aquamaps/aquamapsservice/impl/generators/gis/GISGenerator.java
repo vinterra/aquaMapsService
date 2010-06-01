@@ -148,12 +148,14 @@ public class GISGenerator {
 	
 	
 	public boolean createGroup(GroupGenerationRequest request)throws Exception{
+		logger.trace("Creating group "+request.getName());
 		boolean result=this.createGroup(request.getLayers(), request.getStyles(), request.getName());
 		if(result) JobGenerationDetails.updateGISData(request.getSubmittedId(), request.getName());		
 		return result;
 	}
 	
 	public boolean createLayer(LayerGenerationRequest request)throws Exception{
+		logger.trace("Creating layer "+request.getLayerName());
 		try{
 		session = DBSession.openSession(PoolManager.DBType.postGIS);
 		session.disableAutoCommit();
@@ -179,6 +181,7 @@ public class GISGenerator {
 	}
 	
 	public boolean copyLayers(String srcName,String destName)throws Exception{
+		logger.trace("Copying layers from  "+srcName+" to "+destName);
 		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
 		GroupRest src=caller.getLayerGroup(srcName);
 		GroupRest dest=caller.getLayerGroup(destName);
@@ -188,6 +191,7 @@ public class GISGenerator {
 	
 	
 	public boolean generateStyle(StyleGenerationRequest req)throws Exception{
+		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
 		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
 		String style;
 		if(req.getTypeValue()==Integer.class)
@@ -195,7 +199,11 @@ public class GISGenerator {
 		else if(req.getTypeValue()==Float.class)
 			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
 		else throw new BadRequestException();
-		return caller.sendStyleSDL(style);
+		logger.trace("Submitting style "+req.getNameStyle());
+		boolean toReturn=false;
+		toReturn=caller.sendStyleSDL(style);
+		logger.trace("Submitting style result : "+toReturn);
+		return toReturn;
 	}
 	
 	

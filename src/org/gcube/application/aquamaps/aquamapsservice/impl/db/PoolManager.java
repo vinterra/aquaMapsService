@@ -33,7 +33,7 @@ public class PoolManager {
 	private static PoolableConnectionFactory postGISpoolableConnectionFactory;
 	private static PoolingDriver postGISdriver;
 	
-	
+	private static String validationQUERY="Select 1";
 	
 	static{
 		//MYSQL
@@ -45,11 +45,13 @@ public class PoolManager {
 			e.printStackTrace();
 		}
 		mySqlconnectionPool = new GenericObjectPool(null);
-		mySqlconnectionPool.setMaxActive(30);		
+		mySqlconnectionPool.setMaxActive(30);
+		mySqlconnectionPool.setTestOnBorrow(true);
 		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
+		
 //		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://wn06.research-infrastructures.eu:3306/aquamaps_DB",  "root", "mybohemian");
 		mySqlpoolableConnectionFactory = new PoolableConnectionFactory(mySqlconnectionFactory,mySqlconnectionPool,
-				new StackKeyedObjectPoolFactory(),null,false,true);
+				new StackKeyedObjectPoolFactory(),validationQUERY,false,true);
 		mySqldriver = new PoolingDriver();
 		mySqldriver.registerPool(mySqlPoolName,mySqlconnectionPool);
 		
@@ -63,14 +65,14 @@ public class PoolManager {
 		}
 		postGISconnectionPool = new GenericObjectPool(null);
 		postGISconnectionPool.setMaxActive(30);
-		
+		postGISconnectionPool.setTestOnBorrow(true);
 		postGISconnectionFactory = new DriverManagerConnectionFactory("jdbc:"+"postgresql"+"://"+ServiceContext.getContext().getPostGis_host()+":"+
 				ServiceContext.getContext().getPostGis_port()+"/"+ServiceContext.getContext().getPostGis_database(),ServiceContext.getContext().getPostGis_user(), ServiceContext.getContext().getPostGis_passwd());
 		
 //		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
 //		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/prova",  "root","rootpwd");
 		postGISpoolableConnectionFactory = new PoolableConnectionFactory(postGISconnectionFactory,postGISconnectionPool,
-				new StackKeyedObjectPoolFactory(),null,false,true);
+				new StackKeyedObjectPoolFactory(),validationQUERY,false,true);
 		postGISdriver = new PoolingDriver();
 		postGISdriver.registerPool(postGISPoolName,postGISconnectionPool);
 	}

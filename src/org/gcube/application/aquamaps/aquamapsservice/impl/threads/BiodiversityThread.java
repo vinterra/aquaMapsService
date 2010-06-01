@@ -149,9 +149,11 @@ public class BiodiversityThread extends Thread {
 					styleReq.setC1(Color.YELLOW);
 					styleReq.setC2(Color.RED);
 					styleReq.setMax(String.valueOf(maxValue));
-					styleReq.setMin(String.valueOf(minValue));
-					styleReq.setNameStyle(ServiceUtils.generateId(aquamapsName, "style"));
-					styleReq.setNClasses(5);
+					styleReq.setMin(String.valueOf(minValue));					
+					styleReq.setNameStyle(ServiceUtils.generateId(aquamapsName, "style"));					
+					int Nclasses=((maxValue-minValue)>4)?5:maxValue-minValue;
+					logger.debug("Found "+Nclasses+" classes for style");
+					styleReq.setNClasses(Nclasses);
 					styleReq.setTypeValue(Integer.class);
 					
 
