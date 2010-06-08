@@ -85,5 +85,7 @@ src/org/gcube/application/aquamaps/stubs/dataModel/util/Tags.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/util/XMLUtils.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
+test/testClient/BrokenPipeIssueTest.java -text
 test/testClient/DBConnectionTest.java -text
 test/testClient/LayerPubblicationTest.java -text
+test/testClient/StyleGeneration.java -text
