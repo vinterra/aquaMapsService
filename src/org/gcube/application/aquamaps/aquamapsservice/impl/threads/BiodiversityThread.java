@@ -34,7 +34,7 @@ public class BiodiversityThread extends Thread {
 	private String HSPECName;	
 	private String[] species;
 	private DBSession session;
-
+	private boolean gisEnabled=false;
 
 	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold) {
 		super(group,"BioD_AquaMapObj:"+aquamapsName);	
@@ -47,7 +47,9 @@ public class BiodiversityThread extends Thread {
 	public void setRelatedSpeciesList(String[] ids){
 		species=ids;
 	}
-
+	public void setGis(boolean gis){
+		gisEnabled=gis;
+	}
 
 	public void run() {
 		logger.trace(this.getName()+" started");
@@ -143,7 +145,8 @@ public class BiodiversityThread extends Thread {
 				
 /// *************************** GIS GENERATION
 				
-				if(ServiceContext.getContext().isGISMode()){
+				if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
+					logger.trace(this.getName()+"is gisEnabled");
 					StyleGenerationRequest styleReq=new StyleGenerationRequest();
 					styleReq.setAttributeName(attributeName);
 					styleReq.setC1(Color.YELLOW);

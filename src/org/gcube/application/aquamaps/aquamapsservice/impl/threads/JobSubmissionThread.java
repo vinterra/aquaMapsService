@@ -116,9 +116,11 @@ public class JobSubmissionThread extends Thread {
 					if(aquaMapObj.getType().equalsIgnoreCase(AquaMapsObject.Type.Biodiversity.toString())){
 						t=new BiodiversityThread(waitingGroup,jobId,objId,aquaMapObj.getName(),aquaMapObj.getThreshold());
 						((BiodiversityThread)t).setRelatedSpeciesList(species);
+						((BiodiversityThread)t).setGis(aquaMapObj.isGis());
 					}else{
 						t=new DistributionThread(waitingGroup,jobId,objId,aquaMapObj.getName());
 						((DistributionThread)t).setRelatedSpeciesId(species);
+						((DistributionThread)t).setGis(aquaMapObj.isGis());
 					}
 					t.setPriority(MIN_PRIORITY);
 					ThreadManager.getExecutor().execute(t);

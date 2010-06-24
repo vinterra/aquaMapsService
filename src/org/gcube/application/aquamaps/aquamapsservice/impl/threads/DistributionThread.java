@@ -28,7 +28,7 @@ public class DistributionThread extends Thread {
 	private String[] speciesId;
 	private DBSession session;
 	private int jobId;	
-
+	private boolean gisEnabled=false;
 
 	public DistributionThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName) {
 		super(group,"SAD_AquaMapObj:"+aquamapsName);
@@ -40,6 +40,10 @@ public class DistributionThread extends Thread {
 		speciesId=species;
 	}
 
+	public void setGis(boolean gis){
+		gisEnabled=gis;
+	}
+	
 	public void run() {
 		logger.trace(this.getName()+" started");
 		try {
@@ -117,7 +121,8 @@ public class DistributionThread extends Thread {
 				
 				/// *************************** GIS GENERATION
 				
-				if(ServiceContext.getContext().isGISMode()){
+				if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
+					logger.trace(this.getName()+"is gisEnabled");
 					LayerGenerationRequest request= new LayerGenerationRequest();
 					request.setCsvFile(csvFile);
 					request.setFeatureLabel("Probability");

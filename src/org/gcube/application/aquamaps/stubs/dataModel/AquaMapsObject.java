@@ -56,6 +56,7 @@ public class AquaMapsObject {
 	private String publisher="";
 	private String source="";
 	private String profileUrl="";
+	private Boolean gis=false;
 	private Type type=Type.Biodiversity;
 	private Set<Species> selectedSpecies=new HashSet<Species>();
 	private Map<String,String> relatedResources=new HashMap<String, String>();
@@ -194,22 +195,22 @@ public class AquaMapsObject {
 		profileBuilder.append("<Status>"+status+"</Status>");
 		profileBuilder.append("<Type>"+type.toString()+"</Type>");
 		profileBuilder.append("<date>"+date+"</date>");
-		
+		profileBuilder.append("<Gis>"+gis+"</Gis>");
 		profileBuilder.append("<RelatedResources>");
 		for(Entry<String,String> entry : relatedResources.entrySet()){
 			profileBuilder.append("<Resource>");
-			 profileBuilder.append("<Name>"+entry.getKey()+"</Name>");
-			 profileBuilder.append("<Url>"+entry.getValue()+"</Url>");
+			profileBuilder.append("<Name>"+entry.getKey()+"</Name>");
+			profileBuilder.append("<Url>"+entry.getValue()+"</Url>");
 			profileBuilder.append("</Resource>");
 		}
 		profileBuilder.append("<Resource>");
-		 profileBuilder.append("<Name>Profile</Name>");
-		 profileBuilder.append("<Url>"+profileUrl+"</Url>");
+		profileBuilder.append("<Name>Profile</Name>");
+		profileBuilder.append("<Url>"+profileUrl+"</Url>");
 		profileBuilder.append("</Resource>");		
 		profileBuilder.append("</RelatedResources>");
-		
-		
-		
+
+
+
 		profileBuilder.append("<SelectedSpecies>");
 		for(Species spec:selectedSpecies) profileBuilder.append(spec.toXML());
 		profileBuilder.append("</SelectedSpecies>");
@@ -312,9 +313,14 @@ public class AquaMapsObject {
 		toReturn.getBoundingBox().parse(XMLUtils.getTextContent(bbElement));
 		Element thresholdElement=(Element) doc.getElementsByTagName("Threshold").item(0);
 		toReturn.setThreshold(Float.parseFloat(XMLUtils.getTextContent(thresholdElement)));
-		
-		
-		
+		try{
+			Element gisElement=(Element) doc.getElementsByTagName("Threshold").item(0);
+			toReturn.setGis(Boolean.valueOf(XMLUtils.getTextContent(gisElement)));
+		}catch(Exception e){
+			//Backward compatibility
+			toReturn.setGis(false);
+		}
+
 		NodeList speciesNodes=doc.getElementsByTagName("Species");
 		ArrayList<Species> specList=new ArrayList<Species>(); 
 		for(int i=0;i<speciesNodes.getLength();i++){
@@ -359,6 +365,12 @@ public class AquaMapsObject {
 		}
 
 		return toReturn;
+	}
+	public void setGis(Boolean gis) {
+		this.gis = gis;
+	}
+	public Boolean getGis() {
+		return gis;
 	}
 
 }
