@@ -258,7 +258,16 @@
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
 					<xsd:element name="aquamaps" type="xsd:boolean"/>
-					<xsd:element name="jobId" type="xsd:string"/>
+					<xsd:element name="jobIdEnabled" type="xsd:boolean"/>					
+					<xsd:element name="jobIdValue" type="xsd:string"/>
+					<xsd:element name="objectStatusEnabled" type="xsd:boolean"/>
+					<xsd:element name="objectStatusValue" type="xsd:string"/>
+					<xsd:element name="typeEnabled" type="xsd:boolean"/>
+					<xsd:element name="typeValue" type="xsd:string"/>
+					<xsd:element name="jobStatusEnabled" type="xsd:boolean"/>
+					<xsd:element name="jobStatusValue" type="xsd:string"/>
+					<xsd:element name="dateEnabled" type="xsd:boolean" />
+					<xsd:element name="dateValue" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
 			

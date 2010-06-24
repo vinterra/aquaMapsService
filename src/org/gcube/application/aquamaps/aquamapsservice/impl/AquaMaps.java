@@ -137,7 +137,6 @@ public class AquaMaps extends GCUBEPortType {
 				try {
 					session.close();
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -211,7 +210,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				session.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -259,7 +258,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -295,7 +294,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -321,7 +320,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				session.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -364,7 +363,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -399,7 +398,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -434,7 +433,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -465,7 +464,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -496,7 +495,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -520,7 +519,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}	
@@ -568,7 +567,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -619,7 +618,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -667,7 +666,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -785,7 +784,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -834,7 +833,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -867,33 +866,83 @@ public class AquaMaps extends GCUBEPortType {
 		int limit=arg0.getLimit();
 		String user=arg0.getUserID();
 		String toReturn="{\"data\":[],\"totalcount\":0}";
-		boolean isAquaMaps=arg0.isAquamaps();
-		String jobId=arg0.getJobId();
+		boolean isAquaMaps=arg0.isAquamaps();		
 		DBSession conn=null;
 		try{
+			
+			StringBuilder query= new StringBuilder();
+			StringBuilder countQuery=new StringBuilder("Select count(*) from "+DBCostants.JOB_Table+" where author = ? AND isAquaMap = ? ");
+			ArrayList<String> parameters=new ArrayList<String>();		
+			
+			query.append(DBCostants.AquaMapsListPerAuthor);
+			parameters.add(user);
+			parameters.add(String.valueOf(isAquaMaps));
+			if(arg0.isJobIdEnabled()) {
+				query.append(" AND jobId=? ");
+				countQuery.append(" AND jobId=? ");
+				parameters.add(arg0.getJobIdValue());
+			}
+			if(arg0.isDateEnabled()) {
+				query.append(" AND date>? ");
+				countQuery.append(" AND date>? ");
+				parameters.add(arg0.getDateValue());
+			}
+			if(arg0.isObjectStatusEnabled()) {
+				query.append(" AND status=? ");
+				countQuery.append(" AND status=? ");
+				parameters.add(arg0.getObjectStatusValue());
+			}
+			if(arg0.isTypeEnabled()){
+				query.append(" AND type=? ");
+				countQuery.append(" AND status=? ");
+				parameters.add(arg0.getTypeValue());				
+			}
+			if(arg0.isJobStatusEnabled()){
+				throw new GCUBEFault("JOB STATUS filter is not yet supported");
+			}
+			
+			if(sortColumn!=null){
+				query.append(" order by "+sortColumn+" "+sortDir);				
+			}
+			
+			
 			conn = DBSession.openSession(PoolManager.DBType.mySql);
-			String jobFilter=((jobId!=null)&&isAquaMaps)?" AND jobId=? ":"";
+			PreparedStatement ps=conn.preparedStatement(query.toString()+" LIMIT "+limit+" OFFSET "+offset);
+			PreparedStatement psCount=conn.preparedStatement(countQuery.toString());
+			for(int i=0;i<parameters.size();i++){
+				ps.setString(i+1, parameters.get(i));
+				psCount.setString(i+1, parameters.get(i));
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+//			String jobFilter=((jobId!=null)&&isAquaMaps)?" AND jobId=? ":"";
 			/*
 			 * query parameters 
 			 * 			author
 			 * 			isAquaMaps
 			 * 			jobId (facoltativo) 
 			 */
-			String query=DBCostants.AquaMapsListPerAuthor+jobFilter+
-				((sortColumn!=null)?" order by "+sortColumn+" "+sortDir:"")+" LIMIT "+limit+" OFFSET "+offset;
-			String countQuery="Select count(*) from "+DBCostants.JOB_Table+" where author = ? AND isAquaMap = ? "+jobFilter;
-			PreparedStatement ps=conn.preparedStatement(query);
-			PreparedStatement psCount=conn.preparedStatement(countQuery);
-			logger.debug("Request isAquamap="+isAquaMaps+" query : "+query+"; countQuery : "+countQuery);
-			ps.setString(1, user);
-			psCount.setString(1, user);
-			ps.setBoolean(2,isAquaMaps);
-			psCount.setBoolean(2, isAquaMaps);
-			
-			if((jobId!=null)&&isAquaMaps){
-				ps.setString(3, jobId);
-				psCount.setString(3, jobId);
-			}
+//			String query=DBCostants.AquaMapsListPerAuthor+jobFilter+
+//				((sortColumn!=null)?" order by "+sortColumn+" "+sortDir:"")+" LIMIT "+limit+" OFFSET "+offset;
+//			String countQuery="Select count(*) from "+DBCostants.JOB_Table+" where author = ? AND isAquaMap = ? "+jobFilter;
+//			PreparedStatement ps=conn.preparedStatement(query);
+//			PreparedStatement psCount=conn.preparedStatement(countQuery);
+//			logger.debug("Request isAquamap="+isAquaMaps+" query : "+query+"; countQuery : "+countQuery);
+//			ps.setString(1, user);
+//			psCount.setString(1, user);
+//			ps.setBoolean(2,isAquaMaps);
+//			psCount.setBoolean(2, isAquaMaps);
+//			
+//			if((jobId!=null)&&isAquaMaps){
+//				ps.setString(3, jobId);
+//				psCount.setString(3, jobId);
+//			}
 			ResultSet rsCount=psCount.executeQuery();
 			if(rsCount.next()){
 				int totalCount=rsCount.getInt(1);
@@ -913,7 +962,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
@@ -942,7 +991,7 @@ public class AquaMaps extends GCUBEPortType {
 			try {
 				conn.close();
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				
 				e.printStackTrace();
 			}
 		}
