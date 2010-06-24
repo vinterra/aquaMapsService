@@ -167,9 +167,15 @@ public class JobGenerationDetails {
 		DBSession session=null;
 		try{
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=? AND status=?");
-			ps.setInt(1, jobId);
-			ps.setString(2,status.toString());
+			PreparedStatement ps=null;
+			if(status!=null){
+				ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=? AND status=?");
+				ps.setInt(1, jobId);
+				ps.setString(2,status.toString());
+			}else{
+				ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=?");
+				ps.setInt(1, jobId);
+			}
 			ResultSet rs=ps.executeQuery();
 			ArrayList<String> toReturn=new ArrayList<String>(); 
 			while(rs.next()){
@@ -307,16 +313,14 @@ public class JobGenerationDetails {
 			session.close();
 			if(layers.size()>0){
 				logger.trace("found "+layers.size()+" generated layer(s), looking for related style(s)");
-				GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
-				ArrayList<String> styles=new ArrayList<String>();
-				for(String layerId:layers){
-					LayerRest lRest=caller.getLayer(layerId);
-					styles.add(lRest.getDefaultStyle());
-				}
+				GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 				GroupGenerationRequest req=new GroupGenerationRequest();
 				req.setLayers(layers);
-				req.setName(String.valueOf(jobId));
-				req.setStyles(styles);
+				for(String layerId:layers){
+					LayerRest lRest=caller.getLayer(layerId);
+					req.getStyles().put(layerId, lRest.getDefaultStyle());
+				}								
+				req.setName(String.valueOf(jobId));				
 				req.setSubmittedId(jobId);
 				if(GeneratorManager.requestGeneration(req))logger.trace("Generation of jobId "+jobId+" layers group complete");
 				else throw new Exception("Unable to generate Group");
@@ -328,4 +332,24 @@ public class JobGenerationDetails {
 			if(!session.getConnection().isClosed())session.close();
 		}
 	}
+	
+	
+	public static Status getStatus(int submittedId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Retrieving status for submitted id "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Select status from submitted where searchId=?");
+			ps.setInt(1, submittedId);
+			ResultSet rs= ps.executeQuery();
+			if(rs.next()) return Status.valueOf(rs.getString(1));
+			else throw new Exception("Status not found");			
+		}catch(Exception e){
+			logger.error("Unable to retrieve status",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
 }

@@ -13,6 +13,7 @@ import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
@@ -113,7 +114,7 @@ public class GISGenerator {
 	}
 	
 	private boolean createLayer(String featureTable,LayerGenerationRequest request) throws JSONException{		
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();
 		featureTypeRest.setDatastore("aquamapsdb");
         featureTypeRest.setEnabled(true);
@@ -134,14 +135,17 @@ public class GISGenerator {
 		}else return false;
 	}
 	
-	private boolean createGroup(ArrayList<String> list, ArrayList<String> styles, String groupName)throws Exception{	 
-		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());		
+	private boolean createGroup(List<String> layers,Map<String,String> styles, String groupName)throws Exception{	 
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());		
 		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getTemplateGroup());
 //		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
 //        g.setLayers(list);
 //        g.setStyles(styles);
-		g.getLayers().addAll(g.getLayers().size()-1, list);
-		g.getStyles().addAll(g.getStyles().size()-1, styles);
+		
+		for(String l:layers){
+			g.addLayer(l);
+			g.addStyle(l, styles.get(l));
+		}		
         g.setName(groupName);
         return caller.addLayersGroup(g);
 	}
@@ -182,7 +186,7 @@ public class GISGenerator {
 	
 	public boolean copyLayers(String srcName,String destName)throws Exception{
 		logger.trace("Copying layers from  "+srcName+" to "+destName);
-		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 		GroupRest src=caller.getLayerGroup(srcName);
 		GroupRest dest=caller.getLayerGroup(destName);
 		dest.getLayers().addAll(0, src.getLayers());
@@ -192,7 +196,7 @@ public class GISGenerator {
 	
 	public boolean generateStyle(StyleGenerationRequest req)throws Exception{
 		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
-		GeoserverCaller caller=new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl());
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 		String style;
 		if(req.getTypeValue()==Integer.class)
 			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));

@@ -1,11 +1,13 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GroupGenerationRequest implements GISGenerationRequest {
 
 	private ArrayList<String> layers=new ArrayList<String>();
-	private ArrayList<String> styles=new ArrayList<String>();
+	private Map<String,String> styles=new HashMap<String, String>(); 
 	private String name;
 	private String id;
 	
@@ -45,19 +47,7 @@ public class GroupGenerationRequest implements GISGenerationRequest {
 	 */
 	public void setLayers(ArrayList<String> layers) {
 		this.layers = layers;
-	}
-	/**
-	 * @return the styles
-	 */
-	public ArrayList<String> getStyles() {
-		return styles;
-	}
-	/**
-	 * @param styles the styles to set
-	 */
-	public void setStyles(ArrayList<String> styles) {
-		this.styles = styles;
-	}
+	}	
 	/**
 	 * @return the submittedId
 	 */
@@ -69,6 +59,12 @@ public class GroupGenerationRequest implements GISGenerationRequest {
 	 */
 	public void setSubmittedId(int submittedId) {
 		this.submittedId = submittedId;
+	}
+	public void setStyles(Map<String,String> styles) {
+		this.styles = styles;
+	}
+	public Map<String,String> getStyles() {
+		return styles;
 	}
 	
 }

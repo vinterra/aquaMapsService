@@ -14,6 +14,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.stubs.AquaMap;
@@ -42,19 +43,15 @@ public class JobSubmissionThread extends Thread {
 		this.toPerform=toPerform;
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName());
 		waitingGroup=new ThreadGroup(toPerform.getName());
-		
+
 	}
 
 	public int getJobId(){return jobId;}
-	
+
 	public void run() {	
 		try{
 			insertNewJob();
-//			DBSession session=DBSession.openSession();
-//			session.disableAutoCommit();
-			//			generationStatus.setConnection(session);
 
-			//			filterSpecies();
 			// Create and run Area Perturbation Thread
 			if((toPerform.getEnvironmentCustomization()!=null) && 
 					(toPerform.getEnvironmentCustomization().getPerturbationList()!=null)){
@@ -68,20 +65,17 @@ public class JobSubmissionThread extends Thread {
 
 			//Create and run Species envelop perturbationThreads for specified customization 
 
-			SpeciesPerturbationThread specThread=
-				new SpeciesPerturbationThread(waitingGroup,toPerform.getName(),jobId,
-						toPerform.getEnvelopCustomization());
-			specThread.setPriority(MIN_PRIORITY);
-			ThreadManager.getExecutor().execute(specThread);
+			if(JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize).length>0){
+
+				SpeciesPerturbationThread specThread=new SpeciesPerturbationThread(waitingGroup,toPerform.getName(),jobId,toPerform.getEnvelopCustomization());
+				specThread.setPriority(MIN_PRIORITY);
+				ThreadManager.getExecutor().execute(specThread);				
+			}
 
 
-
-
-			//Create and run Simulation Thread for every selected species
-
-
-			int speciesCount=toPerform.getSelectedSpecies().getSpeciesList().length;
-			while(!(JobGenerationDetails.getSpeciesByStatus(jobId, JobGenerationDetails.SpeciesStatus.Ready).length==speciesCount))
+			//Create and run Simulation Thread
+			
+			while((JobGenerationDetails.getSpeciesByStatus(jobId, JobGenerationDetails.SpeciesStatus.toCustomize).length>0))
 			{
 				try {
 					Thread.sleep(waitTime);
@@ -94,13 +88,24 @@ public class JobSubmissionThread extends Thread {
 			SimulationThread simT=new SimulationThread(waitingGroup,toPerform);
 			simT.setPriority(MIN_PRIORITY);
 			ThreadManager.getExecutor().execute(simT);
-
-			//			JobUtils.updateStatus(JobStatus.Generating, jobID, DBCostants.UNASSIGNED, conn);
+			
+			while(JobGenerationDetails.getStatus(jobId).equals(JobGenerationDetails.Status.Simulating)){
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException e) {}
+				logger.trace(this.getName()+" waiting for simulation process ");			
+				logger.trace(waitingGroup.toString());
+			}
+			if(JobGenerationDetails.getStatus(jobId).equals(JobGenerationDetails.Status.Error)) 
+				throw new Exception(this.getName()+"Something went wrong, check Log. JobId :"+jobId);
+			else {
+				logger.trace(this.getName()+" Launching maps generation");
+			}
 
 			//Create and run Suitable area map generation
 			for(AquaMap aquaMapObj:toPerform.getAquaMapList().getAquaMapList()){
 				int objId=Integer.parseInt(aquaMapObj.getId());
-				
+
 				if((aquaMapObj.getSelectedSpecies()!=null)&&(aquaMapObj.getSelectedSpecies().getSpeciesList()!=null)&&
 						(aquaMapObj.getSelectedSpecies().getSpeciesList().length>0)){
 					Thread t;
@@ -129,18 +134,18 @@ public class JobSubmissionThread extends Thread {
 				logger.trace(this.getName()+" waiting for  generation Process(es) ");			
 				logger.trace(waitingGroup.toString());
 			}
-			
-			
+
+
 			if(ServiceContext.getContext().isGISMode())
 				JobGenerationDetails.createGroup(jobId);
-			
-			
-			
+
+
+
 			logger.warn("Job should be complete here");
 			JobGenerationDetails.updateStatus(jobId,JobGenerationDetails.Status.Completed);
 
 
-//			session.commit();
+			//			session.commit();
 			logger.trace(this.getName()+" job "+toPerform.getName()+" completed");
 		}catch (SQLException e) {
 			try {
@@ -190,18 +195,18 @@ public class JobSubmissionThread extends Thread {
 		logger.trace("Going to execute : "+myJob);
 		DBSession session=null;
 		try{
-		session=DBSession.openSession(PoolManager.DBType.mySql);
-		session.disableAutoCommit();
-		Statement stmt =session.getConnection().createStatement();
-		stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
-		ResultSet rs=stmt.getGeneratedKeys();
-		rs.first();
-		jobId=rs.getInt(1);
-		toPerform.setId(String.valueOf(jobId));
-		stmt.close();	
-		//		JobUtils.updateProfile(toPerform.getName(), toPerform.getId(), JobUtils.makeJobProfile(toPerform),
-		//				toPerform.getHspec(), generationStatus.getSecondLevelDirName(), generationStatus.getConnection());
-		
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			session.disableAutoCommit();
+			Statement stmt =session.getConnection().createStatement();
+			stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs=stmt.getGeneratedKeys();
+			rs.first();
+			jobId=rs.getInt(1);
+			toPerform.setId(String.valueOf(jobId));
+			stmt.close();	
+			//		JobUtils.updateProfile(toPerform.getName(), toPerform.getId(), JobUtils.makeJobProfile(toPerform),
+			//				toPerform.getHspec(), generationStatus.getSecondLevelDirName(), generationStatus.getConnection());
+
 			for(AquaMap aquaMapObj:toPerform.getAquaMapList().getAquaMapList()){
 				String myAquaMapObj="INSERT INTO submitted(title, author, date, status,jobId,type,isAquaMap) VALUES('"+
 				aquaMapObj.getName()+"', '"+
@@ -216,24 +221,24 @@ public class JobSubmissionThread extends Thread {
 				aquaMapObj.setId(String.valueOf(rsA.getInt(1)));
 				aquaStatement.close();
 				//TODO make profile
-				
-							JobUtils.updateProfile(aquaMapObj.getName(), aquaMapObj.getId(), JobUtils.makeAquaMapProfile(aquaMapObj),
-									DBCostants.HSPEC, String.valueOf(jobId));
+
+				JobUtils.updateProfile(aquaMapObj.getName(), aquaMapObj.getId(), JobUtils.makeAquaMapProfile(aquaMapObj),
+						DBCostants.HSPEC, String.valueOf(jobId));
 			}
-			
-			
-			
+
+
+
 			if((toPerform.getSelectedSpecies()!=null)&&(toPerform.getSelectedSpecies().getSpeciesList()!=null)&&
 					(toPerform.getSelectedSpecies().getSpeciesList().length>0)){
-				
+
 				boolean hasPerturbation=false;
 				if((toPerform.getEnvelopCustomization()!=null)&&(toPerform.getEnvelopCustomization().getPerturbationList()!=null)&&
 						(toPerform.getEnvelopCustomization().getPerturbationList().length>0)) hasPerturbation=true;
-				
+
 				boolean hasWeight=false;
 				if((toPerform.getWeights()!=null)&&(toPerform.getWeights().getEnvelopeWeightList()!=null)&&
 						(toPerform.getWeights().getEnvelopeWeightList().length>0)) hasWeight=true;
-				
+
 				PreparedStatement ps=session.preparedStatement("Insert into "+DBCostants.selectedSpecies+" (jobId,speciesId,status) value(?,?,?)");
 				ps.setInt(1, jobId);
 				for(Specie s:toPerform.getSelectedSpecies().getSpeciesList()){
@@ -263,8 +268,8 @@ public class JobSubmissionThread extends Thread {
 			}else throw new Exception("Invalid job, no species found");
 			session.commit();
 			session.close();
-		logger.trace("New Job created with Id "+jobId);
-		return jobId;
+			logger.trace("New Job created with Id "+jobId);
+			return jobId;
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -274,7 +279,7 @@ public class JobSubmissionThread extends Thread {
 
 	public void cleanTmp(){
 		try{
-		JobGenerationDetails.cleanTemp(jobId);
+			JobGenerationDetails.cleanTemp(jobId);
 		}catch(Exception e){
 			logger.error("Unable to clean temp tables for jobId "+jobId, e);
 		}

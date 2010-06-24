@@ -52,6 +52,24 @@ public class ServiceContext extends GCUBEServiceContext {
 	
 	private String worldTable;
 	private String geoServerUrl;
+	private String geoServerUser;
+	private String geoServerPwd;
+	public String getGeoServerUser() {
+		return geoServerUser;
+	}
+
+	public void setGeoServerUser(String geoServerUser) {
+		this.geoServerUser = geoServerUser;
+	}
+
+	public String getGeoServerPwd() {
+		return geoServerPwd;
+	}
+
+	public void setGeoServerPwd(String geoServerPwd) {
+		this.geoServerPwd = geoServerPwd;
+	}
+
 	private String templateGroup;
 	
 	private String distributionDefaultStyle;
@@ -127,6 +145,8 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.postGis_port=prop.getProperty("postGis_port","");
 			this.postGis_user=prop.getProperty("postGis_user","");
 			this.geoServerUrl=prop.getProperty("geoServerUrl", "");
+			this.geoServerUser=prop.getProperty("geoServerUser", "");
+			this.geoServerPwd=prop.getProperty("geoServerPwd", "");
 			this.worldTable=prop.getProperty("worldTable", "");
 			this.templateGroup=prop.getProperty("templateGroup", "");
 			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","");
