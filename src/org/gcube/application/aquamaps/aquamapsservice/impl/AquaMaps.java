@@ -909,13 +909,16 @@ public class AquaMaps extends GCUBEPortType {
 			conn = DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=conn.preparedStatement(query.toString()+" LIMIT "+limit+" OFFSET "+offset);
 			PreparedStatement psCount=conn.preparedStatement(countQuery.toString());
+			logger.debug("Get submitteds query :"+query.toString());
 			for(int i=0;i<parameters.size();i++){
+				logger.debug("Setting param : "+(i+1)+parameters.get(i));
 				ps.setString(i+1, parameters.get(i));
 				psCount.setString(i+1, parameters.get(i));
 			}
 			
-			
-			
+			//NB isAquaMaps è boolean, re setting parameter...
+			ps.setBoolean(2,isAquaMaps);
+			psCount.setBoolean(2, isAquaMaps);
 			
 			
 			
@@ -946,12 +949,10 @@ public class AquaMaps extends GCUBEPortType {
 			ResultSet rsCount=psCount.executeQuery();
 			if(rsCount.next()){
 				int totalCount=rsCount.getInt(1);
-				if(totalCount>0){
 					ResultSet rs=ps.executeQuery();
 					toReturn=DBUtils.toJSon(rs,totalCount);
 					rs.close();
-					ps.close();					
-				}
+					ps.close();									
 			}
 			rsCount.close();
 			psCount.close();
