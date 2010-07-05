@@ -15,6 +15,7 @@ public class ServiceUtils {
 	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	
 	private static DateFormat dateFormatter= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
+	private static DateFormat shortDateFormatter=new SimpleDateFormat("yyyy_MM_dd");
 	
 	
 	public static String fileToString(String path) throws IOException {
@@ -46,5 +47,8 @@ public class ServiceUtils {
 	}
 	public static String getTimeStamp(){
 		return dateFormatter.format(System.currentTimeMillis());
+	}
+	public static String getDate(){
+		return shortDateFormatter.format(System.currentTimeMillis());
 	}
 }

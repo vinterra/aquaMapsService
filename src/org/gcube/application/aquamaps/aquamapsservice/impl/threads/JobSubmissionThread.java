@@ -17,6 +17,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Specie;
@@ -182,14 +183,7 @@ public class JobSubmissionThread extends Thread {
 	public int insertNewJob() throws Exception{
 		logger.trace("Creating new pending Job");
 
-		Calendar cal = new GregorianCalendar();
-		int giorno = cal.get(Calendar.DAY_OF_MONTH);
-		int mese = cal.get(Calendar.MONTH);
-		int anno = cal.get(Calendar.YEAR);
-
-
-
-		String myData = String.valueOf(anno)+"-"+String.valueOf(mese)+"-"+String.valueOf(giorno);
+		String myData = ServiceUtils.getDate();
 		String myJob = "INSERT INTO submitted(title, author, date, status,isAquaMap) VALUES('"+
 		toPerform.getName()+"', '"+
 		toPerform.getAuthor()+"', '"+
