@@ -12,7 +12,7 @@
 
 	<import namespace="http://gcube-system.org/namespaces/common/core/faults"
 		location="../gcube/common/core/faults/GCUBEFaults.wsdl" />
-
+<!-- This should be for Publisher -->
 	<types>
 		<xsd:schema targetNamespace="http://gcube-system.org/namespaces/application/aquamaps"
 			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps">
