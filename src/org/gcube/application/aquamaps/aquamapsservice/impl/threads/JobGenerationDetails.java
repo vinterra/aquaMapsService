@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
@@ -18,6 +19,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorM
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.TaxonomyType;
 
 public class JobGenerationDetails {
 	private static GCUBELog logger= new GCUBELog(JobGenerationDetails.class);
@@ -344,6 +346,43 @@ public class JobGenerationDetails {
 			ResultSet rs= ps.executeQuery();
 			if(rs.next()) return Status.valueOf(rs.getString(1));
 			else throw new Exception("Status not found");			
+		}catch(Exception e){
+			logger.error("Unable to retrieve status",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
+	public static boolean isSpeciesSetCustomized(String[] ids)throws Exception{
+		DBSession session=null;		
+		try{
+			logger.trace("Checking species customizations flag..");
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("Select isCustomized from "+DBCostants.selectedSpecies+" where speciesId=?");
+			for(String id:ids){
+				ps.setString(1, id);
+				ResultSet rs= ps.executeQuery();
+				if(!rs.getBoolean(1)) return false;
+			}			
+			return true;
+		}catch(Exception e){
+			logger.error("unable to check species customization flag",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
+	public static String getAuthor(int submittedId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Retrieving status for submitted id "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Select author from submitted where searchId=?");
+			ps.setInt(1, submittedId);
+			ResultSet rs= ps.executeQuery();
+			return rs.getString(1);						
 		}catch(Exception e){
 			logger.error("Unable to retrieve status",e);
 			throw e;

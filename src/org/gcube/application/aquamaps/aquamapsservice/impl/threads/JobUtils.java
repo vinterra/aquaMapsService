@@ -141,7 +141,7 @@ public class JobUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String publish(String firstLevelDir, String secondLevelDir, Collection<String> filesPath) throws Exception{
+	public static String publishInternal(String firstLevelDir, String secondLevelDir, Collection<String> filesPath) throws Exception{
 		// Destination directory
 	    File dir = new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+ServiceContext.getContext().getHttpServerBasePath()+
 	    			File.separator+firstLevelDir+File.separator+secondLevelDir+File.separator);
@@ -164,18 +164,14 @@ public class JobUtils {
 	    	}catch(Exception e){
 	    		logger.error("Unable to move (copy and delete) "+path,e);
 	    	}
-//	    	boolean success = file.renameTo(dest);
-//	    	if (!success) {
-//	    		logger.error("Error publishing file "+file.getName());
-//	    	}else {
-//	    		boolean deleted=file.delete();
-//	    		if(!deleted)logger.error("Error deleting temp file "+file.getName());
-//	    	}
 	    }
 	    logger.debug(ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir);
 	    return ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir+"/";
 
 	}
+	
+	
+		
 	
 	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir) throws Exception{
 		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
@@ -188,7 +184,7 @@ public class JobUtils {
 		writer.write(resProfile);
 		writer.close();
 		toUpdateProfile.add(file.getAbsolutePath());
-		String path=publish(firstLevelDir,secondLevelDir,toUpdateProfile);
+		String path=publishInternal(firstLevelDir,secondLevelDir,toUpdateProfile);
 		logger.trace("Profile for "+resName+" created, gonna update DB");
 		PreparedStatement ps=c.preparedStatement(DBCostants.profileUpdate);
 		ps.setString(1, path+file.getName());

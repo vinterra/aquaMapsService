@@ -235,7 +235,7 @@ public class JobSubmissionThread extends Thread {
 				if((toPerform.getWeights()!=null)&&(toPerform.getWeights().getEnvelopeWeightList()!=null)&&
 						(toPerform.getWeights().getEnvelopeWeightList().length>0)) hasWeight=true;
 
-				PreparedStatement ps=session.preparedStatement("Insert into "+DBCostants.selectedSpecies+" (jobId,speciesId,status) value(?,?,?)");
+				PreparedStatement ps=session.preparedStatement("Insert into "+DBCostants.selectedSpecies+" (jobId,speciesId,status,isCustomized) value(?,?,?,?)");
 				ps.setInt(1, jobId);
 				for(Specie s:toPerform.getSelectedSpecies().getSpeciesList()){
 					String status=JobGenerationDetails.SpeciesStatus.Ready.toString();
@@ -259,6 +259,7 @@ public class JobSubmissionThread extends Thread {
 					}
 					ps.setString(2, s.getId());
 					ps.setString(3, status);
+					ps.setBoolean(4, (hasWeight||hasPerturbation));
 					ps.execute();
 				}
 			}else throw new Exception("Invalid job, no species found");

@@ -54,21 +54,7 @@ public class ServiceContext extends GCUBEServiceContext {
 	private String geoServerUrl;
 	private String geoServerUser;
 	private String geoServerPwd;
-	public String getGeoServerUser() {
-		return geoServerUser;
-	}
-
-	public void setGeoServerUser(String geoServerUser) {
-		this.geoServerUser = geoServerUser;
-	}
-
-	public String getGeoServerPwd() {
-		return geoServerPwd;
-	}
-
-	public void setGeoServerPwd(String geoServerPwd) {
-		this.geoServerPwd = geoServerPwd;
-	}
+	
 
 	private String templateGroup;
 	
@@ -77,14 +63,13 @@ public class ServiceContext extends GCUBEServiceContext {
 	private boolean GISMode;
 	
 	
+	private String defaultPublisherUrl;
 	
 	
-	
-	
-	
-	
-	
-	
+	public String getDefaultPublisherUrl() {
+		return defaultPublisherUrl;
+	}
+
 	protected void onReady() throws Exception{
 		
 		
@@ -152,6 +137,11 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","");
 			this.setGISMode(Boolean.parseBoolean(prop.getProperty("GISMode", "false")));
 		}catch(Exception e){logger.fatal("error getting GeoServer information",e);}
+		try{
+			Properties prop= new Properties();
+			prop.load(new FileInputStream(this.getFile("publisher.properties", false)));
+			this.defaultPublisherUrl=prop.getProperty("DEFAULT_PUBLISHER_URL","");
+		}catch(Exception e){logger.fatal("error getting default Publisher information",e);}
 	}
 	
 	public String getWebServiceURL(){
@@ -360,6 +350,22 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	public boolean isGISMode() {
 		return GISMode;
+	}
+	
+	public String getGeoServerUser() {
+		return geoServerUser;
+	}
+
+	public void setGeoServerUser(String geoServerUser) {
+		this.geoServerUser = geoServerUser;
+	}
+
+	public String getGeoServerPwd() {
+		return geoServerPwd;
+	}
+
+	public void setGeoServerPwd(String geoServerPwd) {
+		this.geoServerPwd = geoServerPwd;
 	}
 		
 }

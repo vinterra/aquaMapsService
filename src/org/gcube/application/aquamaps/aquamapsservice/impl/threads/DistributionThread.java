@@ -13,6 +13,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generation
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -99,7 +100,8 @@ public class DistributionThread extends Thread {
 
 					logger.trace(this.getName()+" found "+app.size()+" files to publish");
 					if(app.size()>0){
-						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
+//						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
+						String basePath=Publisher.getPublisher().publishImages(this.aquamapsId, speciesId, app.values());
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
 						session=DBSession.openSession(PoolManager.DBType.mySql);
 						PreparedStatement pps =session.preparedStatement(DBCostants.fileInsertion);
