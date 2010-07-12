@@ -15,6 +15,7 @@ etc/deploy-server.wsdd -text
 etc/geoserver.properties -text
 etc/pool.properties -text
 etc/profile.xml -text
+etc/publisher.properties -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
 /install.sh -text
