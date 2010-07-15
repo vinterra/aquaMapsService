@@ -54,7 +54,7 @@ public class PerlImageGenerator {
 		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 		String line = null;
 		while ((line = input.readLine())!=null){
-			//logger.debug(line);
+//			logger.debug(line);
 		}
 
 		try {

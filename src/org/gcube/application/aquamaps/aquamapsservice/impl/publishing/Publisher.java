@@ -64,7 +64,7 @@ public class Publisher{
 		}
 	}
 	
-	private AquaMapsPublisherPortType getPortType(GCUBEScope scope) throws Exception{
+	public AquaMapsPublisherPortType getPortType(GCUBEScope scope) throws Exception{
 		AquaMapsPublisherServiceAddressingLocator asal= new AquaMapsPublisherServiceAddressingLocator();
 		EndpointReferenceType epr;
 		
@@ -79,7 +79,7 @@ public class Publisher{
 				epr=new EndpointReferenceType();
 				epr.setAddress(new AttributedURI(url));
 			}else{
-				epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/AquaMapsPublisher");
+				epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamapspublisher/AquaMapsPublisher");
 				logger.trace("Found RI @ : "+epr.getAddress().getHost());
 			}
 				AquaMapsPublisherPortType aquamapsPT=asal.getAquaMapsPublisherPortTypePort(epr);
