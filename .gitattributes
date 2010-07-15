@@ -2,12 +2,12 @@
 /.ant-targets-build.xml -text
 /.classpath -text
 /.project -text
-/CHANGELOG -text
 /INSTALL -text
 /LICENSE -text
 /MAINTAINERS -text
 /README -text
 /build.xml -text
+/changelog.xml -text
 etc/build.properties -text
 etc/dbprop.properties -text
 etc/deploy-jndi-config.xml -text

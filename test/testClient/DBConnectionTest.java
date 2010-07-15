@@ -14,7 +14,7 @@ public class DBConnectionTest {
 	 */
 	public static void main(String[] args) throws Exception {
 		DBSession session=DBSession.openSession(PoolManager.DBType.mySql);
-		String query=(args.length>0)&&(args[0]!=null)?args[0]:"Select * from EVENTS";
+		String query=(args.length>0)&&(args[0]!=null)?args[0]:"Select * from selectedSpecies";
 		ResultSet rs=session.executeQuery(query);
 		System.out.println(DBUtils.toJSon(rs));	
 		session.close();

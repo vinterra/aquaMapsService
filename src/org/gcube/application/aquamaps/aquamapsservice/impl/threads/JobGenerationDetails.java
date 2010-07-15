@@ -354,16 +354,19 @@ public class JobGenerationDetails {
 		}
 	}
 	
-	public static boolean isSpeciesSetCustomized(String[] ids)throws Exception{
+	public static boolean isSpeciesSetCustomized(int submittedId,String[] ids)throws Exception{
 		DBSession session=null;		
 		try{
 			logger.trace("Checking species customizations flag..");
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("Select isCustomized from "+DBCostants.selectedSpecies+" where speciesId=?");
+			PreparedStatement ps= session.preparedStatement("Select isCustomized from "+DBCostants.selectedSpecies+" where jobId=? AND speciesId=?");
+			ps.setInt(1, submittedId);
 			for(String id:ids){
-				ps.setString(1, id);
+				ps.setString(2, id);
 				ResultSet rs= ps.executeQuery();
-				if(!rs.getBoolean(1)) return false;
+				if(rs.next()){
+					if(!rs.getBoolean(1)) return false;
+				}else throw new Exception("customized flag not found for species "+id+" under "+submittedId+" selection");
 			}			
 			return true;
 		}catch(Exception e){
@@ -382,7 +385,9 @@ public class JobGenerationDetails {
 			PreparedStatement ps=session.preparedStatement("Select author from submitted where searchId=?");
 			ps.setInt(1, submittedId);
 			ResultSet rs= ps.executeQuery();
-			return rs.getString(1);						
+			if(rs.next())
+				return rs.getString(1);
+			else throw new Exception("Author not found for "+submittedId);
 		}catch(Exception e){
 			logger.error("Unable to retrieve status",e);
 			throw e;

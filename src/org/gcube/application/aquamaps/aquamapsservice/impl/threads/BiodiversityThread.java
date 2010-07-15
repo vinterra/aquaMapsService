@@ -21,6 +21,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class BiodiversityThread extends Thread {	
@@ -36,13 +37,19 @@ public class BiodiversityThread extends Thread {
 	private String[] species;
 	private DBSession session;
 	private boolean gisEnabled=false;
-
-	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold) {
+	private GCUBEScope actualScope;
+	
+	
+	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold,GCUBEScope scope) {
 		super(group,"BioD_AquaMapObj:"+aquamapsName);	
 		this.threshold=threshold;
 		this.aquamapsId=aquamapsId;
 		this.aquamapsName=aquamapsName;
-		this.jobId=jobId;
+		this.jobId=jobId;	
+		logger.trace("Passed scope : "+scope.toString());
+//		ServiceContext.getContext().setScope(this, scope);
+//		logger.trace("Setted scope : "+ServiceContext.getContext().getScope());
+		this.actualScope=scope;
 	}
 
 	public void setRelatedSpeciesList(String[] ids){
@@ -97,7 +104,7 @@ public class BiodiversityThread extends Thread {
 			String attributeName=rs.getMetaData().getColumnLabel(2);
 			logger.trace(this.getName()+" Found minValue : "+minValue+"; maxValue : "+maxValue+" for AttributeName :"+attributeName);
 			String csvFile=null;
-			if(ServiceContext.getContext().isGISMode()){
+			if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 				csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
 				FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
 				GenerationUtils.ResultSetToCSVFile(rs, csvFile);				
@@ -125,7 +132,7 @@ public class BiodiversityThread extends Thread {
 					logger.trace(this.getName()+" found "+app.size()+" files to publish");
 					if(app.size()>0){
 //						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
-						String basePath=Publisher.getPublisher().publishImages(this.aquamapsId, species, app.values());
+						String basePath=Publisher.getPublisher().publishImages(this.jobId, species, app.values(),actualScope);
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
 						session=DBSession.openSession(PoolManager.DBType.mySql);
 						PreparedStatement ps =session.preparedStatement(DBCostants.fileInsertion);

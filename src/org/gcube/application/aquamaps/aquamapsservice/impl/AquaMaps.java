@@ -330,7 +330,7 @@ public class AquaMaps extends GCUBEPortType {
 	public String submitJob(Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
-		JobSubmissionThread thread=new JobSubmissionThread(req);
+		JobSubmissionThread thread=new JobSubmissionThread(req,ServiceContext.getContext().getScope());		
 		ThreadManager.getExecutor().execute(thread);
 		return String.valueOf(thread.getId());
 		}catch(Exception e){

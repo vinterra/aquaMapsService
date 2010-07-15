@@ -16,6 +16,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerG
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class DistributionThread extends Thread {
@@ -31,11 +32,17 @@ public class DistributionThread extends Thread {
 	private int jobId;	
 	private boolean gisEnabled=false;
 
-	public DistributionThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName) {
+	private GCUBEScope actualScope;
+	
+	public DistributionThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,GCUBEScope scope) {
 		super(group,"SAD_AquaMapObj:"+aquamapsName);
 		this.aquamapsId=aquamapsId;
 		this.aquamapsName=aquamapsName;
 		this.jobId=jobId;
+		logger.trace("Passed scope : "+scope.toString());
+//		ServiceContext.getContext().setScope(this, scope);
+//		logger.trace("Setted scope : "+ServiceContext.getContext().getScope());
+		this.actualScope=scope;
 	}
 	public void setRelatedSpeciesId(String[] species){
 		speciesId=species;
@@ -68,7 +75,7 @@ public class DistributionThread extends Thread {
 			ResultSet rs=ps.executeQuery();
 
 			String csvFile=null;
-			if(ServiceContext.getContext().isGISMode()){
+			if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 				csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
 				FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
 				GenerationUtils.ResultSetToCSVFile(rs, csvFile);				
@@ -101,7 +108,7 @@ public class DistributionThread extends Thread {
 					logger.trace(this.getName()+" found "+app.size()+" files to publish");
 					if(app.size()>0){
 //						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
-						String basePath=Publisher.getPublisher().publishImages(this.aquamapsId, speciesId, app.values());
+						String basePath=Publisher.getPublisher().publishImages(this.jobId, speciesId, app.values(),actualScope);
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
 						session=DBSession.openSession(PoolManager.DBType.mySql);
 						PreparedStatement pps =session.preparedStatement(DBCostants.fileInsertion);

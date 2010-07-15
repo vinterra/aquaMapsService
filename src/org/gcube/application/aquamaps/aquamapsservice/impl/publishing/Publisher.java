@@ -32,6 +32,8 @@ import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.StoreI
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.TaxonomyType;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.service.AquaMapsPublisherServiceAddressingLocator;
 
+import com.Ostermiller.util.Base64;
+
 public class Publisher{
 
 	private static String[] taxonomyInDB=new String[]{
@@ -85,11 +87,11 @@ public class Publisher{
 	}
 	
 	
-	public String publishImages(int submittedId,String[] coverageSpeciesId,Collection<String> toPublishSet)throws Exception{
+	public String publishImages(int submittedId,String[] coverageSpeciesId,Collection<String> toPublishSet,GCUBEScope scope)throws Exception{
 		
 		StoreImageRequestType req= new StoreImageRequestType();
 		req.setTaxonomy(getTaxonomyCoverage(coverageSpeciesId));
-		if(JobGenerationDetails.isSpeciesSetCustomized(coverageSpeciesId)){
+		if(JobGenerationDetails.isSpeciesSetCustomized(submittedId,coverageSpeciesId)){
 			req.setSourceHCAF(JobGenerationDetails.getHCAFTable(submittedId));
 			req.setSourceHSPEN(JobGenerationDetails.getHSPENTable(submittedId));
 		}else {
@@ -100,19 +102,21 @@ public class Publisher{
 		
 		File zipped=null;		
 		FileInputStream fis=null;
+		File base64Zipped=null;
 		try{
 			zipped=File.createTempFile("imgSet", ".zip");
-			ZipUtils.zipFiles(toPublishSet, zipped.getAbsolutePath());
-			GCUBEScope scope= ServiceContext.getContext().getScope();		
+			ZipUtils.zipFiles(toPublishSet, zipped.getAbsolutePath());	
+			base64Zipped=File.createTempFile("imgSet", "base64");
+			Base64.encode(zipped, base64Zipped);
 			RSWrapper wrapper=null;
 			int attemptsCount=0;
 			while(wrapper==null){
 				try{
 					attemptsCount++;
-					logger.trace("Looking for ResultSet service, attempt N "+attemptsCount);
+					logger.trace("Looking for ResultSet service in scope : "+scope.toString()+" attempt N "+attemptsCount);
 					wrapper=new RSWrapper(scope);				
 				}catch(Exception e){				
-					logger.debug("No ResultSet service found");
+					logger.debug("No ResultSet service found",e);
 					try {
 						Thread.sleep(20*1000);
 					} catch (InterruptedException e1) {}
@@ -120,7 +124,7 @@ public class Publisher{
 			}
 			req.setRsLocator(wrapper.getLocator());
 			AquaMapsPublisherPortType pt=getPortType(scope);			
-			fis=new FileInputStream(zipped);
+			fis=new FileInputStream(base64Zipped);
 			wrapper.add(fis);
 			wrapper.close();			
 			return pt.storeImage(req);
@@ -129,6 +133,8 @@ public class Publisher{
 			throw e;
 		}finally{
 			if(zipped!=null)FileUtils.forceDelete(zipped);
+			logger.trace("temp zip : "+zipped.getAbsolutePath());
+			if(base64Zipped!=null)FileUtils.forceDelete(base64Zipped);			
 			if(fis!=null)IOUtils.closeQuietly(fis);
 		}
 		
@@ -157,10 +163,16 @@ public class Publisher{
 					String speciesId=speciesIds[speciesIndex];
 					ps.setString(1, speciesId);
 					ResultSet rs=ps.executeQuery();
-					String currentTaxonomyValue=rs.getString(1);
-					if(taxonomyValue==null) taxonomyValue=currentTaxonomyValue;
-					else isCommonTaxonomyValue=(taxonomyValue.equalsIgnoreCase(currentTaxonomyValue));
-					speciesIndex++;
+					if(rs.next()){
+						String currentTaxonomyValue=rs.getString(1);
+						if(taxonomyValue==null) taxonomyValue=currentTaxonomyValue;
+						else isCommonTaxonomyValue=(taxonomyValue.equalsIgnoreCase(currentTaxonomyValue));
+						speciesIndex++;
+					}else{
+						logger.warn("Unable to find "+taxonomyInDB[taxonomyLevelIndex]+" for speciesId "+speciesIds[speciesIndex]);
+						speciesIndex++;
+						isCommonTaxonomyValue=false;
+					}
 				}
 				
 				if(isCommonTaxonomyValue){

@@ -22,29 +22,33 @@ import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Specie;
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobSubmissionThread extends Thread {
 
-
+	
 	private static final GCUBELog logger=new GCUBELog(JobSubmissionThread.class);
 	private static final int waitTime=10*1000;
 	//private static final float defaultAlgorithmWeight=1;
 	private Job toPerform;
 	private int jobId;
-	//	JobGenerationDetails generationStatus;
-
+	
+	private GCUBEScope actualScope;
 
 	Map<String,File> toPublishPaths=new HashMap<String, File>();
 	ThreadGroup waitingGroup;
 
-	public JobSubmissionThread(Job toPerform) throws Exception{
+	public JobSubmissionThread(Job toPerform,GCUBEScope scope) throws Exception{
 		super(toPerform.getName()+"_thread");
 		this.setPriority(MIN_PRIORITY+1);
 		this.toPerform=toPerform;
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName());
 		waitingGroup=new ThreadGroup(toPerform.getName());
-
+		logger.trace("Passed scope : "+scope.toString());
+//		ServiceContext.getContext().setScope(this, scope);
+//		logger.trace("Setted scope : "+ServiceContext.getContext().getScope());
+		this.actualScope=scope;
 	}
 
 	public int getJobId(){return jobId;}
@@ -115,14 +119,14 @@ public class JobSubmissionThread extends Thread {
 						species[i]=aquaMapObj.getSelectedSpecies().getSpeciesList(i).getId();
 					}
 					if(aquaMapObj.getType().equalsIgnoreCase(AquaMapsObject.Type.Biodiversity.toString())){
-						t=new BiodiversityThread(waitingGroup,jobId,objId,aquaMapObj.getName(),aquaMapObj.getThreshold());
+						t=new BiodiversityThread(waitingGroup,jobId,objId,aquaMapObj.getName(),aquaMapObj.getThreshold(),actualScope);						
 						((BiodiversityThread)t).setRelatedSpeciesList(species);
 						((BiodiversityThread)t).setGis(aquaMapObj.isGis());
 					}else{
-						t=new DistributionThread(waitingGroup,jobId,objId,aquaMapObj.getName());
+						t=new DistributionThread(waitingGroup,jobId,objId,aquaMapObj.getName(),actualScope);
 						((DistributionThread)t).setRelatedSpeciesId(species);
 						((DistributionThread)t).setGis(aquaMapObj.isGis());
-					}
+					}					
 					t.setPriority(MIN_PRIORITY);
 					ThreadManager.getExecutor().execute(t);
 				}else{

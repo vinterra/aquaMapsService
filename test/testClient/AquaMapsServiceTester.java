@@ -1,9 +1,12 @@
 package testClient;
 
+import java.util.Map;
+
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
 
 import org.gcube.application.aquamaps.stubs.*;
+import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
 import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
@@ -13,7 +16,7 @@ import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 
 public class AquaMapsServiceTester {
 
-	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	private static final String SERVICE_URI="http://dlib26.isti.cnr.it:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 	public static AquaMapsPortType getPortType(ASLSession session) throws Exception{
 		AquaMapsServiceAddressingLocator asal= new AquaMapsServiceAddressingLocator();
@@ -23,7 +26,30 @@ public class AquaMapsServiceTester {
 		return GCUBERemotePortTypeContext.getProxy(aquamapsPT, session.getScope());	
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception{
+		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
+		session.setScope("/gcube/devsec");
+		AquaMapsObject obj=getAquaMapsObject("27956", session);
+	}
+
+	public static AquaMapsObject getAquaMapsObject(String id, ASLSession session)
+	throws Exception {
+		AquaMapsPortType aquamapsPT=getPortType(session);		
+		AquaMapsObject toReturn = AquaMapsObject.parseProfile(aquamapsPT.getProfile(id));//Parsers.parseProfile(aquamapsPT.getProfile(id));
+		toReturn.setId(id);
+		Map<String,String> fileMap=toReturn.getRelatedResources();
+		FileArray files=aquamapsPT.getRelatedFiles(toReturn.getId());
+		if((files!=null)&&(files.getFileList()!=null)){
+			for(File f:files.getFileList()){
+				if(f.getType().equalsIgnoreCase("xml")) toReturn.setProfileUrl(f.getUrl());
+				else fileMap.put(f.getName(), f.getUrl());
+			}
+		}
+		return toReturn;
+	}
+	
+	
+	public static void createAndSendJob(){
 		Job job=new Job();
 		AquaMap obj=new AquaMap();
 		obj.setAuthor("Tester");
@@ -39,7 +65,8 @@ public class AquaMapsServiceTester {
 		spec.setId("FIS-1086");
 		obj.setSelectedSpecies(new SpeciesArray(new Specie[]{spec}));
 		obj.setThreshold((float) 0.5);
-		obj.setType("Biodiversity");
+		obj.setType("SpeciesDistribution");
+		obj.setGis(false);
 		Weight w=new Weight();		
 		//obj.setWeights(new WeightArray(new Weight[]{w,w,w,w}));
 		job.setAquaMapList(new AquaMapArray(new AquaMap[]{obj}));
@@ -58,7 +85,7 @@ public class AquaMapsServiceTester {
 		job.setSelectedSpecies(obj.getSelectedSpecies());
 		job.setWeights(obj.getWeights());
 		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/d4science.research-infrastructures.eu/FARM/AquaMaps");
+		session.setScope("/gcube/devsec");
 		AquaMapsPortType pt;
 		try {
 			pt = getPortType(session);
@@ -69,8 +96,5 @@ public class AquaMapsServiceTester {
 		}
 		
 	}
-
-	
-	
 	
 }
