@@ -5,8 +5,10 @@ import java.util.Map;
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.stubs.*;
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
+import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
 import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
@@ -16,7 +18,9 @@ import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 
 public class AquaMapsServiceTester {
 
-	private static final String SERVICE_URI="http://dlib26.isti.cnr.it:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
+//	private static final String SERVICE_URI="http://dlib26.isti.cnr.it:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	
+	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 	public static AquaMapsPortType getPortType(ASLSession session) throws Exception{
 		AquaMapsServiceAddressingLocator asal= new AquaMapsServiceAddressingLocator();
@@ -29,7 +33,10 @@ public class AquaMapsServiceTester {
 	public static void main(String[] args) throws Exception{
 		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
 		session.setScope("/gcube/devsec");
-		AquaMapsObject obj=getAquaMapsObject("27956", session);
+//		AquaMapsObject obj=getAquaMapsObject("27956", session);
+		createAndSendJob(session);
+//		Publisher.getPublisher().getPortType(session.getScope());
+		System.out.println("Done");
 	}
 
 	public static AquaMapsObject getAquaMapsObject(String id, ASLSession session)
@@ -49,9 +56,10 @@ public class AquaMapsServiceTester {
 	}
 	
 	
-	public static void createAndSendJob(){
+	public static void createAndSendJob(ASLSession session){
 		Job job=new Job();
 		AquaMap obj=new AquaMap();
+		BoundingBox bb= new BoundingBox();
 		obj.setAuthor("Tester");
 		obj.setCreator("Tester");
 		obj.setEnvelopCustomization(new PerturbationArray(new Perturbation[0]));
@@ -62,11 +70,12 @@ public class AquaMapsServiceTester {
 		obj.setRelatedResources(new StringArray(new String[0]));
 		obj.setSelectedAreas(new AreasArray(new Area[0]));
 		Specie spec=new Specie();
-		spec.setId("FIS-1086");
+		spec.setId("Fis-10199");
 		obj.setSelectedSpecies(new SpeciesArray(new Specie[]{spec}));
 		obj.setThreshold((float) 0.5);
 		obj.setType("SpeciesDistribution");
-		obj.setGis(false);
+		obj.setGis(false);		
+		obj.setBoundingBox(bb.toString());
 		Weight w=new Weight();		
 		//obj.setWeights(new WeightArray(new Weight[]{w,w,w,w}));
 		job.setAquaMapList(new AquaMapArray(new AquaMap[]{obj}));
@@ -83,9 +92,9 @@ public class AquaMapsServiceTester {
 		job.setRelatedResources(obj.getRelatedResources());
 		job.setSelectedAreas(obj.getSelectedAreas());
 		job.setSelectedSpecies(obj.getSelectedSpecies());
-		job.setWeights(obj.getWeights());
-		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/gcube/devsec");
+		job.setWeights(obj.getWeights());		
+//		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
+//		session.setScope("/testing/vo1");
 		AquaMapsPortType pt;
 		try {
 			pt = getPortType(session);
