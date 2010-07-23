@@ -55,6 +55,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GroupGene
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/LayerGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/MapRegistration.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/AreaPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text

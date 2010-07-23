@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.axis.components.uuid.UUIDGen;
@@ -70,6 +71,23 @@ public class BiodiversityThread extends Thread {
 				logger.trace("waiting for selected species to be ready");
 			}
 
+			boolean needToGenerate=true;
+			List<String> publishedMaps=null;
+			boolean hasCustomizations=JobGenerationDetails.isSpeciesSetCustomized(jobId,species);
+//			if(hasCustomizations) {
+//				needToGenerate=true;
+//				logger.trace(this.getName()+" has Customizations, going to generate..");
+//			}
+//			else{
+//				logger.trace(this.getName()+" hasn't Customizations, looking for default maps..");
+//				publishedMaps=Publisher.getPublisher().getPublishedMaps(species,JobGenerationDetails.getHSPENTable(jobId),JobGenerationDetails.getHCAFTable(jobId),this.actualScope);
+//				logger.trace(this.getName()+" found "+publishedMaps.size()+" default images");
+//				if(publishedMaps.size()==0) needToGenerate=true;
+//			}
+			if(needToGenerate){
+				//*********************************** GENERATION
+				
+				logger.trace(this.getName()+" entering image generation phase");
 
 			session=DBSession.openSession(PoolManager.DBType.mySql);
 			JobUtils.updateAquaMapStatus(aquamapsId, Status.Generating);
@@ -131,24 +149,10 @@ public class BiodiversityThread extends Thread {
 
 					logger.trace(this.getName()+" found "+app.size()+" files to publish");
 					if(app.size()>0){
-//						String basePath=JobUtils.publish(HSPECName, String.valueOf(jobId), app.values());
-						String basePath=Publisher.getPublisher().publishImages(this.jobId, species, app.values(),actualScope);
+						String basePath=Publisher.getPublisher().publishImages(this.jobId, species, app.values(),actualScope,hasCustomizations);
 						logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-						session=DBSession.openSession(PoolManager.DBType.mySql);
-						PreparedStatement ps =session.preparedStatement(DBCostants.fileInsertion);
-
-						for(String mapName:app.keySet()){
-							File f= new File(app.get(mapName));
-							ps.setBoolean(1,true);
-							ps.setString(2,mapName);
-							ps.setString(3, basePath+f.getName());
-							ps.setString(4,"IMG");
-							ps.setInt(5,aquamapsId);
-							ps.execute();
-						}
-
-//						session.close();
-						logger.trace(this.getName()+" "+app.size()+" file information inserted in DB");
+						logger.trace(this.getName()+" "+JobUtils.linkImagesInDB(app, basePath,aquamapsId)+" file information inserted in DB");
+						
 					}
 				}
 				
@@ -186,8 +190,17 @@ public class BiodiversityThread extends Thread {
 				}
 				
 			}	
-
-			//		session.executeUpdate("DROP TABLE "+tableName);		
+			}else{
+				// ********************************** Using already published Images
+				logger.trace(this.getName()+" using already published Images");
+				
+				Map<String,String> imagesNameAndLink=JobUtils.parsePublished(publishedMaps);
+				String firstUrl=publishedMaps.get(0);
+				String basePath=firstUrl.substring(0, firstUrl.lastIndexOf("/")+1);
+				logger.trace(this.getName()+" "+JobUtils.linkImagesInDB(imagesNameAndLink, basePath,aquamapsId)+" file information inserted in DB");
+				
+			}
+			
 			JobUtils.updateAquaMapStatus(aquamapsId, Status.Completed);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

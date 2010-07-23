@@ -297,6 +297,25 @@ public class JobGenerationDetails {
 		}
 	}
 	
+	public static String getGIS(int submittedId) throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Getting gis for submitted "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Select gis from submitted where searchId =?");
+			ps.setInt(1, submittedId);
+			ResultSet rs= ps.executeQuery();
+			rs.first();
+			return rs.getString(1);
+		}catch(Exception e ){
+			logger.error("Unexpected Error", e);
+			throw e;
+		}finally{
+			session.close();
+		}
+	}
+	
+	
 	public static void createGroup (int jobId)throws Exception{
 		DBSession session=null;
 		try{

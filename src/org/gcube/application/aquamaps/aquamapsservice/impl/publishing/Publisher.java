@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,7 +19,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
-import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.AtomicCondition;
@@ -26,6 +26,7 @@ import org.gcube.common.core.informationsystem.client.ISClient;
 import org.gcube.common.core.informationsystem.client.queries.GCUBERIQuery;
 import org.gcube.common.core.resources.GCUBERunningInstance;
 import org.gcube.common.core.scope.GCUBEScope;
+import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.AquaMapsPublisherPortType;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.StoreImageRequestType;
@@ -87,18 +88,19 @@ public class Publisher{
 	}
 	
 	
-	public String publishImages(int submittedId,String[] coverageSpeciesId,Collection<String> toPublishSet,GCUBEScope scope)throws Exception{
+	public String publishImages(int submittedId,String[] coverageSpeciesId,Collection<String> toPublishSet,GCUBEScope scope, boolean hasCustomizations)throws Exception{
 		
 		StoreImageRequestType req= new StoreImageRequestType();
 		req.setTaxonomy(getTaxonomyCoverage(coverageSpeciesId));
-		if(JobGenerationDetails.isSpeciesSetCustomized(submittedId,coverageSpeciesId)){
+		if(hasCustomizations){
 			req.setSourceHCAF(JobGenerationDetails.getHCAFTable(submittedId));
 			req.setSourceHSPEN(JobGenerationDetails.getHSPENTable(submittedId));
+			req.setAuthor(JobGenerationDetails.getAuthor(submittedId));
 		}else {
-			req.setSourceHCAF(DBCostants.HCAF_S);
+			req.setSourceHCAF(DBCostants.HCAF_D);
 			req.setSourceHSPEN(DBCostants.HSPEN);
 		}
-		req.setAuthor(JobGenerationDetails.getAuthor(submittedId));
+		
 		
 		File zipped=null;		
 		FileInputStream fis=null;
@@ -127,7 +129,18 @@ public class Publisher{
 			fis=new FileInputStream(base64Zipped);
 			wrapper.add(fis);
 			wrapper.close();			
-			return pt.storeImage(req);
+			String basePath= pt.storeImage(req);
+			
+			if((coverageSpeciesId.length==1)&&(!hasCustomizations)){
+				logger.trace("going to register maps in DB ");
+				int[] internalSpeciesIds=getInternalSpeciesIds(coverageSpeciesId);
+				int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesIds[0]);
+				if(alreadyMappedId>0){
+					logger.trace("Found mapId "+alreadyMappedId);
+					MapRegistration.updateDistributionMapBasePath(alreadyMappedId, basePath);
+				}else MapRegistration.registerDistributionMap(1, 1, internalSpeciesIds[0], basePath, null);				
+			}
+			return basePath;
 		}catch(Exception e){
 			logger.error("",e);
 			throw e;
@@ -137,8 +150,6 @@ public class Publisher{
 			if(base64Zipped!=null)FileUtils.forceDelete(base64Zipped);			
 			if(fis!=null)IOUtils.closeQuietly(fis);
 		}
-		
-		
 	}
 	
 	
@@ -196,17 +207,73 @@ public class Publisher{
 		}		
 	}
 	
-//	private static String getSourceName(String sourceId)throws Exception{
-//		DBSession session=null;
-//		try{
-//			session=DBSession.openSession(PoolManager.DBType.mySql);
-//			PreparedStatement ps= session.preparedStatement("Select")
-//			
-//		}catch(Exception e){
-//			logger.error("Unable to retrieve status",e);
-//			throw e;
-//		}finally{
-//			if(!session.getConnection().isClosed())session.close();
-//		}
-//	}
+	public List<String> getPublishedMaps(String[] speciesIds,String HSPEN,String HCAF,GCUBEScope scope)throws Exception{
+		List<String> toReturn=new ArrayList<String>();
+		if(speciesIds.length>1) return toReturn; //TODO Biodiversity registration management
+		
+		int[] internalSpeciesIds=getInternalSpeciesIds(speciesIds);
+		//TODO hspen & hcaf id
+		int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesIds[0]);
+		if(alreadyMappedId>0){
+			logger.trace("Found mapId "+alreadyMappedId);
+			String mapsBasePath=MapRegistration.getDistributionMapBasePath(alreadyMappedId);
+			if(mapsBasePath!=null){
+			AquaMapsPublisherPortType pt=getPortType(scope);
+			StringArray result=pt.getPublishedMapsPath(mapsBasePath);
+			if((result!=null)){
+				String[] urls= result.getItems();
+				if(urls!=null){
+					for(String url:urls) toReturn.add(url);
+				}
+			}else logger.trace("No base path found for mapId "+alreadyMappedId);
+		}
+		}else logger.trace("Map Id not found");
+		return toReturn;
+	}
+	
+	
+
+	private int[] getInternalSpeciesIds(String[] speciesIds)throws Exception{
+		DBSession session= null;
+		try{
+			int[] internals=new int[speciesIds.length];
+			session= DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("SELECT internalId from speciesoccursum where speciesID = ?");
+			for(int i=0;i<speciesIds.length;i++){
+				ps.setString(1,speciesIds[i]);
+				ResultSet rs = ps.executeQuery();
+				rs.first();
+				internals[i]=rs.getInt(1);
+			}
+			return internals;
+		}catch (Exception e){
+			throw e;
+		}finally {
+			session.close();
+		}
+	}
+	
+	public String getPublishedLayer(String[] speciesIds,String HSPEN,String HCAF,GCUBEScope scope)throws Exception{
+		if(speciesIds.length>1) return null;
+		int[] internalSpeciesIds=getInternalSpeciesIds(speciesIds);
+		//TODO hspen & hcaf id
+		int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesIds[0]);
+		if(alreadyMappedId>0){
+			logger.trace("Found mapId "+alreadyMappedId);
+			return MapRegistration.getDistributionMapLayerUri(alreadyMappedId);
+		}else return null; 
+	}
+	
+	public void registerLayer(String[] speciesIds, String HSPEN, String HCAF,String layer)throws Exception{
+		if(speciesIds.length==1){
+			int[] internalSpeciesIds=getInternalSpeciesIds(speciesIds);
+			int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesIds[0]);
+			if(alreadyMappedId>0){
+				logger.trace("Found mapId "+alreadyMappedId);
+				MapRegistration.updateDistributionMapLayerUri(alreadyMappedId, layer);
+			}else MapRegistration.registerDistributionMap(1, 1, internalSpeciesIds[0], null, layer);
+			logger.trace("registered layer "+layer);
+		}
+	}
+	
 }
