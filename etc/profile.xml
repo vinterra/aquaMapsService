@@ -64,6 +64,10 @@
 				<Name>AquaMaps-stubs</Name>
 				<Version>2.2.0</Version>
 				<Files><File>org.gcube.application.aquamaps.stubs.jar</File></Files>
+				<Description>Aquamaps Publisher stubs</Description>
+				<Name>AquaMapsPublisher-stubs</Name>
+				<Version>1.0.0</Version>
+				<Files><File>org.gcube.application.aquamaps.aquamapspublisher.stubs.jar</File></Files>
 			</Software>
 		</Packages>
 	</Profile>
