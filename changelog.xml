@@ -1,0 +1,5 @@
+<ReleaseNotes>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2010-07-16">
+		<Change>Added publishing on AquaMaps Publisher Service</Change>		
+	</Changeset>	
+</ReleaseNotes>

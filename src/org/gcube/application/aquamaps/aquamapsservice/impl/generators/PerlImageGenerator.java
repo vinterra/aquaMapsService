@@ -24,8 +24,9 @@ public class PerlImageGenerator {
 		request=req;
 	}
 	
-	public int generate() throws IOException{
-		return generateImages(request.getFile());
+	public boolean generate() throws IOException{
+		int result=generateImages(request.getClusterFile());
+		return (result==0);
 		
 //		return dummyProcess(request.getFile());
 	}
@@ -53,7 +54,7 @@ public class PerlImageGenerator {
 		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 		String line = null;
 		while ((line = input.readLine())!=null){
-			//logger.debug(line);
+//			logger.debug(line);
 		}
 
 		try {

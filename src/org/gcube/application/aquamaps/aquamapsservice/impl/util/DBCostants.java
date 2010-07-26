@@ -218,7 +218,7 @@ public class DBCostants {
 		toReturn.append("UPDATE "+hspenTable+" SET ");
 		for(int i=0;i<toSetList.size();i++){
 			Perturbation pert=toSetList.get(i);			
-			toReturn.append(getCompleteName(HSPEN, pert.getField().toLowerCase())+" = "+
+			toReturn.append(getCompleteName(hspenTable, pert.getField().toLowerCase())+" = "+
 					pert.getValue());	
 			if(i<toSetList.size()-1) toReturn.append(" , ");
 		}

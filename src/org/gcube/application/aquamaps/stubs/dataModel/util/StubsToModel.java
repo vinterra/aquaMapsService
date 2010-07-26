@@ -180,6 +180,7 @@ public class StubsToModel {
 		toReturn.getBoundingBox().parse(obj.getBoundingBox());
 		toReturn.setCreator(obj.getCreator());
 		toReturn.setDate(obj.getDate());
+		toReturn.setGis(obj.isGis());
 		if((obj.getEnvelopCustomization()!=null)&&(obj.getEnvelopCustomization().getPerturbationList()!=null)){
 			for(Perturbation p : obj.getEnvelopCustomization().getPerturbationList()){
 				if(!toReturn.getEnvelopeCustomization().containsKey(p.getToPerturbId()))

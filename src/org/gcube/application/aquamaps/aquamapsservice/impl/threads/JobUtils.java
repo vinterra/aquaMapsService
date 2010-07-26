@@ -1,13 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,14 +13,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.AreasArray;
@@ -40,8 +39,29 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class JobUtils {
 
 	private static GCUBELog logger= new GCUBELog(JobUtils.class);
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	public static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
+	
+public static final Map<String,String> imageFileAndName= new HashMap<String, String>();
+	
+	static {
+		imageFileAndName.put("_map_pic.jpg", "Earth");
+		imageFileAndName.put("_afr.jpg", "Continent View : Africa");
+		imageFileAndName.put("_asia.jpg", "Continent View : Asia");
+		imageFileAndName.put("_aus.jpg", "Continent View : Australia");
+		imageFileAndName.put("_eur.jpg", "Continent View : Europa");
+		imageFileAndName.put("_nAm.jpg", "Continent View : North America");
+		imageFileAndName.put("_sAm.jpg", "Continent View : South America");
+		imageFileAndName.put("_xmapAtlan.jpg", "Ocean View : Atlantic");
+		imageFileAndName.put("_xmapI.jpg", "Ocean View : Indian");
+		imageFileAndName.put("_xmapN.jpg", "Pole View : Artic");
+		imageFileAndName.put("_xmapNAtlan.jpg", "Ocean View : North Atlantic");
+		imageFileAndName.put("_xmapP.jpg", "Ocean View : Pacific");
+		imageFileAndName.put("_xmapS.jpg", "Pole View : Antarctic");
+		imageFileAndName.put("_xmapSAtlan.jpg", "Ocean View : South Atlantic");		
+	}
+	
+
 	
 /**
  *  Clusterize rs in N stringBuilders compliant with CsquareCode convention
@@ -143,7 +163,7 @@ public class JobUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	public static String publish(String firstLevelDir, String secondLevelDir, Collection<String> filesPath) throws Exception{
+	public static String publishInternal(String firstLevelDir, String secondLevelDir, Collection<String> filesPath) throws Exception{
 		// Destination directory
 	    File dir = new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+ServiceContext.getContext().getHttpServerBasePath()+
 	    			File.separator+firstLevelDir+File.separator+secondLevelDir+File.separator);
@@ -166,21 +186,17 @@ public class JobUtils {
 	    	}catch(Exception e){
 	    		logger.error("Unable to move (copy and delete) "+path,e);
 	    	}
-//	    	boolean success = file.renameTo(dest);
-//	    	if (!success) {
-//	    		logger.error("Error publishing file "+file.getName());
-//	    	}else {
-//	    		boolean deleted=file.delete();
-//	    		if(!deleted)logger.error("Error deleting temp file "+file.getName());
-//	    	}
 	    }
 	    logger.debug(ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir);
 	    return ServiceContext.getContext().getWebServiceURL()+firstLevelDir+"/"+secondLevelDir+"/";
 
 	}
 	
+	
+		
+	
 	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir) throws Exception{
-		MySqlDBSession c=MySqlDBSession.openSession();
+		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
 		Collection<String> toUpdateProfile=new ArrayList<String>();
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+resName);
 		dir.mkdirs();
@@ -190,7 +206,7 @@ public class JobUtils {
 		writer.write(resProfile);
 		writer.close();
 		toUpdateProfile.add(file.getAbsolutePath());
-		String path=publish(firstLevelDir,secondLevelDir,toUpdateProfile);
+		String path=publishInternal(firstLevelDir,secondLevelDir,toUpdateProfile);
 		logger.trace("Profile for "+resName+" created, gonna update DB");
 		PreparedStatement ps=c.preparedStatement(DBCostants.profileUpdate);
 		ps.setString(1, path+file.getName());
@@ -208,12 +224,13 @@ public class JobUtils {
 		c.close();
 	}
 	
+
 	
 	
 	
 	public static void updateAquaMapStatus(int aquamapsId,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
 //		toUpdate.setStatus(status.toString());
-		MySqlDBSession c=MySqlDBSession.openSession();
+		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
 		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
 		ps.setString(1, status.toString());
 		ps.setInt(2,aquamapsId);		
@@ -329,15 +346,15 @@ public class JobUtils {
 		
 		if((areaSelection!=null)&&(areaSelection.getAreasList()!=null)
 				&&(areaSelection.getAreasList().length>0)){
-			MySqlDBSession conn = MySqlDBSession.openSession();
-			String areaTmpTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
+			DBSession conn = DBSession.openSession(PoolManager.DBType.mySql);
+			String areaTmpTable=ServiceUtils.generateId("A", "");//"A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
 			for(Area area: areaSelection.getAreasList())			
 				conn.executeUpdate("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
 			
 			logger.trace(" area temp table created");
 			JobGenerationDetails.addToDropTableList(jobId,areaTmpTable);
-			String filteredTable="A"+(uuidGen.nextUUID()).replaceAll("-", "_");
+			String filteredTable=ServiceUtils.generateId("A", "");//"A"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			conn.executeUpdate("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
 			JobGenerationDetails.addToDropTableList(jobId,filteredTable);
 			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,hspec,areaTmpTable);
@@ -390,63 +407,100 @@ public class JobUtils {
 		Map<String,String> toReturn=new HashMap<String, String>();
 		File f1 = new File(basePath+"csq_map127.0.0.1_"+aquamapName+"_map_pic.jpg");
 		if (f1.exists())
-			toReturn.put(aquamapName+" Earth",f1.getAbsolutePath());			
-				
-		File f2 = new File(basePath+aquamapName+"/"+aquamapName+"_afr.jpg");
-		if (f2.exists())
-			toReturn.put(aquamapName+" Continent View : Africa", f2.getAbsolutePath());						
-				
-		File f3 = new File(basePath+aquamapName+"/"+aquamapName+"_asia.jpg");
-		if (f3.exists())
-			toReturn.put(aquamapName+" Continent View : Asia", f3.getAbsolutePath());			
-				
-		File f4 = new File(basePath+aquamapName+"/"+aquamapName+"_aus.jpg");
-		if (f4.exists())
-			toReturn.put(aquamapName+" Continent View : Australia", f4.getAbsolutePath());			
-				
-		File f5 = new File(basePath+aquamapName+"/"+aquamapName+"_eur.jpg");
-		if (f5.exists())			
-			toReturn.put(aquamapName+" Continent View : Europa", f5.getAbsolutePath());
-				
-		File f6 = new File(basePath+aquamapName+"/"+aquamapName+"_nAm.jpg");
-		if (f6.exists())			
-			toReturn.put(aquamapName+" Continent View : North America", f6.getAbsolutePath());
+			toReturn.put("Earth",f1.getAbsolutePath());			
 		
-		File f7 = new File(basePath+aquamapName+"/"+aquamapName+"_sAm.jpg");
-		if (f7.exists())			
-			toReturn.put(aquamapName+" Continent View : South America", f7.getAbsolutePath());
+		for(String suffix:imageFileAndName.keySet()){
+			File f2 = new File(basePath+aquamapName+"/"+aquamapName+suffix);
+			if (f2.exists())
+				toReturn.put(imageFileAndName.get(suffix), f2.getAbsolutePath());
+		}
 		
-		File f8 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapAtlan.jpg");
-		if (f8.exists())			
-			toReturn.put(aquamapName+" Ocean View : Atlantic", f8.getAbsolutePath());
 		
-		File f9 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapI.jpg");
-		if (f9.exists())
-			toReturn.put(aquamapName+" Ocean View : Indian", f9.getAbsolutePath());			
-		
-		File f10 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapN.jpg");
-		if (f10.exists())			
-			toReturn.put(aquamapName+" Pole View : Artic", f10.getAbsolutePath());
-		
-		File f11= new File(basePath+aquamapName+"/"+aquamapName+"_xmapNAtlan.jpg");
-		if (f11.exists())			
-			toReturn.put(aquamapName+" Ocean View : North Atlantic", f11.getAbsolutePath());
-				
-		File f12= new File(basePath+aquamapName+"/"+aquamapName+"_xmapP.jpg");
-		if (f12.exists())
-			toReturn.put(aquamapName+" Ocean View : Pacific", f12.getAbsolutePath());			
-		
-		File f13= new File(basePath+aquamapName+"/"+aquamapName+"_xmapS.jpg");
-		if (f13.exists())			
-			toReturn.put(aquamapName+" Pole View : Antarctic", f13.getAbsolutePath());
-				
-		File f14= new File(basePath+aquamapName+"/"+aquamapName+"_xmapSAtlan.jpg");
-		if (f14.exists())	
-			toReturn.put(aquamapName+" Ocean View : South Atlantic", f14.getAbsolutePath());
-		
+//		File f2 = new File(basePath+aquamapName+"/"+aquamapName+"_afr.jpg");
+//		if (f2.exists())
+//			toReturn.put("Continent View : Africa", f2.getAbsolutePath());						
+//				
+//		File f3 = new File(basePath+aquamapName+"/"+aquamapName+"_asia.jpg");
+//		if (f3.exists())
+//			toReturn.put("Continent View : Asia", f3.getAbsolutePath());			
+//				
+//		File f4 = new File(basePath+aquamapName+"/"+aquamapName+"_aus.jpg");
+//		if (f4.exists())
+//			toReturn.put("Continent View : Australia", f4.getAbsolutePath());			
+//				
+//		File f5 = new File(basePath+aquamapName+"/"+aquamapName+"_eur.jpg");
+//		if (f5.exists())			
+//			toReturn.put("Continent View : Europa", f5.getAbsolutePath());
+//				
+//		File f6 = new File(basePath+aquamapName+"/"+aquamapName+"_nAm.jpg");
+//		if (f6.exists())			
+//			toReturn.put("Continent View : North America", f6.getAbsolutePath());
+//		
+//		File f7 = new File(basePath+aquamapName+"/"+aquamapName+"_sAm.jpg");
+//		if (f7.exists())			
+//			toReturn.put("Continent View : South America", f7.getAbsolutePath());
+//		
+//		File f8 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapAtlan.jpg");
+//		if (f8.exists())			
+//			toReturn.put("Ocean View : Atlantic", f8.getAbsolutePath());
+//		
+//		File f9 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapI.jpg");
+//		if (f9.exists())
+//			toReturn.put("Ocean View : Indian", f9.getAbsolutePath());			
+//		
+//		File f10 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapN.jpg");
+//		if (f10.exists())			
+//			toReturn.put("Pole View : Artic", f10.getAbsolutePath());
+//		
+//		File f11= new File(basePath+aquamapName+"/"+aquamapName+"_xmapNAtlan.jpg");
+//		if (f11.exists())			
+//			toReturn.put("Ocean View : North Atlantic", f11.getAbsolutePath());
+//				
+//		File f12= new File(basePath+aquamapName+"/"+aquamapName+"_xmapP.jpg");
+//		if (f12.exists())
+//			toReturn.put("Ocean View : Pacific", f12.getAbsolutePath());			
+//		
+//		File f13= new File(basePath+aquamapName+"/"+aquamapName+"_xmapS.jpg");
+//		if (f13.exists())			
+//			toReturn.put("Pole View : Antarctic", f13.getAbsolutePath());
+//				
+//		File f14= new File(basePath+aquamapName+"/"+aquamapName+"_xmapSAtlan.jpg");
+//		if (f14.exists())	
+//			toReturn.put("Ocean View : South Atlantic", f14.getAbsolutePath());
+//		
+		return toReturn;
+	}
+	
+	public static Map<String,String> parsePublished(List<String> publishedUrls){
+		Map<String,String> toReturn=new HashMap<String, String>();		
+		for(String url : publishedUrls){
+			for(String suffix: imageFileAndName.keySet()){
+				if(url.endsWith(suffix)){
+					toReturn.put(imageFileAndName.get(suffix), url);
+					break;
+				}
+			}
+		}
 		return toReturn;
 	}
 	
 	
+	public static int linkImagesInDB(Map<String,String> imagesNameAndLink, String basePath,int aquamapsId) throws Exception{
+		DBSession session=DBSession.openSession(PoolManager.DBType.mySql);
+		PreparedStatement pps =session.preparedStatement(DBCostants.fileInsertion);
+		int count=0;
+		for(String mapName:imagesNameAndLink.keySet()){
+			File f= new File(imagesNameAndLink.get(mapName));
+			pps.setBoolean(1,true);
+			pps.setString(2,mapName);
+			pps.setString(3, basePath+f.getName());
+			pps.setString(4,"IMG");
+			pps.setInt(5,aquamapsId);
+			count+=pps.executeUpdate();
+		}
+		session.close();
+
+		return count;
+	}
 	
 }

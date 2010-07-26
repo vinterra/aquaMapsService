@@ -48,10 +48,9 @@ public class SimulationThread extends Thread {
 				hspec=DBCostants.HSPEC;
 				JobGenerationDetails.setHSPECTable(DBCostants.HSPEC,jobId);							
 			}			
-			JobGenerationDetails.setHSPECTable(JobUtils.filterByArea(jobId,area,hspec),jobId);
+			JobGenerationDetails.setHSPECTable(JobUtils.filterByArea(jobId,area,hspec),jobId);			
+			JobGenerationDetails.updateSpeciesStatus(jobId,JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate), SpeciesStatus.Ready);
 			JobGenerationDetails.updateStatus(jobId, Status.Generating);
-			JobGenerationDetails.updateSpeciesStatus(jobId,
-					JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate), SpeciesStatus.Ready);	
 		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
 		
 		

@@ -119,7 +119,8 @@
 					<xsd:element name="environmentCustomization" type="tns:perturbationArray"/>
 					<xsd:element name="threshold" type="xsd:float"/>
 					<xsd:element name="weights" type="tns:envelopeWeightArray"/>	
-					<xsd:element name="status" type="xsd:string"/>				
+					<xsd:element name="status" type="xsd:string"/>
+					<xsd:element name="gis" type="xsd:boolean"/>				
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -257,7 +258,16 @@
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
 					<xsd:element name="aquamaps" type="xsd:boolean"/>
-					<xsd:element name="jobId" type="xsd:string"/>
+					<xsd:element name="jobIdEnabled" type="xsd:boolean"/>					
+					<xsd:element name="jobIdValue" type="xsd:string"/>
+					<xsd:element name="objectStatusEnabled" type="xsd:boolean"/>
+					<xsd:element name="objectStatusValue" type="xsd:string"/>
+					<xsd:element name="typeEnabled" type="xsd:boolean"/>
+					<xsd:element name="typeValue" type="xsd:string"/>
+					<xsd:element name="jobStatusEnabled" type="xsd:boolean"/>
+					<xsd:element name="jobStatusValue" type="xsd:string"/>
+					<xsd:element name="dateEnabled" type="xsd:boolean" />
+					<xsd:element name="dateValue" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
 			

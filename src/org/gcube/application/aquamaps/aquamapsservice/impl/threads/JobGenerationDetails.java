@@ -1,5 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import it.cnr.isti.geoserverInteraction.GeoserverCaller;
+import it.cnr.isti.geoserverInteraction.bean.LayerRest;
+
 import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -7,10 +10,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.FileUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.TaxonomyType;
 
 public class JobGenerationDetails {
 	private static GCUBELog logger= new GCUBELog(JobGenerationDetails.class);
@@ -30,9 +39,9 @@ public class JobGenerationDetails {
 
 
 	private static void updateSource(Sources sourceField,String source,int jobId)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session= MySqlDBSession.openSession();
+			session= DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Update submitted set "+sourceField.toString()+" = ? where searchId = ?");
 			ps.setString(1, source);
 			ps.setInt(2,jobId);
@@ -45,9 +54,9 @@ public class JobGenerationDetails {
 		}
 	}	
 	private static String getSource(Sources source,int jobId)throws Exception{
-		MySqlDBSession session = null;
+		DBSession session = null;
 		try{
-			session= MySqlDBSession.openSession();
+			session= DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Select "+source.toString()+" from submitted where searchId = ?");
 			ps.setInt(1, jobId);
 			ResultSet rs =ps.executeQuery();
@@ -91,9 +100,9 @@ public class JobGenerationDetails {
 		return (toReturn==null)?DBCostants.HSPEC:toReturn;
 	}
 	public static void addToDropTableList(int jobId,String tableName)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.toDropTables+" (jobId,tableName) VALUE(?,?)");
 			ps.setInt(1, jobId);
 			ps.setString(2, tableName);
@@ -106,9 +115,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void addToDeleteTempFolder(int jobId,String folderName)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.tempFolders+" (jobId,folderName) VALUE(?,?)");
 			ps.setInt(1, jobId);
 			ps.setString(2, folderName);
@@ -121,9 +130,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();		
+			session=DBSession.openSession(PoolManager.DBType.mySql);		
 			//		toUpdate.setStatus(status.toString());
 			PreparedStatement ps=session.preparedStatement(DBCostants.submittedStatusUpdating);
 			ps.setString(1, status.toString());		
@@ -139,9 +148,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=session.preparedStatement("Update "+DBCostants.selectedSpecies+" set status = ? where jobId=? AND speciesId=?");
 			ps.setString(1, status.toString());
 			ps.setInt(2, jobId);
@@ -157,12 +166,18 @@ public class JobGenerationDetails {
 		}
 	}
 	public static String[] getSpeciesByStatus(int jobId,SpeciesStatus status)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
-			PreparedStatement ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=? AND status=?");
-			ps.setInt(1, jobId);
-			ps.setString(2,status.toString());
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=null;
+			if(status!=null){
+				ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=? AND status=?");
+				ps.setInt(1, jobId);
+				ps.setString(2,status.toString());
+			}else{
+				ps=session.preparedStatement("Select speciesId from "+DBCostants.selectedSpecies+" where jobId=?");
+				ps.setInt(1, jobId);
+			}
 			ResultSet rs=ps.executeQuery();
 			ArrayList<String> toReturn=new ArrayList<String>(); 
 			while(rs.next()){
@@ -177,9 +192,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static boolean isJobComplete(int jobId) throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();		
+			session=DBSession.openSession(PoolManager.DBType.mySql);		
 			PreparedStatement ps =session.preparedStatement("Select count(*) from submitted where jobId=? AND status!=? AND status!=?");
 			ps.setInt(1, jobId);
 			ps.setString(2, Status.Error.toString());
@@ -196,9 +211,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static void cleanTemp(int jobId)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			logger.debug("cleaning tables for : "+jobId);
 			PreparedStatement ps=session.preparedStatement("Select tableName from "+DBCostants.toDropTables+" where jobId=?");
 			ps.setInt(1, jobId);
@@ -244,9 +259,9 @@ public class JobGenerationDetails {
 		}
 	}
 	public static boolean isSpeciesListReady(int jobId,String[] toCheck)throws Exception{
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
-			session=MySqlDBSession.openSession();
+			session=DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps=session.preparedStatement("Select status from "+DBCostants.selectedSpecies+" where jobId =? and speciesId=?");
 			ps.setInt(1, jobId);
 			for(String id:toCheck){
@@ -264,4 +279,140 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
+	
+	public static void updateGISData(int submittedId,String GeoId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Setting GIS data "+GeoId+" for submitted Id "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Update submitted set gis=? where searchId=?");
+			ps.setString(1, GeoId);
+			ps.setInt(2, submittedId);
+			logger.trace("updated "+ps.executeUpdate()+" entries");
+		}catch(Exception e ){
+			logger.error("Unexpected Error", e);
+			throw e;
+		}finally{
+			session.close();
+		}
+	}
+	
+	public static String getGIS(int submittedId) throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Getting gis for submitted "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Select gis from submitted where searchId =?");
+			ps.setInt(1, submittedId);
+			ResultSet rs= ps.executeQuery();
+			rs.first();
+			return rs.getString(1);
+		}catch(Exception e ){
+			logger.error("Unexpected Error", e);
+			throw e;
+		}finally{
+			session.close();
+		}
+	}
+	
+	
+	public static void createGroup (int jobId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Starting job Id : "+jobId+" layers group creation ..");
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps =session.preparedStatement(DBCostants.AquaMapsListPerJob);
+			ps.setInt(1, jobId);
+			ResultSet rs=ps.executeQuery();
+			logger.trace("Looking for generated layers");
+			ArrayList<String> layers=new ArrayList<String>();
+			while(rs.next()){
+				String objectFeature=rs.getString("gis");
+				if((objectFeature!=null)&&(!objectFeature.equalsIgnoreCase("null")))
+					layers.add(objectFeature);
+			}
+			session.close();
+			if(layers.size()>0){
+				logger.trace("found "+layers.size()+" generated layer(s), looking for related style(s)");
+				GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
+				GroupGenerationRequest req=new GroupGenerationRequest();
+				req.setLayers(layers);
+				for(String layerId:layers){
+					LayerRest lRest=caller.getLayer(layerId);
+					req.getStyles().put(layerId, lRest.getDefaultStyle());
+				}								
+				req.setName(String.valueOf(jobId));				
+				req.setSubmittedId(jobId);
+				if(GeneratorManager.requestGeneration(req))logger.trace("Generation of jobId "+jobId+" layers group complete");
+				else throw new Exception("Unable to generate Group");
+			}else logger.trace("No generated layers found for job Id "+jobId);
+		}catch(Exception e){
+			logger.error("Unable to complete group "+jobId+" generation",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
+	
+	public static Status getStatus(int submittedId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Retrieving status for submitted id "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Select status from submitted where searchId=?");
+			ps.setInt(1, submittedId);
+			ResultSet rs= ps.executeQuery();
+			if(rs.next()) return Status.valueOf(rs.getString(1));
+			else throw new Exception("Status not found");			
+		}catch(Exception e){
+			logger.error("Unable to retrieve status",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
+	public static boolean isSpeciesSetCustomized(int submittedId,String[] ids)throws Exception{
+		DBSession session=null;		
+		try{
+			logger.trace("Checking species customizations flag..");
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("Select isCustomized from "+DBCostants.selectedSpecies+" where jobId=? AND speciesId=?");
+			ps.setInt(1, submittedId);
+			for(String id:ids){
+				ps.setString(2, id);
+				ResultSet rs= ps.executeQuery();
+				if(rs.next()){
+					if(!rs.getBoolean(1)) return false;
+				}else throw new Exception("customized flag not found for species "+id+" under "+submittedId+" selection");
+			}			
+			return true;
+		}catch(Exception e){
+			logger.error("unable to check species customization flag",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
+	public static String getAuthor(int submittedId)throws Exception{
+		DBSession session=null;
+		try{
+			logger.trace("Retrieving status for submitted id "+submittedId);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps=session.preparedStatement("Select author from submitted where searchId=?");
+			ps.setInt(1, submittedId);
+			ResultSet rs= ps.executeQuery();
+			if(rs.next())
+				return rs.getString(1);
+			else throw new Exception("Author not found for "+submittedId);
+		}catch(Exception e){
+			logger.error("Unable to retrieve status",e);
+			throw e;
+		}finally{
+			if(!session.getConnection().isClosed())session.close();
+		}
+	}
+	
 }

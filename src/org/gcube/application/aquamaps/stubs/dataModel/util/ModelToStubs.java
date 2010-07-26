@@ -130,6 +130,7 @@ public class ModelToStubs {
 		toReturn.setThreshold((float) toTranslate.getThreshold());
 		toReturn.setType(toTranslate.getType().toString());
 		toReturn.setBoundingBox(toTranslate.getBoundingBox().toString());
+		toReturn.setGis(toTranslate.getGis());
 		ArrayList<Perturbation> envelopCustomization=new ArrayList<Perturbation>();
 		for(String specId:toTranslate.getEnvelopeCustomization().keySet())
 			for(String fieldName:toTranslate.getEnvelopeCustomization().get(specId).keySet())

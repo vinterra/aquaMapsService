@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -10,9 +11,11 @@ import java.util.Map.Entry;
 
 import org.apache.axis.components.uuid.UUIDGen;
 import org.apache.axis.components.uuid.UUIDGenFactory;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.MySqlDBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.PerturbationArray;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -22,7 +25,7 @@ public class SpeciesPerturbationThread extends Thread {
 	//JobGenerationDetails generationDetails;
 
 	private static final GCUBELog logger=new GCUBELog(SpeciesPerturbationThread.class);
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 
 	//	private PerturbationArray perturbationArray;
 	private int jobId;	
@@ -34,9 +37,9 @@ public class SpeciesPerturbationThread extends Thread {
 
 		//		this.perturbationArray=perturbationArray;
 		this.jobId=jobId;
-		String[] toGenerateSpecies=JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize);
-		if((toGenerateSpecies!=null)&&(toGenerateSpecies.length>0)){
-			for(String speciesId:toGenerateSpecies){
+		String[] toCustomizeSpecies=JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize);
+		if((toCustomizeSpecies!=null)&&(toCustomizeSpecies.length>0)){
+			for(String speciesId:toCustomizeSpecies){
 				toPerformPerturbations.put(speciesId, new ArrayList<Perturbation>());			
 			}
 
@@ -50,11 +53,11 @@ public class SpeciesPerturbationThread extends Thread {
 
 
 	public void run() {		
-		MySqlDBSession session=null;
+		DBSession session=null;
 		try{
 
 			logger.trace("Filtering species...");
-			String HSPENName="H"+(uuidGen.nextUUID()).replaceAll("-", "_");
+			String HSPENName=ServiceUtils.generateId("H", "");//"H"+(uuidGen.nextUUID()).replaceAll("-", "_");
 			JobGenerationDetails.setHSPENTable(HSPENName,jobId);
 			//			String speciesListTable="s"+(uuidGen.nextUUID()).replaceAll("-", "_");			
 			//
@@ -76,22 +79,43 @@ public class SpeciesPerturbationThread extends Thread {
 
 			// ***************** Perturbation
 			//int progressCount=0;	
-			session=MySqlDBSession.openSession();
-			Statement stmt=session.getConnection().createStatement();
-			for(Entry<String,List<Perturbation>> entry:toPerformPerturbations.entrySet()){
-				String query=null;
-				try{
-					query=DBCostants.perturbationUpdate(HSPENName,
-							entry.getValue(), entry.getKey());
-					stmt.executeUpdate(query);
-				}catch(SQLException e){
-					logger.error("Unable to perturb speciesId: "+entry.getKey()+" queryString :"+query);
-				}catch(Exception e){
-					logger.error("Unable to create perturbation query for speciesId: "+entry.getKey());
-				}				
-			}
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			session.createLikeTable(HSPENName, DBCostants.HSPEN);
+			PreparedStatement ps=session.preparedStatement("INSERT INTO "+HSPENName+" (Select * from "+DBCostants.HSPEN+" where "+DBCostants.SpeciesID+"=?)");
+			for(String speciesId : JobGenerationDetails.getSpeciesByStatus(jobId, null)){
+				ps.setString(1, speciesId);
+				ps.executeUpdate();
+				if(toPerformPerturbations.containsKey(speciesId)){
+					String query=null;
+					try{
+						query=DBCostants.perturbationUpdate(HSPENName,
+								toPerformPerturbations.get(speciesId), speciesId);
+						session.executeUpdate(query);						
+					}catch(SQLException e){
+						logger.error("Unable to perturb speciesId: "+speciesId+" queryString :"+query,e);
+					}catch(Exception e){
+						logger.error("Unable to create perturbation query for speciesId: "+speciesId,e);
+					}
+					JobGenerationDetails.updateSpeciesStatus(jobId,new String[]{speciesId}, SpeciesStatus.toGenerate);
+				}
+			}			
 			session.close();
-			JobGenerationDetails.updateSpeciesStatus(jobId, toPerformPerturbations.keySet().toArray(new String[toPerformPerturbations.keySet().size()]), SpeciesStatus.Ready);
+			
+//			Statement stmt=session.getConnection().createStatement();
+//			for(Entry<String,List<Perturbation>> entry:toPerformPerturbations.entrySet()){
+//				String query=null;
+//				try{
+//					query=DBCostants.perturbationUpdate(HSPENName,
+//							entry.getValue(), entry.getKey());
+//					stmt.executeUpdate(query);
+//				}catch(SQLException e){
+//					logger.error("Unable to perturb speciesId: "+entry.getKey()+" queryString :"+query,e);
+//				}catch(Exception e){
+//					logger.error("Unable to create perturbation query for speciesId: "+entry.getKey(),e);
+//				}				
+//			}
+//			
+//			JobGenerationDetails.updateSpeciesStatus(jobId, toPerformPerturbations.keySet().toArray(new String[toPerformPerturbations.keySet().size()]), SpeciesStatus.Ready);
 
 		}catch (Exception e){
 			try {
