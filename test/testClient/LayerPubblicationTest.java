@@ -2,8 +2,8 @@ package testClient;
 
 import java.sql.ResultSet;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.db.PoolManager.DBType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GISGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
