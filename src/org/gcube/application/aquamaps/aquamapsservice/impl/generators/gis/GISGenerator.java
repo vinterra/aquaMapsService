@@ -19,8 +19,8 @@ import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequestException;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;

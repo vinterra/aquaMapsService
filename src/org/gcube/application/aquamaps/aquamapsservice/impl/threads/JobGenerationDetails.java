@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
@@ -297,23 +297,23 @@ public class JobGenerationDetails {
 		}
 	}
 	
-	public static String getGIS(int submittedId) throws Exception{
-		DBSession session=null;
-		try{
-			logger.trace("Getting gis for submitted "+submittedId);
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select gis from submitted where searchId =?");
-			ps.setInt(1, submittedId);
-			ResultSet rs= ps.executeQuery();
-			rs.first();
-			return rs.getString(1);
-		}catch(Exception e ){
-			logger.error("Unexpected Error", e);
-			throw e;
-		}finally{
-			session.close();
-		}
-	}
+//	public static String getGIS(int submittedId) throws Exception{
+//		DBSession session=null;
+//		try{
+//			logger.trace("Getting gis for submitted "+submittedId);
+//			session=DBSession.openSession(PoolManager.DBType.mySql);
+//			PreparedStatement ps=session.preparedStatement("Select gis from submitted where searchId =?");
+//			ps.setInt(1, submittedId);
+//			ResultSet rs= ps.executeQuery();
+//			rs.first();
+//			return rs.getString(1);
+//		}catch(Exception e ){
+//			logger.error("Unexpected Error", e);
+//			throw e;
+//		}finally{
+//			session.close();
+//		}
+//	}
 	
 	
 	public static void createGroup (int jobId)throws Exception{
@@ -396,23 +396,23 @@ public class JobGenerationDetails {
 		}
 	}
 	
-	public static String getAuthor(int submittedId)throws Exception{
-		DBSession session=null;
-		try{
-			logger.trace("Retrieving status for submitted id "+submittedId);
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select author from submitted where searchId=?");
-			ps.setInt(1, submittedId);
-			ResultSet rs= ps.executeQuery();
-			if(rs.next())
-				return rs.getString(1);
-			else throw new Exception("Author not found for "+submittedId);
-		}catch(Exception e){
-			logger.error("Unable to retrieve status",e);
-			throw e;
-		}finally{
-			if(!session.getConnection().isClosed())session.close();
-		}
-	}
+//	public static String getAuthor(int submittedId)throws Exception{
+//		DBSession session=null;
+//		try{
+//			logger.trace("Retrieving status for submitted id "+submittedId);
+//			session=DBSession.openSession(PoolManager.DBType.mySql);
+//			PreparedStatement ps=session.preparedStatement("Select author from submitted where searchId=?");
+//			ps.setInt(1, submittedId);
+//			ResultSet rs= ps.executeQuery();
+//			if(rs.next())
+//				return rs.getString(1);
+//			else throw new Exception("Author not found for "+submittedId);
+//		}catch(Exception e){
+//			logger.error("Unable to retrieve status",e);
+//			throw e;
+//		}finally{
+//			if(!session.getConnection().isClosed())session.close();
+//		}
+//	}
 	
 }
