@@ -5,8 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +28,7 @@ public class JobSubmissionThread extends Thread {
 	
 	private static final GCUBELog logger=new GCUBELog(JobSubmissionThread.class);
 	private static final int waitTime=10*1000;
-	//private static final float defaultAlgorithmWeight=1;
+	
 	private Job toPerform;
 	private int jobId;
 	
@@ -46,8 +44,7 @@ public class JobSubmissionThread extends Thread {
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName());
 		waitingGroup=new ThreadGroup(toPerform.getName());
 		logger.trace("Passed scope : "+scope.toString());
-//		ServiceContext.getContext().setScope(this, scope);
-//		logger.trace("Setted scope : "+ServiceContext.getContext().getScope());
+
 		this.actualScope=scope;
 	}
 
@@ -198,7 +195,7 @@ public class JobSubmissionThread extends Thread {
 			session=DBSession.openSession(PoolManager.DBType.mySql);
 			session.disableAutoCommit();
 			Statement stmt =session.getConnection().createStatement();
-			stmt.execute(myJob, Statement.RETURN_GENERATED_KEYS);
+			stmt.executeUpdate(myJob, Statement.RETURN_GENERATED_KEYS);
 			ResultSet rs=stmt.getGeneratedKeys();
 			rs.first();
 			jobId=rs.getInt(1);
@@ -215,7 +212,7 @@ public class JobSubmissionThread extends Thread {
 				jobId+"', '"+ aquaMapObj.getType()+"', "+true+")";
 				Statement aquaStatement=session.getConnection().createStatement();
 				logger.trace("Going to execute : "+myAquaMapObj);
-				aquaStatement.execute(myAquaMapObj,Statement.RETURN_GENERATED_KEYS);
+				aquaStatement.executeUpdate(myAquaMapObj,Statement.RETURN_GENERATED_KEYS);
 				ResultSet rsA=aquaStatement.getGeneratedKeys();
 				rsA.first();
 				aquaMapObj.setId(String.valueOf(rsA.getInt(1)));
@@ -264,7 +261,7 @@ public class JobSubmissionThread extends Thread {
 					ps.setString(2, s.getId());
 					ps.setString(3, status);
 					ps.setBoolean(4, (hasWeight||hasPerturbation));
-					ps.execute();
+					ps.executeUpdate();
 				}
 			}else throw new Exception("Invalid job, no species found");
 			session.commit();

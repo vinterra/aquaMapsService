@@ -224,7 +224,7 @@ public class HSPECGenerator {
 						logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
 					}else{
 						psCopy.setString(1, speciesId);
-						if(!psCopy.execute()) {
+						if(psCopy.executeUpdate()==0) {
 							logger.warn("Unable to copy "+speciesId+" into "+resultsTable+". Query was "+"INSERT into "+this.resultsTable+" ( Select * from "+this.hspecTable+" where "+DBCostants.SpeciesID+"=?)");
 						}
 					}

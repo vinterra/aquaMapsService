@@ -346,36 +346,66 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 		
 		if((areaSelection!=null)&&(areaSelection.getAreasList()!=null)
 				&&(areaSelection.getAreasList().length>0)){
-			DBSession conn = DBSession.openSession(PoolManager.DBType.mySql);
-			String areaTmpTable=ServiceUtils.generateId("A", "");//"A"+(uuidGen.nextUUID()).replaceAll("-", "_");
-			conn.executeUpdate("CREATE TABLE "+areaTmpTable+" ( code varchar(50) PRIMARY KEY , type varchar(5))");
-			for(Area area: areaSelection.getAreasList())			
-				conn.executeUpdate("INSERT INTO "+areaTmpTable+" VALUES('"+area.getCode()+"','"+area.getType()+"')");
+			DBSession conn =null;
+			try{
+			conn = DBSession.openSession(PoolManager.DBType.mySql);
+			String filteredTable=ServiceUtils.generateId("A", "");
+			conn.createLikeTable(filteredTable, hspec);
+			JobGenerationDetails.addToDropTableList(jobId, filteredTable);
 			
-			logger.trace(" area temp table created");
-			JobGenerationDetails.addToDropTableList(jobId,areaTmpTable);
-			String filteredTable=ServiceUtils.generateId("A", "");//"A"+(uuidGen.nextUUID()).replaceAll("-", "_");
-			conn.executeUpdate("CREATE TABLE "+filteredTable+"(like "+DBCostants.HSPEC+" )");
-			JobGenerationDetails.addToDropTableList(jobId,filteredTable);
-			String filterQuery=DBCostants.filterCellByAreaQuery(filteredTable,hspec,areaTmpTable);
-			logger.trace("Going to use sql query "+filterQuery);			
-			conn.executeQuery(filterQuery);
-			/*ps.setString(1, filteredTable);
-			ps.setString(2, areaTmpTable);
-			ps.setString(3, areaTmpTable+".code");
-			ps.setString(4, areaTmpTable+".code");
-			ps.setString(5, areaTmpTable+".code");
-			ps.execute();*/
+//			String areaCodesTable=ServiceUtils.generateId("A", "");
+//			conn.executeUpdate("Create table "+areaCodesTable+" (type varchar(3), code int(3), primary key (type,code)) ");
+//			JobGenerationDetails.addToDropTableList(jobId, areaCodesTable);
+//			
+//			PreparedStatement areaInsertPs=conn.preparedStatement("INSERT into "+areaCodesTable+" values (?,?)");
+//			for(Area a: areaSelection.getAreasList()){
+//				areaInsertPs.setString(1, a.getType());
+//				areaInsertPs.setString(2, a.getCode());
+//				areaInsertPs.executeUpdate();
+//			}
+//			logger.trace("Area codes table "+areaCodesTable+" filled");
+//			String insertionQuery=DBCostants.filterCellByAreaQuery(filteredTable, hspec, areaCodesTable);
+//			logger.trace("Going to execute query : "+insertionQuery);
+//			long startTime=System.currentTimeMillis();
+//			conn.executeUpdate(insertionQuery);
+//			logger.trace("Query took "+ (System.currentTimeMillis()-startTime)+" ms");
+
+			PreparedStatement psFAO=conn.preparedStatement(DBCostants.filterCellByFaoAreas(filteredTable, DBCostants.HSPEC));
+			PreparedStatement psLME=conn.preparedStatement(DBCostants.filterCellByLMEAreas(filteredTable, DBCostants.HSPEC));
+			PreparedStatement psEEZ=conn.preparedStatement(DBCostants.filterCellByEEZAreas(filteredTable, DBCostants.HSPEC));
+			long startTime = System.currentTimeMillis(); 
+			for(Area area: areaSelection.getAreasList()){
+				if(area.getType().equalsIgnoreCase("LME")){
+					psLME.setString(1, area.getCode());
+					psLME.executeUpdate();
+				}else if(area.getType().equalsIgnoreCase("FAO")){
+					psFAO.setString(1, area.getCode());
+					psFAO.executeUpdate();
+				} else if(area.getType().equalsIgnoreCase("EEZ")){
+					psEEZ.setString(1, area.getCode());
+					psEEZ.executeUpdate();
+				} else logger.warn(" Invalid area type , skipped selection : code = "+area.getCode()+"; type = "+area.getType()+"; name = "+area.getName());
+			}
+			logger.trace("Completed area filtering in "+(System.currentTimeMillis()-startTime)+" ms");
+
 			
-			logger.trace(" table filtered, dropping area temp table");
-			conn.executeUpdate("drop table "+areaTmpTable);
-			conn.close();
 			toReturn=filteredTable;
+			
+			
+			
+			
+			
+			}catch (Exception e){
+				throw e;
+			}finally{
+				if((conn!=null)&&(!conn.getConnection().isClosed())){
+					conn.close();
+				}
+			}
 		}else {
 			toReturn=hspec;
 			logger.trace(jobId+" no area selected");
-		}
-		logger.trace("area filtering completed for jobid"+jobId);
+		}		
 		return toReturn;
 	}
 	

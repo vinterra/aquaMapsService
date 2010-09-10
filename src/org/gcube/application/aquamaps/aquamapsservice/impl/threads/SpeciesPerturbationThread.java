@@ -70,7 +70,7 @@ public class SpeciesPerturbationThread extends Thread {
 			//			for(int i= 0;i<species.length;i++)
 			//				insertingQuery.append("('"+species[i].getId()+"')"+((i<species.length-1)?" , ":""));
 			//			logger.trace("Inserting query : "+insertingQuery.toString());
-			//			stmt.execute(insertingQuery.toString());		
+			//			stmt.executeUpdate(insertingQuery.toString());		
 
 			//			stmt.execute("Create table "+HSPENName+" AS Select "+DBCostants.HSPEN+".* from "+DBCostants.HSPEN+","+speciesListTable+" where "+
 			//					DBCostants.HSPEN+"."+DBCostants.SpeciesID+" = "+speciesListTable+"."+DBCostants.SpeciesID);

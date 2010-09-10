@@ -219,7 +219,7 @@ public class DBSession {
 			else
 				ps.setObject(i, values[i-1]);
 		}
-		ps.execute();
+		ps.executeUpdate();
 	}
 	
 	/**

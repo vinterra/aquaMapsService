@@ -106,7 +106,7 @@ public class JobGenerationDetails {
 			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.toDropTables+" (jobId,tableName) VALUE(?,?)");
 			ps.setInt(1, jobId);
 			ps.setString(2, tableName);
-			ps.execute();
+			ps.executeUpdate();
 			//		session.close();
 		}catch (Exception e){
 			throw e;
@@ -121,7 +121,7 @@ public class JobGenerationDetails {
 			PreparedStatement ps= session.preparedStatement("Insert into "+DBCostants.tempFolders+" (jobId,folderName) VALUE(?,?)");
 			ps.setInt(1, jobId);
 			ps.setString(2, folderName);
-			ps.execute();
+			ps.executeUpdate();
 			//		session.close();
 		}catch (Exception e){
 			throw e;

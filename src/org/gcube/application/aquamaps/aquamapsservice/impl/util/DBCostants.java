@@ -53,8 +53,23 @@ public class DBCostants {
 		return query;
 	}
 	
+	
+	public static String filterCellByFaoAreas(String newName,String sourceTable){
+	return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
+		" where "+sourceTable+"."+cell_FAO+" = ? ) ";
+	}	
+	
+	public static String filterCellByLMEAreas(String newName,String sourceTable){
+		return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
+			" where "+sourceTable+"."+cell_LME+" = ? ) ";
+		}
+	public static String filterCellByEEZAreas(String newName,String sourceTable){
+		return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
+			" where find_in_set( ? , "+sourceTable+"."+cell_EEZ+")) ";
+		}
+	
 	public static String filterCellByAreaQuery(String newName,String sourceTable,String tempName){
-		String query= "Insert into "+newName+" (Select "+sourceTable+".* from "+sourceTable+" , "+tempName+	
+		String query= "Insert IGNORE into "+newName+" (Select "+sourceTable+".* from "+sourceTable+" , "+tempName+	
 		" where (("+tempName+".type ='"+FAOType+"')AND("+sourceTable+"."+cell_FAO+" = "+tempName+"."+areaCode+
 		")) OR (("+tempName+".type ='"+EEZType+"')AND( find_in_set("+tempName+"."+areaCode+" , "+sourceTable+"."+cell_EEZ+")) )"+
 		" OR (("+tempName+".type ='"+LMEType+"')AND( "+sourceTable+"."+cell_LME+" = "+tempName+"."+areaCode+")) )";
