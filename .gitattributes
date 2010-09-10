@@ -32,6 +32,17 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSessionTest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/db/DBSession.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/db/DBSessionTest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/db/PoolManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/model/AquaMapsI.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/model/AquaMapsObjectType.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/model/FileSet.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/model/JobI.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/model/SourcesType.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/model/SubmittedI.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/structure/SubmittedStatus.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/structure/SubmittedTable.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvCostants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvEngine.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_LandDist.java -text
