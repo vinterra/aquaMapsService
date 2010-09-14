@@ -27,6 +27,17 @@
 			type="java.lang.String"
 			override="false" />
 		 	
+		<environment
+			name="monitorInterval" 
+			value="600000" 
+			type="java.lang.Long"
+			override="false" />
+			
+		<environment
+			name="freeSpaceThreshold" 
+			value="20000000" 
+			type="java.lang.Long"
+			override="false" />
 	</service>
 	
 	
