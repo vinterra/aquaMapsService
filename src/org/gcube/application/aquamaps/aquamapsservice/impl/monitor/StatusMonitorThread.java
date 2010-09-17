@@ -29,10 +29,10 @@ public class StatusMonitorThread extends Thread {
 	public void run() {
 		while(true){
 			try{
-				logger.trace("Retrieving free space..");
+//				logger.trace("Retrieving free space..");
 				long currentDisk=GHNContext.getContext().getFreeSpace(GHNContext.getContext().getLocation());
-				logger.trace("Observed "+currentDisk+" / "+freeSpaceThreshold);
 				if(currentDisk<freeSpaceThreshold){
+					logger.trace("Observed "+currentDisk+" / "+freeSpaceThreshold);
 					logger.trace("Storing value..");
 					HSQLDB.insertReportItem(valueDisk, currentDisk);
 					logger.trace("Forming report..");
