@@ -52,7 +52,7 @@ public class StatusMonitorThread extends Thread {
 				logger.error("Unexpected error ", e);
 			}finally{
 				try{
-					logger.trace("Monitoring routine completed, gonna execute again in : "+interval);
+//					logger.trace("Monitoring routine completed, gonna execute again in : "+interval);
 				Thread.sleep(interval);
 				}catch(InterruptedException eI){
 					logger.trace("Awaken monitoring thread");
