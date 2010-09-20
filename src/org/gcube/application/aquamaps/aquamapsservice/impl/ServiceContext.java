@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.mortbay.jetty.Connector;
@@ -99,6 +100,14 @@ public class ServiceContext extends GCUBEServiceContext {
 		//starting the web server
 		server.start();
 	
+		
+		//Monitoring
+		long interval=(Long)this.getProperty("monitorInterval", true);
+		long threshold=(Long)this.getProperty("freeSpaceThreshold", true);
+		StatusMonitorThread t=new StatusMonitorThread(interval,threshold);
+		logger.debug("Staring monitor thread: interval = "+interval+"; freespaceThreshold="+threshold);
+		t.start();
+		
 	}
 	
 	/**

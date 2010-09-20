@@ -54,6 +54,9 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenera
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GroupGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/LayerGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/StatusMonitorThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/MapRegistration.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
@@ -91,5 +94,7 @@ test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text
 test/testClient/DBConnectionTest.java -text
+test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
 test/testClient/StyleGeneration.java -text
+test/testClient/XStreamTest.java -text

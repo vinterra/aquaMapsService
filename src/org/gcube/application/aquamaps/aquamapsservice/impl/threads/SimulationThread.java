@@ -1,5 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import java.io.IOException;
+import java.sql.SQLException;
+
 import org.gcube.application.aquamaps.aquamapsservice.impl.perturbation.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
@@ -32,7 +35,7 @@ public class SimulationThread extends Thread {
 	}
 
 	public void run() {
-		// TODO Implement simulation data generation
+		
 		
 		try{
 					String hspec;
@@ -51,7 +54,14 @@ public class SimulationThread extends Thread {
 			JobGenerationDetails.setHSPECTable(JobUtils.filterByArea(jobId,area,hspec),jobId);			
 			JobGenerationDetails.updateSpeciesStatus(jobId,JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate), SpeciesStatus.Ready);
 			JobGenerationDetails.updateStatus(jobId, Status.Generating);
-		}catch(Exception e){logger.error("Error in generating HSPEC", e);}
+		}catch(Exception e){
+			logger.error("Error in generating HSPEC", e);
+			try {
+				JobGenerationDetails.updateStatus(jobId, Status.Error);
+			} catch (Exception e1) {
+				logger.error("Unexpected Error", e1);
+			}
+			}
 		
 		
 		

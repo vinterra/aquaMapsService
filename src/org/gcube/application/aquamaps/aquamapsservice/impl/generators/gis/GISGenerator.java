@@ -85,7 +85,7 @@ public class GISGenerator {
 				try{
 					ps.setString(1, arg1.get(0));				
 					ps.setFloat(2, Float.parseFloat(arg1.get(1)));
-					if(ps.execute()) count++;
+					count+=ps.executeUpdate();
 				}catch(Exception e){
 					logger.warn("Unable to complete insertion from file "+fileName, e);
 					e.printStackTrace();
