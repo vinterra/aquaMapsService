@@ -8,16 +8,19 @@ import java.util.Map;
 
 import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.MapRegistration;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -28,7 +31,11 @@ public class DistributionThread extends Thread {
 
 	private int aquamapsId;
 	private String aquamapsName;	
-	//private String HSPECName;
+	
+	
+//	private String HSPEN;
+//	private String HCAF;
+	
 	private String[] speciesId;
 	private DBSession session;
 	private int jobId;	
@@ -57,23 +64,27 @@ public class DistributionThread extends Thread {
 	public void run() {
 		logger.trace(this.getName()+" started");
 		try {
-			while(!JobGenerationDetails.isSpeciesListReady(jobId, speciesId)){
+			while(!JobManager.isSpeciesListReady(jobId, speciesId)){
 				try{
 					Thread.sleep(waitTime);
 				}catch(InterruptedException e){}
 				logger.trace("waiting for "+speciesId[0]+" to Be ready");
 			}
-
+			
+			String sourceHSPEN=SourceManager.getSourceName(SourceType.HSPEN, JobManager.getHSPENTableId(jobId));
+			String sourceHCAF=SourceManager.getSourceName(SourceType.HCAF, JobManager.getHCAFTableId(jobId));
+			
 			boolean needToGenerate=false;
 			List<String> publishedMaps=null;
-			boolean hasCustomizations=JobGenerationDetails.isSpeciesSetCustomized(jobId,speciesId);
+			boolean hasCustomizations=JobManager.isSpeciesSetCustomized(jobId,speciesId);
 			if(hasCustomizations) {
 				needToGenerate=true;
 				logger.trace(this.getName()+" has Customizations, going to generate..");
 			}
 			else{
 				logger.trace(this.getName()+" hasn't Customizations, looking for default maps..");
-				publishedMaps=Publisher.getPublisher().getPublishedMaps(speciesId,JobGenerationDetails.getHSPENTable(jobId),JobGenerationDetails.getHCAFTable(jobId),this.actualScope);
+				
+				publishedMaps=Publisher.getPublisher().getPublishedMaps(speciesId,sourceHSPEN,sourceHCAF,this.actualScope);
 				logger.trace(this.getName()+" found "+publishedMaps.size()+" default images");
 				if(publishedMaps.size()==0) needToGenerate=true;
 			}
@@ -104,9 +115,9 @@ public class DistributionThread extends Thread {
 					///************************ PERL IMAGES GENERATION AND PUBBLICATION
 
 					String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
-					JobGenerationDetails.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
+					JobManager.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
 					logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
-					JobUtils.updateAquaMapStatus(aquamapsId,Status.Publishing);
+					SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Publishing);
 					boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
 					//				JobUtils.generateImages(clusterFile);
 					logger.trace(this.getName()+" Perl execution exit message :"+result);
@@ -139,29 +150,29 @@ public class DistributionThread extends Thread {
 				String basePath=firstUrl.substring(0, firstUrl.lastIndexOf("/")+1);
 				logger.trace(this.getName()+" "+JobUtils.linkImagesInDB(imagesNameAndLink, basePath,aquamapsId)+" file information inserted in DB");
 				if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
-					String layer= Publisher.getPublisher().getPublishedLayer(speciesId,JobGenerationDetails.getHSPENTable(jobId),JobGenerationDetails.getHCAFTable(jobId),this.actualScope);
+					String layer= Publisher.getPublisher().getPublishedLayer(speciesId,sourceHSPEN,sourceHCAF,this.actualScope);
 					
 					if(layer!=null){
 						logger.trace("Going to associate to pre-generated layer "+layer);
-						JobGenerationDetails.updateGISData(aquamapsId, layer);
+						JobManager.updateGISData(aquamapsId, layer);
 					}else{
 						ResultSet rs=queryForProbabilities();
 						String csvFile=generateCsvFile(rs);
 						session.close();
 						generateLayerFromCsv(csvFile);
-						layer= JobGenerationDetails.getGIS(aquamapsId);
-						Publisher.getPublisher().registerLayer(speciesId, JobGenerationDetails.getHSPENTable(jobId),JobGenerationDetails.getHCAFTable(jobId),layer);
+						layer= JobManager.getGIS(aquamapsId);
+						Publisher.getPublisher().registerLayer(speciesId, sourceHSPEN,sourceHCAF,layer);
 					}					
 						
 				}
 			}
 
 
-			JobUtils.updateAquaMapStatus(aquamapsId,Status.Completed);
+			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Completed);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			try {
-				JobUtils.updateAquaMapStatus(aquamapsId, Status.Error);
+				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Error);
 			} catch (Exception e1) {
 				logger.error("Unable to handle previous error! : "+e1.getMessage());
 			}
@@ -199,15 +210,15 @@ public class DistributionThread extends Thread {
 	
 	
 	private ResultSet queryForProbabilities()throws Exception{
-		String HSPECName=JobGenerationDetails.getHSPECTable(jobId);
-		JobUtils.updateAquaMapStatus(aquamapsId,Status.Simulating);
+		String HSPECName=JobManager.getWorkingHSPEC(jobId);
+		SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Simulating);
 		session=DBSession.openSession(PoolManager.DBType.mySql);
 
 		String clusteringQuery=DBCostants.clusteringDistributionQuery(HSPECName);
 		logger.trace("Gonna use query "+clusteringQuery);
 		PreparedStatement ps= session.preparedStatement(clusteringQuery);
 		ps.setString(1,speciesId[0]);
-		//		ps.setFloat(2,toPerform.getThreshold());
+
 
 		return ps.executeQuery();
 	}

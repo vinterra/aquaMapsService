@@ -1,104 +1,87 @@
-package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
+package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import it.cnr.isti.geoserverInteraction.GeoserverCaller;
 import it.cnr.isti.geoserverInteraction.bean.LayerRest;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 
-import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
-import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.TaxonomyType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.AquaMap;
+import org.gcube.application.aquamaps.stubs.Job;
+import org.gcube.application.aquamaps.stubs.Specie;
 
-public class JobGenerationDetails {
-	private static GCUBELog logger= new GCUBELog(JobGenerationDetails.class);
-	//	public static final String Biodiversity="Biodiversity";
-	//	public static final String SpeciesDistribution="SpeciesDistribution";
-
-	public enum SpeciesStatus{
-		toCustomize,toGenerate,Ready
-	}
-
-	public enum Status {
-		Pending,Simulating,Generating,Publishing,Completed,Error
-	}
-	private enum Sources{
-		HCAF,HSPEC,HSPEN
-	}
-
-
-	private static void updateSource(Sources sourceField,String source,int jobId)throws Exception{
+public class JobManager extends SubmittedManager{
+	
+	//******************************************* working tables management ***************************************
+	
+	protected static final String workingTables="workingTables";
+	protected static final String tableField="tableName";
+	protected static final String tableTypeField="tableType";
+	protected static void setWorkingTable(int submittedId,String tableType,String tableName)throws Exception{
 		DBSession session=null;
 		try{
-			session= DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("Update submitted set "+sourceField.toString()+" = ? where searchId = ?");
-			ps.setString(1, source);
-			ps.setInt(2,jobId);
-			ps.execute();
-			//		session.close();
+			session=DBSession.openSession(PoolManager.DBType.mySql);			
+			PreparedStatement ps= session.preparedStatement("INSERT into "+workingTables+" SET "+searchId+"=? , "+tableTypeField+"=? ,"+tableField+"=? ON DUPLICATE KEY UPDATE "+tableField+"=?");
+			ps.setInt(1, submittedId);
+			ps.setString(2, tableType);
+			ps.setString(3,tableName);
+			ps.setString(4,tableName);
+			ps.executeUpdate();
 		}catch (Exception e){
 			throw e;
 		}finally {
 			session.close();
 		}
-	}	
-	private static String getSource(Sources source,int jobId)throws Exception{
-		DBSession session = null;
+	}
+	
+	protected static String getWorkingTable (int submittedId,String tableType)throws Exception{
+		DBSession session=null;
 		try{
-			session= DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("Select "+source.toString()+" from submitted where searchId = ?");
-			ps.setInt(1, jobId);
-			ResultSet rs =ps.executeQuery();
-			rs.first();
-			String toReturn=rs.getString(1);
-			//		session.close();
-			return toReturn;
+			session=DBSession.openSession(PoolManager.DBType.mySql);			
+			PreparedStatement ps= session.preparedStatement("Select * from "+workingTables+" where "+searchId+"=? AND "+tableTypeField+"=?");
+			ps.setInt(1, submittedId);
+			ps.setString(2, tableType);
+			ResultSet rs= ps.executeQuery();
+			rs.next();
+			return rs.getString(tableField);
 		}catch (Exception e){
 			throw e;
 		}finally {
 			session.close();
 		}
 	}
-
-	public static void setHCAFTable(String HCAFId,int jobId)throws Exception{
-		String toSet=(HCAFId==null)?DBCostants.HCAF_D:HCAFId;
-		updateSource(Sources.HCAF,toSet,jobId);
+	
+	public static void setWorkingHCAF(int submittedId,String tableName)throws Exception{
+		setWorkingTable(submittedId,SourceType.HCAF.toString(),tableName);
 	}
-
-	public static void setHSPENTable(String HCAFId,int jobId)throws Exception{
-		String toSet=(HCAFId==null)?DBCostants.HSPEN:HCAFId;
-		updateSource(Sources.HSPEN,toSet,jobId);
+	public static void setWorkingHSPEN(int submittedId,String tableName)throws Exception{
+		setWorkingTable(submittedId,SourceType.HSPEN.toString(),tableName);
 	}
-	public static void setHSPECTable(String HCAFId,int jobId)throws Exception{
-		String toSet=(HCAFId==null)?DBCostants.HSPEC:HCAFId;
-		updateSource(Sources.HSPEC,toSet,jobId);
+	public static void setWorkingHSPEC(int submittedId,String tableName)throws Exception{
+		setWorkingTable(submittedId,SourceType.HSPEC.toString(),tableName);
 	}
-
-	public static String getHCAFTable(int jobId)throws Exception{
-		String toReturn= getSource(Sources.HCAF, jobId);
-		return (toReturn==null)?DBCostants.HCAF_D:toReturn;
+	public static String getWorkingHCAF(int submittedId)throws Exception{
+		return getWorkingTable(submittedId,SourceType.HCAF.toString());
 	}
-
-	public static String getHSPENTable(int jobId)throws Exception{
-		String toReturn= getSource(Sources.HSPEN, jobId);
-		return (toReturn==null)?DBCostants.HSPEN:toReturn;		
+	public static String getWorkingHSPEN(int submittedId)throws Exception{
+		return getWorkingTable(submittedId,SourceType.HSPEN.toString());
 	}
-
-	public static String getHSPECTable(int jobId)throws Exception{
-		String toReturn= getSource(Sources.HSPEC, jobId);
-		return (toReturn==null)?DBCostants.HSPEC:toReturn;
+	public static String getWorkingHSPEC(int submittedId)throws Exception{
+		return getWorkingTable(submittedId,SourceType.HSPEC.toString());
 	}
+	
 	public static void addToDropTableList(int jobId,String tableName)throws Exception{
 		DBSession session=null;
 		try{
@@ -129,24 +112,7 @@ public class JobGenerationDetails {
 			session.close();
 		}
 	}
-	public static void updateStatus(int jobId,Status status)throws SQLException, IOException, Exception{
-		DBSession session=null;
-		try{
-			session=DBSession.openSession(PoolManager.DBType.mySql);		
-			//		toUpdate.setStatus(status.toString());
-			PreparedStatement ps=session.preparedStatement(DBCostants.submittedStatusUpdating);
-			ps.setString(1, status.toString());		
-			ps.setInt(2,jobId);
-			ps.execute();		
-			//		updateProfile(toUpdate.getName(),toUpdate.getId(),makeJobProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
-			logger.trace("done Job status updateing status : "+status.toString());
-			//		session.close();
-		}catch (Exception e){
-			throw e;
-		}finally {
-			session.close();
-		}
-	}
+	
 	public static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
 		DBSession session=null;
 		try{
@@ -197,8 +163,8 @@ public class JobGenerationDetails {
 			session=DBSession.openSession(PoolManager.DBType.mySql);		
 			PreparedStatement ps =session.preparedStatement("Select count(*) from submitted where jobId=? AND status!=? AND status!=?");
 			ps.setInt(1, jobId);
-			ps.setString(2, Status.Error.toString());
-			ps.setString(3, Status.Completed.toString());
+			ps.setString(2, SubmittedStatus.Error.toString());
+			ps.setString(3, SubmittedStatus.Completed.toString());
 			ResultSet rs=ps.executeQuery();
 			rs.first();
 			boolean toReturn=rs.getInt(1)==0;
@@ -224,7 +190,7 @@ public class JobGenerationDetails {
 			}
 			ps=session.preparedStatement("Delete from "+DBCostants.toDropTables+" where jobId=?");
 			ps.setInt(1, jobId);
-			ps.execute();			
+			ps.executeUpdate();			
 			logger.debug("cleaning folders for : "+jobId);
 			ps=session.preparedStatement("Select folderName from "+DBCostants.tempFolders+" where jobId=?");
 			ps.setInt(1, jobId);
@@ -244,14 +210,15 @@ public class JobGenerationDetails {
 			}
 			ps=session.preparedStatement("Delete from "+DBCostants.tempFolders+" where jobId=?");
 			ps.setInt(1, jobId);
-			ps.execute();
+			ps.executeUpdate();
 			logger.debug("cleaning speceisSelection for : "+jobId);
 			ps=session.preparedStatement("Delete from "+DBCostants.selectedSpecies+" where jobId=?");
 			ps.setInt(1, jobId);
-			ps.execute();
-			
-			
-			//		session.close();
+			ps.executeUpdate();
+			logger.debug("cleaning references to working tables for : "+jobId);
+			ps=session.preparedStatement("Delete from "+workingTables+" where "+searchId+" = ?");
+			ps.setInt(1,jobId);
+			ps.executeUpdate();
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -271,7 +238,6 @@ public class JobGenerationDetails {
 				if(!(rs.getString("status").equalsIgnoreCase(SpeciesStatus.Ready.toString())))
 					return false;
 			}
-			//		session.close();
 			return true;
 		}catch (Exception e){
 			throw e;
@@ -280,40 +246,7 @@ public class JobGenerationDetails {
 		}
 	}
 	
-	public static void updateGISData(int submittedId,String GeoId)throws Exception{
-		DBSession session=null;
-		try{
-			logger.trace("Setting GIS data "+GeoId+" for submitted Id "+submittedId);
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Update submitted set gis=? where searchId=?");
-			ps.setString(1, GeoId);
-			ps.setInt(2, submittedId);
-			logger.trace("updated "+ps.executeUpdate()+" entries");
-		}catch(Exception e ){
-			logger.error("Unexpected Error", e);
-			throw e;
-		}finally{
-			session.close();
-		}
-	}
 	
-	public static String getGIS(int submittedId) throws Exception{
-		DBSession session=null;
-		try{
-			logger.trace("Getting gis for submitted "+submittedId);
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select gis from submitted where searchId =?");
-			ps.setInt(1, submittedId);
-			ResultSet rs= ps.executeQuery();
-			rs.first();
-			return rs.getString(1);
-		}catch(Exception e ){
-			logger.error("Unexpected Error", e);
-			throw e;
-		}finally{
-			session.close();
-		}
-	}
 	
 	
 	public static void createGroup (int jobId)throws Exception{
@@ -355,23 +288,7 @@ public class JobGenerationDetails {
 	}
 	
 	
-	public static Status getStatus(int submittedId)throws Exception{
-		DBSession session=null;
-		try{
-			logger.trace("Retrieving status for submitted id "+submittedId);
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select status from submitted where searchId=?");
-			ps.setInt(1, submittedId);
-			ResultSet rs= ps.executeQuery();
-			if(rs.next()) return Status.valueOf(rs.getString(1));
-			else throw new Exception("Status not found");			
-		}catch(Exception e){
-			logger.error("Unable to retrieve status",e);
-			throw e;
-		}finally{
-			if(!session.getConnection().isClosed())session.close();
-		}
-	}
+	
 	
 	public static boolean isSpeciesSetCustomized(int submittedId,String[] ids)throws Exception{
 		DBSession session=null;		
@@ -396,22 +313,111 @@ public class JobGenerationDetails {
 		}
 	}
 	
-	public static String getAuthor(int submittedId)throws Exception{
+	
+	
+	
+	
+	/**Creates a new entry in Job table and AquaMap table (for every aquamap object in job)
+	 * 
+	 * @return new job id
+	 */
+	public static int insertNewJob(Job toPerform) throws Exception{
+		logger.trace("Creating new pending Job");
+		Integer jobId=null;
+		String myData = ServiceUtils.getDate();
+		String submittedInsertion="INSERT INTO "+submittedTable+" ("+title+","+author+","+date+","+status+","+isAquaMap+","+type+
+								","+sourceHCAF+","+sourceHSPEC+","+sourceHSPEN+","+JobManager.jobId+") values (?,?,?,?,?,?,?,?,?,?)";
 		DBSession session=null;
 		try{
-			logger.trace("Retrieving status for submitted id "+submittedId);
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select author from submitted where searchId=?");
-			ps.setInt(1, submittedId);
-			ResultSet rs= ps.executeQuery();
-			if(rs.next())
-				return rs.getString(1);
-			else throw new Exception("Author not found for "+submittedId);
-		}catch(Exception e){
-			logger.error("Unable to retrieve status",e);
+			session.disableAutoCommit();
+			PreparedStatement ps =session.getConnection().prepareStatement(submittedInsertion,Statement.RETURN_GENERATED_KEYS);
+			ps.setString(1, toPerform.getName());
+			ps.setString(2, toPerform.getAuthor());
+			ps.setString(3, myData);
+			ps.setString(4,SubmittedStatus.Pending.toString());
+			ps.setBoolean(5, false);
+			ps.setObject(6,null);
+			int HCAFId=((toPerform.getHcaf()!=null)&&(toPerform.getHcaf().getId()!=null))?Integer.parseInt(toPerform.getHcaf().getId()):SourceManager.getDefaultId(SourceType.HCAF);
+			int HSPENId=((toPerform.getHspen()!=null)&&(toPerform.getHspen().getId()!=null))?Integer.parseInt(toPerform.getHspen().getId()):SourceManager.getDefaultId(SourceType.HSPEN);
+			int HSPECId=((toPerform.getHspec()!=null)&&(toPerform.getHspec().getId()!=null))?Integer.parseInt(toPerform.getHspec().getId()):SourceManager.getDefaultId(SourceType.HSPEC);
+			ps.setInt(7, HCAFId);
+			ps.setInt(8,HSPECId);
+			ps.setInt(9, HSPENId);
+			ps.setObject(10,null);
+			ps.executeUpdate();
+			ResultSet rs=ps.getGeneratedKeys();
+			rs.first();
+			jobId=rs.getInt(1);
+			toPerform.setId(String.valueOf(jobId));			
+			//TODO make jobProfile
+			
+			ps.setBoolean(5, true);
+			ps.setInt(10,jobId);
+			logger.trace("inserting associated aquamapsObj(s)");
+			
+			for(AquaMap aquaMapObj:toPerform.getAquaMapList().getAquaMapList()){
+				
+				ps.setString(1, aquaMapObj.getName());
+				ps.setString(6,aquaMapObj.getType());
+				ps.executeUpdate();
+				rs=ps.getGeneratedKeys();
+				rs.first();
+				aquaMapObj.setId(String.valueOf(rs.getInt(1)));
+				
+				JobUtils.updateProfile(aquaMapObj.getName(), aquaMapObj.getId(), JobUtils.makeAquaMapProfile(aquaMapObj),
+						SourceManager.getSourceName(SourceType.HSPEC,HSPECId), String.valueOf(jobId));
+			}
+
+
+
+			if((toPerform.getSelectedSpecies()!=null)&&(toPerform.getSelectedSpecies().getSpeciesList()!=null)&&
+					(toPerform.getSelectedSpecies().getSpeciesList().length>0)){
+
+				boolean hasPerturbation=false;
+				if((toPerform.getEnvelopCustomization()!=null)&&(toPerform.getEnvelopCustomization().getPerturbationList()!=null)&&
+						(toPerform.getEnvelopCustomization().getPerturbationList().length>0)) hasPerturbation=true;
+
+				boolean hasWeight=false;
+				if((toPerform.getWeights()!=null)&&(toPerform.getWeights().getEnvelopeWeightList()!=null)&&
+						(toPerform.getWeights().getEnvelopeWeightList().length>0)) hasWeight=true;
+
+				PreparedStatement psSpecies=session.preparedStatement("Insert into "+DBCostants.selectedSpecies+" (jobId,speciesId,status,isCustomized) value(?,?,?,?)");
+				psSpecies.setInt(1, jobId);
+				for(Specie s:toPerform.getSelectedSpecies().getSpeciesList()){
+					String status=SpeciesStatus.Ready.toString();
+					if(hasWeight){
+						for(int i=0;i<toPerform.getWeights().getEnvelopeWeightList().length;i++){
+							String sId=toPerform.getWeights().getEnvelopeWeightList(i).getSpeciesId();
+							if(sId.equalsIgnoreCase(s.getId())){
+								status=SpeciesStatus.toGenerate.toString();
+								break;
+							}
+						}
+					}
+					if(hasPerturbation){
+						for(int i=0;i<toPerform.getEnvelopCustomization().getPerturbationList().length;i++){
+							String sId=toPerform.getEnvelopCustomization().getPerturbationList(i).getToPerturbId();
+							if(sId.equalsIgnoreCase(s.getId())){
+								status=SpeciesStatus.toCustomize.toString();
+								break;
+							}
+						}
+					}
+					psSpecies.setString(2, s.getId());
+					psSpecies.setString(3, status);
+					psSpecies.setBoolean(4, (hasWeight||hasPerturbation));
+					psSpecies.executeUpdate();
+				}
+			}else throw new Exception("Invalid job, no species found");
+			session.commit();
+			session.close();			
+			logger.trace("New Job created with Id "+jobId);
+			return jobId;
+		}catch (Exception e){
 			throw e;
-		}finally{
-			if(!session.getConnection().isClosed())session.close();
+		}finally {
+			session.close();
 		}
 	}
 	

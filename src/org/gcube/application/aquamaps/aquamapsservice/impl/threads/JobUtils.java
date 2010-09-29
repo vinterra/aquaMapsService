@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,13 +17,11 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.Area;
-import org.gcube.application.aquamaps.stubs.AreasArray;
 import org.gcube.application.aquamaps.stubs.Cell;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
@@ -228,18 +225,18 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 	
 	
 	
-	public static void updateAquaMapStatus(int aquamapsId,JobGenerationDetails.Status status)throws SQLException,IOException, Exception{
-//		toUpdate.setStatus(status.toString());
-		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
-		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
-		ps.setString(1, status.toString());
-		ps.setInt(2,aquamapsId);		
-		ps.execute();	
-		c.close();
-//		updateProfile(toUpdate.getName(),toUpdate.getId(),makeAquaMapProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
-		logger.trace("done AquaMap status updateing status : "+status.toString());
-		
-	}
+//	public static void updateAquaMapStatus(int aquamapsId,JobManager.Status status)throws SQLException,IOException, Exception{
+////		toUpdate.setStatus(status.toString());
+//		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
+//		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
+//		ps.setString(1, status.toString());
+//		ps.setInt(2,aquamapsId);		
+//		ps.execute();	
+//		c.close();
+////		updateProfile(toUpdate.getName(),toUpdate.getId(),makeAquaMapProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
+//		logger.trace("done AquaMap status updateing status : "+status.toString());
+//		
+//	}
 	
 
 	
@@ -331,83 +328,7 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 	}
 	
 	
-	/**
-	 * returns a new HSPEC table name filtering selected HSPEC against Area selection if any
-	 * 
-	 * @param details
-	 * @return
-	 * @throws SQLException
-	 */
-	
-	
-	public static String filterByArea(int jobId,AreasArray areaSelection,String hspec)throws Exception{
-		String toReturn;		
-		logger.trace(" filtering simulation data on area selection for jobId:"+jobId);
-		
-		if((areaSelection!=null)&&(areaSelection.getAreasList()!=null)
-				&&(areaSelection.getAreasList().length>0)){
-			DBSession conn =null;
-			try{
-			conn = DBSession.openSession(PoolManager.DBType.mySql);
-			String filteredTable=ServiceUtils.generateId("A", "");
-			conn.createLikeTable(filteredTable, hspec);
-			JobGenerationDetails.addToDropTableList(jobId, filteredTable);
-			
-//			String areaCodesTable=ServiceUtils.generateId("A", "");
-//			conn.executeUpdate("Create table "+areaCodesTable+" (type varchar(3), code int(3), primary key (type,code)) ");
-//			JobGenerationDetails.addToDropTableList(jobId, areaCodesTable);
-//			
-//			PreparedStatement areaInsertPs=conn.preparedStatement("INSERT into "+areaCodesTable+" values (?,?)");
-//			for(Area a: areaSelection.getAreasList()){
-//				areaInsertPs.setString(1, a.getType());
-//				areaInsertPs.setString(2, a.getCode());
-//				areaInsertPs.executeUpdate();
-//			}
-//			logger.trace("Area codes table "+areaCodesTable+" filled");
-//			String insertionQuery=DBCostants.filterCellByAreaQuery(filteredTable, hspec, areaCodesTable);
-//			logger.trace("Going to execute query : "+insertionQuery);
-//			long startTime=System.currentTimeMillis();
-//			conn.executeUpdate(insertionQuery);
-//			logger.trace("Query took "+ (System.currentTimeMillis()-startTime)+" ms");
 
-			PreparedStatement psFAO=conn.preparedStatement(DBCostants.filterCellByFaoAreas(filteredTable, DBCostants.HSPEC));
-			PreparedStatement psLME=conn.preparedStatement(DBCostants.filterCellByLMEAreas(filteredTable, DBCostants.HSPEC));
-			PreparedStatement psEEZ=conn.preparedStatement(DBCostants.filterCellByEEZAreas(filteredTable, DBCostants.HSPEC));
-			long startTime = System.currentTimeMillis(); 
-			for(Area area: areaSelection.getAreasList()){
-				if(area.getType().equalsIgnoreCase("LME")){
-					psLME.setString(1, area.getCode());
-					psLME.executeUpdate();
-				}else if(area.getType().equalsIgnoreCase("FAO")){
-					psFAO.setString(1, area.getCode());
-					psFAO.executeUpdate();
-				} else if(area.getType().equalsIgnoreCase("EEZ")){
-					psEEZ.setString(1, area.getCode());
-					psEEZ.executeUpdate();
-				} else logger.warn(" Invalid area type , skipped selection : code = "+area.getCode()+"; type = "+area.getType()+"; name = "+area.getName());
-			}
-			logger.trace("Completed area filtering in "+(System.currentTimeMillis()-startTime)+" ms");
-
-			
-			toReturn=filteredTable;
-			
-			
-			
-			
-			
-			}catch (Exception e){
-				throw e;
-			}finally{
-				if((conn!=null)&&(!conn.getConnection().isClosed())){
-					conn.close();
-				}
-			}
-		}else {
-			toReturn=hspec;
-			logger.trace(jobId+" no area selected");
-		}		
-		return toReturn;
-	}
 	
 	public static String createClusteringFile(String objectName,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
 		
@@ -446,58 +367,7 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 		}
 		
 		
-//		File f2 = new File(basePath+aquamapName+"/"+aquamapName+"_afr.jpg");
-//		if (f2.exists())
-//			toReturn.put("Continent View : Africa", f2.getAbsolutePath());						
-//				
-//		File f3 = new File(basePath+aquamapName+"/"+aquamapName+"_asia.jpg");
-//		if (f3.exists())
-//			toReturn.put("Continent View : Asia", f3.getAbsolutePath());			
-//				
-//		File f4 = new File(basePath+aquamapName+"/"+aquamapName+"_aus.jpg");
-//		if (f4.exists())
-//			toReturn.put("Continent View : Australia", f4.getAbsolutePath());			
-//				
-//		File f5 = new File(basePath+aquamapName+"/"+aquamapName+"_eur.jpg");
-//		if (f5.exists())			
-//			toReturn.put("Continent View : Europa", f5.getAbsolutePath());
-//				
-//		File f6 = new File(basePath+aquamapName+"/"+aquamapName+"_nAm.jpg");
-//		if (f6.exists())			
-//			toReturn.put("Continent View : North America", f6.getAbsolutePath());
-//		
-//		File f7 = new File(basePath+aquamapName+"/"+aquamapName+"_sAm.jpg");
-//		if (f7.exists())			
-//			toReturn.put("Continent View : South America", f7.getAbsolutePath());
-//		
-//		File f8 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapAtlan.jpg");
-//		if (f8.exists())			
-//			toReturn.put("Ocean View : Atlantic", f8.getAbsolutePath());
-//		
-//		File f9 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapI.jpg");
-//		if (f9.exists())
-//			toReturn.put("Ocean View : Indian", f9.getAbsolutePath());			
-//		
-//		File f10 = new File(basePath+aquamapName+"/"+aquamapName+"_xmapN.jpg");
-//		if (f10.exists())			
-//			toReturn.put("Pole View : Artic", f10.getAbsolutePath());
-//		
-//		File f11= new File(basePath+aquamapName+"/"+aquamapName+"_xmapNAtlan.jpg");
-//		if (f11.exists())			
-//			toReturn.put("Ocean View : North Atlantic", f11.getAbsolutePath());
-//				
-//		File f12= new File(basePath+aquamapName+"/"+aquamapName+"_xmapP.jpg");
-//		if (f12.exists())
-//			toReturn.put("Ocean View : Pacific", f12.getAbsolutePath());			
-//		
-//		File f13= new File(basePath+aquamapName+"/"+aquamapName+"_xmapS.jpg");
-//		if (f13.exists())			
-//			toReturn.put("Pole View : Antarctic", f13.getAbsolutePath());
-//				
-//		File f14= new File(basePath+aquamapName+"/"+aquamapName+"_xmapSAtlan.jpg");
-//		if (f14.exists())	
-//			toReturn.put("Ocean View : South Atlantic", f14.getAbsolutePath());
-//		
+		
 		return toReturn;
 	}
 	

@@ -1,7 +1,10 @@
-package org.gcube.application.aquamaps.aquamapsservice.impl.util;
+package org.gcube.application.aquamaps.aquamapsservice.impl.db;
 
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
@@ -19,9 +22,9 @@ public class DBCostants {
 	public static final String selectedSpecies="selectedSpecies";
 	public static final String HCAF_S="HCAF_S";
 	public static final String JOB_Table="submitted";
-	public static final String HCAF_D="HCAF_D";
-	public static final String HSPEN="hspen";
-	public static final String HSPEC="HSPEC";
+//	public static final String HCAF_D="HCAF_D";
+//	public static final String HSPEN="hspen";
+//	public static final String HSPEC="HSPEC";
 	public static final String speciesOccurSum="speciesoccursum";
 	public static final String GOOD_CELLS="occurrenceCells";
 	
@@ -103,8 +106,13 @@ public class DBCostants {
 		return toReturn.toString();
 	}
 	
-	public static final String completeSpeciesById="Select * from "+speciesOccurSum+" INNER JOIN "+HSPEN+" ON "+speciesOccurSum+"."+SpeciesID+"="+HSPEN+"."+SpeciesID+" where "+speciesOccurSum+"."+SpeciesID+" = ? ";
-	public static final String completeCellById="Select * from "+HCAF_S+" INNER JOIN "+HCAF_D+" ON "+HCAF_S+"."+cSquareCode+"="+HCAF_D+"."+cSquareCode+" where "+HCAF_S+"."+cSquareCode+" = ? ";
+	public static final String completeSpeciesById(String HSPEN){
+		return "Select * from "+speciesOccurSum+" INNER JOIN "+HSPEN+" ON "+speciesOccurSum+"."+SpeciesID+"="+HSPEN+"."+SpeciesID+" where "+speciesOccurSum+"."+SpeciesID+" = ? ";
+	}
+	
+	public static final String completeCellById(String HCAF_D){
+		return "Select * from "+HCAF_S+" INNER JOIN "+HCAF_D+" ON "+HCAF_S+"."+cSquareCode+"="+HCAF_D+"."+cSquareCode+" where "+HCAF_S+"."+cSquareCode+" = ? ";
+	}
 	
 	public static final String profileUpdate="Update Files set Path=? where owner=? and type ='XML'";
 	
@@ -122,7 +130,9 @@ public class DBCostants {
 	
 	public static String[] filterSpecies(GetSpeciesByFiltersRequestType req)throws Exception{
 		String selHspen=req.getHspen();
-		selHspen=HSPEN;
+		
+		//FIXME request is never complete with HSPEN id
+		selHspen=SourceManager.getSourceName(SourceType.HSPEN, SourceManager.getDefaultId(SourceType.HSPEN));
 		FieldArray characteristics=req.getCharacteristicFilters();
 		FilterArray names=req.getNameFilters();
 		FilterArray codes=req.getCodeFilters();
@@ -189,9 +199,13 @@ public class DBCostants {
 	
 	public static final String fileInsertion="INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)";
 	
-	public static final String speciesEnvelop="Select * from "+HSPEN+" where "+SpeciesID+" = ?";
+	public static final String speciesEnvelop(String HSPEN){
+		return "Select * from "+HSPEN+" where "+SpeciesID+" = ?";
+	}
 	
-	public static final String cellEnvironment="Select * from "+HCAF_D+" where "+cSquareCode+" = ?";
+	public static final String cellEnvironment(String HCAF_D){
+		return "Select * from "+HCAF_D+" where "+cSquareCode+" = ?";
+	}
 	
 	public static final String submittedRetrieval="Select * from "+JOB_Table+" where searchId = ?";
 	
@@ -242,4 +256,13 @@ public class DBCostants {
 	}
 	
 	public static final String markSaved="Update "+JOB_Table+" set saved = true where searchId=?";
+
+	public static String getMetaTable(SourceType type) throws Exception{
+		switch(type){
+		case HCAF: return "Meta_HCaf";
+		case HSPEC: return "Meta_HSPEC";
+		case HSPEN: return "Meta_HSpen";
+		}
+		throw new Exception("Source type not valid "+type.toString());
+	}
 }

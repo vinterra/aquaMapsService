@@ -7,20 +7,20 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
 import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.Status;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -48,8 +48,6 @@ public class BiodiversityThread extends Thread {
 		this.aquamapsName=aquamapsName;
 		this.jobId=jobId;	
 		logger.trace("Passed scope : "+scope.toString());
-//		ServiceContext.getContext().setScope(this, scope);
-//		logger.trace("Setted scope : "+ServiceContext.getContext().getScope());
 		this.actualScope=scope;
 	}
 
@@ -64,7 +62,7 @@ public class BiodiversityThread extends Thread {
 		logger.trace(this.getName()+" started");
 		try {
 			//Waiting for needed simulation data
-			while(!JobGenerationDetails.isSpeciesListReady(jobId,species)){
+			while(!JobManager.isSpeciesListReady(jobId,species)){
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}			
@@ -73,7 +71,7 @@ public class BiodiversityThread extends Thread {
 
 			boolean needToGenerate=true;
 			List<String> publishedMaps=null;
-			boolean hasCustomizations=JobGenerationDetails.isSpeciesSetCustomized(jobId,species);
+			boolean hasCustomizations=JobManager.isSpeciesSetCustomized(jobId,species);
 //			if(hasCustomizations) {
 //				needToGenerate=true;
 //				logger.trace(this.getName()+" has Customizations, going to generate..");
@@ -90,7 +88,7 @@ public class BiodiversityThread extends Thread {
 				logger.trace(this.getName()+" entering image generation phase");
 
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			JobUtils.updateAquaMapStatus(aquamapsId, Status.Generating);
+			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Generating);
 			String tableName=ServiceUtils.generateId("S", "");
 			PreparedStatement prep=null;
 			String creationSQL="CREATE TABLE "+tableName+" ("+DBCostants.SpeciesID+" varchar(50) PRIMARY KEY )";
@@ -98,14 +96,14 @@ public class BiodiversityThread extends Thread {
 
 			session.executeUpdate(creationSQL);
 
-			JobGenerationDetails.addToDropTableList(jobId, tableName);	
+			JobManager.addToDropTableList(jobId, tableName);	
 			for(String specId: species){
 				session.executeUpdate("INSERT INTO "+tableName+" VALUES('"+specId+"')");
 				logger.trace("INSERT INTO "+tableName+" VALUES('"+specId+"')");
 				;}
 			logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
-			HSPECName=JobGenerationDetails.getHSPECTable(jobId);
-			JobUtils.updateAquaMapStatus(aquamapsId, Status.Simulating);
+			HSPECName=JobManager.getWorkingHSPEC(jobId);
+			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Simulating);
 			prep=session.preparedStatement(DBCostants.clusteringBiodiversityQuery(HSPECName,tableName));				
 			prep.setFloat(1,threshold);
 			ResultSet rs=prep.executeQuery();
@@ -136,9 +134,9 @@ public class BiodiversityThread extends Thread {
 			if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 			else {
 				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
-				JobGenerationDetails.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
+				JobManager.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
 				logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
-				JobUtils.updateAquaMapStatus(aquamapsId, Status.Publishing);
+				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Publishing);
 				boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
 //				JobUtils.generateImages(clusterFile);
 				logger.trace(this.getName()+" Perl execution exit message :"+result);		
@@ -201,11 +199,11 @@ public class BiodiversityThread extends Thread {
 				
 			}
 			
-			JobUtils.updateAquaMapStatus(aquamapsId, Status.Completed);
+			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Completed);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			try {
-				JobUtils.updateAquaMapStatus(aquamapsId, Status.Error);
+				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Error);
 			} catch (Exception e1) {
 				logger.error("Unable to handle previous error! : "+e1.getMessage());
 			}
