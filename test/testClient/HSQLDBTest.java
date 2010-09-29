@@ -9,8 +9,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.ReportItem;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBUtils;
 
 public class HSQLDBTest {
 

@@ -1,5 +1,6 @@
 <ReleaseNotes>
-	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2010-07-16">
-		<Change>Added publishing on AquaMaps Publisher Service</Change>		
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2010-09-29">
+		<Change>Improved sources management</Change>
+		<Change>Added disk monitoring and publishing in RI</Change>		
 	</Changeset>	
 </ReleaseNotes>
