@@ -1,7 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.monitor;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.AreaPerturbationThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
