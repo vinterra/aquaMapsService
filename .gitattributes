@@ -25,8 +25,10 @@ lib/csv4j_gcube.jar -text
 lib/geoserverInt.jar -text
 lib/postgresql-8.4-701.jdbc3.jar -text
 schema/AquaMaps.wsdl -text
+schema/DataManagement.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBCostants.java -text
@@ -36,6 +38,8 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/JobManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationStatus.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceType.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesStatus.java -text
@@ -58,6 +62,9 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorTest
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/ImageGeneratorRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/PerlCallsFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/PerlImageGenerator.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/SourceGenerator.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/SourceGeneratorFactory.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/SourceGeneratorRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GroupGenerationRequest.java -text
@@ -74,6 +81,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThre
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobSubmissionThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SimulationThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SourceGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SpeciesPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/DataTranslation.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text

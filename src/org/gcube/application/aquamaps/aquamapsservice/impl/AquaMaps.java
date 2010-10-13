@@ -19,6 +19,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
 import org.gcube.application.aquamaps.stubs.Area;
 import org.gcube.application.aquamaps.stubs.AreasArray;
 import org.gcube.application.aquamaps.stubs.CalculateEnvelopeRequestType;
@@ -49,7 +50,7 @@ import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
 import org.gcube.common.core.types.VOID;
 
-public class AquaMaps extends GCUBEPortType {
+public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 
 
 

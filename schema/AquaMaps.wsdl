@@ -396,7 +396,9 @@
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
-				
+			
+			
+			
 				
 			<!-- Request / Response elements -->
 			
@@ -454,10 +456,6 @@
 				<xsd:element name="getSpeciesByFiltersResponse" type="xsd:string" />
 
 
-
-				
-			
-
 			<xsd:element name="getResourceListRequest" type="tns:getResourceListRequestType" />
 
 			<xsd:element name="getResourceListResponse" type="tns:resourceArray" />
@@ -468,17 +466,10 @@
 			<xsd:element name="getResourceInfoResponse" type="tns:resource" />
 
 
-
-			
-
 			<xsd:element name="generateMapRequest" type="tns:generateMapRequestType" />
 			<xsd:element name="generateMapResponse" type="coretypes:VOID" />
 			<xsd:element name="generateMapFromFileRequest" type="xsd:string" />
 			<xsd:element name="generateMapFromFileResponse" type="coretypes:VOID" />
-
-
-
-			
 
 
 			<xsd:element name="getSpeciesByAreaRequest" type="tns:getSpeciesByAreaRequestType" />
@@ -490,12 +481,10 @@
 			<xsd:element name="getCellEnvironmentResponse" type="tns:fieldArray" />
 
 
-			
-
 			<xsd:element name="getSelectedCellsRequest" type="tns:getSelectedCellsRequestType" />
 			<xsd:element name="getSelectedCellsResponse" type="xsd:string" />
-
-
+			
+			
 		</xsd:schema>
 	</types>
 
@@ -677,6 +666,7 @@
 	</message>
 
 
+	
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
