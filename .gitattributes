@@ -107,6 +107,7 @@ test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text
 test/testClient/DBConnectionTest.java -text
+test/testClient/HCAFGenerationTest.java -text
 test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
 test/testClient/StyleGeneration.java -text

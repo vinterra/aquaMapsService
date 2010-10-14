@@ -108,6 +108,27 @@ public class SourceManager {
 			session.close();
 		}
 	}
+	private static void updateField(SourceType type, int id, String field, Object value)throws Exception{
+		DBSession session=null;
+		try{
+			String metaTable=DBCostants.getMetaTable(type);
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("UPDATE "+metaTable+"SET "+field+" = ? where "+searchId+" = ?");
+			ps.setObject(1,value);
+			ps.setInt(2, id);
+			ps.executeUpdate();			
+		}catch (Exception e){
+			throw e;
+		}finally {
+			session.close();
+		}
+	}
+	
+	
+	public static void setTableTitle(SourceType type,int id, String tableTitle)throws Exception{
+		updateField(type, id, title, tableTitle);
+	}
+	
 	
 }
 

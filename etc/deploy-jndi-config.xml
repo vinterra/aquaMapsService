@@ -48,6 +48,13 @@
 	 		type="java.lang.Integer"
 	 		override="false" />
 	</service>
-  
+	
+  	<service name="gcube/application/aquamaps/DataManagement">
+    	 	<environment 
+			name="frequentUserLimit" 
+	 		value="3" 
+	 		type="java.lang.Integer"
+	 		override="false" />
+	</service>
 	  
 </jndiConfig>

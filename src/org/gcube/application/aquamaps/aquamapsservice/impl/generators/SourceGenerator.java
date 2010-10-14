@@ -23,48 +23,47 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 	}
 	
 	public boolean generate() throws IOException{
-//		int result=generateImages(request.getClusterFile());
-//		return (result==0);
 		
-		return (dummyProcess(request.getRequestId())==0);
+	return (generateCSV(request.getInputFile(), request.getOutputFile())==0);	
+//		return (dummyProcess(request.getRequestId())==0);
 	}
 	
 	
-	private static int dummyProcess(int requestId){
-		try {
-			logger.debug("Executing.."+requestId);
-			Thread.sleep(5*1000);
-		} catch (InterruptedException e) {
-			logger.debug("Done"+requestId);
-		}
-		return 0;
-	}
-	
-	
-	private static int  generateCSV(int requestId) throws IOException{
-
-//
-//		Runtime rt  = Runtime.getRuntime();
-//		String cmdLine[] = { "/usr/bin/perl", "-w",  System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid"+
-//				File.separator+"bin"+File.separator+"cs_mapMod.pl",file};
-//		Process p = rt.exec(cmdLine);
-//
-//		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
-//		String line = null;
-//		while ((line = input.readLine())!=null){
-////			logger.debug(line);
-//		}
-//
+//	private static int dummyProcess(int requestId){
 //		try {
-//			p.waitFor();
+//			logger.debug("Executing.."+requestId);
+//			Thread.sleep(5*1000);
 //		} catch (InterruptedException e) {
-//			logger.trace("Perl process exited");
+//			logger.debug("Done"+requestId);
 //		}
-//		p.destroy();
-//		File f= new File(file);
-//		if(!f.delete())logger.warn("Unable to delete clustering file "+file);
-//		return p.exitValue();
-		return 0;
+//		return 0;
+//	}
+	
+	
+	private static int  generateCSV(String inputFile,String outputFile) throws IOException{
+
+
+		Runtime rt  = Runtime.getRuntime();
+		String cmdLine[] = { System.getenv("GLOBUS_LOCATION")+File.separator+"ML3"+
+				File.separator+"bin"+File.separator+"runML3.sh",inputFile,outputFile};
+		logger.trace("starting csv generation from "+inputFile);
+		long startTime=System.currentTimeMillis();
+		Process p = rt.exec(cmdLine);
+
+		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
+		String line = null;
+		while ((line = input.readLine())!=null){
+			logger.debug(line);
+		}
+
+		try {
+			p.waitFor();
+		} catch (InterruptedException e) {
+			logger.trace("wrote "+outputFile+" in "+(System.currentTimeMillis()-startTime)+" ms ");
+		}
+		p.destroy();		
+		
+		return p.exitValue();		
 	}
 
 	/**

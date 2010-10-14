@@ -8,11 +8,10 @@ import java.sql.Statement;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
-import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceGenerationManager {
 
-	private static final GCUBELog logger=new GCUBELog(SourceGenerationManager.class);
+//	private static final GCUBELog logger=new GCUBELog(SourceGenerationManager.class);
 
 	private static final String searchId="searchId";
 	private static final String author="author";
@@ -101,4 +100,34 @@ public class SourceGenerationManager {
 		}
 	}
 
+	//*********************** SETTERS
+	
+	
+	
+	public static void setStatus(int requestId, SourceGenerationStatus toSet)throws Exception{
+		setValue(status, toSet.toString(), requestId);
+	}
+	
+	public static void setGeneratedHCAFId(int requestId, int generatedId)throws Exception{
+		setValue(generatedHCAFId,generatedId,requestId);
+	}
+
+	//************************ GETTERS
+	
+	public static int getSourceId(int requestId)throws Exception{
+		return (Integer) getValue(HCAFsourceId, requestId);
+	}
+	
+	
+	public static String getSources(int requestId)throws Exception{
+		return (String) getValue(sources,requestId);
+	}
+	
+	public static String getGeneratedHCAFName(int requestId)throws Exception{
+		return (String) getValue(generatedHCAFName,requestId);
+	}
+	
+	public static String getAuthor(int requestId)throws Exception{
+		return (String) getValue(author,requestId);
+	}
 }
