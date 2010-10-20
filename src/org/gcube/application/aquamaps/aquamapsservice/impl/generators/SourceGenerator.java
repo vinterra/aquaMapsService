@@ -11,6 +11,9 @@ public class SourceGenerator {
 
 private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 	
+	private static final String shPath=System.getenv("GLOBUS_LOCATION")+File.separator+"ML3_stub"+
+	File.separator+"bin"+File.separator+"runML3.sh";
+
 
 	private SourceGeneratorRequest request;
 
@@ -44,8 +47,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 
 
 		Runtime rt  = Runtime.getRuntime();
-		String cmdLine[] = { System.getenv("GLOBUS_LOCATION")+File.separator+"ML3"+
-				File.separator+"bin"+File.separator+"runML3.sh",inputFile,outputFile};
+		String cmdLine[] = { "/bin/sh", shPath,inputFile,outputFile};
 		logger.trace("starting csv generation from "+inputFile);
 		long startTime=System.currentTimeMillis();
 		Process p = rt.exec(cmdLine);
@@ -53,7 +55,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 		String line = null;
 		while ((line = input.readLine())!=null){
-			logger.debug(line);
+			logger.trace(line);
 		}
 
 		try {

@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 import java.rmi.RemoteException;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SourceGenerationThread;
 import org.gcube.application.aquamaps.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.stubs.GenerateHCAFRequestType;
 import org.gcube.application.aquamaps.stubs.GetHCAFgenerationReportRequestType;
@@ -24,6 +25,8 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			logger.trace("Submitting request for "+arg0.getResultingHCAFName()+" generation submitted by "+arg0.getUserId());
 			int id=SourceGenerationManager.insertHCAFRequest(arg0.getUserId(),Integer.parseInt(arg0.getSourceHCAFId()), arg0.getResultingHCAFName(), arg0.getUrls().getItems());
 			logger.trace("Inserted request with id : "+id);
+			SourceGenerationThread t=new SourceGenerationThread(id);
+			ThreadManager.getExecutor().execute(t);
 			return new VOID();
 		}catch(Exception e){
 			logger.error("",e);

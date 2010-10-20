@@ -13,7 +13,6 @@ import java.util.List;
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
 
-import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
@@ -38,9 +37,11 @@ public class SourceGenerationThread extends Thread {
 	}
 	
 	@Override
-	public void run() {		
-		String sourcesFileName=ServiceContext.getContext().getPersistenceRoot()+File.separator+"SourceGeneration"+File.separator+ServiceUtils.generateId("", ".txt");
-		String csvFileName=ServiceContext.getContext().getPersistenceRoot()+File.separator+"SourceGeneration"+File.separator+ServiceUtils.generateId("", ".csv");
+	public void run() {	
+		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+"SourceGeneration");
+		dir.mkdirs();
+		String sourcesFileName=dir.getAbsolutePath()+File.separator+ServiceUtils.generateId("", ".txt");
+		String csvFileName=ServiceUtils.generateId("", ".csv");
 		String appTable=ServiceUtils.generateId("HCAFapp", "");
 		DBSession session=null;
 		try{
@@ -60,9 +61,17 @@ public class SourceGenerationThread extends Thread {
 			
 			logger.trace("Requesting generator");
 			SourceGenerationManager.setStatus(requestId, SourceGenerationStatus.Importing);
-			if (!GeneratorManager.requestGeneration(req)) throw new Exception("CSV Generation failed");
+			GeneratorManager.requestGeneration(req);
+			//!!!!!!!!! Standalone application always adds ".txt" to outputfile
+			csvFileName=System.getenv("GLOBUS_LOCATION")+File.separator+csvFileName+".txt";
+			if(!(new File(csvFileName).exists())) throw new Exception("CSV Generation failed");
+			
+			
 			
 			// ************* LOADING CSV
+			
+			
+			
 			
 			logger.trace("Creating appTable");
 			
@@ -93,12 +102,12 @@ public class SourceGenerationThread extends Thread {
 			session.createLikeTable(targetHCAFTable, sourceHCAFName);
 			String insertionQuery="INSERT INTO "+targetHCAFTable+" (Select "+
 				sourceHCAFName+".CsquareCode, "+
-				sourceHCAFName+".DepthMin, "+sourceHCAFName+".DepthMax, "+sourceHCAFName+".DepthMean, "+sourceHCAFName+".DepthSD, "+
-				sourceHCAFName+".SSTAnMean, "+sourceHCAFName+".SSTMnMax, "+sourceHCAFName+".SSTMnMin, "+sourceHCAFName+".SSTMnRange, "+sourceHCAFName+"SBTAnMean, "+
-				sourceHCAFName+".SalinityMean, "+sourceHCAFName+".SalinitySD, "+sourceHCAFName+".SalinityMax, "+sourceHCAFName+".SalinityMin, "+sourceHCAFName+".SalinityBMean, "+
+				sourceHCAFName+".DepthMin, "+		sourceHCAFName+".DepthMax, "+sourceHCAFName+".DepthMean, "+sourceHCAFName+".DepthSD, "+
+				sourceHCAFName+".SSTAnMean, "+sourceHCAFName+".SSTAnSD, "+sourceHCAFName+".SSTMnMax, "+sourceHCAFName+".SSTMnMin, "+sourceHCAFName+".SSTMnRange, "+sourceHCAFName+".SBTAnMean, "+
+				sourceHCAFName+".SalinityMean, "+	sourceHCAFName+".SalinitySD, "+sourceHCAFName+".SalinityMax, "+sourceHCAFName+".SalinityMin, "+sourceHCAFName+".SalinityBMean, "+
 				appTable+".PrimProdMean, "+
-				sourceHCAFName+".IceConAnn, "+sourceHCAFName+".IceConSpr, "+sourceHCAFName+".IceConSum, "+sourceHCAFName+"IceConFal, "+sourceHCAFName+".IceConWin "+
-				"from "+sourceHCAFName+" inner join "+appTable+" on "+sourceHCAFName+".CsquareCode = "+appTable+".CsquareCode";
+				sourceHCAFName+".IceConAnn, "+		sourceHCAFName+".IceConSpr, "+sourceHCAFName+".IceConSum, "+sourceHCAFName+".IceConFal, "+sourceHCAFName+".IceConWin "+
+				"from "+sourceHCAFName+" inner join "+appTable+" on "+sourceHCAFName+".CsquareCode = "+appTable+".CsquareCode )";
 			logger.trace("Query is "+insertionQuery);
 			session.executeUpdate(insertionQuery);
 			long mergedCount=session.getTableCount(targetHCAFTable);

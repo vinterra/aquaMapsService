@@ -113,7 +113,7 @@ public class SourceManager {
 		try{
 			String metaTable=DBCostants.getMetaTable(type);
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("UPDATE "+metaTable+"SET "+field+" = ? where "+searchId+" = ?");
+			PreparedStatement ps= session.preparedStatement("UPDATE "+metaTable+" SET "+field+" = ? where "+searchId+" = ?");
 			ps.setObject(1,value);
 			ps.setInt(2, id);
 			ps.executeUpdate();			

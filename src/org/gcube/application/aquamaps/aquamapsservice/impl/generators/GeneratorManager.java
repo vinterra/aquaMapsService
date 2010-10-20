@@ -73,13 +73,13 @@ public class GeneratorManager {
 		boolean toReturn=false;
 		SourceGenerator obj = null;
 		try{
-			obj=(SourceGenerator) perlPool.borrowObject();
+			obj=(SourceGenerator) SourceGeneratorPool.borrowObject();
 			obj.setRequest(request);
 			toReturn= obj.generate();
 		}catch(Exception e){
 			throw e;
 		}finally{
-			perlPool.returnObject(obj);
+			SourceGeneratorPool.returnObject(obj);
 		}
 
 		return toReturn;
