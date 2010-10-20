@@ -58,6 +58,10 @@
 					<Name>gcube/application/aquamaps/AquaMaps</Name>
 					<WSDL></WSDL>
 				</PortType>
+				<PortType>
+					<Name>gcube/application/aquamaps/DataManagement</Name>
+					<WSDL></WSDL>
+				</PortType>
 			</Main>
 			<Software>
 				<Description>Aquamaps stubs</Description>
