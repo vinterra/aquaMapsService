@@ -4,16 +4,28 @@ import java.util.Map;
 
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
-
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.stubs.*;
+import org.gcube.application.aquamaps.stubs.AquaMap;
+import org.gcube.application.aquamaps.stubs.AquaMapArray;
+import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
+import org.gcube.application.aquamaps.stubs.Area;
+import org.gcube.application.aquamaps.stubs.AreasArray;
+import org.gcube.application.aquamaps.stubs.Cell;
+import org.gcube.application.aquamaps.stubs.CellArray;
+import org.gcube.application.aquamaps.stubs.File;
+import org.gcube.application.aquamaps.stubs.FileArray;
+import org.gcube.application.aquamaps.stubs.Job;
+import org.gcube.application.aquamaps.stubs.Perturbation;
+import org.gcube.application.aquamaps.stubs.PerturbationArray;
+import org.gcube.application.aquamaps.stubs.Resource;
+import org.gcube.application.aquamaps.stubs.Specie;
+import org.gcube.application.aquamaps.stubs.SpeciesArray;
+import org.gcube.application.aquamaps.stubs.StringArray;
+import org.gcube.application.aquamaps.stubs.Weight;
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
 import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
 import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
-//import org.gcube.application.framework.core.session.ASLSession;
-//import org.gcube.application.framework.core.session.SessionManager;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 
 public class AquaMapsServiceTester {

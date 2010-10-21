@@ -15,10 +15,12 @@ import org.apache.commons.io.IOUtils;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.RSWrapper;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.ZipUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceType;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.AtomicCondition;
@@ -92,16 +94,10 @@ public class Publisher{
 		
 		StoreImageRequestType req= new StoreImageRequestType();
 		req.setTaxonomy(getTaxonomyCoverage(coverageSpeciesId));
-		if(hasCustomizations){
-			req.setSourceHCAF(JobGenerationDetails.getHCAFTable(submittedId));
-			req.setSourceHSPEN(JobGenerationDetails.getHSPENTable(submittedId));
-			req.setAuthor(JobGenerationDetails.getAuthor(submittedId));
-		}else {
-			req.setSourceHCAF(DBCostants.HCAF_D);
-			req.setSourceHSPEN(DBCostants.HSPEN);
-		}
-		
-		
+		req.setSourceHCAF(SourceManager.getSourceName(SourceType.HCAF, JobManager.getHCAFTableId(submittedId)));
+		req.setSourceHSPEN(SourceManager.getSourceName(SourceType.HSPEN, JobManager.getHSPENTableId(submittedId)));
+		if(hasCustomizations)
+			req.setAuthor(JobManager.getAuthor(submittedId));
 		File zipped=null;		
 		FileInputStream fis=null;
 		File base64Zipped=null;

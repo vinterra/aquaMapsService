@@ -14,7 +14,7 @@ public class GeneratorManager {
 	static GCUBELog logger= new GCUBELog(GeneratorManager.class);
 	private static GenericObjectPool perlPool=new GenericObjectPool(new PerlCallsFactory());
 	private static GenericObjectPool gisPool=new GenericObjectPool(new GISGeneratorFactory());
-
+	private static GenericObjectPool SourceGeneratorPool=new GenericObjectPool(new SourceGeneratorFactory());
 	static{
 		perlPool.setLifo(false);
 		perlPool.setMaxActive(3);
@@ -39,6 +39,17 @@ public class GeneratorManager {
 			e.printStackTrace();
 		}
 
+		SourceGeneratorPool.setLifo(false);
+		SourceGeneratorPool.setMaxActive(1);
+		SourceGeneratorPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
+		try{
+			for(int i =0;i<SourceGeneratorPool.getMaxActive();i++){
+				SourceGeneratorPool.addObject();
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
 	}
 
 
@@ -58,6 +69,23 @@ public class GeneratorManager {
 		return toReturn;
 	}
 
+	private static boolean requestSourceGeneration(SourceGeneratorRequest request) throws Exception{
+		boolean toReturn=false;
+		SourceGenerator obj = null;
+		try{
+			obj=(SourceGenerator) SourceGeneratorPool.borrowObject();
+			obj.setRequest(request);
+			toReturn= obj.generate();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			SourceGeneratorPool.returnObject(obj);
+		}
+
+		return toReturn;
+	}
+	
+	
 	private static boolean requestGISGeneration(GISGenerationRequest req)throws Exception{
 		GISGenerator obj=null;
 		boolean toReturn=false;
@@ -78,6 +106,7 @@ public class GeneratorManager {
 	public static boolean requestGeneration(GenerationRequest request)throws Exception{
 		if(request instanceof ImageGeneratorRequest) return requestPerlGeneration((ImageGeneratorRequest) request);
 		else if(request instanceof GISGenerationRequest) return requestGISGeneration((GISGenerationRequest) request);
+		else if(request instanceof SourceGeneratorRequest) return requestSourceGeneration((SourceGeneratorRequest)request);
 		else throw new BadRequestException();
 	}
 

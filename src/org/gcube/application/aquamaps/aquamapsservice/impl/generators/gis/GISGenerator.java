@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +20,8 @@ import net.sf.csv4j.CSVReaderProcessor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequestException;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.json.JSONException;
@@ -154,7 +153,7 @@ public class GISGenerator {
 	public boolean createGroup(GroupGenerationRequest request)throws Exception{
 		logger.trace("Creating group "+request.getName());
 		boolean result=this.createGroup(request.getLayers(), request.getStyles(), request.getName());
-		if(result) JobGenerationDetails.updateGISData(request.getSubmittedId(), request.getName());		
+		if(result) JobManager.updateGISData(request.getSubmittedId(), request.getName());		
 		return result;
 	}
 	
@@ -170,7 +169,7 @@ public class GISGenerator {
 			Thread.sleep(4*1000);
 		} catch (InterruptedException e) {}
 		boolean result= this.createLayer(featureTable, request);
-		if(result) JobGenerationDetails.updateGISData(request.getSubmittedId(), featureTable);		
+		if(result) JobManager.updateGISData(request.getSubmittedId(), featureTable);		
 		return result;
 		}catch(Exception e){			
 			logger.error("Unable to complete Gis generation for layer "+request.getLayerName());

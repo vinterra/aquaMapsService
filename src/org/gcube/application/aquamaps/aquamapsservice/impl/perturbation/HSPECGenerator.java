@@ -8,11 +8,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobGenerationDetails.SpeciesStatus;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.EnvelopeWeightArray;
 import org.gcube.application.aquamaps.stubs.EnvelopeWeights;
@@ -37,41 +39,21 @@ public class HSPECGenerator {
 	private String resultsTable;
 	private String occurenceCellsTable;
 	private int jobId;
-	//	private JobGenerationDetails details;
+	
 	private Map<String,WeightArray> weights=new HashMap<String, WeightArray>(); 
 
-	/*	private double sstWeight;
-	private double depthWeight;
-	private double salinityWeight;
-	private double primaryProductsWeight;
-	private double seaIceConcentrationWeight;
-	 */
-	public HSPECGenerator(int jobId,String HCAF_D,String HCAF_S,String HSPEN,EnvelopeWeightArray envelopeWeights) {
+	
+	public HSPECGenerator(int jobId,String HCAF_D,String HCAF_S,String HSPEN,EnvelopeWeightArray envelopeWeights) throws Exception {
 		super();
-		this.hcafViewTable = ServiceUtils.generateId("HCAF", "");//"HCAF"+uuidGen.nextUUID().replace("-", "_");
+		this.hcafViewTable = ServiceUtils.generateId("HCAF", "");
 		this.hcafDynamicTable=HCAF_D;
 		this.hcafStaticTable=HCAF_S;
 		this.hspenTable = HSPEN;
-		this.hspecTable = DBCostants.HSPEC;
+		this.hspecTable = SourceManager.getSourceName(SourceType.HSPEC, SourceManager.getDefaultId(SourceType.HSPEC));
 		this.occurenceCellsTable = DBCostants.GOOD_CELLS;
 		this.jobId=jobId;
 
-		/*this.depthWeight = 1.0;
-		this.salinityWeight = 1.0;
-		this.primaryProductsWeight = 1.0;
-		this.seaIceConcentrationWeight =1.0;
-		this.sstWeight =1.0;
 
-
-		if ((details.getToPerform().getWeights()!=null)&&(details.getToPerform().getWeights().getWeightList()!=null))
-			for (Weight weight:details.getToPerform().getWeights().getWeightList()){
-				if(weight.getParameterName().compareTo("Primary Production")==0) this.primaryProductsWeight=weight.getChosenWeight();
-				if(weight.getParameterName().compareTo("Sea Surface Temp.")==0) this.sstWeight=  weight.getChosenWeight();
-				if(weight.getParameterName().compareTo("Ice Concentration")==0) this.seaIceConcentrationWeight=  weight.getChosenWeight();
-				if(weight.getParameterName().compareTo("Salinity")==0) this.salinityWeight=  weight.getChosenWeight();
-				if(weight.getParameterName().compareTo("Depth")==0) this.depthWeight=  weight.getChosenWeight();
-			}
-		 */	
 
 		if((envelopeWeights!=null)&&(envelopeWeights.getEnvelopeWeightList()!=null)&&(envelopeWeights.getEnvelopeWeightList().length>0)){
 			for(EnvelopeWeights envW : envelopeWeights.getEnvelopeWeightList()){
@@ -79,10 +61,7 @@ public class HSPECGenerator {
 			}
 		}
 
-		this.resultsTable= ServiceUtils.generateId("HSPEC", "");//"HSPEC"+uuidGen.nextUUID().replace("-", "_");
-		//		JobGenerationDetails.set
-		//		details.setHspecTable(this.resultsTable);
-		//logger.trace("Weights: "+this.depthWeight+" "+this.salinityWeight+" "+this.primaryProductsWeight+" "+this.seaIceConcentrationWeight+" "+this.sstWeight);
+		this.resultsTable= ServiceUtils.generateId("HSPEC", "");
 	}
 
 
@@ -99,7 +78,7 @@ public class HSPECGenerator {
 		DBSession session = null;
 		long generationStart= System.currentTimeMillis();
 		Set<String> toGenerateSpeciesIds=new HashSet<String>();
-		for(String id: JobGenerationDetails.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate)) toGenerateSpeciesIds.add(id);
+		for(String id: JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate)) toGenerateSpeciesIds.add(id);
 		if((toGenerateSpeciesIds.size()>0)){
 			try{
 				session=DBSession.openSession(PoolManager.DBType.mySql);
@@ -228,7 +207,7 @@ public class HSPECGenerator {
 							logger.warn("Unable to copy "+speciesId+" into "+resultsTable+". Query was "+"INSERT into "+this.resultsTable+" ( Select * from "+this.hspecTable+" where "+DBCostants.SpeciesID+"=?)");
 						}
 					}
-					JobGenerationDetails.updateSpeciesStatus(jobId,new String[]{hspenRes.getString("SpeciesID")}, SpeciesStatus.Ready);
+					JobManager.updateSpeciesStatus(jobId,new String[]{hspenRes.getString("SpeciesID")}, SpeciesStatus.Ready);
 					hspenLoops++;
 				}			
 			}catch (Exception e) {

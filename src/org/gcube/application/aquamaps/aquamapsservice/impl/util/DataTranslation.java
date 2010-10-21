@@ -8,10 +8,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceType;
 import org.gcube.application.aquamaps.stubs.Field;
 import org.gcube.application.aquamaps.stubs.FieldArray;
 import org.gcube.application.aquamaps.stubs.Filter;
-import org.gcube.application.aquamaps.stubs.Perturbation;
 import org.gcube.application.aquamaps.stubs.Resource;
 
 public class DataTranslation {
@@ -127,7 +129,7 @@ public class DataTranslation {
 	
 	public static String filterToString(Filter filter)throws Exception{
 		StringBuilder toReturn=new StringBuilder();		
-		toReturn.append(DBCostants.getCompleteName(DBCostants.HSPEN, filter.getName().toLowerCase()));
+		toReturn.append(DBCostants.getCompleteName(SourceManager.getSourceName(SourceType.HSPEN, SourceManager.getDefaultId(SourceType.HSPEN)), filter.getName().toLowerCase()));
 		if(filter.getType().equalsIgnoreCase("is")){
 	    	toReturn.append(" = '"+filter.getValue()+"'");	  
 	    }else

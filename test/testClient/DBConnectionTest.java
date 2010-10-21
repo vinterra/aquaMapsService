@@ -3,8 +3,8 @@ package testClient;
 import java.sql.ResultSet;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.DBUtils;
 
 public class DBConnectionTest {
 
