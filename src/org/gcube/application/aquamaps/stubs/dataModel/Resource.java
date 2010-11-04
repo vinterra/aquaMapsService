@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Resource{
 
-	public enum Type {HSPEC,HSPEN,JOB,HCAF};
+	public enum Type {HSPEC,HSPEN,HCAF};
 	
 	public static class Tags{
 		public static final String NAME="title";

@@ -13,6 +13,7 @@ import java.util.List;
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
 
+import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
@@ -61,9 +62,12 @@ public class SourceGenerationThread extends Thread {
 			
 			logger.trace("Requesting generator");
 			SourceGenerationManager.setStatus(requestId, SourceGenerationStatus.Importing);
-			GeneratorManager.requestGeneration(req);
+			
+			logger.trace("Generation reuslt ="+GeneratorManager.requestGeneration(req));
 			//!!!!!!!!! Standalone application always adds ".txt" to outputfile
+			
 			csvFileName=System.getenv("GLOBUS_LOCATION")+File.separator+csvFileName+".txt";
+			logger.trace("Exèected output file : "+csvFileName);
 			if(!(new File(csvFileName).exists())) throw new Exception("CSV Generation failed");
 			
 			
@@ -130,14 +134,14 @@ public class SourceGenerationThread extends Thread {
 				logger.error("unexpected error",e1);
 			}	
 		}finally{
-//			File f=new File(sourcesFileName);
-//			if(f.exists()) FileUtils.delete(f);
-//			f=new File(csvFileName);
-//			if(f.exists()) FileUtils.delete(f);
-//			try{
-//				session.dropTable(appTable);
-//				session.close();
-//			}catch(Exception e){logger.error("unable to close session and/or delete temp tables");}
+			File f=new File(sourcesFileName);
+			if(f.exists()) FileUtils.delete(f);
+			f=new File(csvFileName);
+			if(f.exists()) FileUtils.delete(f);
+			try{
+				session.dropTable(appTable);
+				session.close();
+			}catch(Exception e){logger.error("unable to close session and/or delete temp tables");}
 		}
 	}
 	

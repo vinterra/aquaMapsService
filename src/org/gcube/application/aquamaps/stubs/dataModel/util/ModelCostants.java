@@ -5,9 +5,9 @@ public class ModelCostants {
 	public static final String EEZ ="EEZ";
 	public static final String LME ="LME";
 
-	public static final String HCAF="Meta_HCaf";
-	public static final String HSPEC="Meta_HSPEC";
-	public static final String HSPEN="Meta_HSpen";
+//	public static final String HCAF="Meta_HCaf";
+//	public static final String HSPEC="Meta_HSPEC";
+//	public static final String HSPEN="Meta_HSpen";
 	public static final String JOB ="JOBS";
 
 	public static final String is ="is";

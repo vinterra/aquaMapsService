@@ -60,7 +60,9 @@ public class SimulationThread extends Thread {
 				String filteredHcaf=filterByArea(jobId, area, SourceType.HCAF, JobManager.getHCAFTableId(jobId));
 				JobManager.setWorkingHCAF(jobId,filteredHcaf);
 				String generatedHSPEC=generateHSPEC(jobId, weights, true);
-				JobManager.setWorkingHSPEC(jobId,generatedHSPEC);		
+				String toUseHSPEC=filterByArea(jobId,area,SourceType.HSPEC,generatedHSPEC);
+				JobManager.setWorkingHSPEC(jobId,toUseHSPEC);	
+				JobManager.addToDropTableList(jobId, generatedHSPEC);
 				
 			}else if (filteredArea){
 				JobManager.setWorkingHSPEC(jobId,filterByArea(jobId, area, SourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId)));
@@ -99,6 +101,11 @@ public class SimulationThread extends Thread {
 	
 	private static String filterByArea(int jobId,AreasArray areaSelection,SourceType tableType,int sourceId)throws Exception{
 			
+		return filterByArea(jobId,areaSelection,tableType,SourceManager.getSourceName(tableType, sourceId));
+		
+	}
+	@Deprecated
+	private static String filterByArea(int jobId,AreasArray areaSelection,SourceType tableType,String sourceTable)throws Exception{
 		logger.trace(" filtering on area selection for jobId:"+jobId);
 
 		DBSession conn =null;
@@ -106,7 +113,7 @@ public class SimulationThread extends Thread {
 			
 		conn = DBSession.openSession(PoolManager.DBType.mySql);
 		String filteredTable=ServiceUtils.generateId(tableType.toString(), "");
-		String sourceTableName=SourceManager.getSourceName(tableType, sourceId);
+		String sourceTableName=sourceTable;
 		conn.createLikeTable(filteredTable, sourceTableName);
 		
 		JobManager.addToDropTableList(jobId, filteredTable);
@@ -142,8 +149,8 @@ public class SimulationThread extends Thread {
 				conn.close();
 			}
 		}
-		
 	}
+	
 	
 	private static String generateHSPEC(int jobId,EnvelopeWeightArray weights,boolean makeTemp)throws Exception{
 		String HCAF_DName=JobManager.getWorkingHCAF(jobId);		

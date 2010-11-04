@@ -73,9 +73,10 @@ public class SourceGenerationManager {
 			ps.setString(4, sourceString.toString());
 			ps.setDate(5, new Date(System.currentTimeMillis()));
 			ps.setString(6,SourceGenerationStatus.Pending.toString());
+			ps.executeUpdate();
 			ResultSet rs=ps.getGeneratedKeys();
 			rs.next();
-			return rs.getInt(searchId);
+			return rs.getInt(1);
 		}catch (Exception e){
 			throw e;
 		}finally {

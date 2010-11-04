@@ -34,13 +34,15 @@ public class StubsToModel {
 
 
 	public static String resourceTyperesolver(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type type){
-		switch(type){
-		case HCAF: return ModelCostants.HCAF;
-		case HSPEC: return ModelCostants.HSPEC;
-		case HSPEN:return ModelCostants.HSPEN;
-		case JOB:return ModelCostants.JOB;
-		default: return null;
-		}
+//		switch(type){
+//		case HCAF: return .HCAF;
+//		case HSPEC: return ModelCostants.HSPEC;
+//		case HSPEN:return ModelCostants.HSPEN;
+//		case JOB:return ModelCostants.JOB;
+//		default: return null;
+//		}
+		return type.toString();
+		
 	}
 
 	public static org.gcube.application.aquamaps.stubs.dataModel.Field translateToClient(Field toTranslate){
@@ -104,14 +106,19 @@ public class StubsToModel {
 
 	public static org.gcube.application.aquamaps.stubs.dataModel.Resource translateToClient(Resource toTranslate){
 		org.gcube.application.aquamaps.stubs.dataModel.Resource toReturn=new org.gcube.application.aquamaps.stubs.dataModel.Resource();
-		if(toTranslate.getType().equals(ModelCostants.HCAF))
-			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.HCAF);
-		else if(toTranslate.getType().equals(ModelCostants.HSPEC))
-			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.HSPEC);
-		else if(toTranslate.getType().equals(ModelCostants.HSPEN))
-			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.HSPEN);
-		else if(toTranslate.getType().equals(ModelCostants.JOB))
-			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.JOB);
+//		if(toTranslate.getType().equals(ModelCostants.HCAF))
+//			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.HCAF);
+//		else if(toTranslate.getType().equals(ModelCostants.HSPEC))
+//			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.HSPEC);
+//		else if(toTranslate.getType().equals(ModelCostants.HSPEN))
+//			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.HSPEN);
+//		else if(toTranslate.getType().equals(ModelCostants.JOB))
+//			toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.JOB);
+		
+		toReturn.setType(org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.valueOf(toTranslate.getType()));
+		
+		
+		
 		org.gcube.application.aquamaps.stubs.dataModel.Field idField=new org.gcube.application.aquamaps.stubs.dataModel.Field();
 		if(toTranslate.getId()!=null)idField.setValue(toTranslate.getId());
 		else idField.setValue(ModelCostants.VOID);

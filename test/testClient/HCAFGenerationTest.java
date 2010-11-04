@@ -15,7 +15,7 @@ import org.gcube.common.core.types.StringArray;
 
 public class HCAFGenerationTest {
 
-	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/DataManagement";
 	
 	public static DataManagementPortType getPortType(ASLSession session)throws Exception{
 		DataManagementServiceAddressingLocator asal= new DataManagementServiceAddressingLocator();

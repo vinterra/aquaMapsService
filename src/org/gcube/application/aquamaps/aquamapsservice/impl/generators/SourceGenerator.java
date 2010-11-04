@@ -47,6 +47,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 
 
 		Runtime rt  = Runtime.getRuntime();
+		logger.trace("TERRADUE APPLICATION SHOULD BE : "+shPath);
 		String cmdLine[] = { "/bin/sh", shPath,inputFile,outputFile};
 		logger.trace("starting csv generation from "+inputFile);
 		long startTime=System.currentTimeMillis();

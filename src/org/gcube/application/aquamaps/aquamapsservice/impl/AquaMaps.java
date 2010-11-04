@@ -790,7 +790,9 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 	public ResourceArray getResourceList(GetResourceListRequestType req) throws GCUBEFault{
 		logger.debug("entroin getResourceList");
 		ArrayList<Resource> resources = new ArrayList<Resource>();
-		String query = DataTranslation.completeResourceListQuery.get(req.getType());
+		String query = DataTranslation.completeResourceListQuery.get(
+				org.gcube.application.aquamaps.dataModel.Resource.Type.valueOf(req.getType()));
+		logger.debug("Query for "+req.getType()+" : "+query);
 		DBSession conn=null;
 		try{
 			conn = DBSession.openSession(PoolManager.DBType.mySql);

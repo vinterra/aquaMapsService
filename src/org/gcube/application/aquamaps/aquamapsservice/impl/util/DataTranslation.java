@@ -20,7 +20,7 @@ public class DataTranslation {
 
 	public static HashMap<String,String> completeFieldNamesMap = new HashMap<String, String>();
 	static HashMap<String,String> completePhylogenyQuery = new HashMap<String, String>();
-	public static HashMap<String,String> completeResourceListQuery = new HashMap<String, String>();
+	public static HashMap<org.gcube.application.aquamaps.dataModel.Resource.Type,String> completeResourceListQuery = new HashMap<org.gcube.application.aquamaps.dataModel.Resource.Type, String>();
 
 	public static Set<String> speciesoccurSumFields=new HashSet<String>();
 	public static Set<String> hspenFields=new HashSet<String>();
@@ -98,10 +98,10 @@ public class DataTranslation {
 		completePhylogenyQuery.put("Family", "Select distinct speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class, speciesoccursum.Order, speciesoccursum.Family from speciesoccursum ORDER BY speciesoccursum.Family ");
 		completePhylogenyQuery.put(DBCostants.SpeciesID, "Select speciesoccursum.Kingdom, speciesoccursum.Phylum, speciesoccursum.Class, speciesoccursum.Order, speciesoccursum.Family, speciesoccursum.SPECIESID  from speciesoccursum ORDER BY speciesoccursum.SPECIESID ");
 	
-		completeResourceListQuery.put("JOBS", "select JOBS.*, Meta_HSPEC.title As sourceName from JOBS, Meta_HSPEC where Meta_HSPEC.searchId = JOBS.sourceId");
-		completeResourceListQuery.put("Meta_HCaf", "select * from Meta_HCaf");
-		completeResourceListQuery.put("Meta_HSPEC", "select Meta_HSPEC.*, Meta_HCaf.title AS sourceHCafName, Meta_HSpen.title AS sourceHSpenName from Meta_HSPEC, Meta_HSpen, Meta_HCaf where Meta_HSPEC.sourceHCafId = Meta_HCaf.searchId AND Meta_HSPEC.sourceHSpenId = Meta_HSpen.searchId");
-		completeResourceListQuery.put("Meta_HSpen", "select * from Meta_HSpen");
+		//completeResourceListQuery.put("JOBS", "select JOBS.*, Meta_HSPEC.title As sourceName from JOBS, Meta_HSPEC where Meta_HSPEC.searchId = JOBS.sourceId");
+		completeResourceListQuery.put(org.gcube.application.aquamaps.dataModel.Resource.Type.HCAF, "select * from Meta_HCaf");
+		completeResourceListQuery.put(org.gcube.application.aquamaps.dataModel.Resource.Type.HSPEC, "select Meta_HSPEC.*, Meta_HCaf.title AS sourceHCafName, Meta_HSpen.title AS sourceHSpenName from Meta_HSPEC, Meta_HSpen, Meta_HCaf where Meta_HSPEC.sourceHCafId = Meta_HCaf.searchId AND Meta_HSPEC.sourceHSpenId = Meta_HSpen.searchId");
+		completeResourceListQuery.put(org.gcube.application.aquamaps.dataModel.Resource.Type.HSPEN, "select * from Meta_HSpen");
 	}
 	
 	public static final int ResourceIdIndex=8;
