@@ -23,7 +23,9 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			throws RemoteException, GCUBEFault {
 		try{
 			logger.trace("Submitting request for "+arg0.getResultingHCAFName()+" generation submitted by "+arg0.getUserId());
-			int id=SourceGenerationManager.insertHCAFRequest(arg0.getUserId(),Integer.parseInt(arg0.getSourceHCAFId()), arg0.getResultingHCAFName(), arg0.getUrls().getItems());
+			String[] sources=arg0.getUrls().getItems();
+			for(String s:sources) logger.trace("found source : "+s);
+			int id=SourceGenerationManager.insertHCAFRequest(arg0.getUserId(),Integer.parseInt(arg0.getSourceHCAFId()), arg0.getResultingHCAFName(), sources);
 			logger.trace("Inserted request with id : "+id);
 			SourceGenerationThread t=new SourceGenerationThread(id);
 			ThreadManager.getExecutor().execute(t);

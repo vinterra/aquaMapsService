@@ -791,7 +791,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 		logger.debug("entroin getResourceList");
 		ArrayList<Resource> resources = new ArrayList<Resource>();
 		String query = DataTranslation.completeResourceListQuery.get(
-				org.gcube.application.aquamaps.dataModel.Resource.Type.valueOf(req.getType()));
+				org.gcube.application.aquamaps.stubs.dataModel.Resource.Type.valueOf(req.getType()));
 		logger.debug("Query for "+req.getType()+" : "+query);
 		DBSession conn=null;
 		try{

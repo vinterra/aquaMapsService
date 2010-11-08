@@ -66,8 +66,8 @@ public class SourceGenerationThread extends Thread {
 			logger.trace("Generation reuslt ="+GeneratorManager.requestGeneration(req));
 			//!!!!!!!!! Standalone application always adds ".txt" to outputfile
 			
-			csvFileName=System.getenv("GLOBUS_LOCATION")+File.separator+csvFileName+".txt";
-			logger.trace("Exèected output file : "+csvFileName);
+			csvFileName=System.getenv("GLOBUS_LOCATION")+File.separator+csvFileName;
+			logger.trace("Expected output file : "+csvFileName);
 			if(!(new File(csvFileName).exists())) throw new Exception("CSV Generation failed");
 			
 			
