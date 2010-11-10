@@ -42,7 +42,8 @@ public class SourceGenerationThread extends Thread {
 		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+"SourceGeneration");
 		dir.mkdirs();
 		String sourcesFileName=dir.getAbsolutePath()+File.separator+ServiceUtils.generateId("", ".txt");
-		String csvFileName=ServiceUtils.generateId("", ".csv");
+		String outputFileName=ServiceUtils.generateId("", "");
+		String csvFileName=outputFileName+".csv";
 		String appTable=ServiceUtils.generateId("HCAFapp", "");
 		DBSession session=null;
 		try{
@@ -56,7 +57,7 @@ public class SourceGenerationThread extends Thread {
 			ps.close();
 			logger.trace("Wroten "+sources.length+" sources to "+sourcesFileName);
 			
-			SourceGeneratorRequest req= new SourceGeneratorRequest(sourcesFileName,csvFileName,SourceType.HCAF);
+			SourceGeneratorRequest req= new SourceGeneratorRequest(sourcesFileName,outputFileName,SourceType.HCAF);
 			
 			//*************** IMPORT
 			
@@ -67,8 +68,10 @@ public class SourceGenerationThread extends Thread {
 			//!!!!!!!!! Standalone application always adds ".txt" to outputfile
 			
 			csvFileName=System.getenv("GLOBUS_LOCATION")+File.separator+csvFileName;
+			outputFileName=System.getenv("GLOBUS_LOCATION")+File.separator+outputFileName;
+			
 			logger.trace("Expected output file : "+csvFileName);
-			if(!(new File(csvFileName).exists())) throw new Exception("CSV Generation failed");
+			if(!(new File(csvFileName).exists())) throw new Exception("CSV Generation output file not found "+csvFileName);
 			
 			
 			
@@ -138,6 +141,8 @@ public class SourceGenerationThread extends Thread {
 			if(f.exists()) FileUtils.delete(f);
 			f=new File(csvFileName);
 			if(f.exists()) FileUtils.delete(f);
+			f=new File(outputFileName);
+			if(f.exists()) FileUtils.delete(f);
 			try{
 				session.dropTable(appTable);
 				session.close();
@@ -170,7 +175,7 @@ public class SourceGenerationThread extends Thread {
 			public void processHeaderLine(int arg0, List<String> arg1) {
 				for(int i=0;i<arg1.size();i++){
 					if (arg1.get(i).equalsIgnoreCase("csquarecode")) csquareCodeIndex=i;
-					if (arg1.get(i).equalsIgnoreCase("ClorophyllA_avg")) meanValueIndex=i;
+					if (arg1.get(i).equalsIgnoreCase("mean")) meanValueIndex=i;
 				}
 			}});
 		

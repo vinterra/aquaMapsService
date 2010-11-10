@@ -34,7 +34,8 @@ public class HCAFGenerationTest {
 		request.setResultingHCAFName("Testing HCAF");
 		request.setSourceHCAFId("1");
 		request.setUrls(new StringArray(new String[]{
-				"http://maps.terradue.com/catalogue/gpod/MER_RR__2P/MER_RR__2PNPDE20070601_004647_000026132058_00346_27454_0694.N1/xml"
+				"http://www.genesi-dec.eu/catalogue/genesi/MERIS_L3_CHL1/L3_ENV_MER_CHL1_m__20021101_GLOB_SI_ACR_9277x9277_-90%2b90%2b-180%2b180_0000.nc.gz/xml",
+					"http://www.genesi-dec.eu/catalogue/genesi/MERIS_L3_CHL1/L3_ENV_MER_CHL1_m__20021201_GLOB_SI_ACR_9277x9277_-90%2b90%2b-180%2b180_0000.nc.gz/xml"
 		}));
 		request.setUserId("Tester");
 		pt.generateHCAF(request);
