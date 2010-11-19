@@ -1,12 +1,16 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SubmittedManager {
@@ -62,6 +66,63 @@ public class SubmittedManager {
 			session.close();
 		}
 	}
+	@Deprecated
+	protected static int deletelocalFiles(int submittedId)throws Exception{
+		DBSession session=null;
+		try{
+			int count=0;
+			session=DBSession.openSession(DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("Select * from Files where owner=?");
+			ps.setInt(1, submittedId);
+			ResultSet rs=ps.executeQuery();
+			String publishedBasePath=JobUtils.getBasePublicPath();
+			String localBasePath=JobUtils.getBaseLocalPath();
+			while(rs.next()){
+				String path=rs.getString("Path");
+				path.replaceFirst(publishedBasePath, localBasePath);
+//				path.replace(path.indexOf(publishedBasePath), publishedBasePath.length(), localBasePath);
+				logger.trace("Trying to delete "+path);
+				File f=new File(path);
+				try{
+					if(f.exists()){
+						count++;
+						if(f.exists()) FileUtils.forceDelete(f);
+						File dir=f.getParentFile();
+						if(dir.listFiles().length==0) FileUtils.forceDelete(dir);
+					}
+				}catch(IOException err){
+					logger.error("unable to delete file or parent directory",err);
+				}
+			}
+			return count;
+		}catch(Exception e){
+			logger.warn("impossible to retrieve files for obj "+submittedId);
+			throw e;
+		}
+	}
+	
+	
+	protected static int deleteFromTables(int submittedId)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("DELETE from "+submittedTable+" where "+searchId+" = ? ");
+			ps.setObject(1, submittedId);
+			return ps.executeUpdate();
+		}catch (Exception e){
+			throw e;
+		}finally {
+			session.close();
+		}
+	}
+	
+	
+	public static int delete(int submittedId)throws Exception{
+		if(isAquaMap(submittedId)) return AquaMapsManager.deleteObject(submittedId);
+		else return JobManager.deleteJob(submittedId);
+	}
+	
+	
 	// **************************************** getters *********************************
 	
 	public static int getHCAFTableId(int jobId)throws Exception{
@@ -82,6 +143,15 @@ public class SubmittedManager {
 	public static String getAuthor(int submittedId)throws Exception{
 		return (String) getField(submittedId,author);
 	}
+	
+	public static Boolean isAquaMap(int submittedId)throws Exception{
+		return (Boolean) getField(submittedId,isAquaMap);
+	}
+	
+	public static int getMapId(int submittedId)throws Exception{
+		return (Integer) getField(submittedId,mapId);
+	}
+	
 	//**************************************** setters **********************************
 	
 	public static int setHCAFTable(int HCAFId,int jobId)throws Exception{

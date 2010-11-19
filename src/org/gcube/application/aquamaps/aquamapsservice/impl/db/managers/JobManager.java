@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
@@ -23,9 +24,9 @@ import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.application.aquamaps.stubs.Specie;
 
 public class JobManager extends SubmittedManager{
-	
+
 	//******************************************* working tables management ***************************************
-	
+
 	protected static final String workingTables="workingTables";
 	protected static final String tableField="tableName";
 	protected static final String tableTypeField="tableType";
@@ -45,7 +46,7 @@ public class JobManager extends SubmittedManager{
 			session.close();
 		}
 	}
-	
+
 	protected static String getWorkingTable (int submittedId,String tableType)throws Exception{
 		DBSession session=null;
 		try{
@@ -62,7 +63,7 @@ public class JobManager extends SubmittedManager{
 			session.close();
 		}
 	}
-	
+
 	public static void setWorkingHCAF(int submittedId,String tableName)throws Exception{
 		setWorkingTable(submittedId,SourceType.HCAF.toString(),tableName);
 	}
@@ -81,7 +82,7 @@ public class JobManager extends SubmittedManager{
 	public static String getWorkingHSPEC(int submittedId)throws Exception{
 		return getWorkingTable(submittedId,SourceType.HSPEC.toString());
 	}
-	
+
 	public static void addToDropTableList(int jobId,String tableName)throws Exception{
 		DBSession session=null;
 		try{
@@ -112,7 +113,7 @@ public class JobManager extends SubmittedManager{
 			session.close();
 		}
 	}
-	
+
 	public static void updateSpeciesStatus(int jobId,String speciesId[],SpeciesStatus status)throws Exception{
 		DBSession session=null;
 		try{
@@ -245,10 +246,10 @@ public class JobManager extends SubmittedManager{
 			session.close();
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	public static void createGroup (int jobId)throws Exception{
 		DBSession session=null;
 		try{
@@ -286,10 +287,10 @@ public class JobManager extends SubmittedManager{
 			if(!session.getConnection().isClosed())session.close();
 		}
 	}
-	
-	
-	
-	
+
+
+
+
 	public static boolean isSpeciesSetCustomized(int submittedId,String[] ids)throws Exception{
 		DBSession session=null;		
 		try{
@@ -312,11 +313,11 @@ public class JobManager extends SubmittedManager{
 			if(!session.getConnection().isClosed())session.close();
 		}
 	}
-	
-	
-	
-	
-	
+
+
+
+
+
 	/**Creates a new entry in Job table and AquaMap table (for every aquamap object in job)
 	 * 
 	 * @return new job id
@@ -326,7 +327,7 @@ public class JobManager extends SubmittedManager{
 		Integer jobId=null;
 		String myData = ServiceUtils.getDate();
 		String submittedInsertion="INSERT INTO "+submittedTable+" ("+title+","+author+","+date+","+status+","+isAquaMap+","+type+
-								","+sourceHCAF+","+sourceHSPEC+","+sourceHSPEN+","+JobManager.jobId+") values (?,?,?,?,?,?,?,?,?,?)";
+		","+sourceHCAF+","+sourceHSPEC+","+sourceHSPEN+","+JobManager.jobId+") values (?,?,?,?,?,?,?,?,?,?)";
 		DBSession session=null;
 		try{
 			session=DBSession.openSession(PoolManager.DBType.mySql);
@@ -351,20 +352,20 @@ public class JobManager extends SubmittedManager{
 			jobId=rs.getInt(1);
 			toPerform.setId(String.valueOf(jobId));			
 			//TODO make jobProfile
-			
+
 			ps.setBoolean(5, true);
 			ps.setInt(10,jobId);
 			logger.trace("inserting associated aquamapsObj(s)");
-			
+
 			for(AquaMap aquaMapObj:toPerform.getAquaMapList().getAquaMapList()){
-				
+
 				ps.setString(1, aquaMapObj.getName());
 				ps.setString(6,aquaMapObj.getType());
 				ps.executeUpdate();
 				rs=ps.getGeneratedKeys();
 				rs.first();
 				aquaMapObj.setId(String.valueOf(rs.getInt(1)));
-				
+
 				JobUtils.updateProfile(aquaMapObj.getName(), aquaMapObj.getId(), JobUtils.makeAquaMapProfile(aquaMapObj),
 						SourceManager.getSourceName(SourceType.HSPEC,HSPECId), String.valueOf(jobId));
 			}
@@ -420,5 +421,44 @@ public class JobManager extends SubmittedManager{
 			session.close();
 		}
 	}
-	
+
+	protected static int deleteJob(int submittedId)throws Exception{
+		logger.trace("Deleting job "+submittedId);
+		List<Integer> objectsId=getObjects(submittedId);
+		logger.trace("Found "+objectsId.size()+" object(s) to delete..");
+		int count=0;
+		for(int objId:objectsId) {
+			try{
+			AquaMapsManager.deleteObject(objId);
+			count++;
+			}catch(Exception e){
+				logger.error("Unable to delete object "+objId);
+			}
+		}
+		try{
+		deletelocalFiles(submittedId);
+		}catch(Exception e){
+			logger.error("Unable to delete files for job"+submittedId,e);
+		}
+		count+=deleteFromTables(submittedId);
+		return count;
+	}
+
+	public static List<Integer> getObjects (int jobId)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.openSession(PoolManager.DBType.mySql);
+			PreparedStatement ps= session.preparedStatement("Select "+searchId+" from "+submittedTable+" where "+JobManager.jobId+"=? ");
+			ps.setInt(1, jobId);
+			ArrayList<Integer> toReturn=new ArrayList<Integer>();
+			ResultSet rs=ps.executeQuery();
+			while(rs.next())
+				toReturn.add(rs.getInt(searchId));
+			return toReturn;
+		}catch (Exception e){
+			throw e;
+		}finally {
+			session.close();
+		}
+	}
 }

@@ -87,6 +87,10 @@ public class SourceManager {
 		return (String) getField(type, id, tableName);
 	}
 	
+	public static String getSourceTitle(SourceType type, int id)throws Exception{
+		return (String) getField(type,id,title);
+	}
+	
 	public static int getSourceId(SourceType type,int id)throws Exception{
 		return (Integer) getField(type, id, sourceId);
 	}

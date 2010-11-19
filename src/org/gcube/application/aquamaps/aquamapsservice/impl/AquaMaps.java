@@ -15,6 +15,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.DataTranslation;
@@ -68,79 +69,13 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 
 	public int deleteSubmitted(StringArray submittedIds)throws GCUBEFault{
 		int toReturn=0;
-		DBSession session = null;
-		if((submittedIds!=null)&&(submittedIds.getStringList()!=null)&&(submittedIds.getStringList().length>0))
-			try{
-				session=DBSession.openSession(PoolManager.DBType.mySql);
-				PreparedStatement ps1=session.preparedStatement(DBCostants.submittedRetrieval);				
-				for(String submittedId:submittedIds.getStringList()){
-					logger.trace("Deleting submitted : "+submittedId);
-					ps1.setInt(1, Integer.parseInt(submittedId));
-					ResultSet rs1=ps1.executeQuery();
-					
-					if(rs1.first()){
-						logger.trace("found submitted ..");
-						PreparedStatement psFiles=session.preparedStatement(DBCostants.fileRetrievalByOwner);
-						PreparedStatement psDeleteFiles=session.preparedStatement(DBCostants.fileDeletingByOwner);
-						PreparedStatement psDeleteSubmitted=session.preparedStatement(DBCostants.deleteSubmittedById);
-						if(!rs1.getBoolean("isAquaMap")){
-							logger.trace("going to delete AquaMaps for the selected job..");
-							PreparedStatement psAquaMaps=session.preparedStatement(DBCostants.AquaMapsListPerJob);
-							psAquaMaps.setInt(1,Integer.parseInt(submittedId));
-							ResultSet rsAquaMaps=psAquaMaps.executeQuery();				
-							while(rsAquaMaps.next()){
-								String aquamapsId=rsAquaMaps.getString("searchId");					
-								String path=rsAquaMaps.getString("resourcePath");
-								if(path!=null){
-									logger.trace("deleting files for aquamaps from path : "+path);
-									psFiles.setInt(1, Integer.parseInt(aquamapsId));
-									ResultSet rsFiles=psFiles.executeQuery();
-									while(rsFiles.next()){
-										String[] urlParts=rsFiles.getString("Path").split("/");
-										ServiceUtils.deleteFile(path+File.pathSeparator+urlParts[urlParts.length-1]);
-										logger.trace("deleted file "+rsFiles.getString("nameHuman"));
-									}						
-								}
-								psDeleteFiles.setInt(1,Integer.parseInt(aquamapsId));
-								psDeleteFiles.executeUpdate();
-								psDeleteSubmitted.setInt(1,Integer.parseInt(aquamapsId));					
-								toReturn+=psDeleteSubmitted.executeUpdate();
-							}
-							logger.trace("deleted "+toReturn+" AquaMap Objects");				
-						}
-						String toDeletePath=rs1.getString("resourcePath");
-						if(toDeletePath!=null){
-							logger.trace("deleting files for selected from path : "+toDeletePath);
-							psFiles.setInt(1, Integer.parseInt(submittedId));
-							ResultSet rsFiles=psFiles.executeQuery();
-							while(rsFiles.next()){
-								String[] urlParts=rsFiles.getString("Path").split("/");
-								ServiceUtils.deleteFile(toDeletePath+File.pathSeparator+urlParts[urlParts.length-1]);
-								logger.trace("deleted file "+rsFiles.getString("nameHuman"));
-							}						
-						}
-						psDeleteFiles.setInt(1,Integer.parseInt(submittedId));
-						psDeleteFiles.executeUpdate();
-						psDeleteSubmitted.setInt(1,Integer.parseInt(submittedId));
-						toReturn+=psDeleteSubmitted.executeUpdate();
-					}
-				}
-//				session.close();
-				logger.trace("Total deleted submitted count : "+toReturn);
-				
-			}catch(SQLException e){
-				logger.error("SQLException, unable to serve getjobList");
-				logger.trace("Raised Exception", e);
-				throw new GCUBEFault();
-			} catch (Exception e){
-				logger.error("General Exception, unable to contact DB");
-				logger.trace("Raised Exception", e);
-				throw new GCUBEFault();
-			}finally{
-				try {
-					session.close();
-				} catch (Exception e) {
-					e.printStackTrace();
+		if((submittedIds!=null)&&(submittedIds.getStringList()!=null))
+			for(String id:submittedIds.getStringList()){
+				try{
+				int toDelete=Integer.parseInt(id);
+				toReturn+=SubmittedManager.delete(toDelete);
+				}catch(Exception e){
+					logger.error("cannot delete "+id, e);
 				}
 			}
 			return toReturn;
@@ -732,50 +667,63 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 	public Resource getResourceInfo(Resource myResource) throws GCUBEFault{
 		logger.debug("entro in getResourceInfo");		
 		Resource toReturn=myResource;		
-		//Cambiare id in SearchId
-		//String myQuery ="SELECT * FROM "+to_do.getType()+ " WHERE searchId = "+to_do.getId();
-		String myQuery = "";
-		if(myResource.getType().equalsIgnoreCase("JOBS")){
-
-			myQuery = DataTranslation.completeResourceListQuery.get(myResource.getType())+ " AND JOBS.searchId ="+myResource.getId();
-		}else{
-			if(myResource.getType().equalsIgnoreCase("Meta_HSPEC")){
-				myQuery = DataTranslation.completeResourceListQuery.get(myResource.getType())+ " AND Meta_HSPEC.searchId ="+myResource.getId();
-			}else{
-				myQuery ="SELECT * FROM "+myResource.getType()+ " WHERE searchId = "+myResource.getId();
-			}
-		}
-		DBSession conn=null;
+//		//Cambiare id in SearchId
+//		//String myQuery ="SELECT * FROM "+to_do.getType()+ " WHERE searchId = "+to_do.getId();
+//		String myQuery = "";
+//		if(myResource.getType().equalsIgnoreCase("JOBS")){
+//
+//			myQuery = DataTranslation.completeResourceListQuery.get(myResource.getType())+ " AND JOBS.searchId ="+myResource.getId();
+//		}else{
+//			if(myResource.getType().equalsIgnoreCase("Meta_HSPEC")){
+//				myQuery = DataTranslation.completeResourceListQuery.get(myResource.getType())+ " AND Meta_HSPEC.searchId ="+myResource.getId();
+//			}else{
+//				myQuery ="SELECT * FROM "+myResource.getType()+ " WHERE searchId = "+myResource.getId();
+//			}
+//		}
+//		DBSession conn=null;
+//		try{
+//			conn = DBSession.openSession(PoolManager.DBType.mySql);
+//			ResultSet rs = conn.executeQuery(myQuery);
+//			rs.next();
+//			toReturn=DataTranslation.getResourceFromResultSet(rs,rs.getMetaData(),myResource.getType());
+//
+//
+//			//bisogna controllare se siamo in JOBS per via del campo addizionale
+//			if(myResource.getType().equalsIgnoreCase("JOBS")){
+//				Field relatedField =new Field();
+//				relatedField.setName("related");
+//				relatedField.setType("String");
+//				relatedField.setValue(getJobMaps(myResource.getId(),conn));
+//				Field[] fields=toReturn.getAdditionalField().getFields();
+//				fields[fields.length-1]=relatedField;
+//			}			
+//			rs.close();			
+////			conn.close();
+//		}catch(Exception e){
+//			logger.error("Errors while performing operation",e);	
+//		}finally{
+//			try {
+//				conn.close();
+//			} catch (Exception e) {
+//				
+//				e.printStackTrace();
+//			}
+//		}
+		
+		//FIXME get Entire details
 		try{
-			conn = DBSession.openSession(PoolManager.DBType.mySql);
-			ResultSet rs = conn.executeQuery(myQuery);
-			rs.next();
-			toReturn=DataTranslation.getResourceFromResultSet(rs,rs.getMetaData(),myResource.getType());
-
-
-			//bisogna controllare se siamo in JOBS per via del campo addizionale
-			if(myResource.getType().equalsIgnoreCase("JOBS")){
-				Field relatedField =new Field();
-				relatedField.setName("related");
-				relatedField.setType("String");
-				relatedField.setValue(getJobMaps(myResource.getId(),conn));
-				Field[] fields=toReturn.getAdditionalField().getFields();
-				fields[fields.length-1]=relatedField;
-			}			
-			rs.close();			
-//			conn.close();
-		}catch(Exception e){
-			logger.error("Errors while performing operation",e);	
-		}finally{
-			try {
-				conn.close();
-			} catch (Exception e) {
-				
-				e.printStackTrace();
-			}
-		}
+		String title=SourceManager.getSourceTitle(SourceType.HCAF, Integer.parseInt(myResource.getId()));
+		
+		FieldArray fieldArray=new FieldArray(new Field[]{new Field(org.gcube.application.aquamaps.stubs.dataModel.Resource.Tags.NAME, org.gcube.application.aquamaps.stubs.dataModel.Field.Type.STRING.toString(), title)});
+		toReturn.setAdditionalField(fieldArray);
+		
+		
 		logger.debug("esco da getresourceInfo");
 		return toReturn;
+		}catch(Exception e){
+			logger.error("Unable to load source details. id: "+myResource.getId(), e);
+			throw new GCUBEFault();
+		}
 	}
 
 	private String getJobMaps(String jobId,DBSession  c)throws Exception{

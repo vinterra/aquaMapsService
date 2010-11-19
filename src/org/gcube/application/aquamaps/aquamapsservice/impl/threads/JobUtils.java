@@ -189,7 +189,9 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 
 	}
 	
-	
+	public static String getBasePublicPath(){return ServiceContext.getContext().getWebServiceURL();}
+	public static String getBaseLocalPath(){return ServiceContext.getContext().getPersistenceRoot()+File.separator+ServiceContext.getContext().getHttpServerBasePath();}
+		
 		
 	
 	public static void updateProfile(String resName,String resId,String resProfile,String firstLevelDir,String secondLevelDir) throws Exception{

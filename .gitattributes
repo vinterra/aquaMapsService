@@ -38,6 +38,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/JobManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/MapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationStatus.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManager.java -text
