@@ -1,0 +1,5 @@
+<ReleaseNotes>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2010-10-22">
+		<Change>Added DataManagement port type</Change>				
+	</Changeset>	
+</ReleaseNotes>
