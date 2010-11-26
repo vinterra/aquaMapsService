@@ -6,12 +6,12 @@
 		<Description>Aquamaps Service</Description>
 		<Class>Application</Class>
 		<Name>AquaMaps</Name>
-		<Version>2.4.1</Version>
+		<Version>2.4.2</Version>
 		<Packages>
 			<Main>
 				<Description>Aquamaps Stateless Service</Description>
 				<Name>AquaMaps-Service</Name>
-				<Version>2.4.1</Version>
+				<Version>2.4.2</Version>
 				<GHNRequirements>
 					<Requirement category="Site"  requirement="string" value="java1.5" operator="le"/>
 				</GHNRequirements>
@@ -23,10 +23,10 @@
 						<Service>
 							<Class>Application</Class>
 							<Name>AquaMaps</Name>
-							<Version>2.4.1</Version>
+							<Version>2.4.2</Version>
 						</Service>
 						<Package>AquaMaps-stubs</Package>
-						<Version>2.4.1</Version>
+						<Version>2.4.2</Version>
 						<Scope level="GHN"/>
 						<Optional>false</Optional>
 					</Dependency>
@@ -66,7 +66,7 @@
 			<Software>
 				<Description>Aquamaps stubs</Description>
 				<Name>AquaMaps-stubs</Name>
-				<Version>2.4.1</Version>
+				<Version>2.4.2</Version>
 				<Files><File>org.gcube.application.aquamaps.stubs.jar</File></Files>
 			</Software>
 		</Packages>
