@@ -2,19 +2,14 @@ package org.gcube.application.aquamaps.stubs.dataModel;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.PerturbationType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,8 +47,8 @@ public class AquaMapsObject {
 	private String author;
 	private String date;
 	private int id;	
-//	private String source;
-//	private String profileUrl;
+	//	private String source;
+	//	private String profileUrl;
 	private Boolean gis=false;
 	private ObjectType type=ObjectType.Biodiversity;
 	private Set<Species> selectedSpecies=new HashSet<Species>();
@@ -125,23 +120,23 @@ public class AquaMapsObject {
 		profileBuilder.append("<Author>"+author+"</Author>");
 		profileBuilder.append("<BoundingBox>"+boundingBox.toString()+"</BoundingBox>");
 		profileBuilder.append("<Identifier>"+id+"</Identifier>");
-//		profileBuilder.append("<Source>"+source+"</Source>");
+		//		profileBuilder.append("<Source>"+source+"</Source>");
 		profileBuilder.append("<Status>"+status+"</Status>");
 		profileBuilder.append("<Type>"+type.toString()+"</Type>");
 		profileBuilder.append("<date>"+date+"</date>");
 		profileBuilder.append("<Gis>"+gis+"</Gis>");
-//		profileBuilder.append("<RelatedResources>");
-//		for(Entry<String,String> entry : relatedResources.entrySet()){
-//			profileBuilder.append("<Resource>");
-//			profileBuilder.append("<Name>"+entry.getKey()+"</Name>");
-//			profileBuilder.append("<Url>"+entry.getValue()+"</Url>");
-//			profileBuilder.append("</Resource>");
-//		}
-//		profileBuilder.append("<Resource>");
-//		profileBuilder.append("<Name>Profile</Name>");
-//		profileBuilder.append("<Url>"+profileUrl+"</Url>");
-//		profileBuilder.append("</Resource>");		
-//		profileBuilder.append("</RelatedResources>");
+		//		profileBuilder.append("<RelatedResources>");
+		//		for(Entry<String,String> entry : relatedResources.entrySet()){
+		//			profileBuilder.append("<Resource>");
+		//			profileBuilder.append("<Name>"+entry.getKey()+"</Name>");
+		//			profileBuilder.append("<Url>"+entry.getValue()+"</Url>");
+		//			profileBuilder.append("</Resource>");
+		//		}
+		//		profileBuilder.append("<Resource>");
+		//		profileBuilder.append("<Name>Profile</Name>");
+		//		profileBuilder.append("<Url>"+profileUrl+"</Url>");
+		//		profileBuilder.append("</Resource>");		
+		//		profileBuilder.append("</RelatedResources>");
 
 
 
@@ -149,48 +144,48 @@ public class AquaMapsObject {
 		for(Species spec:selectedSpecies) profileBuilder.append(spec.toXML());
 		profileBuilder.append("</SelectedSpecies>");
 
-//		profileBuilder.append("<"+Tags.envelopeCustomization+">");
-//		for(Species spec:selectedSpecies){
-//			String specId=spec.getId();
-//			if((envelopeWeights.containsKey(specId))||(envelopeCustomization.containsKey(specId))){
-//				profileBuilder.append("<"+Tags.customizationSet+" "+SpeciesOccursumFields.SpeciesID+" =\""+specId+"\">");
-//				if(envelopeWeights.containsKey(specId)){
-//					profileBuilder.append("<Weights>");
-//					for(Field field:envelopeWeights.get(specId).values()) profileBuilder.append(field.toXML());
-//					profileBuilder.append("</Weights>");
-//				}
-//				if(envelopeCustomization.containsKey(specId))
-//					for(String fieldName:envelopeCustomization.get(specId).keySet()){
-//						profileBuilder.append("<"+Tags.customization+">");
-//						profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
-//						profileBuilder.append("<Type>"+envelopeCustomization.get(specId).get(fieldName).getType()+"</Type>");
-//						profileBuilder.append("<Value>"+envelopeCustomization.get(specId).get(fieldName).getPerturbationValue()+"</Value>");
-//						profileBuilder.append("</"+Tags.customization+">");
-//					}
-//				profileBuilder.append("</"+Tags.customizationSet+">");				
-//			}			
-//		}
-//		profileBuilder.append("</"+Tags.envelopeCustomization+">");
+		//		profileBuilder.append("<"+Tags.envelopeCustomization+">");
+		//		for(Species spec:selectedSpecies){
+		//			String specId=spec.getId();
+		//			if((envelopeWeights.containsKey(specId))||(envelopeCustomization.containsKey(specId))){
+		//				profileBuilder.append("<"+Tags.customizationSet+" "+SpeciesOccursumFields.SpeciesID+" =\""+specId+"\">");
+		//				if(envelopeWeights.containsKey(specId)){
+		//					profileBuilder.append("<Weights>");
+		//					for(Field field:envelopeWeights.get(specId).values()) profileBuilder.append(field.toXML());
+		//					profileBuilder.append("</Weights>");
+		//				}
+		//				if(envelopeCustomization.containsKey(specId))
+		//					for(String fieldName:envelopeCustomization.get(specId).keySet()){
+		//						profileBuilder.append("<"+Tags.customization+">");
+		//						profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
+		//						profileBuilder.append("<Type>"+envelopeCustomization.get(specId).get(fieldName).getType()+"</Type>");
+		//						profileBuilder.append("<Value>"+envelopeCustomization.get(specId).get(fieldName).getPerturbationValue()+"</Value>");
+		//						profileBuilder.append("</"+Tags.customization+">");
+		//					}
+		//				profileBuilder.append("</"+Tags.customizationSet+">");				
+		//			}			
+		//		}
+		//		profileBuilder.append("</"+Tags.envelopeCustomization+">");
 
-//		profileBuilder.append("<SelectedAreas>");
-//		for(Area area:selectedAreas) profileBuilder.append(area.toXML());
-//		
-//		profileBuilder.append("</SelectedAreas>");
+		//		profileBuilder.append("<SelectedAreas>");
+		//		for(Area area:selectedAreas) profileBuilder.append(area.toXML());
+		//		
+		//		profileBuilder.append("</SelectedAreas>");
 
 
-//		profileBuilder.append("<"+Tags.environementCustomization+">");
-//		for(String cellId:environmentCustomization.keySet()){			
-//			profileBuilder.append("<"+Tags.customizationSet+" "+Cell.Tags.ID+" = \""+cellId+"\">");
-//			for(String fieldName:environmentCustomization.get(cellId).keySet()){
-//				profileBuilder.append("<"+Tags.customization+">");
-//				profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
-//				profileBuilder.append("<Type>"+environmentCustomization.get(cellId).get(fieldName).getType()+"</Type>");
-//				profileBuilder.append("<Value>"+environmentCustomization.get(cellId).get(fieldName).getPerturbationValue()+"</Value>");
-//				profileBuilder.append("</"+Tags.customization+">");
-//			}
-//			profileBuilder.append("</"+Tags.customizationSet+">");
-//		}
-//		profileBuilder.append("</"+Tags.environementCustomization+">");
+		//		profileBuilder.append("<"+Tags.environementCustomization+">");
+		//		for(String cellId:environmentCustomization.keySet()){			
+		//			profileBuilder.append("<"+Tags.customizationSet+" "+Cell.Tags.ID+" = \""+cellId+"\">");
+		//			for(String fieldName:environmentCustomization.get(cellId).keySet()){
+		//				profileBuilder.append("<"+Tags.customization+">");
+		//				profileBuilder.append("<FieldName>"+fieldName+"</FieldName>");
+		//				profileBuilder.append("<Type>"+environmentCustomization.get(cellId).get(fieldName).getType()+"</Type>");
+		//				profileBuilder.append("<Value>"+environmentCustomization.get(cellId).get(fieldName).getPerturbationValue()+"</Value>");
+		//				profileBuilder.append("</"+Tags.customization+">");
+		//			}
+		//			profileBuilder.append("</"+Tags.customizationSet+">");
+		//		}
+		//		profileBuilder.append("</"+Tags.environementCustomization+">");
 
 		profileBuilder.append("<AlgorithmSettings>");		
 		profileBuilder.append("<Threshold>"+threshold+"</Threshold>");
@@ -212,18 +207,18 @@ public class AquaMapsObject {
 	public BoundingBox getBoundingBox() {
 		return boundingBox;
 	}
-//	public void setProfileUrl(String profileUrl) {
-//		this.profileUrl = profileUrl;
-//	}
-//	public String getProfileUrl() {
-//		return profileUrl;
-//	}
-//	public void setEnvelopeWeights(Map<String,Map<EnvelopeFields,Field>> envelopeWeights) {
-//		this.envelopeWeights = envelopeWeights;
-//	}
-//	public Map<String,Map<EnvelopeFields,Field>> getEnvelopeWeights() {
-//		return envelopeWeights;
-//	}
+	//	public void setProfileUrl(String profileUrl) {
+	//		this.profileUrl = profileUrl;
+	//	}
+	//	public String getProfileUrl() {
+	//		return profileUrl;
+	//	}
+	//	public void setEnvelopeWeights(Map<String,Map<EnvelopeFields,Field>> envelopeWeights) {
+	//		this.envelopeWeights = envelopeWeights;
+	//	}
+	//	public Map<String,Map<EnvelopeFields,Field>> getEnvelopeWeights() {
+	//		return envelopeWeights;
+	//	}
 
 	public AquaMapsObject(String profile) throws ParserConfigurationException{
 		super();
@@ -261,40 +256,40 @@ public class AquaMapsObject {
 		}
 		this.addSpecies(specList);
 
-//		Element envelopeElement =(Element)doc.getElementsByTagName(Tags.envelopeCustomization).item(0);
-//		if(envelopeElement!=null){
-//			NodeList customizedSpeciesNodes=envelopeElement.getElementsByTagName(Tags.customizationSet);		
-//			for(int i=0;i<customizedSpeciesNodes.getLength();i++){
-//				Element customizationSetEl=(Element)customizedSpeciesNodes.item(i);
-//				String specId= customizationSetEl.getAttribute(SpeciesOccursumFields.SpeciesID+"");
-//				// look for weights
-//				NodeList weights=customizationSetEl.getElementsByTagName("Weights");
-//				if((weights!=null)&&(weights.getLength()>0)){
-//					NodeList settedWeights=((Element)weights.item(0)).getElementsByTagName("Field");
-//					Map<EnvelopeFields,Field> toPutList=new HashMap<EnvelopeFields, Field>();
-//					for(int j=0;j<settedWeights.getLength();j++){
-//						Field f=new Field((Element) settedWeights.item(j));
-//						toPutList.put(EnvelopeFields.valueOf(f.getName()),f);
-//					}
-////					this.getEnvelopeWeights().put(specId, toPutList);
-//				}
-//				//look for customizations
-//				NodeList customizations=customizationSetEl.getElementsByTagName(Tags.customization);
-//				if((customizations!=null)&&(customizations.getLength()>0)){
-//					Map<String,Perturbation> toPutMap=new HashMap<String, Perturbation>();
-//					for(int j=0;j<customizations.getLength();j++){
-//						Element customization=(Element) customizations.item(j);
-//						Element fieldName=(Element) customization.getElementsByTagName("FieldName").item(0);
-//						Element type=(Element) customization.getElementsByTagName("Type").item(0);
-//						Element value=(Element) customization.getElementsByTagName("Value").item(0);
-//						Perturbation pert=new Perturbation(PerturbationType.valueOf(XMLUtils.getTextContent(type)),
-//								XMLUtils.getTextContent(value));
-//						toPutMap.put(XMLUtils.getTextContent(fieldName), pert);
-//					}
-////					this.getEnvelopeCustomization().put(specId, toPutMap);
-//				}
-//			}
-//		}
+		//		Element envelopeElement =(Element)doc.getElementsByTagName(Tags.envelopeCustomization).item(0);
+		//		if(envelopeElement!=null){
+		//			NodeList customizedSpeciesNodes=envelopeElement.getElementsByTagName(Tags.customizationSet);		
+		//			for(int i=0;i<customizedSpeciesNodes.getLength();i++){
+		//				Element customizationSetEl=(Element)customizedSpeciesNodes.item(i);
+		//				String specId= customizationSetEl.getAttribute(SpeciesOccursumFields.SpeciesID+"");
+		//				// look for weights
+		//				NodeList weights=customizationSetEl.getElementsByTagName("Weights");
+		//				if((weights!=null)&&(weights.getLength()>0)){
+		//					NodeList settedWeights=((Element)weights.item(0)).getElementsByTagName("Field");
+		//					Map<EnvelopeFields,Field> toPutList=new HashMap<EnvelopeFields, Field>();
+		//					for(int j=0;j<settedWeights.getLength();j++){
+		//						Field f=new Field((Element) settedWeights.item(j));
+		//						toPutList.put(EnvelopeFields.valueOf(f.getName()),f);
+		//					}
+		////					this.getEnvelopeWeights().put(specId, toPutList);
+		//				}
+		//				//look for customizations
+		//				NodeList customizations=customizationSetEl.getElementsByTagName(Tags.customization);
+		//				if((customizations!=null)&&(customizations.getLength()>0)){
+		//					Map<String,Perturbation> toPutMap=new HashMap<String, Perturbation>();
+		//					for(int j=0;j<customizations.getLength();j++){
+		//						Element customization=(Element) customizations.item(j);
+		//						Element fieldName=(Element) customization.getElementsByTagName("FieldName").item(0);
+		//						Element type=(Element) customization.getElementsByTagName("Type").item(0);
+		//						Element value=(Element) customization.getElementsByTagName("Value").item(0);
+		//						Perturbation pert=new Perturbation(PerturbationType.valueOf(XMLUtils.getTextContent(type)),
+		//								XMLUtils.getTextContent(value));
+		//						toPutMap.put(XMLUtils.getTextContent(fieldName), pert);
+		//					}
+		////					this.getEnvelopeCustomization().put(specId, toPutMap);
+		//				}
+		//			}
+		//		}
 
 	}
 	public void setGis(Boolean gis) {
@@ -324,14 +319,15 @@ public class AquaMapsObject {
 				toReturn.add(new AquaMapsObject(a));
 		return toReturn;
 	}
-	
+
 	public static org.gcube.application.aquamaps.stubs.AquaMapArray toStubsVersion(List<AquaMapsObject> toConvert){
 		List<org.gcube.application.aquamaps.stubs.AquaMap> list=new ArrayList<org.gcube.application.aquamaps.stubs.AquaMap>();
-		for(AquaMapsObject obj:toConvert)
-			list.add(obj.toStubsVersion());
+		if(toConvert!=null)
+			for(AquaMapsObject obj:toConvert)
+				list.add(obj.toStubsVersion());
 		return new org.gcube.application.aquamaps.stubs.AquaMapArray(list.toArray(new org.gcube.application.aquamaps.stubs.AquaMap[list.size()]));
 	}
-	
+
 	public org.gcube.application.aquamaps.stubs.AquaMap toStubsVersion(){
 		org.gcube.application.aquamaps.stubs.AquaMap toReturn= new org.gcube.application.aquamaps.stubs.AquaMap();
 		toReturn.setAuthor(this.author);
@@ -347,11 +343,11 @@ public class AquaMapsObject {
 		toReturn.setType(this.type.toString());
 		return toReturn;
 	}
-	
+
 	public AquaMapsObject(String name,int id, ObjectType type){
-	this.setName(name);
-	this.setId(id);
-	this.setType(type);
+		this.setName(name);
+		this.setId(id);
+		this.setType(type);
 	}
 	public AquaMapsObject(){}
 }

@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Cell;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
 
 
@@ -38,13 +40,13 @@ public class Env_PrimProd extends EnvEngine {
 */
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			if (cell.getFieldbyName(Cell.PRIMPRODMEAN).getValue() != null && 
-				Double.parseDouble(cell.getFieldbyName(Cell.OCEANAREA).getValue()) > 0) {
+			if (cell.getFieldbyName(HCAF_DFields.PrimProdMean+"").getValue() != null && 
+				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
 		
-		this.fillData(filterCells, Cell.PRIMPRODMEAN);
+		this.fillData(filterCells, HCAF_DFields.PrimProdMean+"");
 		
 		this.prodMin = this.getMin();
 		this.prodMax = this.getMax();					

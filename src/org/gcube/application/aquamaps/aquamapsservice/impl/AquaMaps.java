@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
+import java.rmi.RemoteException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Job;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.Submitted;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.AreaType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
@@ -214,7 +216,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 		logger.trace("serving get Species envelope");
 		try{
 			Species selected=SpeciesManager.getSpeciesById(true,true,arg0.getSpeciesId(),arg0.getHspenId());
-			return selected.extractEnvelope().toFieldArray();
+			return Field.toStubsVersion(selected.attributesList);
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
@@ -317,10 +319,23 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 				for(String id:ids.getItems())SubmittedManager.markSaved(Integer.parseInt(id));
 			return new VOID();
 		}catch(Exception e){
-			logger.error(e);
+			logger.error("",e);
 			throw new GCUBEFault();
 		}
 		
+	}
+
+	public org.gcube.application.aquamaps.stubs.Submitted loadSubmittedById(int arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			logger.trace("Loading submitted id : "+arg0);
+			List<Field> conditions=new ArrayList<Field>();
+			conditions.add(new Field(SubmittedFields.searchId+"", arg0+"", FieldType.INTEGER));
+			return SubmittedManager.getList(conditions).get(0).toStubsVersion();			
+		}catch(Exception e){
+			logger.error("",e);
+			throw new GCUBEFault("Impossible to load submitted : "+e.getMessage());
+		}
 	}
 
 

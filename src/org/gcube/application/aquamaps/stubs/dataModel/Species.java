@@ -13,7 +13,7 @@ import org.w3c.dom.NodeList;
 
 public class Species {
 
-	
+
 	private String id;
 	public List<Field> attributesList=new ArrayList<Field>();
 	public List<Field> getAttributesList() {
@@ -28,18 +28,18 @@ public class Species {
 	public String getId() {
 		return id;
 	}
-	
+
 	public Field getFieldbyName(String fieldName){
 		for(Field field:attributesList){
 			if(field.getName().equals(fieldName)) return field;
 		}
 		return null;		
 	}
-	
+
 	public void addField(Field toAddField){
 		attributesList.add(toAddField);
 	}
-	
+
 	public Envelope extractEnvelope(){
 		Envelope toReturn=new Envelope();
 		for(EnvelopeFields envelopeField:EnvelopeFields.values()){
@@ -47,27 +47,47 @@ public class Species {
 				toReturn.setValue(envelopeField, paramName,Double.parseDouble(this.getFieldbyName(paramName.toString()).getValue()));
 			}
 		}
+		
+		String eString=this.getFieldbyName(HspenFields.EMostLong+"").getValue();
+		if(!eString.equalsIgnoreCase("null"))
+			toReturn.getBoundingBox().setE(Float.valueOf(eString));
+		
+		String nString=this.getFieldbyName(HspenFields.NMostLat+"").getValue();
+		if(!nString.equalsIgnoreCase("null"))
+			toReturn.getBoundingBox().setN(Float.valueOf(nString));
+		
+		String wString=this.getFieldbyName(HspenFields.WMostLong+"").getValue();
+		if(!wString.equalsIgnoreCase("null"))
+			toReturn.getBoundingBox().setW(Float.valueOf(wString));
+		
+		String sString=this.getFieldbyName(HspenFields.SMostLat+"").getValue();
+		if(!sString.equalsIgnoreCase("null"))
+			toReturn.getBoundingBox().setS(Float.valueOf(sString));
+		
+		toReturn.setFaoAreas(this.getFieldbyName(HspenFields.FAOAreas+"").getValue());
+		toReturn.setPelagic(Boolean.parseBoolean(this.getFieldbyName(HspenFields.Pelagic+"").getValue()));
+		toReturn.setUseBottomSeaTempAndSalinity(this.getFieldbyName(HspenFields.Layer+"").getValue().equalsIgnoreCase("b"));
 		return toReturn;
 	}
-	
-	
-//	public String toJSON(){
-//		StringBuilder toReturn=new StringBuilder();
-//		toReturn.append("{\""+Tags.ID+"\":\""+id+"\"");
-//		for(Field field:attributesList){
-//			toReturn.append(" ,\""+field.getName()+"\":\""+field.getValue()+"\"");
-//		}
-//		toReturn.append("}");
-//		return toReturn.toString();
-//	}
+
+
+	//	public String toJSON(){
+	//		StringBuilder toReturn=new StringBuilder();
+	//		toReturn.append("{\""+Tags.ID+"\":\""+id+"\"");
+	//		for(Field field:attributesList){
+	//			toReturn.append(" ,\""+field.getName()+"\":\""+field.getValue()+"\"");
+	//		}
+	//		toReturn.append("}");
+	//		return toReturn.toString();
+	//	}
 	public String toXML(){
 		StringBuilder toReturn=new StringBuilder();
 		toReturn.append("<Species>");
 		toReturn.append("<"+SpeciesOccursumFields.SpeciesID+">"+id+"</"+SpeciesOccursumFields.SpeciesID+">");
 		toReturn.append("<Attributes>");
-			for(Field field:attributesList){
-				toReturn.append(field.toXML());
-			}
+		for(Field field:attributesList){
+			toReturn.append(field.toXML());
+		}
 		toReturn.append("</Attributes>");
 		toReturn.append("</Species>");
 		return toReturn.toString();
@@ -97,7 +117,7 @@ public class Species {
 			return false;
 		return true;
 	}
-	
+
 	public Species (Element el){
 		Element idEl=(Element) el.getElementsByTagName(SpeciesOccursumFields.SpeciesID.toString()).item(0);
 		this.setId(XMLUtils.getTextContent(idEl));
@@ -106,13 +126,13 @@ public class Species {
 			this.addField(new Field((Element)fieldNodes.item(i)));
 		}
 	}
-	
+
 	public Species(org.gcube.application.aquamaps.stubs.Specie toLoad){
 		super();
 		this.setId(toLoad.getId());
 		this.getAttributesList().addAll(Field.load(toLoad.getAdditionalField()));
 	}
-	
+
 	public static List<Species> load(org.gcube.application.aquamaps.stubs.SpeciesArray toLoad){
 		ArrayList<Species> toReturn = new ArrayList<Species>();
 		if((toLoad!=null)&&(toLoad.getSpeciesList()!=null))
@@ -120,21 +140,22 @@ public class Species {
 				toReturn.add(new Species(s));
 		return toReturn;
 	}
-	
+
 	public static org.gcube.application.aquamaps.stubs.SpeciesArray toStubsVersion(Set<Species> toConvert){
 		List<org.gcube.application.aquamaps.stubs.Specie> list=new ArrayList<org.gcube.application.aquamaps.stubs.Specie>();
-		for(Species obj:toConvert)
-			list.add(obj.toStubsVersion());
+		if(toConvert!=null)
+			for(Species obj:toConvert)
+				list.add(obj.toStubsVersion());
 		return new org.gcube.application.aquamaps.stubs.SpeciesArray(list.toArray(new org.gcube.application.aquamaps.stubs.Specie[list.size()]));
 	}
-	
+
 	public org.gcube.application.aquamaps.stubs.Specie toStubsVersion(){
 		org.gcube.application.aquamaps.stubs.Specie toReturn=new org.gcube.application.aquamaps.stubs.Specie();
 		toReturn.setAdditionalField(Field.toStubsVersion(this.getAttributesList()));
 		toReturn.setId(this.id);
 		return toReturn;
 	}
-	
+
 	public Species(String speciesId){
 		this.id=speciesId;
 	}

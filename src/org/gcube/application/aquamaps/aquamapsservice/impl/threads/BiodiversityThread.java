@@ -23,9 +23,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerG
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -225,8 +225,8 @@ public class BiodiversityThread extends Thread {
 	
 	
 	public static String clusteringBiodiversityQuery(String hspecName, String tmpTable){
-	String query= "Select "+Cell.ID+", count("+hspecName+"."+SpeciesOccursumFields.SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
-			" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesOccursumFields.SpeciesID+" = "+tmpTable+"."+SpeciesOccursumFields.SpeciesID+" where probability > ? GROUP BY "+Cell.ID+" ORDER BY MaxSpeciesCountInACell DESC";
+	String query= "Select "+HCAF_SFields.CSquareCode+", count("+hspecName+"."+SpeciesOccursumFields.SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
+			" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesOccursumFields.SpeciesID+" = "+tmpTable+"."+SpeciesOccursumFields.SpeciesID+" where probability > ? GROUP BY "+HCAF_SFields.CSquareCode+" ORDER BY MaxSpeciesCountInACell DESC";
 	logger.trace("clusteringBiodiversityQuery: "+query);
 	return query;
 }

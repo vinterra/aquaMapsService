@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Cell;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
 
 
@@ -38,13 +40,13 @@ public class Env_SeaIce extends EnvEngine {
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
 			
-			if (cell.getFieldbyName(Cell.ICEANN).getValue() != null &&
-					Double.parseDouble(cell.getFieldbyName(Cell.OCEANAREA).getValue()) > 0) {
+			if (cell.getFieldbyName(HCAF_DFields.IceConAnn+"").getValue() != null &&
+					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
 		
-		this.fillData(filterCells, Cell.ICEANN);
+		this.fillData(filterCells, HCAF_DFields.IceConAnn+"");
 		
 		this.iceMin = this.getMin();
 		this.iceMax = this.getMax();					
@@ -60,7 +62,7 @@ public class Env_SeaIce extends EnvEngine {
 			sumIce = 0;
 
 			for (Cell cell: filterCells) {
-		         sumIce = sumIce + Double.parseDouble(cell.getFieldbyName(Cell.ICEANN).getValue());
+		         sumIce = sumIce + Double.parseDouble(cell.getFieldbyName(HCAF_DFields.IceConAnn+"").getValue());
 		    }
 			int reccount = filterCells.size();
 			if(reccount != 0)	{meanIce = sumIce / reccount;}

@@ -10,6 +10,7 @@ import java.util.Set;
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.Cell;
+import org.gcube.application.aquamaps.stubs.dataModel.Envelope;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
 import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Job;
@@ -32,17 +33,17 @@ import org.gcube.application.framework.core.session.SessionManager;
 
 public class AquaMapsServiceTester {
 
-	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
+//	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
-//	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 	public static void main(String[] args){
 		try{
 		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
 		session.setScope("/gcube/devsec");
 		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(session, SERVICE_URI);
-//		
-//		Species spec=new Species("Fis-10199");
+		
+		Species spec=new Species("Fis-29501");
 //		System.out.println("Occurrence cells for ");
 //		System.out.println(wrapper.getJSONOccurrenceCells(spec.getId(), new PagedRequestSettings(10, 0, Cell.ID, "ASC")));
 //		System.out.println("Getting envelope");
@@ -59,11 +60,15 @@ public class AquaMapsServiceTester {
 //		System.out.println("Getting default hcaf");
 //		System.out.println(wrapper.loadResource(1, ResourceType.HCAF));
 		
-		System.out.println("Submitting Job");
-		wrapper.submitJob(createDummyJob());
+//		System.out.println("Submitting Job");
+//		wrapper.submitJob(createDummyJob());
 		
 //		System.out.println("Loading obj");
 //		wrapper.loadObject(285);
+	
+		System.out.println("Loading Envelope");
+		
+		Envelope env= wrapper.loadEnvelope(spec.getId(), 1);
 		
 		System.out.println("Done");
 		}catch(Exception e){

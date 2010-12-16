@@ -114,6 +114,7 @@ src/org/gcube/application/aquamaps/stubs/dataModel/fields/HCAF_DFields.java -tex
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/HCAF_SFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/HSPECFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/HspenFields.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/fields/MetaSourceFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/OccurrenceCellsFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SpeciesOccursumFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SubmittedFields.java -text

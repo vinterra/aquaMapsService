@@ -107,14 +107,14 @@ public class SpeciesManager {
 		
 		if((names.size()>0)){
 			for(Filter filter:names)				
-				namesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString());
+				namesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString()+" AND ");
 			int index=namesFilter.lastIndexOf("AND");
 			namesFilter.delete(index, index+3);
 		}
 		
 		if((codes.size()>0)){
 			for(Filter filter:codes)				
-				codesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString());
+				codesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString()+" AND ");
 			int index=codesFilter.lastIndexOf("AND");
 			codesFilter.delete(index, index+3);
 		}

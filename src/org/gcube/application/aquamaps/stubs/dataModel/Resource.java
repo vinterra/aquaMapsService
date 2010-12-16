@@ -8,26 +8,11 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 
 public class Resource{
 
-	
-	//***** Constants fields
-	
-	public static final String SEARCHID="searchId";
-	public static final String TITLE="title";
-	public static final String TABLENAME="tableName";
-	public static final String DESCRIPTION="description";
-	public static final String AUTHOR="author";
-	public static final String DISCLAIMER="disclaimer";
-	public static final String PROVENANCE="provenience";
-	public static final String DATE="data";
-	public static final String SOURCEID="sourceId";
-	public static final String PARAMETERS="parameters";
-	public static final String STATUS="status";
-	public static final String SOURCENAME="sourceName";
-	
+
 	
 	//********* instance values
-	
-	
+
+
 	public int getSearchId() {
 		return searchId;
 	}
@@ -113,25 +98,25 @@ public class Resource{
 	private String parameters="parameters";
 	private String status="status";
 	private String sourceName="sourceName";
-	
-	
+
+
 	private ResourceType type=ResourceType.HCAF;
-	
-	
+
+
 	public void setType(ResourceType type) {
 		this.type = type;
 	}
 	public ResourceType getType() {
 		return type;
 	}
-	
+
 	public Resource(ResourceType type,int searchId) {		
 		this.type=type;
 		this.searchId=searchId;
 	}
-	
 
-	
+
+
 	public Resource (org.gcube.application.aquamaps.stubs.Resource toLoad){
 		this.setAuthor(toLoad.getAuthor());
 		this.setDate(toLoad.getDate());
@@ -147,7 +132,7 @@ public class Resource{
 		this.setTitle(toLoad.getTitle());
 		this.setType(ResourceType.valueOf(toLoad.getType()));
 	}
-	
+
 	public org.gcube.application.aquamaps.stubs.Resource toStubsVersion(){
 		org.gcube.application.aquamaps.stubs.Resource toReturn=new org.gcube.application.aquamaps.stubs.Resource();
 		toReturn.setAuthor(this.getAuthor());
@@ -165,19 +150,20 @@ public class Resource{
 		toReturn.setType(this.getType().toString());
 		return toReturn;
 	}
-	
-	
+
+
 	public static List<Resource> load(org.gcube.application.aquamaps.stubs.ResourceArray toLoad){
 		List<Resource> toReturn=new ArrayList<Resource>();
 		if((toLoad!=null)&&(toLoad.getResourceList()!=null))
 			for(org.gcube.application.aquamaps.stubs.Resource f: toLoad.getResourceList())toReturn.add(new Resource(f));
 		return toReturn;
 	}
-	
+
 	public static org.gcube.application.aquamaps.stubs.ResourceArray toStubsVersion(List<Resource> toConvert){
 		List<org.gcube.application.aquamaps.stubs.Resource> list=new ArrayList<org.gcube.application.aquamaps.stubs.Resource>();
-		for(Resource obj:toConvert)
-			list.add(obj.toStubsVersion());
+		if(toConvert!=null)
+			for(Resource obj:toConvert)
+				list.add(obj.toStubsVersion());
 		return new org.gcube.application.aquamaps.stubs.ResourceArray(list.toArray(new org.gcube.application.aquamaps.stubs.Resource[list.size()]));
 	}
 	@Override
@@ -206,29 +192,29 @@ public class Resource{
 			return false;
 		return true;
 	}
-	
-	
-//	public String toXML(){
-//		StringBuilder doc=new StringBuilder();
-//		doc.append("<Resource>");
-//		doc.append("<Type>"+type.toString()+"</Type>");
-//		doc.append("<Attributes>");
-//		for(Field field:attributes.values())
-//			doc.append(field.toXML());
-//		doc.append("</Attributes>");		
-//		doc.append("</Resource>");
-//		return doc.toString();
-//	}
-//	public String toJSON(){
-//		StringBuilder toReturn=new StringBuilder();
-//		toReturn.append("{\"type\" :\""+type.toString()+"\"");
-//		for(Field field:attributes.values()){
-//			toReturn.append(" ,\""+field.getName()+"\":\""+field.getValue()+"\"");
-//		}
-//		toReturn.append("}");
-//		return toReturn.toString();
-//	}
-	
-	
-	
+
+
+	//	public String toXML(){
+	//		StringBuilder doc=new StringBuilder();
+	//		doc.append("<Resource>");
+	//		doc.append("<Type>"+type.toString()+"</Type>");
+	//		doc.append("<Attributes>");
+	//		for(Field field:attributes.values())
+	//			doc.append(field.toXML());
+	//		doc.append("</Attributes>");		
+	//		doc.append("</Resource>");
+	//		return doc.toString();
+	//	}
+	//	public String toJSON(){
+	//		StringBuilder toReturn=new StringBuilder();
+	//		toReturn.append("{\"type\" :\""+type.toString()+"\"");
+	//		for(Field field:attributes.values()){
+	//			toReturn.append(" ,\""+field.getName()+"\":\""+field.getValue()+"\"");
+	//		}
+	//		toReturn.append("}");
+	//		return toReturn.toString();
+	//	}
+
+
+
 }

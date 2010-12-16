@@ -16,6 +16,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.MetaSourceFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceManager {
@@ -52,7 +53,7 @@ public class SourceManager {
 		try{
 			String metaTable=getMetaTable(type);
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.getConnection().prepareStatement("INSERT into "+metaTable+" ("+Resource.TABLENAME+","+Resource.DESCRIPTION+","+Resource.AUTHOR+","+Resource.SOURCEID+","+Resource.SOURCENAME+") values(?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);		
+			PreparedStatement ps=session.getConnection().prepareStatement("INSERT into "+metaTable+" ("+MetaSourceFields.tableName+","+MetaSourceFields.description+","+MetaSourceFields.author+","+MetaSourceFields.sourceId+","+MetaSourceFields.sourceName+") values(?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);		
 			ps.setString(1, toSetTableName);
 			ps.setString(2,toSetDescription);
 			ps.setString(3, toSetAuthor);
@@ -77,7 +78,7 @@ public class SourceManager {
 		try{
 			session=DBSession.openSession(PoolManager.DBType.mySql);
 			String metaTable=getMetaTable(type);
-			PreparedStatement ps=session.preparedStatement("DELETE from "+metaTable+" where "+Resource.SEARCHID+"=?");
+			PreparedStatement ps=session.preparedStatement("DELETE from "+metaTable+" where "+MetaSourceFields.searchId+"=?");
 			ps.setInt(1, id);
 			ps.executeUpdate();
 		}catch(Exception e){
@@ -88,27 +89,27 @@ public class SourceManager {
 	}
 	
 	public static String getSourceName(ResourceType type, int id)throws Exception{
-		return (String) getField(type, id, Resource.TABLENAME);
+		return (String) getField(type, id, MetaSourceFields.tableName);
 	}
 	
 	public static String getSourceTitle(ResourceType type, int id)throws Exception{
-		return (String) getField(type,id,Resource.TITLE);
+		return (String) getField(type,id,MetaSourceFields.title);
 	}
 	
 	public static int getSourceId(ResourceType type,int id)throws Exception{
-		return (Integer) getField(type, id, Resource.SOURCEID);
+		return (Integer) getField(type, id, MetaSourceFields.sourceId);
 	}
 	
-	private static Object getField(ResourceType type, int id, String field)throws Exception{
+	private static Object getField(ResourceType type, int id, MetaSourceFields field)throws Exception{
 		DBSession session=null;
 		try{
 			String metaTable=getMetaTable(type);
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("Select * from "+metaTable+" where "+Resource.SEARCHID+" = ?");
+			PreparedStatement ps= session.preparedStatement("Select * from "+metaTable+" where "+MetaSourceFields.searchId+" = ?");
 			ps.setInt(1, id);
 			ResultSet rs= ps.executeQuery();
 			if(rs.next())
-				return rs.getObject(field);
+				return rs.getObject(field+"");
 			else return null;
 		}catch (Exception e){
 			throw e;
@@ -116,12 +117,12 @@ public class SourceManager {
 			session.close();
 		}
 	}
-	private static void updateField(ResourceType type, int id, String field, Object value)throws Exception{
+	private static void updateField(ResourceType type, int id, MetaSourceFields field, Object value)throws Exception{
 		DBSession session=null;
 		try{
 			String metaTable=getMetaTable(type);
 			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("UPDATE "+metaTable+" SET "+field+" = ? where "+Resource.SEARCHID+" = ?");
+			PreparedStatement ps= session.preparedStatement("UPDATE "+metaTable+" SET "+field+" = ? where "+MetaSourceFields.searchId+" = ?");
 			ps.setObject(1,value);
 			ps.setInt(2, id);
 			ps.executeUpdate();			
@@ -134,14 +135,14 @@ public class SourceManager {
 	
 	
 	public static void setTableTitle(ResourceType type,int id, String tableTitle)throws Exception{
-		updateField(type, id, Resource.TITLE, tableTitle);
+		updateField(type, id, MetaSourceFields.title, tableTitle);
 	}
 	
 	public static Set<Resource> getList(ResourceType type)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.openSession(DBType.mySql);
-			return loadRS((session.executeFilteredQuery(new ArrayList<Field>(), getMetaTable(type), Resource.SEARCHID, "ASC")));
+			return loadRS((session.executeFilteredQuery(new ArrayList<Field>(), getMetaTable(type), MetaSourceFields.searchId+"", "ASC")));
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
@@ -160,18 +161,18 @@ public class SourceManager {
 		for(List<Field> row:rows){
 			Resource toAdd=new Resource(ResourceType.HCAF, 0);
 			for(Field f : row){
-				if(f.getName().equals(Resource.AUTHOR))toAdd.setAuthor(f.getValue());
-				else if(f.getName().equals(Resource.DATE))toAdd.setDate(f.getValue());
-				else if(f.getName().equals(Resource.DESCRIPTION))toAdd.setDescription(f.getValue());
-				else if(f.getName().equals(Resource.DISCLAIMER))toAdd.setDisclaimer(f.getValue());
-				else if(f.getName().equals(Resource.PARAMETERS))toAdd.setParameters(f.getValue());
-				else if(f.getName().equals(Resource.PROVENANCE))toAdd.setProvenance(f.getValue());
-				else if(f.getName().equals(Resource.SEARCHID))toAdd.setSearchId(Integer.valueOf(f.getValue()));
-				else if(f.getName().equals(Resource.SOURCEID))toAdd.setSourceId(Integer.valueOf(f.getValue()));
-				else if(f.getName().equals(Resource.SOURCENAME))toAdd.setSourceName((f.getValue()));
-				else if(f.getName().equals(Resource.STATUS))toAdd.setStatus(f.getValue());
-				else if(f.getName().equals(Resource.TABLENAME))toAdd.setTableName(f.getValue());
-				else if(f.getName().equals(Resource.TITLE))toAdd.setTableName(f.getValue());
+				if(f.getName().equals(MetaSourceFields.author+""))toAdd.setAuthor(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.data+""))toAdd.setDate(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.description+""))toAdd.setDescription(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.disclaimer+""))toAdd.setDisclaimer(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.parameters+""))toAdd.setParameters(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.provenience+""))toAdd.setProvenance(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.searchId+""))toAdd.setSearchId(Integer.valueOf(f.getValue()));
+				else if(f.getName().equals(MetaSourceFields.sourceId+""))toAdd.setSourceId(Integer.valueOf(f.getValue()));
+				else if(f.getName().equals(MetaSourceFields.sourceName+""))toAdd.setSourceName((f.getValue()));
+				else if(f.getName().equals(MetaSourceFields.status+""))toAdd.setStatus(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.tableName+""))toAdd.setTableName(f.getValue());
+				else if(f.getName().equals(MetaSourceFields.title+""))toAdd.setTableName(f.getValue());
 			}
 			toReturn.add(toAdd);
 		}

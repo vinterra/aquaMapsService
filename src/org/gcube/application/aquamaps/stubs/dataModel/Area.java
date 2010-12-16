@@ -31,7 +31,7 @@ public class Area {
 		this.code=code;
 		this.type=type;
 	}
-	
+
 	public void setType(AreaType type) {
 		this.type = type;
 	}
@@ -48,14 +48,14 @@ public class Area {
 		this.code = code;
 	}
 
-	
+
 	public Area(org.gcube.application.aquamaps.stubs.Area toLoad){
 		super();
 		this.setCode(toLoad.getCode());
 		this.setName(toLoad.getName());
 		this.setType(AreaType.valueOf(toLoad.getType()));
 	}
-	
+
 	public org.gcube.application.aquamaps.stubs.Area toStubsVersion(){
 		org.gcube.application.aquamaps.stubs.Area toReturn= new org.gcube.application.aquamaps.stubs.Area();
 		toReturn.setCode(this.getCode());
@@ -63,15 +63,16 @@ public class Area {
 		toReturn.setType(this.getType().toString());
 		return toReturn;
 	}
-	
+
 	public static org.gcube.application.aquamaps.stubs.AreasArray toStubsVersion(Set<Area> toConvert){
 		List<org.gcube.application.aquamaps.stubs.Area> list=new ArrayList<org.gcube.application.aquamaps.stubs.Area>();
-		for(Area obj:toConvert)
-			list.add(obj.toStubsVersion());
+		if(toConvert!=null)
+			for(Area obj:toConvert)
+				list.add(obj.toStubsVersion());
 		return new org.gcube.application.aquamaps.stubs.AreasArray(list.toArray(new org.gcube.application.aquamaps.stubs.Area[list.size()]));
 	}
-	
-	
+
+
 	public static Set<Area> load(org.gcube.application.aquamaps.stubs.AreasArray toLoad){
 		Set<Area> toReturn= new HashSet<Area>();
 		if((toLoad!=null)&&(toLoad.getAreasList()!=null))
@@ -79,7 +80,7 @@ public class Area {
 				toReturn.add(new Area(a));
 		return toReturn;
 	}
-	
+
 	//	public String toJSON(){
 	//		StringBuilder toReturn=new StringBuilder();
 	//		toReturn.append("{\""+CODE+"\":\""+code+"\"");
@@ -92,18 +93,18 @@ public class Area {
 	//		return toReturn.toString();
 	//	}	
 	//	
-		public String toXML(){
-			StringBuilder toReturn=new StringBuilder();
-			toReturn.append("<Area>");
-			toReturn.append("<"+CODE+">"+code+"</"+CODE+">");
-			toReturn.append("<"+TYPE+">"+type.toString()+"</"+TYPE+">");
-			toReturn.append("<"+Name+">"+name+"</"+Name+">");
-			toReturn.append("<Attributes>");
-			for(Field field:attributes.values())toReturn.append(field.toXML());
-			toReturn.append("</Attributes>");
-			toReturn.append("</Area>");
-			return toReturn.toString();
-		}
+	public String toXML(){
+		StringBuilder toReturn=new StringBuilder();
+		toReturn.append("<Area>");
+		toReturn.append("<"+CODE+">"+code+"</"+CODE+">");
+		toReturn.append("<"+TYPE+">"+type.toString()+"</"+TYPE+">");
+		toReturn.append("<"+Name+">"+name+"</"+Name+">");
+		toReturn.append("<Attributes>");
+		for(Field field:attributes.values())toReturn.append(field.toXML());
+		toReturn.append("</Attributes>");
+		toReturn.append("</Area>");
+		return toReturn.toString();
+	}
 
 	@Override
 	public int hashCode() {
@@ -135,5 +136,5 @@ public class Area {
 			return false;
 		return true;
 	}
-	
+
 }

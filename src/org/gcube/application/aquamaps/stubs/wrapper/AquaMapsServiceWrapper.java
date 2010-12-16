@@ -22,6 +22,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Job;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.Submitted;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
@@ -64,17 +65,16 @@ public class AquaMapsServiceWrapper {
 	private static AquaMapsPortType getPortType(ASLSession session,String defaultURI) throws Exception{
 		AquaMapsServiceAddressingLocator asal= new AquaMapsServiceAddressingLocator();
 		EndpointReferenceType epr;
-//			GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
-//			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass","Application"));
-//			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName","AquaMaps"));
-//			List<GCUBERunningInstance> toReturn= isClient.execute(query, session.getScope());
-//			//FIXME
-			if(true) {				
+			GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
+			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass","Application"));
+			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName","AquaMaps"));
+			List<GCUBERunningInstance> toReturn= isClient.execute(query, session.getScope());
+			if(toReturn.isEmpty()) {				
 				System.out.println("No runnning instance found, using default service @ : "+defaultURI);
 				epr=new EndpointReferenceType();
 				epr.setAddress(new AttributedURI(defaultURI));
 			}else{
-//				epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/AquaMaps");
+				epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/AquaMaps");
 				System.out.println("Found RI @ : "+epr.getAddress().getHost());
 			}
 		AquaMapsPortType aquamapsPT=asal.getAquaMapsPortTypePort(epr);
@@ -246,6 +246,9 @@ try{
 		Species spec=new Species(speciesId);
 		GetSpeciesEnvelopeRequestType req=new GetSpeciesEnvelopeRequestType(hspenId, speciesId);
 			spec.attributesList.addAll(Field.load(pt.getSpeciesEnvelop(req)));
+			System.out.println("Loaded Fields : ");
+			for(Field f:spec.attributesList)
+				System.out.println(f.getName()+" : "+f.getValue());
 			return spec.extractEnvelope();
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -267,6 +270,15 @@ try{
 	public void submitJob(Job toSubmit) throws Exception{
 		try{
 			pt.submitJob(toSubmit.toStubsVersion());
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}	
+	}
+	
+	public Submitted loadSubmittedById(int id)throws Exception{
+		try{
+			return new Submitted(pt.loadSubmittedById(id));
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

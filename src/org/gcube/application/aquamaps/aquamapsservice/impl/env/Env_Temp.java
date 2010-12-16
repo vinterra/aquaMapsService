@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Cell;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
 
 
@@ -45,7 +46,7 @@ public class Env_Temp extends EnvEngine{
 			
 			if (cell.getFieldbyName(fld).getValue() != null &&
 					Double.parseDouble(cell.getFieldbyName(fld).getValue()) != -9999 &&
-					Double.parseDouble(cell.getFieldbyName(Cell.OCEANAREA).getValue()) > 0) {
+					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}

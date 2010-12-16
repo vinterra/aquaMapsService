@@ -36,8 +36,8 @@ public class Field {
 		this(name,value);
 		this.setType(type);
 	}
-	
-	
+
+
 	public void setType(FieldType type) {
 		this.type = type;		
 	}
@@ -63,8 +63,9 @@ public class Field {
 
 	public static org.gcube.application.aquamaps.stubs.FieldArray toStubsVersion(Collection<Field> collection){
 		List<org.gcube.application.aquamaps.stubs.Field> list=new ArrayList<org.gcube.application.aquamaps.stubs.Field>();
-		for(Field obj:collection)
-			list.add(obj.toStubsVersion());
+		if(collection!=null)
+			for(Field obj:collection)
+				list.add(obj.toStubsVersion());
 		return new org.gcube.application.aquamaps.stubs.FieldArray(list.toArray(new org.gcube.application.aquamaps.stubs.Field[list.size()]));
 	}
 
@@ -99,7 +100,7 @@ public class Field {
 		doc.append("</Field>");
 		return doc.toString();
 	}
-		
+
 	public Field (Element el){
 		Element typeElement=(Element) el.getElementsByTagName("FieldType").item(0);
 		this.setType(FieldType.valueOf(XMLUtils.getTextContent(typeElement)));

@@ -142,6 +142,27 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
+			<xsd:complexType name="submitted">
+			<xsd:sequence>
+				<xsd:element name="author" type="xsd:string"/>
+				<xsd:element name="date" type="xsd:string"/>
+				<xsd:element name="gis" type="xsd:string"/>
+				<xsd:element name="isAquaMap" type="xsd:boolean"/>
+				<xsd:element name="jobId" type="xsd:int"/>
+				<xsd:element name="mapId" type="xsd:int"/>
+				<xsd:element name="saved" type="xsd:boolean"/>
+				<xsd:element name="searchId" type="xsd:int"/>
+				<xsd:element name="selectionCriteria" type="xsd:string"/>
+				<xsd:element name="sourceHCAF" type="xsd:int"/>
+				<xsd:element name="sourceHSPEC" type="xsd:int"/>
+				<xsd:element name="sourceHSPEN" type="xsd:int"/>
+				<xsd:element name="status" type="xsd:string"/>
+				<xsd:element name="title" type="xsd:string"/>
+				<xsd:element name="type" type="xsd:string"/>
+			</xsd:sequence>
+			</xsd:complexType>
+			
+
 			<!-- Arrays -->
 
 			<xsd:complexType name="fileArray">
@@ -384,7 +405,8 @@
 			<xsd:element name="getSpeciesEnvelopRequest" type="tns:getSpeciesEnvelopeRequestType" />
 			<xsd:element name="getSpeciesEnvelopResponse" type="tns:fieldArray" />
 
-
+			<xsd:element name="loadSubmittedByIdRequest" type="xsd:int"/>
+			<xsd:element name="loadSubmittedByIdResponse" type="tns:submitted"/>
 		
 			
 		</xsd:schema>
@@ -492,6 +514,17 @@
 		<part name="response" element="tns:getResourceInfoResponse" />
 	</message>
 
+	<message name="LoadSubmittedByIdRequest">
+		<part name="request" element="tns:loadSubmittedByIdRequest" />
+	</message>
+	<message name="LoadSubmittedByIdResponse">
+		<part name="response" element="tns:loadSubmittedByIdResponse" />
+	</message>
+
+
+
+
+
 	<portType name="AquaMapsPortType">
 
 		<!-- operation part -->
@@ -579,6 +612,14 @@
 			<output message="tns:GetResourceInfoResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
+
+		<wsdl:operation name="loadSubmittedById">
+			<input message="tns:LoadSubmittedByIdRequest" />
+			<output message="tns:LoadSubmittedByIdResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
+		
+
 
 	</portType>
 

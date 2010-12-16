@@ -1,6 +1,5 @@
 package org.gcube.application.aquamaps.stubs.dataModel;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
@@ -16,7 +15,7 @@ public class Submitted {
 	private String author;
 	private Integer jobId;
 	private String selectionCriteria;
-	private Date date;
+	private String date;
 	private SubmittedStatus status=SubmittedStatus.Pending;
 	private ObjectType type;
 	private Boolean isAquaMap;
@@ -58,10 +57,10 @@ public class Submitted {
 	public void setSelectionCriteria(String selectionCriteria) {
 		this.selectionCriteria = selectionCriteria;
 	}
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
 	public SubmittedStatus getStatus() {
@@ -124,7 +123,7 @@ public class Submitted {
 		while(rs.next()){
 			Submitted obj=new Submitted();
 			obj.setAuthor(rs.getString(SubmittedFields.author.toString()));
-			obj.setDate(rs.getDate(SubmittedFields.date.toString()));
+			obj.setDate(rs.getString(SubmittedFields.date.toString()));
 			obj.setGis(rs.getString(SubmittedFields.gis.toString()));
 			obj.setIsAquaMap(rs.getBoolean(SubmittedFields.isAquaMap.toString()));
 			obj.setJobId(rs.getInt(SubmittedFields.jobid.toString()));
@@ -142,5 +141,72 @@ public class Submitted {
 		}
 		return toReturn;
 	}
+	
+	
+	public Submitted (org.gcube.application.aquamaps.stubs.Submitted toLoad){
+		super();
+		this.author=toLoad.getAuthor();
+		this.date=toLoad.getDate();
+		this.gis=toLoad.getGis();
+		this.isAquaMap=toLoad.isIsAquaMap();
+		this.jobId=toLoad.getJobId();
+		this.mapId=toLoad.getMapId();
+		this.saved=toLoad.isSaved();
+		this.searchId=toLoad.getSearchId();
+		this.selectionCriteria=toLoad.getSelectionCriteria();
+		this.sourceHCAF=toLoad.getSourceHCAF();
+		this.sourceHSPEC=toLoad.getSourceHSPEC();
+		this.sourceHSPEN=toLoad.getSourceHSPEN();
+		this.status=SubmittedStatus.valueOf(toLoad.getStatus());
+		this.title=toLoad.getTitle();
+		this.type=((toLoad.getType()!=null)&&(!toLoad.getType().equalsIgnoreCase("null")))?ObjectType.valueOf(toLoad.getType()):null;
+	}
+	
+	public org.gcube.application.aquamaps.stubs.Submitted toStubsVersion(){
+		org.gcube.application.aquamaps.stubs.Submitted toReturn=new org.gcube.application.aquamaps.stubs.Submitted();
+		toReturn.setAuthor(author);
+		toReturn.setDate(date);
+		toReturn.setGis(gis);
+		toReturn.setIsAquaMap(isAquaMap);
+		toReturn.setJobId(jobId);
+		toReturn.setMapId(mapId);
+		toReturn.setSaved(saved);
+		toReturn.setSearchId(searchId);
+		toReturn.setSelectionCriteria(selectionCriteria);
+		toReturn.setSourceHCAF(sourceHCAF);
+		toReturn.setSourceHSPEC(sourceHSPEC);
+		toReturn.setSourceHSPEN(sourceHSPEN);
+		toReturn.setStatus(status+"");
+		toReturn.setTitle(title);
+		toReturn.setType(type+"");
+		return toReturn;		
+	}
+	
+	private Submitted(){};
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((searchId == null) ? 0 : searchId.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Submitted other = (Submitted) obj;
+		if (searchId == null) {
+			if (other.searchId != null)
+				return false;
+		} else if (!searchId.equals(other.searchId))
+			return false;
+		return true;
+	}
+	
 	
 }

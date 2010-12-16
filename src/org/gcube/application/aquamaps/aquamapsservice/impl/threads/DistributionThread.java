@@ -21,10 +21,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorM
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -231,7 +231,7 @@ public class DistributionThread extends Thread {
 
 	
 	public static String clusteringDistributionQuery(String hspecName){
-		String query= "Select "+Cell.ID+", "+HSPECFields.Probability+"  FROM "+hspecName+" where "+
+		String query= "Select "+HCAF_SFields.CSquareCode+", "+HSPECFields.Probability+"  FROM "+hspecName+" where "+
 		hspecName+"."+SpeciesOccursumFields.SpeciesID+"=?  ORDER BY "+HSPECFields.Probability+" DESC";
 		logger.trace("clusteringDistributionQuery: "+query);
 		return query;
