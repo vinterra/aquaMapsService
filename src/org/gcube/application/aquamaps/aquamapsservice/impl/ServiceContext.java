@@ -84,22 +84,22 @@ public class ServiceContext extends GCUBEServiceContext {
 		logger.debug("HTTP Server port = " + httpServerPort);
 		webServerUrl="http://"+GHNContext.getContext().getHostname()+":"+httpServerPort+"/";
 		logger.debug("WEBSERVER URL: "+this.webServerUrl);
-//		//initializing jetty
-//		Connector connector = new SelectChannelConnector();
-//		connector.setPort(httpServerPort);
-//		Server server = new Server(httpServerPort);
-//		server.setConnectors(new Connector[]{connector});
-//		ResourceHandler resourceHandler = new ResourceHandler();
-//		resourceHandler.setResourceBase(serverPathDir.getAbsolutePath());
-//		try {
-//			logger.debug("HTTP Server Base Path : " + resourceHandler.getBaseResource().getFile().getAbsolutePath());
-//		} catch (IOException e) {
-//			logger.error(e);
-//		}
-//		server.setHandler(resourceHandler);
-//		//starting the web server
-//		server.start();
-//	
+		//initializing jetty
+		Connector connector = new SelectChannelConnector();
+		connector.setPort(httpServerPort);
+		Server server = new Server(httpServerPort);
+		server.setConnectors(new Connector[]{connector});
+		ResourceHandler resourceHandler = new ResourceHandler();
+		resourceHandler.setResourceBase(serverPathDir.getAbsolutePath());
+		try {
+			logger.debug("HTTP Server Base Path : " + resourceHandler.getBaseResource().getFile().getAbsolutePath());
+		} catch (IOException e) {
+			logger.error(e);
+		}
+		server.setHandler(resourceHandler);
+		//starting the web server
+		server.start();
+	
 		
 		//Monitoring
 		long interval=(Long)this.getProperty("monitorInterval", true);

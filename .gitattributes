@@ -25,15 +25,14 @@ lib/csv4j_gcube.jar -text
 lib/geoserverInt.jar -text
 lib/postgresql-8.4-701.jdbc3.jar -text
 schema/AquaMaps.wsdl -text
+schema/AquaMapsSchema.xsd -text
 schema/DataManagement.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBCostants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSessionTest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
@@ -60,7 +59,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GISGeneratorF
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorManager.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorTest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/ImageGeneratorRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/PerlCallsFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/PerlImageGenerator.java -text
@@ -75,8 +74,6 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGene
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/StatusMonitorThread.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/perturbation/HSPECGenerator.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/MapRegistration.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThread.java -text
@@ -85,7 +82,6 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobUtils.java -t
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SimulationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SourceGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SpeciesPerturbationThread.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/util/DataTranslation.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/AquaMapsObject.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/Area.java -text
@@ -118,6 +114,8 @@ src/org/gcube/application/aquamaps/stubs/dataModel/fields/MetaSourceFields.java 
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/OccurrenceCellsFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SpeciesOccursumFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SubmittedFields.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/CustomizationConverter.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/util/MetaDataHandler.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/util/XMLUtils.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/AquaMapsServiceWrapper.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/PagedRequestSettings.java -text
@@ -130,5 +128,7 @@ test/testClient/DataModelTest.java -text
 test/testClient/HCAFGenerationTest.java -text
 test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
+test/testClient/MetaDataTest.java -text
+test/testClient/ProfileRetrievalTest.java -text
 test/testClient/StyleGeneration.java -text
 test/testClient/XStreamTest.java -text

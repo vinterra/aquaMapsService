@@ -4,22 +4,14 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.PrintStream;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.stubs.Job;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -138,9 +130,7 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 	}
 
 
-//	public static int generateImages(String File)throws Exception{
-//		throw new Exception("Do not use this method!");
-//	}
+
 	
 	
 	

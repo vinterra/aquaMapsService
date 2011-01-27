@@ -217,6 +217,7 @@ public class DistributionThread extends Thread {
 	
 	private ResultSet queryForProbabilities()throws Exception{
 		String HSPECName=JobManager.getWorkingHSPEC(jobId);
+		//FIXME Simulating -> Generating
 		SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Simulating);
 		session=DBSession.openSession(PoolManager.DBType.mySql);
 

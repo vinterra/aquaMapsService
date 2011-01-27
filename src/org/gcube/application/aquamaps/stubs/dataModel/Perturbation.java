@@ -5,11 +5,17 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.PerturbationType;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("Customization")
 public class Perturbation {
 
-
+	@XStreamAlias("operation")
+	@XStreamAsAttribute
 	private PerturbationType type=PerturbationType.ASSIGN;
+	@XStreamAlias("value")
+	@XStreamAsAttribute
 	private String perturbationValue;
 
 

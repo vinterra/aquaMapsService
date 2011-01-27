@@ -8,8 +8,9 @@
 	xmlns:coretypes="http://gcube-system.org/namespaces/common/core/types"
 	xmlns:corefaults="http://gcube-system.org/namespaces/common/core/faults"
 	xmlns:wsntw="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.wsdl"
-	xmlns:provider="http://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider">
-
+	xmlns:provider="http://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider"
+	xmlns:aqtypes="http://gcube-system.org/namespaces/application/aquamaps/types">
+	
 	<import namespace="http://gcube-system.org/namespaces/common/core/faults"
 		location="../gcube/common/core/faults/GCUBEFaults.wsdl" />
 
@@ -18,227 +19,9 @@
 			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps">
 			<xsd:import namespace="http://gcube-system.org/namespaces/common/core/types"
 				schemaLocation="../gcube/common/core/types/GCUBETypes.xsd" />
-
-			<xsd:complexType name="perturbation">
-				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="field" type="xsd:string" />
-					<xsd:element name="toPerturbId" type="xsd:string" />
-					<xsd:element name="value" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			
-
-			<xsd:complexType name="envelopeWeights">
-				<xsd:sequence>
-					<xsd:element name="speciesId" type="xsd:string" />
-					<xsd:element name="weights" type="tns:fieldArray" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="customization">
-				<xsd:sequence>
-					<xsd:element name="code" type="xsd:string" />
-					<xsd:element name="perturbationList" type="tns:perturbation"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			<xsd:complexType name="field">
-				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="value" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="filter">
-				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="value" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="resource">
-				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="searchId" type="xsd:int" />
-					<xsd:element name="author" type="xsd:string" />
-					<xsd:element name="disclaimer" type="xsd:string" />
-					<xsd:element name="provenance" type="xsd:string" />
-					<xsd:element name="date" type="xsd:string" />
-					<xsd:element name="sourceId" type="xsd:int" />
-					<xsd:element name="parameters" type="xsd:string" />
-					<xsd:element name="status" type="xsd:string" />
-					<xsd:element name="sourceName" type="xsd:string" />
-					<xsd:element name="title" type="xsd:string" />
-					<xsd:element name="tableName" type="xsd:string" />
-					<xsd:element name="description" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="area">
-				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="code" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			<xsd:complexType name="specie">
-				<xsd:sequence>
-					<xsd:element name="additionalField" type="tns:fieldArray" />
-					<xsd:element name="id" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="AquaMap">
-				<xsd:sequence>
-					<xsd:element name="boundingBox" type="xsd:string" />
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="author" type="xsd:string" />
-					<xsd:element name="date" type="xsd:string" />
-					<xsd:element name="id" type="xsd:int" />
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="selectedSpecies" type="tns:speciesArray" />
-					<xsd:element name="relatedResources" type="tns:fileArray" />
-					<xsd:element name="threshold" type="xsd:float" />
-					<xsd:element name="status" type="xsd:string" />
-					<xsd:element name="gis" type="xsd:boolean" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			<xsd:complexType name="job">
-				<xsd:sequence>
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="id" type="xsd:int" />
-					<xsd:element name="aquaMapList" type="tns:aquaMapArray" />
-					<xsd:element name="status" type="xsd:string" />
-					<xsd:element name="hspec" type="tns:resource" />
-					<xsd:element name="hspen" type="tns:resource" />
-					<xsd:element name="hcaf" type="tns:resource" />
-					<xsd:element name="selectedSpecies" type="tns:speciesArray" />
-					<xsd:element name="envelopCustomization" type="tns:perturbationArray" />
-					<xsd:element name="selectedAreas" type="tns:areasArray" />
-					<xsd:element name="weights" type="tns:envelopeWeightArray" />
-					<xsd:element name="author" type="xsd:string" />
-					<xsd:element name="date" type="xsd:string" />
-					<xsd:element name="relatedResources" type="tns:fileArray" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			<xsd:complexType name="file">
-				<xsd:sequence>
-					<xsd:element name="name" type="xsd:string" />
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="url" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="submitted">
-			<xsd:sequence>
-				<xsd:element name="author" type="xsd:string"/>
-				<xsd:element name="date" type="xsd:string"/>
-				<xsd:element name="gis" type="xsd:string"/>
-				<xsd:element name="isAquaMap" type="xsd:boolean"/>
-				<xsd:element name="jobId" type="xsd:int"/>
-				<xsd:element name="mapId" type="xsd:int"/>
-				<xsd:element name="saved" type="xsd:boolean"/>
-				<xsd:element name="searchId" type="xsd:int"/>
-				<xsd:element name="selectionCriteria" type="xsd:string"/>
-				<xsd:element name="sourceHCAF" type="xsd:int"/>
-				<xsd:element name="sourceHSPEC" type="xsd:int"/>
-				<xsd:element name="sourceHSPEN" type="xsd:int"/>
-				<xsd:element name="status" type="xsd:string"/>
-				<xsd:element name="title" type="xsd:string"/>
-				<xsd:element name="type" type="xsd:string"/>
-			</xsd:sequence>
-			</xsd:complexType>
-			
-
-			<!-- Arrays -->
-
-			<xsd:complexType name="fileArray">
-				<xsd:sequence>
-					<xsd:element name="fileList" type="tns:file" minOccurs="0"
-						maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			<xsd:complexType name="aquaMapArray">
-				<xsd:sequence>
-					<xsd:element name="aquaMapList" type="tns:AquaMap"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			<xsd:complexType name="perturbationArray">
-				<xsd:sequence>
-					<xsd:element name="perturbationList" type="tns:perturbation"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="customizationArray">
-				<xsd:sequence>
-					<xsd:element name="customizationList" type="tns:customization"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-
-			
-
-			<xsd:complexType name="envelopeWeightArray">
-				<xsd:sequence>
-					<xsd:element name="envelopeWeightList" type="tns:envelopeWeights"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="speciesArray">
-				<xsd:sequence>
-					<xsd:element name="speciesList" type="tns:specie"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="filterArray">
-				<xsd:sequence>
-					<xsd:element name="filterList" type="tns:filter"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="areasArray">
-				<xsd:sequence>
-					<xsd:element name="areasList" type="tns:area"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="resourceArray">
-				<xsd:sequence>
-					<xsd:element name="resourceList" type="tns:resource"
-						minOccurs="0" maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
-
-			<xsd:complexType name="fieldArray">
-				<xsd:sequence>
-					<xsd:element name="fields" type="tns:field" minOccurs="0"
-						maxOccurs="unbounded" />
-				</xsd:sequence>
-			</xsd:complexType>
+		<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/types"
+		 schemaLocation="AquaMapsSchema.xsd"/>
+		
 
 			<!-- Request / Response Types-->
 
@@ -298,7 +81,7 @@
 
 			<xsd:complexType name="getPhylogenyRequestType">
 				<xsd:sequence>
-					<xsd:element name="fieldList" type="tns:fieldArray" />
+					<xsd:element name="fieldList" type="aqtypes:fieldArray" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -309,9 +92,9 @@
 
 			<xsd:complexType name="getSpeciesByFiltersRequestType">
 				<xsd:sequence>
-					<xsd:element name="characteristicFilters" type="tns:fieldArray" />
-					<xsd:element name="codeFilters" type="tns:filterArray" />
-					<xsd:element name="nameFilters" type="tns:filterArray" />
+					<xsd:element name="characteristicFilters" type="aqtypes:fieldArray" />
+					<xsd:element name="codeFilters" type="aqtypes:filterArray" />
+					<xsd:element name="nameFilters" type="aqtypes:filterArray" />
 					<xsd:element name="sortColumn" type="xsd:string" />
 					<xsd:element name="sortDirection" type="xsd:string" />
 					<xsd:element name="limit" type="xsd:int" />
@@ -354,12 +137,12 @@
 			<xsd:element name="getAquaMapsPerUserResponse" type="xsd:string" />
 
 			<xsd:element name="calculateEnvelopeRequest" type="tns:calculateEnvelopeRequestType" />
-			<xsd:element name="calculateEnvelopeResponse" type="tns:fieldArray" />
+			<xsd:element name="calculateEnvelopeResponse" type="aqtypes:fieldArray" />
 
 			<xsd:element name="calculateEnvelopefromCellSelectionRequest"
 				type="tns:calculateEnvelopefromCellSelectionRequestType" />
 			<xsd:element name="calculateEnvelopefromCellSelectionResponse"
-				type="tns:fieldArray" />
+				type="aqtypes:fieldArray" />
 
 			<xsd:element name="getOccurrenceCellsRequest" type="tns:getOccurrenceCellsRequestType" />
 			<xsd:element name="getOccurrenceCellsResponse" type="xsd:string" />
@@ -369,11 +152,11 @@
 			<xsd:element name="getProfileResponse" type="xsd:string" />
 
 			<xsd:element name="getRelatedFilesRequest" type="xsd:string" />
-			<xsd:element name="getRelatedFilesResponse" type="tns:fileArray" />
+			<xsd:element name="getRelatedFilesResponse" type="aqtypes:fileArray" />
 			
 			
 
-			<xsd:element name="submitJobRequest" type="tns:job"/>
+			<xsd:element name="submitJobRequest" type="aqtypes:job"/>
 			<xsd:element name="submitJobResponse" type="xsd:string"/>
 
 			<xsd:element name="getPhylogenyRequest" type="tns:getPhylogenyRequestType" />
@@ -396,17 +179,17 @@
 			<xsd:element name="getResourceListResponse" type="xsd:string" />
 
 
-			<xsd:element name="getResourceInfoRequest" type="tns:resource" />
+			<xsd:element name="getResourceInfoRequest" type="aqtypes:resource" />
 
-			<xsd:element name="getResourceInfoResponse" type="tns:resource" />
+			<xsd:element name="getResourceInfoResponse" type="aqtypes:resource" />
 
 
 
 			<xsd:element name="getSpeciesEnvelopRequest" type="tns:getSpeciesEnvelopeRequestType" />
-			<xsd:element name="getSpeciesEnvelopResponse" type="tns:fieldArray" />
+			<xsd:element name="getSpeciesEnvelopResponse" type="aqtypes:fieldArray" />
 
 			<xsd:element name="loadSubmittedByIdRequest" type="xsd:int"/>
-			<xsd:element name="loadSubmittedByIdResponse" type="tns:submitted"/>
+			<xsd:element name="loadSubmittedByIdResponse" type="aqtypes:submitted"/>
 		
 			
 		</xsd:schema>

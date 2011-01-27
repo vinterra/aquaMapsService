@@ -18,11 +18,12 @@ public class Area {
 	public static final String CODE="code";
 	public static final String Name="name";
 
-
 	private AreaType type=AreaType.FAO;
 	private String name;
 	private String code;
 	public Map<String,Field> attributes= new HashMap<String, Field>();
+	
+	
 	public AreaType getType() {
 		return type;
 	}
@@ -81,18 +82,18 @@ public class Area {
 		return toReturn;
 	}
 
-	//	public String toJSON(){
-	//		StringBuilder toReturn=new StringBuilder();
-	//		toReturn.append("{\""+CODE+"\":\""+code+"\"");
-	//		toReturn.append(",\""+TYPE+"\":\""+type.toString()+"\"");
-	//		toReturn.append(",\""+Name+"\":\""+name+"\"");
-	//		for(String fieldName:attributes.keySet()){
-	//			toReturn.append(" ,\""+fieldName+"\":\""+attributes.get(fieldName).getValue()+"\"");
-	//		}
-	//		toReturn.append("}");
-	//		return toReturn.toString();
-	//	}	
-	//	
+		public String toJSON(){
+			StringBuilder toReturn=new StringBuilder();
+			toReturn.append("{\""+CODE+"\":\""+code+"\"");
+			toReturn.append(",\""+TYPE+"\":\""+type.toString()+"\"");
+			toReturn.append(",\""+Name+"\":\""+name+"\"");
+			for(String fieldName:attributes.keySet()){
+				toReturn.append(" ,\""+fieldName+"\":\""+attributes.get(fieldName).getValue()+"\"");
+			}
+			toReturn.append("}");
+			return toReturn.toString();
+		}	
+		
 	public String toXML(){
 		StringBuilder toReturn=new StringBuilder();
 		toReturn.append("<Area>");
@@ -137,4 +138,6 @@ public class Area {
 		return true;
 	}
 
+	
+	
 }

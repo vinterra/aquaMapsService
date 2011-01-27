@@ -22,11 +22,15 @@ import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.OccurrenceCellsFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CellManager {
 
 	private static String occurrenceCells="occurrenceCells";
-	private static String HCAF_S="HCAF_S";
+	public static String HCAF_S="HCAF_S";
+	
+	private static final GCUBELog logger=new GCUBELog(CellManager.class);
+	
 	
 	public static Set<Cell> getCells(List<Field> filters, boolean fetchGoodCells, String speciesID, boolean fetchEnvironment, int HCAFId) throws Exception{
 		DBSession session=null;
@@ -150,6 +154,7 @@ public class CellManager {
 			
 			for(Cell c : toReturn){
 				//Cehcking BB
+				try{
 				float latitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.CenterLat+"").getValue());
 				float longitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.CenterLong+"").getValue());
 				if((latitude-0.25<bb.getS())||(latitude+0.25>bb.getN())||(longitude-0.25<bb.getE())||(longitude+0.25>bb.getW()))
@@ -157,6 +162,10 @@ public class CellManager {
 				//Checking A
 				Area areaM=new Area(AreaType.FAO,c.getFieldbyName(OccurrenceCellsFields.FAOAreaM+"").getValue());
 				if((areas.size()>0)&&(!areas.contains(areaM))) toReturn.remove(c);
+				}catch(Exception e){
+					logger.error("Unable to evaluate Cell "+c.getFieldbyName(HCAF_SFields.CSquareCode+"").getValue());
+					throw e;
+				}
 			}
 			
 			

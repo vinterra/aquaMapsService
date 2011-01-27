@@ -5,12 +5,25 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FileType;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+@XStreamAlias("File")
 public class File {
 
-	private FileType type=FileType.XML;
+	@XStreamAsAttribute
+	private FileType type=FileType.InternalProfile;
+	@XStreamAsAttribute
 	private String uuri;
+	@XStreamAsAttribute
 	private String name;
 
+	public File(FileType type,String uuri,String name) {
+		this.type=type;
+		this.uuri=uuri;
+		this.name=name;
+	}
+	
 	public FileType getType() {
 		return type;
 	}

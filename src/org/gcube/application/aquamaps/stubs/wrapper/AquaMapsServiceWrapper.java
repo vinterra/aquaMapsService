@@ -137,6 +137,7 @@ public class AquaMapsServiceWrapper {
 	public String getJSONSubmitted(boolean showObjects,String date,Integer jobId,SubmittedStatus status,ObjectType objType, PagedRequestSettings settings)throws Exception{
 		try{
 			GetAquaMapsPerUserRequestType request=new GetAquaMapsPerUserRequestType();
+			request.setUserID(session.getUsername());
 			request.setAquamaps(showObjects);
 			request.setDateEnabled(date!=null);
 			if(date!=null)request.setDateValue(date);

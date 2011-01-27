@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
@@ -13,7 +12,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManage
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.perturbation.HSPECGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
@@ -23,6 +22,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.mortbay.log.Log;
 
 public class SimulationThread extends Thread {
 
@@ -49,19 +49,22 @@ public class SimulationThread extends Thread {
 			boolean filteredArea=(area.size()>0);
 
 			if(filteredArea&&needToGenerate){
+				Log.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
 				String filteredHcaf=filterByArea(jobId, area, ResourceType.HCAF, JobManager.getHCAFTableId(jobId));
 				JobManager.setWorkingHCAF(jobId,filteredHcaf);
 				String generatedHSPEC=generateHSPEC(jobId, weights, true);
 				String toUseHSPEC=filterByArea(jobId,area,ResourceType.HSPEC,generatedHSPEC);
 				JobManager.setWorkingHSPEC(jobId,toUseHSPEC);	
-				JobManager.addToDropTableList(jobId, generatedHSPEC);
 
 			}else if (filteredArea){
+				Log.debug(" jobId "+jobId+" : Filter By Area");
 				JobManager.setWorkingHSPEC(jobId,filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId)));
 			}else if (needToGenerate){				
+				Log.debug(" jobId "+jobId+" : Re-generate");
 				String generatedHSPEC=generateHSPEC(jobId,  weights,true);
 				JobManager.setWorkingHSPEC(jobId,generatedHSPEC);		
 			}else{
+				Log.debug(" jobId "+jobId+" no needs");
 				JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(ResourceType.HSPEC, JobManager.getHSPECTableId(jobId)));
 			}
 
@@ -148,7 +151,7 @@ public class SimulationThread extends Thread {
 	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp)throws Exception{
 		String HCAF_DName=JobManager.getWorkingHCAF(jobId);		
 		String HSPENName=JobManager.getWorkingHSPEN(jobId);
-		HSPECGenerator generator= new HSPECGenerator(jobId,HCAF_DName,DBCostants.HCAF_S,HSPENName,weights);
+		HSPECGenerator generator= new HSPECGenerator(jobId,HCAF_DName,CellManager.HCAF_S,HSPENName,weights);
 		String generatedHspecName=generator.generate();
 		System.out.println("table generated:"+generatedHspecName);
 		if (makeTemp)JobManager.addToDropTableList(jobId,generatedHspecName);

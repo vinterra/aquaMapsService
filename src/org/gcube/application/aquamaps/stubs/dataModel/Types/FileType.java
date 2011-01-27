@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.stubs.dataModel.Types;
 
+
+
 public enum FileType {
 	
 	@Deprecated
@@ -7,6 +9,7 @@ public enum FileType {
 	@Deprecated
 	JPG,
 	
-	InternalProfile,ExternalMeta,Image
+	InternalProfile,ExternalMeta,Image,
+	Layer,WMSContext
 	
 }

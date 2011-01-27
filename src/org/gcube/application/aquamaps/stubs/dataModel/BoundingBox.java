@@ -1,10 +1,17 @@
 package org.gcube.application.aquamaps.stubs.dataModel;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("BoundingBox")
 public class BoundingBox {
+	@XStreamAsAttribute
 	float N=90;
+	@XStreamAsAttribute
 	float S=-90;
+	@XStreamAsAttribute
 	float W=180;
+	@XStreamAsAttribute
 	float E=-180;
 	public BoundingBox() {		
 	}

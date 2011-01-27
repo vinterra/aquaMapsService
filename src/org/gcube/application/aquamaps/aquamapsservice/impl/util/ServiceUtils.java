@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -19,6 +21,8 @@ public class ServiceUtils {
 	
 	
 	public static String fileToString(String path) throws IOException {
+		
+		
 		BufferedReader filebuf = null;
 		String nextStr = null;
 		String ret = new String();
@@ -33,6 +37,24 @@ public class ServiceUtils {
 		
 		return ret;
 	}
+	
+	public static String URLtoString(String path) throws IOException{
+		URL yahoo = new URL(path);
+		BufferedReader in = new BufferedReader(
+					new InputStreamReader(
+					yahoo.openStream()));
+
+		String inputLine;
+		StringBuilder toReturn=new StringBuilder(); 
+		
+		
+		while ((inputLine = in.readLine()) != null)
+		    toReturn.append(inputLine);
+
+		in.close();
+		return toReturn.toString();
+	}
+	
 	
 	public static void deleteFile(String path) throws IOException {
 		File f=new File(path);

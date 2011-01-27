@@ -5,9 +5,32 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-public class Resource{
+@XStreamAlias("Resource")
+public class Resource {
 
+	@XStreamAsAttribute
+	private ResourceType type=ResourceType.HCAF;
+	
+	@XStreamAsAttribute
+	private int searchId=1;
+
+	private String title;
+	private String tableName;
+	private String description;
+	private String author;
+	private String disclaimer;
+	private String provenance;
+	private String date;
+	private Integer sourceId=0;
+	private String parameters;
+	private String status;
+	private String sourceName;
+
+	
+	
 
 	
 	//********* instance values
@@ -61,7 +84,7 @@ public class Resource{
 	public void setDate(String date) {
 		this.date = date;
 	}
-	public int getSourceId() {
+	public Integer getSourceId() {
 		return sourceId;
 	}
 	public void setSourceId(int sourceId) {
@@ -86,21 +109,7 @@ public class Resource{
 		this.sourceName = sourceName;
 	}
 
-	private int searchId=1;
-	private String title;
-	private String tableName;
-	private String description;
-	private String author;
-	private String disclaimer;
-	private String provenance;
-	private String date;
-	private int sourceId;
-	private String parameters="parameters";
-	private String status="status";
-	private String sourceName="sourceName";
-
-
-	private ResourceType type=ResourceType.HCAF;
+	
 
 
 	public void setType(ResourceType type) {

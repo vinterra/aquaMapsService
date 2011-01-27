@@ -8,13 +8,19 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
 import org.w3c.dom.Element;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 
+@XStreamAlias("Field")
 public class Field {
 
-
+	@XStreamOmitField
 	private FieldType type=FieldType.STRING;
+	@XStreamAsAttribute
 	private String name;
+	@XStreamAsAttribute
 	private String value;
 
 	public FieldType getType() {

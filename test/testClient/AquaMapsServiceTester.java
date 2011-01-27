@@ -66,9 +66,17 @@ public class AquaMapsServiceTester {
 //		System.out.println("Loading obj");
 //		wrapper.loadObject(285);
 	
-		System.out.println("Loading Envelope");
+//		System.out.println("Loading Envelope");
+//		
+//		Envelope env= wrapper.loadEnvelope(spec.getId(), 1);
+//		
 		
-		Envelope env= wrapper.loadEnvelope(spec.getId(), 1);
+//		Resource r= wrapper.loadResource(1, ResourceType.HCAF);
+//		r=wrapper.loadResource(1, ResourceType.HSPEC);
+//		r=wrapper.loadResource(1, ResourceType.HSPEN);
+//		
+		wrapper.submitJob(createDummyJob(true,true,true));
+		
 		
 		System.out.println("Done");
 		}catch(Exception e){
@@ -80,7 +88,7 @@ public class AquaMapsServiceTester {
 		
 	}
 
-	public static Job createDummyJob(){
+	public static Job createDummyJob(boolean areaSelection,boolean customization,boolean weights){
 		Job toReturn= new Job();
 		toReturn.setName("Dummy Testing Job");
 		toReturn.setAuthor("Tester");
@@ -96,11 +104,24 @@ public class AquaMapsServiceTester {
 //		toReturn.getEnvelopeCustomization().put(basket.iterator().next().getId(), pert);
 ////		
 		
+		if(areaSelection){
+		
 		List<Area> areas=new ArrayList<Area>();
 		areas.add(new Area(AreaType.FAO,"18"));
 		areas.add(new Area(AreaType.FAO,"21"));
 		areas.add(new Area(AreaType.FAO,"27"));
 		toReturn.addAreas(areas);
+		}
+		
+		if(customization){
+			toReturn.setCustomization(basket.iterator().next(), new Field(HspenFields.DepthMax+"","15"), new Perturbation(PerturbationType.ASSIGN, "25"));
+		}
+		if(weights){
+			List<Field> settedWeights= new ArrayList<Field>();
+			for(EnvelopeFields f: EnvelopeFields.values())
+				settedWeights.add(new Field(f+"","true",FieldType.BOOLEAN));
+			toReturn.setWeights(basket.iterator().next(), settedWeights);
+		}
 		
 		toReturn.setSourceHCAF(new Resource(ResourceType.HCAF, 1));
 		toReturn.setSourceHSPEC(new Resource(ResourceType.HSPEC, 1));

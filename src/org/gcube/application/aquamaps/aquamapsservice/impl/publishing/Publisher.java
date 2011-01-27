@@ -18,10 +18,10 @@ import org.apache.commons.io.IOUtils;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.RSWrapper;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.ZipUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCostants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.MapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
@@ -135,11 +135,11 @@ public class Publisher{
 			if((coverageSpeciesId.size()==1)&&(!hasCustomizations)){
 				logger.trace("going to register maps in DB ");
 				int internalSpeciesId=getInternalSpeciesIds(coverageSpeciesId).iterator().next();
-				int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesId);
+				int alreadyMappedId=MapsManager.getDistributionMapId(1, 1, internalSpeciesId);
 				if(alreadyMappedId>0){
 					logger.trace("Found mapId "+alreadyMappedId);
-					MapRegistration.updateDistributionMapBasePath(alreadyMappedId, basePath);
-				}else MapRegistration.registerDistributionMap(1, 1, internalSpeciesId, basePath, null);				
+					MapsManager.updateDistributionMapBasePath(alreadyMappedId, basePath);
+				}else MapsManager.registerDistributionMap(1, 1, internalSpeciesId, basePath, null);				
 			}
 			return basePath;
 		}catch(Exception e){
@@ -214,10 +214,10 @@ public class Publisher{
 		
 		int internalSpeciesId=getInternalSpeciesIds(speciesIds).iterator().next();
 		//TODO hspen & hcaf id
-		int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesId);
+		int alreadyMappedId=MapsManager.getDistributionMapId(1, 1, internalSpeciesId);
 		if(alreadyMappedId>0){
 			logger.trace("Found mapId "+alreadyMappedId);
-			String mapsBasePath=MapRegistration.getDistributionMapBasePath(alreadyMappedId);
+			String mapsBasePath=MapsManager.getDistributionMapBasePath(alreadyMappedId);
 			if(mapsBasePath!=null){
 			AquaMapsPublisherPortType pt=getPortType(scope);
 			StringArray result=pt.getPublishedMapsPath(mapsBasePath);
@@ -258,21 +258,21 @@ public class Publisher{
 		if(speciesIds.size()>1) return null;
 		int internalSpeciesIds=getInternalSpeciesIds(speciesIds).iterator().next();
 		//TODO hspen & hcaf id
-		int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesIds);
+		int alreadyMappedId=MapsManager.getDistributionMapId(1, 1, internalSpeciesIds);
 		if(alreadyMappedId>0){
 			logger.trace("Found mapId "+alreadyMappedId);
-			return MapRegistration.getDistributionMapLayerUri(alreadyMappedId);
+			return MapsManager.getDistributionMapLayerUri(alreadyMappedId);
 		}else return null; 
 	}
 	
 	public void registerLayer(Set<String> speciesIds, String HSPEN, String HCAF,String layer)throws Exception{
 		if(speciesIds.size()==1){
 			int internalSpeciesIds=getInternalSpeciesIds(speciesIds).iterator().next();
-			int alreadyMappedId=MapRegistration.getDistributionMapId(1, 1, internalSpeciesIds);
+			int alreadyMappedId=MapsManager.getDistributionMapId(1, 1, internalSpeciesIds);
 			if(alreadyMappedId>0){
 				logger.trace("Found mapId "+alreadyMappedId);
-				MapRegistration.updateDistributionMapLayerUri(alreadyMappedId, layer);
-			}else MapRegistration.registerDistributionMap(1, 1, internalSpeciesIds, null, layer);
+				MapsManager.updateDistributionMapLayerUri(alreadyMappedId, layer);
+			}else MapsManager.registerDistributionMap(1, 1, internalSpeciesIds, null, layer);
 			logger.trace("registered layer "+layer);
 		}
 	}

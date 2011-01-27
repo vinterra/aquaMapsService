@@ -7,17 +7,25 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SubmittedFields;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("Submitted")
 public class Submitted {
 
+	
+	@XStreamAsAttribute
 	private Integer searchId;
+	@XStreamAsAttribute
 	private String title;
 	private String author;
 	private Integer jobId;
 	private String selectionCriteria;
 	private String date;
+	@XStreamAsAttribute
 	private SubmittedStatus status=SubmittedStatus.Pending;
 	private ObjectType type;
+	@XStreamAsAttribute
 	private Boolean isAquaMap;
 	private Boolean saved;
 	private Integer sourceHCAF;
@@ -26,6 +34,10 @@ public class Submitted {
 	private String gis;
 	private Integer mapId;
 	
+	@Deprecated
+	public Submitted(Integer searchId){
+		this.setSearchId(searchId);
+	}
 	
 	public Integer getSearchId() {
 		return searchId;

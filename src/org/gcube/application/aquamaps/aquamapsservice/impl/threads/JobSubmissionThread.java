@@ -62,7 +62,7 @@ public class JobSubmissionThread extends Thread {
 
 			//Create and run Simulation Thread
 			
-			while((JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize).length>0))
+			while((JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize).length>0)&&(JobManager.getStatus(jobId)!=SubmittedStatus.Error))
 			{
 				try {
 					Thread.sleep(waitTime);
@@ -71,12 +71,15 @@ public class JobSubmissionThread extends Thread {
 				logger.trace(waitingGroup.toString());
 			}
 
+			if((JobManager.getStatus(jobId)==SubmittedStatus.Error))
+				throw new Exception("Job "+jobId+" failed perturbation phase");
+			
 			SubmittedManager.updateStatus(jobId, SubmittedStatus.Simulating);
 			SimulationThread simT=new SimulationThread(waitingGroup,toPerform);
 			simT.setPriority(MIN_PRIORITY);
 			ThreadManager.getExecutor().execute(simT);
 			
-			while(JobManager.getStatus(jobId).equals(SubmittedStatus.Simulating)){
+			while(JobManager.getStatus(jobId).equals(SubmittedStatus.Simulating)&&(JobManager.getStatus(jobId)!=SubmittedStatus.Error)){
 				try {
 					Thread.sleep(waitTime);
 				} catch (InterruptedException e) {}
@@ -84,7 +87,7 @@ public class JobSubmissionThread extends Thread {
 				logger.trace(waitingGroup.toString());
 			}
 			if(JobManager.getStatus(jobId).equals(SubmittedStatus.Error)) 
-				throw new Exception(this.getName()+"Something went wrong, check Log. JobId :"+jobId);
+				throw new Exception("Job "+jobId+" failed simulation phase");
 			else {
 				logger.trace(this.getName()+" Launching maps generation");
 			}

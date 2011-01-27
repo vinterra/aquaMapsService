@@ -15,6 +15,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+
+@XStreamAlias("AquaMapsObject")
 public class AquaMapsObject {
 
 	public static class Tags{
@@ -35,26 +40,35 @@ public class AquaMapsObject {
 
 
 
-	public static String projectCitation=	"Kaschner, K., J. S. Ready, E. Agbayani, J. Rius, K. Kesner-Reyes, P. D. Eastwood, A. B. South, "+
-	"S. O. Kullander, T. Rees, C. H. Close, R. Watson, D. Pauly, and R. Froese. 2008 AquaMaps: "+
-	"Predicted range maps for aquatic species. World wide web electronic publication, www.aquamaps.org, Version 10/2008.";
-
-
-
-
-	private SubmittedStatus status=SubmittedStatus.Pending;
-	private String name;
-	private String author;
-	private String date;
+	@XStreamAsAttribute
 	private int id;	
-	//	private String source;
-	//	private String profileUrl;
+	@XStreamAsAttribute
+	private String name;
+	@XStreamAsAttribute
+	private String author;
+	@XStreamAsAttribute
+	private SubmittedStatus status=SubmittedStatus.Pending;
+	@XStreamAsAttribute
+	private String date;
+	
 	private Boolean gis=false;
+	private String layerId;
 	private ObjectType type=ObjectType.Biodiversity;
+	
+	@XStreamAlias("SpeciesCoverage")
+	
 	private Set<Species> selectedSpecies=new HashSet<Species>();
+	@XStreamAlias("RelatedFiles")
 	private List<File> relatedResources=new ArrayList<File>();
 	private float threshold=0.5f;	
 	private BoundingBox boundingBox=new BoundingBox();
+	
+	public String projectCitation=	"Kaschner, K., J. S. Ready, E. Agbayani, J. Rius, K. Kesner-Reyes, P. D. Eastwood, A. B. South, "+
+	"S. O. Kullander, T. Rees, C. H. Close, R. Watson, D. Pauly, and R. Froese. 2008 AquaMaps: "+
+	"Predicted range maps for aquatic species. World wide web electronic publication, www.aquamaps.org, Version 10/2008.";
+
+	
+	
 	public String getName() {
 		return name;
 	}
@@ -113,6 +127,8 @@ public class AquaMapsObject {
 		selectedSpecies.removeAll(toAdd);
 		return selectedSpecies.size();
 	}
+	
+	@Deprecated
 	public String toXML(){
 		StringBuilder profileBuilder=new StringBuilder();
 		profileBuilder.append("<AquaMap>");
@@ -220,13 +236,14 @@ public class AquaMapsObject {
 	//		return envelopeWeights;
 	//	}
 
+	@Deprecated
 	public AquaMapsObject(String profile) throws ParserConfigurationException{
 		super();
 		Document doc=XMLUtils.getDocumentGivenXML(profile);
 
 		Element nameElement=(Element) doc.getElementsByTagName("Name").item(0);
 		this.setName(XMLUtils.getTextContent(nameElement));
-		Element idElement=(Element) doc.getElementsByTagName("ID").item(0);
+		Element idElement=(Element) doc.getElementsByTagName("Identifier").item(0);
 		this.setId(Integer.parseInt(XMLUtils.getTextContent(idElement)));
 		Element dateElement=(Element) doc.getElementsByTagName("Date").item(0);
 		this.setDate(XMLUtils.getTextContent(dateElement));
@@ -310,7 +327,8 @@ public class AquaMapsObject {
 		this.setName(toLoad.getName());
 		this.setStatus(SubmittedStatus.valueOf(toLoad.getStatus()));
 		this.setThreshold(toLoad.getThreshold());
-		this.setType(ObjectType.valueOf(toLoad.getType()));		
+		this.setType(ObjectType.valueOf(toLoad.getType()));	
+		this.setLayerId(toLoad.getLayerId());
 	}
 	public static List<AquaMapsObject> load(org.gcube.application.aquamaps.stubs.AquaMapArray toLoad){
 		List<AquaMapsObject> toReturn= new ArrayList<AquaMapsObject>();
@@ -341,6 +359,7 @@ public class AquaMapsObject {
 		toReturn.setStatus(this.status+"");
 		toReturn.setThreshold(this.threshold);
 		toReturn.setType(this.type.toString());
+		toReturn.setLayerId(this.layerId);
 		return toReturn;
 	}
 
@@ -350,4 +369,13 @@ public class AquaMapsObject {
 		this.setType(type);
 	}
 	public AquaMapsObject(){}
+	
+	
+	
+	public void setLayerId(String layerId) {
+		this.layerId = layerId;
+	}
+	public String getLayerId() {
+		return layerId;
+	}
 }

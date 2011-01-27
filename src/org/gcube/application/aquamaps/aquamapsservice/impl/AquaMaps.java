@@ -34,7 +34,6 @@ import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Job;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Submitted;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.AreaType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
@@ -256,11 +255,11 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 		Resource toReturn=new Resource(myResource);		
 		
 		try{
-		String title=SourceManager.getSourceTitle(ResourceType.HCAF, toReturn.getSearchId());
+//		String title=SourceManager.getSourceTitle(toReturn.getType(), toReturn.getSearchId());
+//		
+//		toReturn.setTitle(title);
 		
-		toReturn.setTitle(title);
-		
-		return toReturn.toStubsVersion();
+		return SourceManager.getById(toReturn.getType(), toReturn.getSearchId()).toStubsVersion();
 		}catch(Exception e){
 			logger.error("Unable to load source details. id: "+myResource.getSearchId(), e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -282,7 +281,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 
 
 	public String getAquaMapsPerUser(GetAquaMapsPerUserRequestType arg0)throws GCUBEFault{
-
+		logger.trace("Serving get submitted ..");
 		try{
 		
 			ArrayList<Field> parameters=new ArrayList<Field>();		
@@ -304,7 +303,9 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 			if(arg0.isJobStatusEnabled()){
 				throw new GCUBEFault("JOB STATUS filter is not yet supported");
 			}
-			
+			logger.trace("Filtering parameters : ");
+			for(Field f:parameters)
+				logger.trace(f.getName()+" = "+f.getValue()+" ("+f.getType()+")");
 			
 			return SubmittedManager.getJsonList(parameters, arg0.getSortColumn(), arg0.getSortDirection(), arg0.getLimit(), arg0.getOffset()); 			
 		}catch(Exception e ){

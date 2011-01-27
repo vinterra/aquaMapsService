@@ -11,6 +11,9 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+
 public class Envelope {
 
 	private boolean useFaoAreas=true;

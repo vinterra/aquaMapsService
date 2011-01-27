@@ -15,30 +15,59 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
+
+@XStreamAlias("Job")
 public class Job {
 	
-	public Job() {
-	}
 	
+	@XStreamAsAttribute
 	private int id;
-	private String name="";
-	private List<AquaMapsObject> aquaMapsObjectList=new ArrayList<AquaMapsObject>();
+	@XStreamAsAttribute
+	private String name;
+	@XStreamAsAttribute
+	private String author;
+	@XStreamAsAttribute
 	private SubmittedStatus status=SubmittedStatus.Pending;
+	@XStreamAsAttribute
+	private String date;
+	@XStreamAlias("ObjectList")
+	private List<AquaMapsObject> aquaMapsObjectList=new ArrayList<AquaMapsObject>();
+	
+	private Boolean isGis=false;
+	private String wmsContextId;
+	
+	
 	private Resource sourceHSPEN=new Resource(ResourceType.HSPEN,1);
 	private Resource sourceHCAF=new Resource(ResourceType.HCAF,1);
 	private Resource sourceHSPEC=new Resource(ResourceType.HSPEC,1);
+	@XStreamAlias("SpeciesCoverage")	
 	private Set<Species> selectedSpecies=new HashSet<Species> ();
+	
+//	@XStreamConverter
 	private Map<String,Map<String,Perturbation>> envelopeCustomization=new HashMap<String, Map<String,Perturbation>>();
 	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights=new HashMap<String, Map<EnvelopeFields,Field>>();
+	
+	@XStreamAlias("AreaLimitation")
 	private Set<Area> selectedAreas=new HashSet<Area>();
-	private String author="";
-	private String date="";	
+	
+		
+	
 	/**
 	 * @param weights the weights to set
 	 */
 	
 	
+	
+	
 	private List<File> related=new ArrayList<File>();	
+	
+	
+	
+	public Job() {
+	}
 	public String getName() {
 		return name;
 	}
@@ -82,6 +111,8 @@ public class Job {
 		this.date = date;
 	}
 	
+	
+	@Deprecated
 	public String toXML(){
 		StringBuilder profileBuilder=new StringBuilder();
 		profileBuilder.append("<JOB>");
@@ -143,7 +174,7 @@ public class Job {
 		
 		profileBuilder.append("<AlgorithmSettings>");			
 			//profileBuilder.append("<Threshold>"+threshold+"</Threshold>");
-			profileBuilder.append("<Source>"+AquaMapsObject.projectCitation+"</Source>");
+//			profileBuilder.append("<Source>"+AquaMapsObject.projectCitation+"</Source>");
 		profileBuilder.append("</AlgorithmSettings>");
 		
 		
@@ -289,6 +320,10 @@ public class Job {
 		this.setAquaMapsObjectList(AquaMapsObject.load(toLoad.getAquaMapList()));
 		this.getSelectedSpecies().addAll(Species.load(toLoad.getSelectedSpecies()));
 		
+		
+		this.setIsGis(toLoad.isGis());
+		this.setWmsContextId(toLoad.getGroupId());
+		
 	}
 
 	public org.gcube.application.aquamaps.stubs.Job toStubsVersion(){
@@ -316,6 +351,9 @@ public class Job {
 		toReturn.setSelectedSpecies(Species.toStubsVersion(this.selectedSpecies));
 		toReturn.setStatus(this.status.toString());
 		
+		toReturn.setGis(this.isGis);
+		toReturn.setGroupId(this.getWmsContextId());
+		
 		List<org.gcube.application.aquamaps.stubs.EnvelopeWeights> weightList= new ArrayList<org.gcube.application.aquamaps.stubs.EnvelopeWeights>();
 		for(String specId:this.envelopeWeights.keySet()){
 			weightList.add(new org.gcube.application.aquamaps.stubs.EnvelopeWeights(
@@ -337,4 +375,32 @@ public class Job {
 		this.selectedAreas = selectedAreas;
 	}
 	
+	
+	public void setCustomization(Species s, Field f, Perturbation p){
+		Map<String, Perturbation> map=envelopeCustomization.get(s.getId());
+		if(map==null)map=new HashMap<String, Perturbation>();
+		map.put(f.getName(), p);
+		envelopeCustomization.put(s.getId(), map);
+	}
+	
+	public void setWeights(Species s,List<Field> weights){
+		Map<EnvelopeFields,Field> map=envelopeWeights.get(s.getId());
+		if(map==null) map=new HashMap<EnvelopeFields, Field>();
+		for(Field f:weights){
+			map.put(EnvelopeFields.valueOf(f.getName()), f);
+		}
+		envelopeWeights.put(s.getId(), map);
+	}
+	public Boolean getIsGis() {
+		return isGis;
+	}
+	public void setIsGis(Boolean isGis) {
+		this.isGis = isGis;
+	}
+	public String getWmsContextId() {
+		return wmsContextId;
+	}
+	public void setWmsContextId(String wmsContextId) {
+		this.wmsContextId = wmsContextId;
+	}
 }

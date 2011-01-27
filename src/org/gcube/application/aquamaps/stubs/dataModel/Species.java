@@ -11,10 +11,19 @@ import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
+
+@XStreamAlias("Species")
 public class Species {
 
-
+	@XStreamAlias("SpeciesID")
+	@XStreamAsAttribute
 	private String id;
+	
+	@XStreamOmitField
 	public List<Field> attributesList=new ArrayList<Field>();
 	public List<Field> getAttributesList() {
 		return attributesList;
@@ -49,19 +58,19 @@ public class Species {
 		}
 		
 		String eString=this.getFieldbyName(HspenFields.EMostLong+"").getValue();
-		if(!eString.equalsIgnoreCase("null"))
+		if((eString!=null)&&(!eString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setE(Float.valueOf(eString));
 		
 		String nString=this.getFieldbyName(HspenFields.NMostLat+"").getValue();
-		if(!nString.equalsIgnoreCase("null"))
+		if((nString!=null)&&(!nString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setN(Float.valueOf(nString));
 		
 		String wString=this.getFieldbyName(HspenFields.WMostLong+"").getValue();
-		if(!wString.equalsIgnoreCase("null"))
+		if((wString!=null)&&(!wString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setW(Float.valueOf(wString));
 		
 		String sString=this.getFieldbyName(HspenFields.SMostLat+"").getValue();
-		if(!sString.equalsIgnoreCase("null"))
+		if((sString!=null)&&(!sString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setS(Float.valueOf(sString));
 		
 		toReturn.setFaoAreas(this.getFieldbyName(HspenFields.FAOAreas+"").getValue());

@@ -15,6 +15,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.MetaSourceFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -177,6 +178,20 @@ public class SourceManager {
 			toReturn.add(toAdd);
 		}
 		return toReturn;
+	}
+	
+	
+	
+	public static Resource getById(ResourceType type, int id)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.openSession(DBType.mySql);
+			String table = getMetaTable(type);
+			List<Field> filters=new ArrayList<Field>();
+			filters.add(new Field(MetaSourceFields.searchId+"",id+"",FieldType.INTEGER));
+			return loadRS(session.executeFilteredQuery(filters, table, MetaSourceFields.searchId+"", "ASC")).iterator().next();
+		}catch(Exception e){throw e;}
+		finally{session.close();}
 	}
 	
 }

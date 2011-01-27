@@ -6,11 +6,13 @@ import java.util.List;
 import org.apache.commons.cli2.validation.InvalidArgumentException;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FilterType;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+@XStreamAlias("Filter")
 public class Filter {
 
 
-
+	@XStreamAlias("method")
 	private FilterType type=FilterType.is;
 	private Field field;
 
@@ -76,4 +78,5 @@ public class Filter {
 		default : throw new InvalidArgumentException("invalid filter type");
 		}
 	}
+
 }

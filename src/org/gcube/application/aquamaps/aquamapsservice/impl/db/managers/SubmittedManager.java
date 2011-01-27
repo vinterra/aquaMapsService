@@ -82,7 +82,7 @@ public class SubmittedManager {
 			}
 			path.replaceFirst(publishedBasePath, localBasePath);
 			logger.trace("trying to read "+path);
-			return ServiceUtils.fileToString(path);			
+			return ServiceUtils.URLtoString(path);			
 		}catch (Exception e){
 			throw e;
 		}finally {

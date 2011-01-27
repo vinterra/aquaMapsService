@@ -8,7 +8,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
 public class DataModelTest {
 
 	public static void main(String args[]){
-		Job job= AquaMapsServiceTester.createDummyJob();
+		Job job= AquaMapsServiceTester.createDummyJob(true,true,true);
 		Job copied=new Job(job.toStubsVersion());
 		System.out.println("customization elements");
 		for(String specId:copied.getEnvelopeCustomization().keySet())
