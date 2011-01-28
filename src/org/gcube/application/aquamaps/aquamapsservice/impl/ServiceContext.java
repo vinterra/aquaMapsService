@@ -28,6 +28,8 @@ public class ServiceContext extends GCUBEServiceContext {
 	private ServiceContext(){};
 	
 	private String httpServerBasePath; 
+	private int httpServerPort;
+	
 	
 	/** {@inheritDoc} */
 	protected String getJNDIName() {return "gcube/application/aquamaps";}
@@ -66,6 +68,11 @@ public class ServiceContext extends GCUBEServiceContext {
 	private String defaultPublisherUrl;
 	
 	
+	private long monitorInterval;
+	private long monitorThreshold;
+	
+	
+	
 	public String getDefaultPublisherUrl() {
 		return defaultPublisherUrl;
 	}
@@ -73,17 +80,13 @@ public class ServiceContext extends GCUBEServiceContext {
 	protected void onReady() throws Exception{
 		
 		
-		//taking jetty parameters
-		httpServerBasePath =(String) this.getProperty("httpServerBasePath", true);
-		logger.debug("HTTP Server Base path = " + httpServerBasePath);
 		File serverPathDir= new File(this.getPersistenceRoot()+File.separator+httpServerBasePath);
 		if(!serverPathDir.exists())
 			serverPathDir.mkdirs();
 				
-		int httpServerPort = Integer.parseInt((String)this.getProperty("httpServerPort",true));
-		logger.debug("HTTP Server port = " + httpServerPort);
 		webServerUrl="http://"+GHNContext.getContext().getHostname()+":"+httpServerPort+"/";
 		logger.debug("WEBSERVER URL: "+this.webServerUrl);
+
 		//initializing jetty
 		Connector connector = new SelectChannelConnector();
 		connector.setPort(httpServerPort);
@@ -101,11 +104,9 @@ public class ServiceContext extends GCUBEServiceContext {
 		server.start();
 	
 		
-		//Monitoring
-		long interval=(Long)this.getProperty("monitorInterval", true);
-		long threshold=(Long)this.getProperty("freeSpaceThreshold", true);
-		StatusMonitorThread t=new StatusMonitorThread(interval,threshold);
-		logger.debug("Staring monitor thread: interval = "+interval+"; freespaceThreshold="+threshold);
+//		//Monitoring
+		StatusMonitorThread t=new StatusMonitorThread(monitorInterval,monitorThreshold);
+		logger.debug("Staring monitor thread: interval = "+monitorInterval+"; freespaceThreshold="+monitorThreshold);
 		t.start();
 		
 	}
@@ -114,23 +115,21 @@ public class ServiceContext extends GCUBEServiceContext {
      * {@inheritDoc}
      */
 	public void onInitialisation(){
+		
 		try{
 			Properties prop= new Properties();
-			prop.load(new FileInputStream(this.getFile("dbprop.properties", false)));
+			logger.debug("Loading configuration File...");
+			prop.load(new FileInputStream(this.getFile("config.properties", false)));
+			logger.debug("Found properties : "+prop.toString());
+			
 			this.dbUsername=prop.getProperty("dbusername","");
 			this.dbPassword=prop.getProperty("dbpassword","");
-		}catch(Exception e){logger.error("error getting DB credential ",e);}
-		try{
-			Properties prop= new Properties();
-			prop.load(new FileInputStream(this.getFile("pool.properties", false)));
+			
 			this.coreSize=Integer.parseInt(prop.getProperty("coreSize","30"));
 			this.queueSize=Integer.parseInt(prop.getProperty("queueSize","1000"));
 			this.maxSize=Integer.parseInt(prop.getProperty("maxSize","50"));
 			this.waitIdleTime=Long.parseLong(prop.getProperty("waitIdleTime","30000"));
-		}catch(Exception e){logger.fatal("error getting Thread Pool settings ",e);}
-		try{
-			Properties prop= new Properties();
-			prop.load(new FileInputStream(this.getFile("geoserver.properties", false)));
+
 			this.postGis_database=prop.getProperty("postGis_database","");
 			this.postGis_dbtype=prop.getProperty("postGis_dbtype","");
 			this.postGis_host=prop.getProperty("postGis_host","");
@@ -144,12 +143,21 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.templateGroup=prop.getProperty("templateGroup", "");
 			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","");
 			this.setGISMode(Boolean.parseBoolean(prop.getProperty("GISMode", "false")));
-		}catch(Exception e){logger.fatal("error getting GeoServer information",e);}
-		try{
-			Properties prop= new Properties();
-			prop.load(new FileInputStream(this.getFile("publisher.properties", false)));
+
 			this.defaultPublisherUrl=prop.getProperty("DEFAULT_PUBLISHER_URL","");
-		}catch(Exception e){logger.fatal("error getting default Publisher information",e);}
+		
+			this.httpServerBasePath =prop.getProperty("httpServerBasePath", "");
+					
+			this.httpServerPort = Integer.parseInt(prop.getProperty("httpServerPort",""));
+			
+			this.monitorInterval=Long.parseLong(prop.getProperty("monitorInterval", ""));
+			this.monitorThreshold=Long.parseLong(prop.getProperty("freeSpaceThreshold", ""));
+			
+		}catch(Exception e){
+			logger.fatal("Unable to load properties ",e);
+		}
+			
+			
 	}
 	
 	public String getWebServiceURL(){
