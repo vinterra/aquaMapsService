@@ -1,18 +1,13 @@
 package testClient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
-import org.gcube.application.aquamaps.stubs.dataModel.Envelope;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Job;
 import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
@@ -24,9 +19,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.PerturbationType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.stubs.wrapper.AquaMapsServiceWrapper;
-import org.gcube.application.aquamaps.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
 

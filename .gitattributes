@@ -128,4 +128,3 @@ test/testClient/LayerPubblicationTest.java -text
 test/testClient/MetaDataTest.java -text
 test/testClient/ProfileRetrievalTest.java -text
 test/testClient/StyleGeneration.java -text
-test/testClient/XStreamTest.java -text
