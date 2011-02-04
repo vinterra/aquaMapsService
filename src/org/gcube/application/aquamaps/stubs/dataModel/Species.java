@@ -11,19 +11,11 @@ import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-
-@XStreamAlias("Species")
 public class Species {
 
-	@XStreamAlias("SpeciesID")
-	@XStreamAsAttribute
 	private String id;
 	
-	@XStreamOmitField
 	public List<Field> attributesList=new ArrayList<Field>();
 	public List<Field> getAttributesList() {
 		return attributesList;

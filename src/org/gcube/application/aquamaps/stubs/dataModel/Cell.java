@@ -5,17 +5,10 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
-@XStreamAlias("Cell")
 public class Cell {
 	
 	
-	@XStreamAsAttribute
  	private String cSquareCode;
-	@XStreamOmitField
  	public List<Field> attributesList=new ArrayList<Field>();
  	
  	public Cell(String code){this.cSquareCode=code;}

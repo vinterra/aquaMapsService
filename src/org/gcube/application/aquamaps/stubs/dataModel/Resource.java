@@ -5,16 +5,10 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
-@XStreamAlias("Resource")
 public class Resource {
 
-	@XStreamAsAttribute
 	private ResourceType type=ResourceType.HCAF;
 	
-	@XStreamAsAttribute
 	private int searchId=1;
 
 	private String title;
