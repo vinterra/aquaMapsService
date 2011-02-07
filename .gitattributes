@@ -103,6 +103,7 @@ src/org/gcube/application/aquamaps/stubs/dataModel/Types/PerturbationType.java -
 src/org/gcube/application/aquamaps/stubs/dataModel/Types/ResourceType.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/Types/SubmittedStatus.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/EnvelopeFields.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/fields/FilesFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/HCAF_DFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/HCAF_SFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/HSPECFields.java -text
