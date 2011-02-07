@@ -247,9 +247,9 @@ try{
 		Species spec=new Species(speciesId);
 		GetSpeciesEnvelopeRequestType req=new GetSpeciesEnvelopeRequestType(hspenId, speciesId);
 			spec.attributesList.addAll(Field.load(pt.getSpeciesEnvelop(req)));
-			System.out.println("Loaded Fields : ");
-			for(Field f:spec.attributesList)
-				System.out.println(f.getName()+" : "+f.getValue());
+//			System.out.println("Loaded Fields : ");
+//			for(Field f:spec.attributesList)
+//				System.out.println(f.getName()+" : "+f.getValue());
 			return spec.extractEnvelope();
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
