@@ -1,9 +1,7 @@
 package testClient;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
@@ -76,7 +74,6 @@ public class MetaDataTest {
 		job.setWeights(spec,weights);
 		
 		
-		System.out.println(MetaDataHandler.get().toXML(job));
 		
 		
 	}
