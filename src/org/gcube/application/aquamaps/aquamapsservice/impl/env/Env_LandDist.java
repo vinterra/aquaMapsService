@@ -39,14 +39,14 @@ public class Env_LandDist extends EnvEngine {
 */
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			if (cell.getFieldbyName(HCAF_SFields.LandDist+"").getValue() != null && 
-				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.LandDist+"").getValue()) != -9999 && 
-				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
+			if (cell.getFieldbyName(HCAF_SFields.landdist+"").getValue() != null && 
+				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.landdist+"").getValue()) != -9999 && 
+				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
 		
-		this.fillData(filterCells, HCAF_SFields.LandDist+"");
+		this.fillData(filterCells, HCAF_SFields.landdist+"");
 		
 		this.landMin = this.getMin();
 		this.landMax = this.getMax();
@@ -89,9 +89,9 @@ public class Env_LandDist extends EnvEngine {
 			}
 		}
 		
-		species.getFieldbyName(HspenFields.LandDistMin.toString()).setValue(""+this.landMin);
-		species.getFieldbyName(HspenFields.LandDistMax.toString()).setValue(""+this.landMax);
-		species.getFieldbyName(HspenFields.LandDistPrefMin.toString()).setValue(""+this.landPMin);
-		species.getFieldbyName(HspenFields.LandDistPrefMax.toString()).setValue(""+this.landPMax);
+		species.getFieldbyName(HspenFields.landdistmin.toString()).setValue(""+this.landMin);
+		species.getFieldbyName(HspenFields.landdistmax.toString()).setValue(""+this.landMax);
+		species.getFieldbyName(HspenFields.landdistprefmin.toString()).setValue(""+this.landPMin);
+		species.getFieldbyName(HspenFields.landdistprefmax.toString()).setValue(""+this.landPMax);
 	}
 }

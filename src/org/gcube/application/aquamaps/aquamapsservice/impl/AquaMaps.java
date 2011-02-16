@@ -1,25 +1,22 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.rmi.RemoteException;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
+import org.gcube.application.aquamaps.stubs.AquaMap;
 import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
 import org.gcube.application.aquamaps.stubs.CalculateEnvelopeRequestType;
 import org.gcube.application.aquamaps.stubs.CalculateEnvelopefromCellSelectionRequestType;
 import org.gcube.application.aquamaps.stubs.FieldArray;
-import org.gcube.application.aquamaps.stubs.FileArray;
 import org.gcube.application.aquamaps.stubs.GetAquaMapsPerUserRequestType;
 import org.gcube.application.aquamaps.stubs.GetOccurrenceCellsRequestType;
 import org.gcube.application.aquamaps.stubs.GetPhylogenyRequestType;
@@ -103,8 +100,8 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
  			Species species=SpeciesManager.getSpeciesById(true,true,req.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HSPEN));
  			
 			if(req.isUseBottomSeaTempAndSalinity())
-				species.getFieldbyName(HspenFields.Layer+"").setValue("b");
-			else species.getFieldbyName(HspenFields.Layer+"").setValue("u");
+				species.getFieldbyName(HspenFields.layer+"").setValue("b");
+			else species.getFieldbyName(HspenFields.layer+"").setValue("u");
  			
 			SpEnvelope envelope=new SpEnvelope();
 			envelope.reCalculate(species, foundCells);
@@ -137,8 +134,8 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 		logger.trace("getting profile for owner id : "+id);
 		
 		try{
-			
-			return SubmittedManager.getProfile(id);
+			//TODO profile retrieval -> object retrieval
+			throw new Exception ("Not Yet Implemented");
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
@@ -147,26 +144,13 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 	}
 
 	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
-		String speciesId=request.getSpeciesID();
-		DBSession session=null;
 		try{
+			return CellManager.getJSONOccurrenceCells(request.getSpeciesID(), request.getSortColumn(), request.getSortDirection(), request.getLimit(), request.getOffset());
 			
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			ResultSet rs=session.executeQuery("select occurrenceCells.* , HCAF_D.DepthMean, HCAF_D.SSTAnMean, HCAF_D.SBTAnMean, HCAF_D.SalinityBMean, HCAF_D.SalinityMean, HCAF_D.PrimProdMean, HCAF_D.IceConAnn  from HCAF_D inner join occurrenceCells on HCAF_D.CsquareCode = occurrenceCells.CsquareCode where occurrenceCells.SpeciesID = '"+speciesId+"'");		
-			String toReturn= DBUtils.toJSon(rs,request.getOffset(),request.getOffset()+request.getLimit());
-			session.close();
-			return toReturn;
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}finally{
-			try {
-				session.close();
-			} catch (Exception e) {
-				
-				e.printStackTrace();
-			}
-		}		
+		}
 	}
 
 	public String submitJob(org.gcube.application.aquamaps.stubs.Job req)throws GCUBEFault{
@@ -182,31 +166,31 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 	}
 
 
-	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
-		logger.trace("getting file List for owner id : "+owner);
-		FileArray toReturn=null;
-		DBSession conn=null;
-		try{
-			conn = DBSession.openSession(PoolManager.DBType.mySql);			
-			ResultSet rs=conn.executeQuery("Select * from Files where owner = "+owner);
-			ArrayList<org.gcube.application.aquamaps.stubs.File> files=new ArrayList<org.gcube.application.aquamaps.stubs.File>();
-			while(rs.next()){
-				org.gcube.application.aquamaps.stubs.File f=new org.gcube.application.aquamaps.stubs.File();
-				f.setName(rs.getString(4));
-				f.setType(rs.getString(5));
-				f.setUrl(rs.getString(3));
-				files.add(f);			
-			}
-			toReturn=new FileArray(files.toArray(new org.gcube.application.aquamaps.stubs.File[files.size()]));
-			rs.close();			
-			conn.close();
-		} catch (Exception e){
-			logger.error("General Exception, unable to serve request",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}finally{try {conn.close();} 
-		catch (Exception e) {logger.error("Unrecoverable while attempitng to close session",e);}}
-		return toReturn;
-	}
+//	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
+//		logger.trace("getting file List for owner id : "+owner);
+//		FileArray toReturn=null;
+//		DBSession conn=null;
+//		try{
+//			conn = DBSession.openSession(PoolManager.DBType.mySql);			
+//			ResultSet rs=conn.executeQuery("Select * from Files where owner = "+owner);
+//			ArrayList<org.gcube.application.aquamaps.stubs.File> files=new ArrayList<org.gcube.application.aquamaps.stubs.File>();
+//			while(rs.next()){
+//				org.gcube.application.aquamaps.stubs.File f=new org.gcube.application.aquamaps.stubs.File();
+//				f.setName(rs.getString(4));
+//				f.setType(rs.getString(5));
+//				f.setUrl(rs.getString(3));
+//				files.add(f);			
+//			}
+//			toReturn=new FileArray(files.toArray(new org.gcube.application.aquamaps.stubs.File[files.size()]));
+//			rs.close();			
+//			conn.close();
+//		} catch (Exception e){
+//			logger.error("General Exception, unable to serve request",e);
+//			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+//		}finally{try {conn.close();} 
+//		catch (Exception e) {logger.error("Unrecoverable while attempitng to close session",e);}}
+//		return toReturn;
+//	}
 
 
 
@@ -287,7 +271,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 			ArrayList<Field> parameters=new ArrayList<Field>();		
 			
 			parameters.add(new Field(SubmittedFields.author+"",arg0.getUserID(),FieldType.STRING));
-			parameters.add(new Field(SubmittedFields.isAquaMap+"",arg0.isAquamaps()+"",FieldType.BOOLEAN));
+			parameters.add(new Field(SubmittedFields.isaquamap+"",arg0.isAquamaps()+"",FieldType.BOOLEAN));
 			if(arg0.isJobIdEnabled()) {
 				parameters.add(new Field(SubmittedFields.jobid+"",arg0.getJobIdValue()+"",FieldType.INTEGER));
 			}
@@ -331,11 +315,21 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 		try{
 			logger.trace("Loading submitted id : "+arg0);
 			List<Field> conditions=new ArrayList<Field>();
-			conditions.add(new Field(SubmittedFields.searchId+"", arg0+"", FieldType.INTEGER));
+			conditions.add(new Field(SubmittedFields.searchid+"", arg0+"", FieldType.INTEGER));
 			return SubmittedManager.getList(conditions).get(0).toStubsVersion();			
 		}catch(Exception e){
 			logger.error("",e);
 			throw new GCUBEFault("Impossible to load submitted : "+e.getMessage());
+		}
+	}
+
+	public AquaMap getObject(int arg0) throws RemoteException, GCUBEFault {
+		try{
+			return PublisherImpl.getPublisher().getAquaMapsObjectById(arg0).toStubsVersion();
+			
+		}catch(Exception e){
+			logger.error("",e);
+			throw new GCUBEFault("Impossible to load Object from Publisher : "+e.getMessage());
 		}
 	}
 

@@ -1,21 +1,20 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
+import org.gcube.application.aquamaps.stubs.dataModel.Species;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesPerturbationThread extends Thread {
@@ -41,18 +40,18 @@ public class SpeciesPerturbationThread extends Thread {
 	public void run() {		
 		DBSession session=null;
 		try{
-
-			logger.trace("Filtering species...");
-			String HSPENName=ServiceUtils.generateId("H", "");
-			JobManager.setWorkingHSPEN(jobId,HSPENName);
-			JobManager.addToDropTableList(jobId, HSPENName);
-			session=DBSession.openSession(PoolManager.DBType.mySql);
+			
 			String sourceHSPEN=SourceManager.getSourceName(ResourceType.HSPEN, JobManager.getHSPENTableId(jobId));
-			session.createLikeTable(HSPENName, sourceHSPEN);
-			PreparedStatement ps=session.preparedStatement("INSERT INTO "+HSPENName+" (Select * from "+sourceHSPEN+" where "+SpeciesOccursumFields.SpeciesID+"=?)");
-			for(String speciesId : JobManager.getSpeciesByStatus(jobId, null)){
-				ps.setString(1, speciesId);
-				ps.executeUpdate();
+			Set<Species> toInsert=new HashSet<Species>();
+			
+			for(String speciesId : JobManager.getSpeciesByStatus(jobId, null))
+				toInsert.add(new Species(speciesId));
+			String HSPENName=SpeciesManager.getFilteredHSPEN(sourceHSPEN, toInsert);
+			
+			
+			logger.trace("Going to Perturb filtered HSPEN "+HSPENName);
+			session=DBSession.getInternalDBSession();
+			for(String speciesId : JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize)){
 				if(toPerformPerturbations.containsKey(speciesId)){
 					String query=null;
 					try{
@@ -64,8 +63,9 @@ public class SpeciesPerturbationThread extends Thread {
 					}catch(Exception e){
 						logger.error("Unable to create perturbation query for speciesId: "+speciesId,e);
 					}
-					JobManager.updateSpeciesStatus(jobId,new String[]{speciesId}, SpeciesStatus.toGenerate);
-				}
+				}else
+					logger.warn("Unable to find perturbation for species "+speciesId+" which was "+SpeciesStatus.toCustomize);
+				JobManager.updateSpeciesStatus(jobId,new String[]{speciesId}, SpeciesStatus.toGenerate);
 			}			
 			session.close();
 			

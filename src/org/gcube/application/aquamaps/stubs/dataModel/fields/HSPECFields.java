@@ -4,12 +4,12 @@ public enum HSPECFields {
 
 //	SpeciesId,
 //	CsquareCode,
-	Probability,
-	boundboxYN,
-	faoareaYN,
-	FAOAreaM,
-	LME,
-	EEZAll,    
+	probability,
+	boundboxyn,
+	faoareayn,
+	faoaream,
+	lme,
+	eezall,    
 	
 	
 }

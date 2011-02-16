@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
@@ -36,8 +37,14 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	
 	private String webServerUrl=null;
-	private String dbUsername;
-	private String dbPassword;
+	private String internaldbUsername;
+	private String internaldbPassword;
+	private DBType internalDBType;
+	private String internalDBName;
+	private String internalDBPort;
+	private String internalDBHost;
+	
+	
 	private int queueSize;
 	private int coreSize;
 	private int maxSize;
@@ -63,13 +70,22 @@ public class ServiceContext extends GCUBEServiceContext {
 	private String distributionDefaultStyle;
 	
 	private boolean GISMode;
-	
+	private boolean standAloneMode;
 	
 	private String defaultPublisherUrl;
 	
 	
 	private long monitorInterval;
 	private long monitorThreshold;
+	
+	//************ ALGORITHM
+	
+	private boolean evaluateDepth;
+	private boolean evaluateTemperature;
+	private boolean evaluateSalinity;
+	private boolean evaluatePrimaryProduction;
+	private boolean evaluateIceConcentration;
+	private boolean evaluateLandDistance;
 	
 	
 	
@@ -122,37 +138,47 @@ public class ServiceContext extends GCUBEServiceContext {
 			prop.load(new FileInputStream(this.getFile("config.properties", false)));
 			logger.debug("Found properties : "+prop.toString());
 			
-			this.dbUsername=prop.getProperty("dbusername","");
-			this.dbPassword=prop.getProperty("dbpassword","");
+			this.internaldbUsername=prop.getProperty("internaldbusername","").trim();
+			this.internaldbPassword=prop.getProperty("internaldbpassword","").trim();
+			this.setInternalDBType(DBType.valueOf(prop.getProperty("internaldbType","mySql").trim()));
+			this.setInternalDBName(prop.getProperty("internaldbName","").trim());
+			this.setInternalDBHost(prop.getProperty("internaldbHost","").trim());
+			this.setInternalDBPort(prop.getProperty("internaldbPort","").trim());
 			
-			this.coreSize=Integer.parseInt(prop.getProperty("coreSize","30"));
-			this.queueSize=Integer.parseInt(prop.getProperty("queueSize","1000"));
-			this.maxSize=Integer.parseInt(prop.getProperty("maxSize","50"));
-			this.waitIdleTime=Long.parseLong(prop.getProperty("waitIdleTime","30000"));
+			this.coreSize=Integer.parseInt(prop.getProperty("coreSize","30").trim());
+			this.queueSize=Integer.parseInt(prop.getProperty("queueSize","1000").trim());
+			this.maxSize=Integer.parseInt(prop.getProperty("maxSize","50").trim());
+			this.waitIdleTime=Long.parseLong(prop.getProperty("waitIdleTime","30000").trim());
 
-			this.postGis_database=prop.getProperty("postGis_database","");
-			this.postGis_dbtype=prop.getProperty("postGis_dbtype","");
-			this.postGis_host=prop.getProperty("postGis_host","");
-			this.postGis_passwd=prop.getProperty("postGis_passwd","");
-			this.postGis_port=prop.getProperty("postGis_port","");
-			this.postGis_user=prop.getProperty("postGis_user","");
-			this.geoServerUrl=prop.getProperty("geoServerUrl", "");
-			this.geoServerUser=prop.getProperty("geoServerUser", "");
-			this.geoServerPwd=prop.getProperty("geoServerPwd", "");
-			this.worldTable=prop.getProperty("worldTable", "");
-			this.templateGroup=prop.getProperty("templateGroup", "");
-			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","");
-			this.setGISMode(Boolean.parseBoolean(prop.getProperty("GISMode", "false")));
-
-			this.defaultPublisherUrl=prop.getProperty("DEFAULT_PUBLISHER_URL","");
+			this.postGis_database=prop.getProperty("postGis_database","").trim();
+			this.postGis_dbtype=prop.getProperty("postGis_dbtype","").trim();
+			this.postGis_host=prop.getProperty("postGis_host","").trim();
+			this.postGis_passwd=prop.getProperty("postGis_passwd","").trim();
+			this.postGis_port=prop.getProperty("postGis_port","").trim();
+			this.postGis_user=prop.getProperty("postGis_user","").trim();
+			this.geoServerUrl=prop.getProperty("geoServerUrl", "").trim();
+			this.geoServerUser=prop.getProperty("geoServerUser", "").trim();
+			this.geoServerPwd=prop.getProperty("geoServerPwd", "").trim();
+			this.worldTable=prop.getProperty("worldTable", "").trim();
+			this.templateGroup=prop.getProperty("templateGroup", "").trim();
+			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","").trim();
+			this.setGISMode(Boolean.parseBoolean(prop.getProperty("GISMode", "false").trim()));
+			this.setStandAloneMode(Boolean.parseBoolean(prop.getProperty("StandAloneMode", "false").trim()));
+			this.defaultPublisherUrl=prop.getProperty("DEFAULT_PUBLISHER_URL","").trim();
 		
-			this.httpServerBasePath =prop.getProperty("httpServerBasePath", "");
+			this.httpServerBasePath =prop.getProperty("httpServerBasePath", "").trim();
 					
-			this.httpServerPort = Integer.parseInt(prop.getProperty("httpServerPort",""));
+			this.httpServerPort = Integer.parseInt(prop.getProperty("httpServerPort","").trim());
 			
-			this.monitorInterval=Long.parseLong(prop.getProperty("monitorInterval", ""));
-			this.monitorThreshold=Long.parseLong(prop.getProperty("freeSpaceThreshold", ""));
+			this.monitorInterval=Long.parseLong(prop.getProperty("monitorInterval", "").trim());
+			this.monitorThreshold=Long.parseLong(prop.getProperty("freeSpaceThreshold", "").trim());
 			
+			this.setEvaluateDepth(Boolean.parseBoolean(prop.getProperty("evaluateDepth","true").trim()));
+			this.setEvaluateTemperature(Boolean.parseBoolean(prop.getProperty("evaluateTemperature","true").trim()));
+			this.setEvaluateSalinity(Boolean.parseBoolean(prop.getProperty("evaluateSalinity","true").trim()));
+			this.setEvaluatePrimaryProduction(Boolean.parseBoolean(prop.getProperty("evaluatePrimaryProduction","true").trim()));
+			this.setEvaluateIceConcentration(Boolean.parseBoolean(prop.getProperty("evaluateIceConcentration","true").trim()));
+			this.setEvaluateLandDistance(Boolean.parseBoolean(prop.getProperty("evaluateLandDistance","false").trim()));
 		}catch(Exception e){
 			logger.fatal("Unable to load properties ",e);
 		}
@@ -168,12 +194,12 @@ public class ServiceContext extends GCUBEServiceContext {
 		return httpServerBasePath;
 	}
 
-	public String getDbUsername() {
-		return dbUsername;
+	public String getInternalDbUsername() {
+		return internaldbUsername;
 	}
 
-	public String getDbPassword() {
-		return dbPassword;
+	public String getInternalDbPassword() {
+		return internaldbPassword;
 	}
 
 	/**
@@ -382,6 +408,94 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	public void setGeoServerPwd(String geoServerPwd) {
 		this.geoServerPwd = geoServerPwd;
+	}
+
+	public void setStandAloneMode(boolean standAloneMode) {
+		this.standAloneMode = standAloneMode;
+	}
+
+	public boolean isStandAloneMode() {
+		return standAloneMode;
+	}
+
+	public void setInternalDBType(DBType internalDBType) {
+		this.internalDBType = internalDBType;
+	}
+
+	public DBType getInternalDBType() {
+		return internalDBType;
+	}
+
+	public void setInternalDBName(String intarnalDBName) {
+		this.internalDBName = intarnalDBName;
+	}
+
+	public String getInternalDBName() {
+		return internalDBName;
+	}
+
+	public void setInternalDBPort(String internalDBPort) {
+		this.internalDBPort = internalDBPort;
+	}
+
+	public String getInternalDBPort() {
+		return internalDBPort;
+	}
+
+	public void setInternalDBHost(String internalDBHost) {
+		this.internalDBHost = internalDBHost;
+	}
+
+	public String getInternalDBHost() {
+		return internalDBHost;
+	}
+
+	public boolean isEvaluateDepth() {
+		return evaluateDepth;
+	}
+
+	public void setEvaluateDepth(boolean evaluateDepth) {
+		this.evaluateDepth = evaluateDepth;
+	}
+
+	public boolean isEvaluateTemperature() {
+		return evaluateTemperature;
+	}
+
+	public void setEvaluateTemperature(boolean evaluateTemperature) {
+		this.evaluateTemperature = evaluateTemperature;
+	}
+
+	public boolean isEvaluateSalinity() {
+		return evaluateSalinity;
+	}
+
+	public void setEvaluateSalinity(boolean evaluateSalinity) {
+		this.evaluateSalinity = evaluateSalinity;
+	}
+
+	public boolean isEvaluatePrimaryProduction() {
+		return evaluatePrimaryProduction;
+	}
+
+	public void setEvaluatePrimaryProduction(boolean evaluatePrimaryProduction) {
+		this.evaluatePrimaryProduction = evaluatePrimaryProduction;
+	}
+
+	public boolean isEvaluateIceConcentration() {
+		return evaluateIceConcentration;
+	}
+
+	public void setEvaluateIceConcentration(boolean evaluateIceConcentration) {
+		this.evaluateIceConcentration = evaluateIceConcentration;
+	}
+
+	public boolean isEvaluateLandDistance() {
+		return evaluateLandDistance;
+	}
+
+	public void setEvaluateLandDistance(boolean evaluateLandDistance) {
+		this.evaluateLandDistance = evaluateLandDistance;
 	}
 		
 }

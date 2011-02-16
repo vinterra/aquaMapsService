@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-public class SourceGenerator {
+public class SourceGenerator implements Generator{
 
 private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 	
@@ -25,22 +25,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 		request=req;
 	}
 	
-	public boolean generate() throws IOException{
-		
-	return (generateCSV(request.getInputFile(), request.getOutputFile())==0);	
-//		return (dummyProcess(request.getRequestId())==0);
-	}
 	
-	
-//	private static int dummyProcess(int requestId){
-//		try {
-//			logger.debug("Executing.."+requestId);
-//			Thread.sleep(5*1000);
-//		} catch (InterruptedException e) {
-//			logger.debug("Done"+requestId);
-//		}
-//		return 0;
-//	}
 	
 	
 	private static int  generateCSV(String inputFile,String outputFile) throws IOException{
@@ -76,11 +61,18 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 		return request;
 	}
 
-	/**
-	 * @param request the request to set
-	 */
-	public void setRequest(SourceGeneratorRequest request) {
-		this.request = request;
+	
+	public boolean getResponse() throws Exception {
+		if(request==null) throw new Exception("No request setted");
+		return (generateCSV(request.getInputFile(), request.getOutputFile())==0);
+	}
+
+	public void setRequest(GenerationRequest theRequest)
+			throws BadRequestException {
+		if (theRequest instanceof SourceGeneratorRequest)
+			this.request=(SourceGeneratorRequest) theRequest;
+		else throw new BadRequestException();
+		
 	}
 	
 	

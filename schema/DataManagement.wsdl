@@ -36,6 +36,31 @@
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
+			
+			
+			<xsd:complexType name="generateHSPECRequestType">
+				<xsd:sequence>
+					<xsd:element name="userId" 				type="xsd:string" />
+					<xsd:element name="generateNative" 		type="xsd:boolean" />
+					<xsd:element name="generateSuitable"    type="xsd:boolean"/>
+					<xsd:element name="toGeneratePrefix" 	type="xsd:string" />
+					<xsd:element name="sourceHCAFId" 		type="xsd:int" />
+					<xsd:element name="sourceHSPENId" 		type="xsd:int" />
+					<xsd:element name="speciesSelection"    type="coretypes:stringArray"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="getGenerationReportByTypeRequestType">
+				<xsd:sequence>
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="resourceType" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			
 			<!-- Data management request elements -->
 
 			<xsd:element name="generateHCAFRequest" type="tns:generateHCAFRequestType" />
@@ -44,6 +69,14 @@
 			<xsd:element name="getHCAFGenerationReportRequest"
 				type="tns:getHCAFgenerationReportRequestType" />
 			<xsd:element name="getHCAFGenerationReportResponse" type="xsd:string" />
+
+			<xsd:element name="generateHSPECRequest" type="tns:generateHSPECRequestType" />
+			<xsd:element name="generateHSPECResponse" type="coretypes:VOID" />
+
+			<xsd:element name="getGenerationReportByTypeRequest"
+				type="tns:getGenerationReportByTypeRequestType" />
+			<xsd:element name="getGenerationReportByTypeResponse" type="xsd:string" />
+
 
 		</xsd:schema>
 	</types>
@@ -62,7 +95,21 @@
 	</message>
 	<message name="GetHCAFGenerationReportResponse">
 		<part name="response" element="tns:getHCAFGenerationReportResponse" />
+		
+		
+	</message><message name="GenerateHSPECRequest">
+		<part name="request" element="tns:generateHSPECRequest" />
 	</message>
+	<message name="GenerateHSPECResponse">
+		<part name="response" element="tns:generateHSPECResponse" />
+	</message>
+	<message name="GetGenerationReportByTypeRequest">
+		<part name="request" element="tns:getGenerationReportByTypeRequest" />
+	</message>
+	<message name="GetGenerationReportByTypeResponse">
+		<part name="response" element="tns:getGenerationReportByTypeResponse" />
+	</message>
+	
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
 			<wsdl:input message="tns:GenerateHCAFRequest" />
@@ -72,6 +119,17 @@
 		<wsdl:operation name="getHCAFGenerationReport">
 			<wsdl:input message="tns:GetHCAFGenerationReportRequest" />
 			<wsdl:output message="tns:GetHCAFGenerationReportResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="generateHSPEC">
+			<wsdl:input message="tns:GenerateHSPECRequest" />
+			<wsdl:output message="tns:GenerateHSPECResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="getGenerationReportByType">
+			<wsdl:input message="tns:GetGenerationReportByTypeRequest" />
+			<wsdl:output message="tns:GetGenerationReportByTypeResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

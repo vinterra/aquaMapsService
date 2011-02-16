@@ -147,9 +147,9 @@
 			<xsd:element name="getOccurrenceCellsRequest" type="tns:getOccurrenceCellsRequestType" />
 			<xsd:element name="getOccurrenceCellsResponse" type="xsd:string" />
 
-
-			<xsd:element name="getProfileRequest" type="xsd:int" />
-			<xsd:element name="getProfileResponse" type="xsd:string" />
+ 
+			<xsd:element name="getObjectRequest" type="xsd:int" />
+			<xsd:element name="getObjectResponse" type="aqtypes:AquaMap" />
 
 			<xsd:element name="getRelatedFilesRequest" type="xsd:string" />
 			<xsd:element name="getRelatedFilesResponse" type="aqtypes:fileArray" />
@@ -238,21 +238,21 @@
 	<message name="GetOccurrenceCellsResponse">
 		<part name="response" element="tns:getOccurrenceCellsResponse" />
 	</message>
-
-	<message name="GetProfileRequest">
-		<part name="request" element="tns:getProfileRequest" />
+ 
+	<message name="GetObjectRequest">
+		<part name="request" element="tns:getObjectRequest" />
 	</message>
-	<message name="GetProfileResponse">
-		<part name="response" element="tns:getProfileResponse" />
+	<message name="GetObjectResponse">
+		<part name="response" element="tns:getObjectResponse" />
 	</message>
-
+<!-- 
 	<message name="GetRelatedFilesRequest">
 		<part name="request" element="tns:getRelatedFilesRequest" />
 	</message>
 	<message name="GetRelatedFilesResponse">
 		<part name="response" element="tns:getRelatedFilesResponse" />
 	</message>
-
+-->
 	<message name="SubmitJobRequest">
 		<part name="request" element="tns:submitJobRequest" />
 	</message>
@@ -347,19 +347,19 @@
 			<output message="tns:GetOccurrenceCellsResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
-
-		<wsdl:operation name="getProfile">
-			<input message="tns:GetProfileRequest" />
-			<output message="tns:GetProfileResponse" />
+  
+		<wsdl:operation name="getObject">
+			<input message="tns:GetObjectRequest" />
+			<output message="tns:GetObjectResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
-
+<!--  
 		<wsdl:operation name="getRelatedFiles">
 			<input message="tns:GetRelatedFilesRequest" />
 			<output message="tns:GetRelatedFilesResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
-
+-->
 		<wsdl:operation name="submitJob">
 			<input message="tns:SubmitJobRequest" />
 			<output message="tns:SubmitJobResponse" />

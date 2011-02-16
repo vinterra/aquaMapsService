@@ -1,36 +1,37 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
-import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.dataModel.Field;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 
 public class SourceGenerationManager {
 
 //	private static final GCUBELog logger=new GCUBELog(SourceGenerationManager.class);
 
-	private static final String searchId="searchId";
+	private static final String searchId="searchid";
 	private static final String author="author";
-	private static final String generationTable="HCAFGeneration";
-	private static final String HCAFsourceId="HCAFSourceId";
-	private static final String submittedDate="submittedDate";
+	private static final String generationTable="hcafgeneration";
+	private static final String HCAFsourceId="hcafsourceid";
+	private static final String submittedDate="submitteddate";
 	private static final String status="status";
 	private static final String sources="sources";
-	private static final String generatedHCAFName="generatedHCAFName";
-	private static final String generatedHCAFId="generatedHCAFId";
+	private static final String generatedHCAFName="generatedhcafname";
+	private static final String generatedHCAFId="generatedhcafid";
 
 
 	private static Object getValue(String fieldName,int generationId)throws Exception{
 		DBSession session=null;
-		try{			
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps= session.preparedStatement("Select * from "+generationTable+" where "+searchId+" = ?");
-			ps.setInt(1, generationId);
-			ResultSet rs= ps.executeQuery();
+		try{
+			session=DBSession.getInternalDBSession();
+			List<Field> filter= new ArrayList<Field>();
+			filter.add(new Field(searchId,generationId+"",FieldType.INTEGER));
+			ResultSet rs= session.executeFilteredQuery(filter, generationTable, searchId, "ASC");
 			if(rs.next())
 				return rs.getObject(fieldName);
 			else return null;
@@ -40,14 +41,20 @@ public class SourceGenerationManager {
 			session.close();
 		}
 	}
-	private static void setValue(String fieldName,Object value,int generationId)throws Exception{
+	private static void setValue(String fieldName,Object value,FieldType type,int generationId)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Update "+generationTable+" SET "+fieldName+"= ? where "+searchId+"= ?");
-			ps.setObject(1, value);
-			ps.setInt(2, generationId);
-			ps.executeUpdate();
+			session=DBSession.getInternalDBSession();
+			List<List<Field>> keys=new ArrayList<List<Field>>();
+			List<Field> filter= new ArrayList<Field>();
+			filter.add(new Field(searchId,generationId+"",FieldType.INTEGER));
+			keys.add(filter);
+			List<List<Field>> values=new ArrayList<List<Field>>();
+			List<Field> valueList=new ArrayList<Field>();
+			valueList.add(new Field(fieldName,value+"",type));
+			values.add(valueList);
+			session.updateOperation(generationTable, keys, values);
+			
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -58,25 +65,25 @@ public class SourceGenerationManager {
 	public static int insertHCAFRequest(String authorValue,int HCAFSourceIdValue, String toGenerateNameValue,String[] sourcesValue)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			PreparedStatement ps=session.getConnection().prepareStatement("INSERT into "+generationTable+" ("+author+","+
-					HCAFsourceId+","+generatedHCAFName+","+sources+","+submittedDate+","+status+") values(?,?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS);
-			ps.setString(1,authorValue);
-			ps.setInt(2,HCAFSourceIdValue);
-			ps.setString(3,toGenerateNameValue);
+			session=DBSession.getInternalDBSession();
+			
+			List<List<Field>> values=new ArrayList<List<Field>>();
+			List<Field> row= new ArrayList<Field>();
+			row.add(new Field(author,authorValue,FieldType.STRING));
+			row.add(new Field(HCAFsourceId,HCAFSourceIdValue+"",FieldType.INTEGER));
+			row.add(new Field(generatedHCAFName,toGenerateNameValue,FieldType.STRING));
+			
 			StringBuilder sourceString=new StringBuilder();
 			for(String source:sourcesValue){
 				sourceString.append(source+";");
 			}
 			sourceString.deleteCharAt(sourceString.lastIndexOf(";"));
-			
-			ps.setString(4, sourceString.toString());
-			ps.setDate(5, new Date(System.currentTimeMillis()));
-			ps.setString(6,SourceGenerationStatus.Pending.toString());
-			ps.executeUpdate();
-			ResultSet rs=ps.getGeneratedKeys();
-			rs.next();
-			return rs.getInt(1);
+			row.add(new Field(sources,sourceString.toString(),FieldType.STRING));
+			row.add(new Field(submittedDate,ServiceUtils.getDate(),FieldType.STRING));
+			row.add(new Field(status,SourceGenerationStatus.Pending+"",FieldType.STRING));
+			values.add(row);
+			List<List<Field>> ids=session.insertOperation(generationTable, values);
+			return Integer.parseInt(ids.get(0).get(0).getValue());
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -90,12 +97,9 @@ public class SourceGenerationManager {
 	public static String getReport(String orderColumn, String orderMode, int offset, int limit)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(PoolManager.DBType.mySql);
-			ResultSet rs=session.executeQuery("Select count(*) from "+generationTable);
-			rs.next();
-			int totalCount=rs.getInt(1);
-			rs= session.executeQuery("Select * from "+generationTable+" ORDER BY "+orderColumn+" "+orderMode);
-			return DBUtils.toJSon(rs, totalCount);
+			session=DBSession.getInternalDBSession();
+			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), generationTable, orderColumn, orderMode),
+					session.getCount(generationTable, new ArrayList<Field>()));
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -108,11 +112,11 @@ public class SourceGenerationManager {
 	
 	
 	public static void setStatus(int requestId, SourceGenerationStatus toSet)throws Exception{
-		setValue(status, toSet.toString(), requestId);
+		setValue(status, toSet.toString(),FieldType.STRING, requestId);
 	}
 	
 	public static void setGeneratedHCAFId(int requestId, int generatedId)throws Exception{
-		setValue(generatedHCAFId,generatedId,requestId);
+		setValue(generatedHCAFId,generatedId,FieldType.INTEGER,requestId);
 	}
 
 	//************************ GETTERS

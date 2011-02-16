@@ -40,13 +40,13 @@ public class Env_SeaIce extends EnvEngine {
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
 			
-			if (cell.getFieldbyName(HCAF_DFields.IceConAnn+"").getValue() != null &&
-					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
+			if (cell.getFieldbyName(HCAF_DFields.iceconann+"").getValue() != null &&
+					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
 		
-		this.fillData(filterCells, HCAF_DFields.IceConAnn+"");
+		this.fillData(filterCells, HCAF_DFields.iceconann+"");
 		
 		this.iceMin = this.getMin();
 		this.iceMax = this.getMax();					
@@ -62,7 +62,7 @@ public class Env_SeaIce extends EnvEngine {
 			sumIce = 0;
 
 			for (Cell cell: filterCells) {
-		         sumIce = sumIce + Double.parseDouble(cell.getFieldbyName(HCAF_DFields.IceConAnn+"").getValue());
+		         sumIce = sumIce + Double.parseDouble(cell.getFieldbyName(HCAF_DFields.iceconann+"").getValue());
 		    }
 			int reccount = filterCells.size();
 			if(reccount != 0)	{meanIce = sumIce / reccount;}
@@ -71,9 +71,9 @@ public class Env_SeaIce extends EnvEngine {
 			this.iceMin = adjVal + meanIce;
 		}
 		
-		species.getFieldbyName(HspenFields.IceConMin+"").setValue(""+this.iceMin);
-		species.getFieldbyName(HspenFields.IceConMax+"").setValue(""+this.iceMax);
-		species.getFieldbyName(HspenFields.IceConPrefMin+"").setValue(""+this.icePMin);
-		species.getFieldbyName(HspenFields.IceConPrefMax+"").setValue(""+this.icePMax);
+		species.getFieldbyName(HspenFields.iceconmin+"").setValue(""+this.iceMin);
+		species.getFieldbyName(HspenFields.iceconmax+"").setValue(""+this.iceMax);
+		species.getFieldbyName(HspenFields.iceconprefmin+"").setValue(""+this.icePMin);
+		species.getFieldbyName(HspenFields.iceconprefmax+"").setValue(""+this.icePMax);
 	}
 }

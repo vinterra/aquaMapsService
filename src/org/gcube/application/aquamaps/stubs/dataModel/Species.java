@@ -11,19 +11,11 @@ import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-
-@XStreamAlias("Species")
 public class Species {
 
-	@XStreamAlias("SpeciesID")
-	@XStreamAsAttribute
 	private String id;
 	
-	@XStreamOmitField
 	public List<Field> attributesList=new ArrayList<Field>();
 	public List<Field> getAttributesList() {
 		return attributesList;
@@ -57,25 +49,25 @@ public class Species {
 			}
 		}
 		
-		String eString=this.getFieldbyName(HspenFields.EMostLong+"").getValue();
+		String eString=this.getFieldbyName(HspenFields.emostlong+"").getValue();
 		if((eString!=null)&&(!eString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setE(Float.valueOf(eString));
 		
-		String nString=this.getFieldbyName(HspenFields.NMostLat+"").getValue();
+		String nString=this.getFieldbyName(HspenFields.nmostlat+"").getValue();
 		if((nString!=null)&&(!nString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setN(Float.valueOf(nString));
 		
-		String wString=this.getFieldbyName(HspenFields.WMostLong+"").getValue();
+		String wString=this.getFieldbyName(HspenFields.wmostlong+"").getValue();
 		if((wString!=null)&&(!wString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setW(Float.valueOf(wString));
 		
-		String sString=this.getFieldbyName(HspenFields.SMostLat+"").getValue();
+		String sString=this.getFieldbyName(HspenFields.smostlat+"").getValue();
 		if((sString!=null)&&(!sString.equalsIgnoreCase("null")))
 			toReturn.getBoundingBox().setS(Float.valueOf(sString));
 		
-		toReturn.setFaoAreas(this.getFieldbyName(HspenFields.FAOAreas+"").getValue());
-		toReturn.setPelagic(Boolean.parseBoolean(this.getFieldbyName(HspenFields.Pelagic+"").getValue()));
-		toReturn.setUseBottomSeaTempAndSalinity(this.getFieldbyName(HspenFields.Layer+"").getValue().equalsIgnoreCase("b"));
+		toReturn.setFaoAreas(this.getFieldbyName(HspenFields.faoareas+"").getValue());
+		toReturn.setPelagic(Boolean.parseBoolean(this.getFieldbyName(HspenFields.pelagic+"").getValue()));
+		toReturn.setUseBottomSeaTempAndSalinity(this.getFieldbyName(HspenFields.layer+"").getValue().equalsIgnoreCase("b"));
 		return toReturn;
 	}
 
@@ -92,7 +84,7 @@ public class Species {
 	public String toXML(){
 		StringBuilder toReturn=new StringBuilder();
 		toReturn.append("<Species>");
-		toReturn.append("<"+SpeciesOccursumFields.SpeciesID+">"+id+"</"+SpeciesOccursumFields.SpeciesID+">");
+		toReturn.append("<"+SpeciesOccursumFields.speciesid+">"+id+"</"+SpeciesOccursumFields.speciesid+">");
 		toReturn.append("<Attributes>");
 		for(Field field:attributesList){
 			toReturn.append(field.toXML());
@@ -128,7 +120,7 @@ public class Species {
 	}
 
 	public Species (Element el){
-		Element idEl=(Element) el.getElementsByTagName(SpeciesOccursumFields.SpeciesID.toString()).item(0);
+		Element idEl=(Element) el.getElementsByTagName(SpeciesOccursumFields.speciesid.toString()).item(0);
 		this.setId(XMLUtils.getTextContent(idEl));
 		NodeList fieldNodes=el.getElementsByTagName("Field");
 		for(int i=0;i<fieldNodes.getLength();i++){

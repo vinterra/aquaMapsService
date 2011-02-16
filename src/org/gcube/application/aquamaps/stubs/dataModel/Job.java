@@ -15,25 +15,15 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-
-@XStreamAlias("Job")
 public class Job {
 	
 	
-	@XStreamAsAttribute
 	private int id;
-	@XStreamAsAttribute
 	private String name;
-	@XStreamAsAttribute
 	private String author;
-	@XStreamAsAttribute
 	private SubmittedStatus status=SubmittedStatus.Pending;
-	@XStreamAsAttribute
 	private String date;
-	@XStreamAlias("ObjectList")
 	private List<AquaMapsObject> aquaMapsObjectList=new ArrayList<AquaMapsObject>();
 	
 	private Boolean isGis=false;
@@ -43,14 +33,11 @@ public class Job {
 	private Resource sourceHSPEN=new Resource(ResourceType.HSPEN,1);
 	private Resource sourceHCAF=new Resource(ResourceType.HCAF,1);
 	private Resource sourceHSPEC=new Resource(ResourceType.HSPEC,1);
-	@XStreamAlias("SpeciesCoverage")	
 	private Set<Species> selectedSpecies=new HashSet<Species> ();
 	
-//	@XStreamConverter
 	private Map<String,Map<String,Perturbation>> envelopeCustomization=new HashMap<String, Map<String,Perturbation>>();
 	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights=new HashMap<String, Map<EnvelopeFields,Field>>();
 	
-	@XStreamAlias("AreaLimitation")
 	private Set<Area> selectedAreas=new HashSet<Area>();
 	
 		
@@ -132,7 +119,7 @@ public class Job {
 		for(Species spec:selectedSpecies){
 			String specId=spec.getId();
 			if((envelopeWeights.containsKey(specId))||(envelopeCustomization.containsKey(specId))){
-				profileBuilder.append("<"+Tags.customizationSet+" "+SpeciesOccursumFields.SpeciesID+" =\""+specId+"\">");
+				profileBuilder.append("<"+Tags.customizationSet+" "+SpeciesOccursumFields.speciesid+" =\""+specId+"\">");
 				if(envelopeWeights.containsKey(specId)){
 					profileBuilder.append("<Weights>");
 					for(Field field:envelopeWeights.get(specId).values()) profileBuilder.append(field.toXML());

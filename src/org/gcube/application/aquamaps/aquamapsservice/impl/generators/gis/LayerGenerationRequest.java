@@ -1,102 +1,337 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest.ClusterScaleType;
+import org.gcube.application.aquamaps.stubs.dataModel.Area;
+import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
+import org.gcube.application.aquamaps.stubs.dataModel.Field;
+import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
+import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
 
 
 public class LayerGenerationRequest implements GISGenerationRequest {
 
+
+	//************ Layer Generation details
 	private String csvFile;
 	private String featureLabel;
-	private String layerName;
-	private String featureDefinition;
-	private int featureSQLType;
-	private String defaultStyle;
-	private ArrayList<String> styles=new ArrayList<String>();
+	private String FeatureDefinition;
+	private String mapName;
+	private ObjectType mapType;
 	
-	private int submittedId;
+	private List<StyleGenerationRequest> toGenerateStyles=new ArrayList<StyleGenerationRequest>();
+	private List<String> toAssociateStyles=new ArrayList<String>();
+	
+	//************ Layer Info Type identification parameters 
+	
+	private Set<String> speciesCoverage; 
+	private int hcafId;
+	private int hspenId; 
+	private Map<String,Map<String,Perturbation>> envelopeCustomization;
+	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights;
+	private Set<Area> selectedAreas;
+	private BoundingBox bb;
+	private float threshold;
 	
 	
-	/**
-	 * @return the csvFile
-	 */
+	//************ Generated Layer references
+	
+	private LayerInfoType generatedLayer;
+	private String geServerLayerId;
+	
+	
+	public static LayerGenerationRequest getBioDiversityRequest(Set<String> speciesCoverage, int hcafId,int hspenId,
+			Map<String,Map<String,Perturbation>> envelopeCustomization, Map<String,Map<EnvelopeFields,Field>> envelopeWeights,
+			Set<Area> areaSelection, BoundingBox bb,float threshold, String csvFile,String objectName, int min,int max ){
+		LayerGenerationRequest toReturn= new LayerGenerationRequest(hcafId,hspenId,areaSelection,bb,csvFile);
+		toReturn.setMapName(objectName);
+		toReturn.getSpeciesCoverage().addAll(speciesCoverage);
+		toReturn.setEnvelopeCustomization(envelopeCustomization);
+		toReturn.setEnvelopeWeights(envelopeWeights);
+		toReturn.setFeatureLabel(AquaMapsManager.maxSpeciesCountInACell);
+		toReturn.setFeatureDefinition("integer");
+		toReturn.setMapType(ObjectType.Biodiversity);
+		toReturn.setThreshold(threshold);
+		toReturn.toGenerateStyles.add(
+				StyleGenerationRequest.getBiodiversityStyle(min,max,ClusterScaleType.linear,objectName));
+		return toReturn;
+	}
+
+	public static LayerGenerationRequest getSpeciesDistributionRequest(String speciesId, int hcafId,int hspenId,
+			Map<String,Perturbation> envelopeCustomization, Map<EnvelopeFields,Field> envelopeWeights,
+			Set<Area> areaSelection, BoundingBox bb, String csvFile){
+		LayerGenerationRequest toReturn= new LayerGenerationRequest(hcafId,hspenId,areaSelection,bb,csvFile);
+		toReturn.getSpeciesCoverage().add(speciesId);
+		toReturn.getEnvelopeCustomization().put(speciesId, envelopeCustomization);
+		toReturn.getEnvelopeWeights().put(speciesId, envelopeWeights);
+		toReturn.setMapName(speciesId);
+		toReturn.setMapType(ObjectType.SpeciesDistribution);
+		toReturn.setFeatureLabel(HSPECFields.probability+"");
+		toReturn.setFeatureDefinition("real");
+		toReturn.getToAssociateStyles().add(ServiceContext.getContext().getDistributionDefaultStyle());
+		return toReturn;
+	}
+	
+
+	private LayerGenerationRequest(int hcafId,int hspenId,Set<Area> areaSelection, BoundingBox bb, String csvFile){
+		this.setHcafId(hcafId);
+		this.setHspenId(hspenId);
+		this.setBb(bb);
+		this.setSelectedAreas(areaSelection);
+		this.csvFile=csvFile;
+	}
+	
+
+
 	public String getCsvFile() {
 		return csvFile;
 	}
-	/**
-	 * @param csvFile the csvFile to set
-	 */
+
+
+
+
 	public void setCsvFile(String csvFile) {
 		this.csvFile = csvFile;
 	}
-	/**
-	 * @return the featureLabel
-	 */
+
+
+
+
 	public String getFeatureLabel() {
 		return featureLabel;
 	}
-	/**
-	 * @param featureLabel the featureLabel to set
-	 */
+
+
+
+
 	public void setFeatureLabel(String featureLabel) {
 		this.featureLabel = featureLabel;
 	}
-	/**
-	 * @return the layerName
-	 */
-	public String getLayerName() {
-		return layerName;
-	}
-	/**
-	 * @param layerName the layerName to set
-	 */
-	public void setLayerName(String layerName) {
-		this.layerName = layerName;
-	}
-	/**
-	 * @return the featureDefinition
-	 */
+
+
+
+
 	public String getFeatureDefinition() {
-		return featureDefinition;
+		return FeatureDefinition;
 	}
-	/**
-	 * @param featureDefinition the featureDefinition to set
-	 */
+
+
+
+
 	public void setFeatureDefinition(String featureDefinition) {
-		this.featureDefinition = featureDefinition;
+		FeatureDefinition = featureDefinition;
 	}
-	/**
-	 * @return the featureSQLType
-	 */
-	public int getFeatureSQLType() {
-		return featureSQLType;
+
+
+
+
+	public String getMapName() {
+		return mapName;
 	}
-	/**
-	 * @param featureSQLType the featureSQLType to set
-	 */
-	public void setFeatureSQLType(int featureSQLType) {
-		this.featureSQLType = featureSQLType;
+
+
+
+
+	public void setMapName(String mapName) {
+		this.mapName = mapName;
 	}
-	public void setDefaultStyle(String defaultStyle) {
-		if(styles.size()==0)styles.add(defaultStyle);
-		this.defaultStyle = defaultStyle;
+
+
+
+
+	public ObjectType getMapType() {
+		return mapType;
 	}
-	public String getDefaultStyle() {
-		return defaultStyle;
+
+
+
+
+	public void setMapType(ObjectType mapType) {
+		this.mapType = mapType;
 	}
-	public void setStyles(ArrayList<String> styles) {
-		this.styles = styles;
+
+
+
+
+	public List<StyleGenerationRequest> getToGenerateStyles() {
+		return toGenerateStyles;
 	}
-	public ArrayList<String> getStyles() {
-		return styles;
+
+
+
+
+	public void setToGenerateStyles(List<StyleGenerationRequest> toGenerateStyles) {
+		this.toGenerateStyles = toGenerateStyles;
 	}
-	public void setSubmittedId(int submittedId) {
-		this.submittedId = submittedId;
+
+
+
+
+	public List<String> getToAssociateStyles() {
+		return toAssociateStyles;
 	}
-	public int getSubmittedId() {
-		return submittedId;
-	} 
+
+
+
+
+	public void setToAssociateStyles(List<String> toAssociateStyles) {
+		this.toAssociateStyles = toAssociateStyles;
+	}
+
+
+
+
+	public Set<String> getSpeciesCoverage() {
+		return speciesCoverage;
+	}
+
+
+
+
+	public void setSpeciesCoverage(Set<String> speciesCoverage) {
+		this.speciesCoverage = speciesCoverage;
+	}
+
+
+
+
+	public int getHcafId() {
+		return hcafId;
+	}
+
+
+
+
+	public void setHcafId(int hcafId) {
+		this.hcafId = hcafId;
+	}
+
+
+
+
+	public int getHspenId() {
+		return hspenId;
+	}
+
+
+
+
+	public void setHspenId(int hspenId) {
+		this.hspenId = hspenId;
+	}
+
+
+
+
+	public Map<String, Map<String, Perturbation>> getEnvelopeCustomization() {
+		return envelopeCustomization;
+	}
+
+
+
+
+	public void setEnvelopeCustomization(
+			Map<String, Map<String, Perturbation>> envelopeCustomization) {
+		this.envelopeCustomization = envelopeCustomization;
+	}
+
+
+
+
+	public Map<String, Map<EnvelopeFields, Field>> getEnvelopeWeights() {
+		return envelopeWeights;
+	}
+
+
+
+
+	public void setEnvelopeWeights(
+			Map<String, Map<EnvelopeFields, Field>> envelopeWeights) {
+		this.envelopeWeights = envelopeWeights;
+	}
+
+
+
+
+	public Set<Area> getSelectedAreas() {
+		return selectedAreas;
+	}
+
+
+
+
+	public void setSelectedAreas(Set<Area> selectedAreas) {
+		this.selectedAreas = selectedAreas;
+	}
+
+
+
+
+	public BoundingBox getBb() {
+		return bb;
+	}
+
+
+
+
+	public void setBb(BoundingBox bb) {
+		this.bb = bb;
+	}
+
+
+
+
+	public void setGeneratedLayer(LayerInfoType generatedLayer) {
+		this.generatedLayer = generatedLayer;
+	}
+
+
+
+
+	public LayerInfoType getGeneratedLayer() {
+		return generatedLayer;
+	}
+
+	public String getGeServerLayerId() {
+		return geServerLayerId;
+	}
+
+	public void setGeServerLayerId(String geServerLayerId) {
+		this.geServerLayerId = geServerLayerId;
+	}
+
+	public void setThreshold(float threshold) {
+		this.threshold = threshold;
+	}
+
+	public float getThreshold() {
+		return threshold;
+	}
 	
 	
 	
-	
+//	
+//	
+//	public void setStyleGenerationParameter(int maxValue,int minValue){
+//		styleDefinition=new StyleGenerationRequest();
+//		styleDefinition.setAttributeName(this.getFeatureLabel());
+//		styleDefinition.setC1(Color.YELLOW);
+//		styleDefinition.setC2(Color.RED);
+//		styleDefinition.setMax(String.valueOf(maxValue));
+//		styleDefinition.setMin(String.valueOf(minValue));					
+//		styleDefinition.setNameStyle(ServiceUtils.generateId(this.getLayerName(), "style"));					
+//		int Nclasses=((maxValue-minValue)>4)?5:maxValue-minValue;
+//		styleDefinition.setNClasses(Nclasses);
+//		styleDefinition.setTypeValue(Integer.class);
+//	}
+//	
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
@@ -21,6 +20,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.mortbay.log.Log;
 
@@ -106,17 +106,17 @@ public class SimulationThread extends Thread {
 		DBSession conn =null;
 		try{
 
-			conn = DBSession.openSession(PoolManager.DBType.mySql);
-			String filteredTable=ServiceUtils.generateId(tableType.toString(), "");
+			conn = DBSession.getInternalDBSession();
+			String filteredTable=ServiceUtils.generateId(tableType.toString().toLowerCase(), "");
 			String sourceTableName=sourceTable;
 			conn.createLikeTable(filteredTable, sourceTableName);
 
 			JobManager.addToDropTableList(jobId, filteredTable);
 
 
-			PreparedStatement psFAO=conn.preparedStatement(CellManager.filterCellByFaoAreas(filteredTable, sourceTableName));
-			PreparedStatement psLME=conn.preparedStatement(CellManager.filterCellByLMEAreas(filteredTable, sourceTableName));
-			PreparedStatement psEEZ=conn.preparedStatement(CellManager.filterCellByEEZAreas(filteredTable, sourceTableName));
+			PreparedStatement psFAO=conn.getFilterCellByAreaQuery(HSPECFields.faoaream,filteredTable, sourceTableName);
+			PreparedStatement psLME=conn.getFilterCellByAreaQuery(HSPECFields.lme,filteredTable, sourceTableName);
+			PreparedStatement psEEZ=conn.getFilterCellByAreaQuery(HSPECFields.eezall,filteredTable, sourceTableName);
 
 
 			for(Area area: areaSelection){
@@ -152,7 +152,8 @@ public class SimulationThread extends Thread {
 		String HCAF_DName=JobManager.getWorkingHCAF(jobId);		
 		String HSPENName=JobManager.getWorkingHSPEN(jobId);
 		HSPECGenerator generator= new HSPECGenerator(jobId,HCAF_DName,CellManager.HCAF_S,HSPENName,weights);
-		String generatedHspecName=generator.generate();
+		generator.generate();
+		String generatedHspecName=generator.getNativeTable();
 		System.out.println("table generated:"+generatedHspecName);
 		if (makeTemp)JobManager.addToDropTableList(jobId,generatedHspecName);
 		//		return SourceManager.registerSource(ResourceType.HSPEC, generatedHspecName, "generated HSPEC", JobManager.getAuthor(jobId), HCAF_id, ResourceType.HCAF);

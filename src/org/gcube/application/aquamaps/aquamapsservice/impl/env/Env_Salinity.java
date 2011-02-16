@@ -30,7 +30,7 @@ public class Env_Salinity extends EnvEngine {
 	public void re_computes(Species species, Set<Cell> goodCells) throws Exception {
 		
 		String fld;
-		if (species.getFieldbyName(HspenFields.Layer+"").equals("b")) {
+		if (species.getFieldbyName(HspenFields.layer+"").equals("b")) {
 			fld = "SalinityBMean";			
 			this.salinUp = EnvCostants.salinBUpper; 	//reset absolute min and max for bottom
 			this.salinLow = EnvCostants.salinBLower;
@@ -56,7 +56,7 @@ public class Env_Salinity extends EnvEngine {
 			
 			if (cell.getFieldbyName(fld).getValue() != null &&
 					Double.parseDouble(cell.getFieldbyName(fld).getValue()) != -9999 &&
-					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
+					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
@@ -106,9 +106,9 @@ public class Env_Salinity extends EnvEngine {
 		    else this.salinMax = EnvCostants.salinUpper;
 		}
 			
-		species.getFieldbyName(HspenFields.SalinityMin+"").setValue(""+this.salinMin);
-		species.getFieldbyName(HspenFields.SalinityMax+"").setValue(""+this.salinMax);
-		species.getFieldbyName(HspenFields.SalinityPrefMin+"").setValue(""+this.salinPMin);
-		species.getFieldbyName(HspenFields.SalinityPrefMax+"").setValue(""+this.salinPMax);
+		species.getFieldbyName(HspenFields.salinitymin+"").setValue(""+this.salinMin);
+		species.getFieldbyName(HspenFields.salinitymax+"").setValue(""+this.salinMax);
+		species.getFieldbyName(HspenFields.salinityprefmin+"").setValue(""+this.salinPMin);
+		species.getFieldbyName(HspenFields.salinityprefmax+"").setValue(""+this.salinPMax);
 	}
 }

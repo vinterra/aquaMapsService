@@ -2,69 +2,51 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
+import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
 
 public class GroupGenerationRequest implements GISGenerationRequest {
 
-	private ArrayList<String> layers=new ArrayList<String>();
-	private Map<String,String> styles=new HashMap<String, String>(); 
-	private String name;
-	private String id;
 	
-	private int submittedId;
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
+	private Map<String,String> geoServerLayers=new HashMap<String, String>();
+	private String toCreateGroupName;
+	
+	private List<LayerInfoType> publishedLayer=new ArrayList<LayerInfoType>();
+	
+	private WMSContextInfoType associatedContext;
+	
+	
+	public Set<String> getGeoServerLayers(){return getGeoServerLayersMap().keySet();}
+	public Map<String,String> getStyles(){return getGeoServerLayersMap();}
+	
+	
+	public Map<String,String> getGeoServerLayersMap() {
+		return geoServerLayers;
 	}
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setGeoServerLayers(Map<String,String> geoServerLayers) {
+		this.geoServerLayers = geoServerLayers;
 	}
-	/**
-	 * @return the id
-	 */
-	public String getId() {
-		return id;
+	public void setToCreateGroupName(String toCreateGroupName) {
+		this.toCreateGroupName = toCreateGroupName;
 	}
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(String id) {
-		this.id = id;
+	public String getToCreateGroupName() {
+		return toCreateGroupName;
 	}
-	/**
-	 * @return the layers
-	 */
-	public ArrayList<String> getLayers() {
-		return layers;
+	public void setPublishedLayer(List<LayerInfoType> publishedLayer) {
+		this.publishedLayer = publishedLayer;
 	}
-	/**
-	 * @param layers the layers to set
-	 */
-	public void setLayers(ArrayList<String> layers) {
-		this.layers = layers;
-	}	
-	/**
-	 * @return the submittedId
-	 */
-	public int getSubmittedId() {
-		return submittedId;
+	public List<LayerInfoType> getPublishedLayer() {
+		return publishedLayer;
 	}
-	/**
-	 * @param submittedId the submittedId to set
-	 */
-	public void setSubmittedId(int submittedId) {
-		this.submittedId = submittedId;
+	public void setAssociatedContext(WMSContextInfoType associatedContext) {
+		this.associatedContext = associatedContext;
 	}
-	public void setStyles(Map<String,String> styles) {
-		this.styles = styles;
-	}
-	public Map<String,String> getStyles() {
-		return styles;
+	public WMSContextInfoType getAssociatedContext() {
+		return associatedContext;
 	}
 	
 }

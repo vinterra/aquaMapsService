@@ -40,13 +40,13 @@ public class Env_PrimProd extends EnvEngine {
 */
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			if (cell.getFieldbyName(HCAF_DFields.PrimProdMean+"").getValue() != null && 
-				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
+			if (cell.getFieldbyName(HCAF_DFields.primprodmean+"").getValue() != null && 
+				Double.parseDouble(cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
 		
-		this.fillData(filterCells, HCAF_DFields.PrimProdMean+"");
+		this.fillData(filterCells, HCAF_DFields.primprodmean+"");
 		
 		this.prodMin = this.getMin();
 		this.prodMax = this.getMax();					
@@ -89,9 +89,9 @@ public class Env_PrimProd extends EnvEngine {
 			}
 		}
 		
-		species.getFieldbyName(HspenFields.PrimProdMin+"").setValue(""+this.prodMin);
-		species.getFieldbyName(HspenFields.PrimProdMax+"").setValue(""+this.prodMax);
-		species.getFieldbyName(HspenFields.PrimProdPrefMin+"").setValue(""+this.prodPMin);
-		species.getFieldbyName(HspenFields.PrimProdPrefMax+"").setValue(""+this.prodPMax);
+		species.getFieldbyName(HspenFields.primprodmin+"").setValue(""+this.prodMin);
+		species.getFieldbyName(HspenFields.primprodmax+"").setValue(""+this.prodMax);
+		species.getFieldbyName(HspenFields.primprodprefmin+"").setValue(""+this.prodPMin);
+		species.getFieldbyName(HspenFields.primprodprefmax+"").setValue(""+this.prodPMax);
 	}
 }

@@ -2,6 +2,14 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
 public class BadRequestException extends Exception {
 
+	public BadRequestException(String string) {
+		super(string);
+	}
+
+	public BadRequestException() {
+		super();
+	}
+
 	/**
 	 * 
 	 */

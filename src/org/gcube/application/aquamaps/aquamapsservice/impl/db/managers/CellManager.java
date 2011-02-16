@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
 import org.gcube.application.aquamaps.stubs.dataModel.Cell;
@@ -19,15 +18,14 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.AreaType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.OccurrenceCellsFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CellManager {
 
-	private static String occurrenceCells="occurrenceCells";
-	public static String HCAF_S="HCAF_S";
+	private static String occurrenceCells="occurrencecells";
+	public static String HCAF_S="hcaf_s";
 	
 	private static final GCUBELog logger=new GCUBELog(CellManager.class);
 	
@@ -35,7 +33,7 @@ public class CellManager {
 	public static Set<Cell> getCells(List<Field> filters, boolean fetchGoodCells, String speciesID, boolean fetchEnvironment, int HCAFId) throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			Set<Cell> toReturn=loadRS(session.executeFilteredQuery(filters, HCAF_S,null,null));
 			
 			if(fetchEnvironment)
@@ -59,7 +57,7 @@ public class CellManager {
 	public static String getJSONCells(String orderBy, String orderDir, int limit, int offset) throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 		return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), HCAF_S, orderBy, orderDir), offset, offset+limit);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
@@ -68,9 +66,9 @@ public class CellManager {
 	public static String getJSONOccurrenceCells(String speciesId, String orderBy, String orderDir, int limit, int offset) throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			List<Field> filter=new ArrayList<Field>();
-			filter.add(new Field(SpeciesOccursumFields.SpeciesID+"",speciesId,FieldType.STRING));
+			filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesId,FieldType.STRING));
 		return DBUtils.toJSon(session.executeFilteredQuery(filter, occurrenceCells, orderBy, orderDir), offset, offset+limit);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
@@ -79,20 +77,20 @@ public class CellManager {
 //		throw new Exception("not implemented");
 //	}
 	
-	public static String filterCellByFaoAreas(String newName,String sourceTable){
-	return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
-		" where "+sourceTable+"."+HSPECFields.FAOAreaM+" = ? ) ";
-	}	
-	
-	public static String filterCellByLMEAreas(String newName,String sourceTable){
-		return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
-			" where "+sourceTable+"."+HSPECFields.LME+" = ? ) ";
-		}
-	public static String filterCellByEEZAreas(String newName,String sourceTable){
-		return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
-			" where find_in_set( ? , "+sourceTable+"."+HSPECFields.EEZAll+")) ";
-		}
-	
+//	public static String filterCellByFaoAreas(String newName,String sourceTable){
+//	return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
+//		" where "+sourceTable+"."+HSPECFields.FAOAreaM+" = ? ) ";
+//	}	
+//	
+//	public static String filterCellByLMEAreas(String newName,String sourceTable){
+//		return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
+//			" where "+sourceTable+"."+HSPECFields.LME+" = ? ) ";
+//		}
+//	public static String filterCellByEEZAreas(String newName,String sourceTable){
+//		return "INSERT IGNORE INTO "+newName+" ( Select "+sourceTable+".* from "+sourceTable+
+//			" where find_in_set( ? , "+sourceTable+"."+HSPECFields.EEZAll+")) ";
+//		}
+//	
 	private static Set<Cell> loadRS(ResultSet rs) throws SQLException{
 		HashSet<Cell> toReturn=new HashSet<Cell>();
 		List<List<Field>> rows=DBUtils.toFields(rs);
@@ -117,9 +115,12 @@ public class CellManager {
 	private static Set<Cell> loadEnvironmentData(int HCAFId, Set<Cell> toUpdate)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			String HCAFName=SourceManager.getSourceName(ResourceType.HCAF, HCAFId);
-			PreparedStatement ps=session.preparedStatement("Select * from "+HCAFName+" where "+HCAF_SFields.CSquareCode+" = ?");
+			List<Field> filter=new ArrayList<Field>();
+			filter.add(new Field(HCAF_SFields.csquarecode+"","",FieldType.STRING));
+			PreparedStatement ps=session.getPreparedStatementForQuery(filter, HCAFName,null,null);
+//			PreparedStatement ps=session.preparedStatement("Select * from "+HCAFName+" where "+HCAF_SFields.CSquareCode+" = ?");
 			for(Cell c: toUpdate){
 				ps.setString(1,c.getCode());
 				c.attributesList.addAll(DBUtils.toFields(ps.executeQuery()).get(0));
@@ -132,8 +133,12 @@ public class CellManager {
 	private static Set<Cell> loadGoodCellsData(String SpeciesID, Set<Cell> toUpdate)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select * from "+occurrenceCells+" where "+HCAF_SFields.CSquareCode+" = ? AND "+SpeciesOccursumFields.SpeciesID+" =?");
+			session=DBSession.getInternalDBSession();
+			List<Field> filter=new ArrayList<Field>();
+			filter.add(new Field(HCAF_SFields.csquarecode+"","",FieldType.STRING));
+			filter.add(new Field(SpeciesOccursumFields.speciesid+"","",FieldType.STRING));
+			PreparedStatement ps=session.getPreparedStatementForQuery(filter, occurrenceCells,null,null);
+//			PreparedStatement ps=session.preparedStatement("Select * from "+occurrenceCells+" where "+HCAF_SFields.CSquareCode+" = ? AND "+SpeciesOccursumFields.SpeciesID+" = ?");
 			ps.setString(2,SpeciesID);
 			for(Cell c: toUpdate){
 				ps.setString(1,c.getCode());
@@ -147,23 +152,23 @@ public class CellManager {
 	public static Set<Cell> getGoodCells(BoundingBox bb, List<Area> areas, String speciesID, int hcafId)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			List<Field> cellFilter=new ArrayList<Field>();
-			cellFilter.add(new Field(SpeciesOccursumFields.SpeciesID+"",speciesID,FieldType.STRING));
-			Set<Cell> toReturn = loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.CSquareCode+"", "ASC"));
+			cellFilter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
+			Set<Cell> toReturn = loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.csquarecode+"", "ASC"));
 			
 			for(Cell c : toReturn){
 				//Cehcking BB
 				try{
-				float latitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.CenterLat+"").getValue());
-				float longitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.CenterLong+"").getValue());
+				float latitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.centerlat+"").getValue());
+				float longitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.centerlong+"").getValue());
 				if((latitude-0.25<bb.getS())||(latitude+0.25>bb.getN())||(longitude-0.25<bb.getE())||(longitude+0.25>bb.getW()))
 						toReturn.remove(c);
 				//Checking A
-				Area areaM=new Area(AreaType.FAO,c.getFieldbyName(OccurrenceCellsFields.FAOAreaM+"").getValue());
+				Area areaM=new Area(AreaType.FAO,c.getFieldbyName(OccurrenceCellsFields.faoaream+"").getValue());
 				if((areas.size()>0)&&(!areas.contains(areaM))) toReturn.remove(c);
 				}catch(Exception e){
-					logger.error("Unable to evaluate Cell "+c.getFieldbyName(HCAF_SFields.CSquareCode+"").getValue());
+					logger.error("Unable to evaluate Cell "+c.getFieldbyName(HCAF_SFields.csquarecode+"").getValue());
 					throw e;
 				}
 			}
@@ -179,8 +184,11 @@ public class CellManager {
 	private static Set<Cell> loadCells(String[] ids)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
-			PreparedStatement ps=session.preparedStatement("Select * from "+HCAF_S+" where "+HCAF_SFields.CSquareCode+" = ?");
+			session=DBSession.getInternalDBSession();
+			List<Field> filter=new ArrayList<Field>();
+			filter.add(new Field(HCAF_SFields.csquarecode+"","",FieldType.STRING));
+//			PreparedStatement ps=session.preparedStatement("Select * from "+HCAF_S+" where "+HCAF_SFields.CSquareCode+" = ?");
+			PreparedStatement ps=session.getPreparedStatementForQuery(filter, HCAF_S,null,null);
 			Set<Cell> toReturn=new HashSet<Cell>();
 			for(String code:ids){
 				ps.setString(1,code);

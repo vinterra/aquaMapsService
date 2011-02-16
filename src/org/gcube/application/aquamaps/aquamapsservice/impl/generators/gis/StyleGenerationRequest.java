@@ -2,8 +2,20 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
 import java.awt.Color;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.common.core.utils.logging.GCUBELog;
+
 public class StyleGenerationRequest implements GISGenerationRequest {
 
+	private static final GCUBELog logger=new GCUBELog(StyleGenerationRequest.class);
+	
+	
+	public static enum ClusterScaleType{
+		linear,logarithmic
+	}
+	
+	
 	private String nameStyle; 
 	private  String attributeName; 
 	private  int nClasses; 
@@ -12,6 +24,26 @@ public class StyleGenerationRequest implements GISGenerationRequest {
 	private  Class typeValue;
 	private  String max;
 	private  String min;
+	private  ClusterScaleType clusterScaleType;  
+	
+	
+	public static StyleGenerationRequest getBiodiversityStyle(int min,int max, ClusterScaleType type, String mapName){
+		StyleGenerationRequest toReturn= new StyleGenerationRequest();
+		toReturn.setAttributeName(AquaMapsManager.maxSpeciesCountInACell);
+		toReturn.setNameStyle(ServiceUtils.generateId(mapName, type+"Style"));
+		toReturn.setC1(Color.YELLOW);
+		toReturn.setC2(Color.RED);
+		toReturn.setClusterScaleType(type);
+		toReturn.setMax(String.valueOf(max));
+		toReturn.setMin(String.valueOf(min));
+		int Nclasses=((max-min)>4)?5:max-min;
+		logger.debug("Found "+Nclasses+" classes for style (min : "+min+", max : "+max+")");
+		toReturn.setNClasses(Nclasses);
+		toReturn.setTypeValue(Integer.class);
+		return toReturn;
+	}
+	
+	
 	/**
 	 * @return the nameStyle
 	 */
@@ -107,6 +139,12 @@ public class StyleGenerationRequest implements GISGenerationRequest {
 	 */
 	public void setMin(String min) {
 		this.min = min;
+	}
+	public void setClusterScaleType(ClusterScaleType clusterScaleType) {
+		this.clusterScaleType = clusterScaleType;
+	}
+	public ClusterScaleType getClusterScaleType() {
+		return clusterScaleType;
 	}
 	
 }

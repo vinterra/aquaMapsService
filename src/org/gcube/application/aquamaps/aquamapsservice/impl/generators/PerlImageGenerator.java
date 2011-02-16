@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
-public class PerlImageGenerator {
+public class PerlImageGenerator implements Generator{
 	private static GCUBELog logger= new GCUBELog(PerlImageGenerator.class);
 	
 
@@ -22,24 +22,6 @@ public class PerlImageGenerator {
 	
 	public PerlImageGenerator(ImageGeneratorRequest req) {		
 		request=req;
-	}
-	
-	public boolean generate() throws IOException{
-		int result=generateImages(request.getClusterFile());
-		return (result==0);
-		
-//		return dummyProcess(request.getFile());
-	}
-	
-	
-	private static int dummyProcess(String file){
-		try {
-			logger.debug("Executing.."+file);
-			Thread.sleep(5*1000);
-		} catch (InterruptedException e) {
-			logger.debug("Done"+file);
-		}
-		return 0;
 	}
 	
 	
@@ -75,10 +57,18 @@ public class PerlImageGenerator {
 		return request;
 	}
 
-	/**
-	 * @param request the request to set
-	 */
-	public void setRequest(ImageGeneratorRequest request) {
-		this.request = request;
+	
+
+	public boolean getResponse() throws Exception {
+		if(request==null) throw new Exception("No request setted");
+		int result=generateImages(request.getClusterFile());
+		return (result==0);
+	}
+
+	public void setRequest(GenerationRequest theRequest)
+			throws BadRequestException {
+		if(theRequest instanceof ImageGeneratorRequest)
+			this.request=(ImageGeneratorRequest) theRequest;
+		else throw new BadRequestException();
 	}
 }

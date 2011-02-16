@@ -7,25 +7,17 @@ import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SubmittedFields;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
-@XStreamAlias("Submitted")
 public class Submitted {
 
 	
-	@XStreamAsAttribute
 	private Integer searchId;
-	@XStreamAsAttribute
 	private String title;
 	private String author;
 	private Integer jobId;
 	private String selectionCriteria;
 	private String date;
-	@XStreamAsAttribute
 	private SubmittedStatus status=SubmittedStatus.Pending;
 	private ObjectType type;
-	@XStreamAsAttribute
 	private Boolean isAquaMap;
 	private Boolean saved;
 	private Integer sourceHCAF;
@@ -137,15 +129,15 @@ public class Submitted {
 			obj.setAuthor(rs.getString(SubmittedFields.author.toString()));
 			obj.setDate(rs.getString(SubmittedFields.date.toString()));
 			obj.setGis(rs.getString(SubmittedFields.gis.toString()));
-			obj.setIsAquaMap(rs.getBoolean(SubmittedFields.isAquaMap.toString()));
+			obj.setIsAquaMap(rs.getBoolean(SubmittedFields.isaquamap.toString()));
 			obj.setJobId(rs.getInt(SubmittedFields.jobid.toString()));
-			obj.setMapId(rs.getInt(SubmittedFields.mapId.toString()));
+			obj.setMapId(rs.getInt(SubmittedFields.mapid.toString()));
 			obj.setSaved(rs.getBoolean(SubmittedFields.saved.toString()));
-			obj.setSearchId(rs.getInt(SubmittedFields.searchId.toString()));
-			obj.setSelectionCriteria(rs.getString(SubmittedFields.selectionCriteria.toString()));
-			obj.setSourceHCAF(rs.getInt(SubmittedFields.sourceHCAF.toString()));
-			obj.setSourceHSPEC(rs.getInt(SubmittedFields.sourceHSPEC.toString()));
-			obj.setSourceHSPEN(rs.getInt(SubmittedFields.sourceHCAF.toString()));
+			obj.setSearchId(rs.getInt(SubmittedFields.searchid.toString()));
+			obj.setSelectionCriteria(rs.getString(SubmittedFields.selectioncriteria.toString()));
+			obj.setSourceHCAF(rs.getInt(SubmittedFields.sourcehcaf.toString()));
+			obj.setSourceHSPEC(rs.getInt(SubmittedFields.sourcehspec.toString()));
+			obj.setSourceHSPEN(rs.getInt(SubmittedFields.sourcehcaf.toString()));
 			obj.setStatus(SubmittedStatus.valueOf(rs.getString(SubmittedFields.status.toString())));
 			obj.setTitle(rs.getString(SubmittedFields.title.toString()));
 			obj.setType(ObjectType.valueOf(rs.getString(SubmittedFields.type.toString())));

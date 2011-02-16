@@ -5,17 +5,10 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
-@XStreamAlias("Cell")
 public class Cell {
 	
 	
-	@XStreamAsAttribute
  	private String cSquareCode;
-	@XStreamOmitField
  	public List<Field> attributesList=new ArrayList<Field>();
  	
  	public Cell(String code){this.cSquareCode=code;}
@@ -43,7 +36,7 @@ public class Cell {
 	public Cell(List<Field> initFields){
 		this("DUMMYCODE");
 		attributesList.addAll(initFields);
-		this.setCode(this.getFieldbyName(HCAF_SFields.CSquareCode+"").getValue());
+		this.setCode(this.getFieldbyName(HCAF_SFields.csquarecode+"").getValue());
 	}
 	
 	
@@ -51,7 +44,7 @@ public class Cell {
 	public String toXML(){
 		StringBuilder toReturn=new StringBuilder();
 		toReturn.append("<Cell>");
-		toReturn.append("<"+HCAF_SFields.CSquareCode+">"+cSquareCode+"</"+HCAF_SFields.CSquareCode+">");
+		toReturn.append("<"+HCAF_SFields.csquarecode+">"+cSquareCode+"</"+HCAF_SFields.csquarecode+">");
 		toReturn.append("<Attributes>");
 		for(Field field:attributesList) toReturn.append(field.toXML());
 		toReturn.append("</Attributes>");

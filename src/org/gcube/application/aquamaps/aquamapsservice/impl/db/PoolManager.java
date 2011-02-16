@@ -14,15 +14,15 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 public class PoolManager {
 
 	public static enum DBType{
-		mySql,postGIS
+		mySql,postgreSQL
 	}
 	
-	private static GenericObjectPool mySqlconnectionPool; 
-	private static ConnectionFactory mySqlconnectionFactory;
-	private static PoolableConnectionFactory mySqlpoolableConnectionFactory;
-	private static PoolingDriver mySqldriver;
+	private static GenericObjectPool internalDBconnectionPool; 
+	private static ConnectionFactory internalDBconnectionFactory;
+	private static PoolableConnectionFactory internalDBpoolableConnectionFactory;
+	private static PoolingDriver internalDBdriver;
 	
-	private static final String mySqlPoolName="mySqlPool";
+	private static final String internalDBPoolName="mySqlPool";
 	private static final String postGISPoolName="postGISPool";
 	//TODO load from properties 
 	
@@ -35,25 +35,39 @@ public class PoolManager {
 	
 	private static String validationQUERY="Select 1";
 	
+	private static String internalDBconnectionString=null; 
+	
+	
 	static{
 		//MYSQL
 		
+		
+		
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			switch(ServiceContext.getContext().getInternalDBType()){
+			case mySql:Class.forName("com.mysql.jdbc.Driver");
+						internalDBconnectionString="jdbc:mysql://"+ServiceContext.getContext().getInternalDBHost()+":"+ServiceContext.getContext().getInternalDBPort()+"/"+ServiceContext.getContext().getInternalDBName();
+			break;
+			case postgreSQL:Class.forName("org.postgresql.Driver");
+			internalDBconnectionString="jdbc:postgresql://"+ServiceContext.getContext().getInternalDBHost()+":"+ServiceContext.getContext().getInternalDBPort()+"/"+ServiceContext.getContext().getInternalDBName();
+			break;
+			default : throw new ClassNotFoundException("Not Valid internal DB Type "+ServiceContext.getContext().getInternalDBType());
+			}
+			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		mySqlconnectionPool = new GenericObjectPool(null);
-		mySqlconnectionPool.setMaxActive(30);
-		mySqlconnectionPool.setTestOnBorrow(true);
-		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
+		internalDBconnectionPool = new GenericObjectPool(null);
+		internalDBconnectionPool.setMaxActive(30);
+		internalDBconnectionPool.setTestOnBorrow(true);
+		internalDBconnectionFactory = new DriverManagerConnectionFactory(internalDBconnectionString,  ServiceContext.getContext().getInternalDbUsername(), ServiceContext.getContext().getInternalDbPassword());
 		
 //		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://wn06.research-infrastructures.eu:3306/aquamaps_DB",  "root", "mybohemian");
-		mySqlpoolableConnectionFactory = new PoolableConnectionFactory(mySqlconnectionFactory,mySqlconnectionPool,
+		internalDBpoolableConnectionFactory = new PoolableConnectionFactory(internalDBconnectionFactory,internalDBconnectionPool,
 				new StackKeyedObjectPoolFactory(),validationQUERY,false,true);
-		mySqldriver = new PoolingDriver();
-		mySqldriver.registerPool(mySqlPoolName,mySqlconnectionPool);
+		internalDBdriver = new PoolingDriver();
+		internalDBdriver.registerPool(internalDBPoolName,internalDBconnectionPool);
 		
 		//POSTGIS
 		
@@ -78,12 +92,14 @@ public class PoolManager {
 	}
 	
 	
-	public static Connection getConnection(DBType type)throws Exception{
-		switch(type){
-		case mySql : return DriverManager.getConnection("jdbc:apache:commons:dbcp:"+mySqlPoolName);
-		case postGIS : return DriverManager.getConnection("jdbc:apache:commons:dbcp:"+postGISPoolName);
-		}
-		throw new Exception("wrong type "+type.toString());
+	public static Connection getInternalDBConnection()throws Exception{
+		return DriverManager.getConnection("jdbc:apache:commons:dbcp:"+internalDBPoolName);
 	}
+	public static Connection getPostGisDBConnection()throws Exception{
+		return DriverManager.getConnection("jdbc:apache:commons:dbcp:"+postGISPoolName);
+	}
+	
+	
+	public static String getInternalConnectionString(){return internalDBconnectionString;}
 	
 }

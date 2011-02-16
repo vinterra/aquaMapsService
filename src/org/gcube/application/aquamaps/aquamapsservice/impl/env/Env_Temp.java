@@ -29,7 +29,7 @@ public class Env_Temp extends EnvEngine{
 	public void re_computes(Species species, Set<Cell> goodCells) throws Exception {
 		
 		String fld;
-		if (species.getFieldbyName(HspenFields.Layer+"").getValue().contentEquals("b")) fld = "SBTAnMean";		
+		if (species.getFieldbyName(HspenFields.layer+"").getValue().contentEquals("b")) fld = "SBTAnMean";		
 		else fld = "SSTAnMean"; //s
 /*
 		String strSQL="SELECT DISTINCT "+ocVar+".CsquareCode, "+ocVar+".SpeciesID, HCAF."+fld;
@@ -46,7 +46,7 @@ public class Env_Temp extends EnvEngine{
 			
 			if (cell.getFieldbyName(fld).getValue() != null &&
 					Double.parseDouble(cell.getFieldbyName(fld).getValue()) != -9999 &&
-					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.OceanArea+"").getValue()) > 0) {
+					Double.parseDouble(cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValue()) > 0) {
 				filterCells.add(cell);
 			}
 		}
@@ -102,9 +102,9 @@ public class Env_Temp extends EnvEngine{
 		//check if envelope is as broad as pre-defined minimum
 		if (tempPMax >= 25)	tempMax = tempPMax + 4.2;
 		
-		species.getFieldbyName(HspenFields.TempMin+"").setValue(""+this.tempMin);
-		species.getFieldbyName(HspenFields.TempMax+"").setValue(""+this.tempMax);
-		species.getFieldbyName(HspenFields.TempPrefMin+"").setValue(""+this.tempPMin);
-		species.getFieldbyName(HspenFields.TempPrefMax+"").setValue(""+this.tempPMax);
+		species.getFieldbyName(HspenFields.tempmin+"").setValue(""+this.tempMin);
+		species.getFieldbyName(HspenFields.tempmax+"").setValue(""+this.tempMax);
+		species.getFieldbyName(HspenFields.tempprefmin+"").setValue(""+this.tempPMin);
+		species.getFieldbyName(HspenFields.tempprefmax+"").setValue(""+this.tempPMax);
 	}
 }

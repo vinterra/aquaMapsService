@@ -15,11 +15,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-
-@XStreamAlias("AquaMapsObject")
 public class AquaMapsObject {
 
 	public static class Tags{
@@ -40,25 +36,18 @@ public class AquaMapsObject {
 
 
 
-	@XStreamAsAttribute
 	private int id;	
-	@XStreamAsAttribute
 	private String name;
-	@XStreamAsAttribute
 	private String author;
-	@XStreamAsAttribute
 	private SubmittedStatus status=SubmittedStatus.Pending;
-	@XStreamAsAttribute
 	private String date;
 	
 	private Boolean gis=false;
 	private String layerId;
 	private ObjectType type=ObjectType.Biodiversity;
 	
-	@XStreamAlias("SpeciesCoverage")
 	
 	private Set<Species> selectedSpecies=new HashSet<Species>();
-	@XStreamAlias("RelatedFiles")
 	private List<File> relatedResources=new ArrayList<File>();
 	private float threshold=0.5f;	
 	private BoundingBox boundingBox=new BoundingBox();

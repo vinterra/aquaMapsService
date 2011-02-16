@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
 import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
@@ -26,15 +27,15 @@ public class SpeciesManager {
 
 	private static GCUBELog logger= new GCUBELog(SpeciesManager.class);
 	public static final String speciesOccurSum="speciesoccursum";
-	public static final String GOOD_CELLS="occurrenceCells";
+	public static final String GOOD_CELLS="occurrencecells";
 	
 	
 	public static Species getSpeciesById(boolean fetchStatic,boolean fetchEnvelope, String id, int hspenId) throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			List<Field> filters=new ArrayList<Field>();
-			filters.add(new Field(SpeciesOccursumFields.SpeciesID+"", id, FieldType.STRING));
+			filters.add(new Field(SpeciesOccursumFields.speciesid+"", id, FieldType.STRING));
 			Species toReturn=new Species(id);
 			if(fetchStatic){
 				List<Field> row=DBUtils.toFields(session.executeFilteredQuery(filters, speciesOccurSum,null,null)).get(0);
@@ -53,7 +54,7 @@ public class SpeciesManager {
 	public static Set<Species> getList(List<Field> filters)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			return loadRS(session.executeFilteredQuery(filters, speciesOccurSum,null,null));
 		}catch(Exception e){throw e;}
 		finally{session.close();}
@@ -64,7 +65,7 @@ public class SpeciesManager {
 		queries=formfilterQueries(characteristics, names, codes, selHspen);
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			ResultSet rs=session.executeQuery(queries[1]);
 			rs.next();
 			int totalCount=rs.getInt(1);
@@ -129,12 +130,43 @@ public class SpeciesManager {
 			filter.append("( "+codesFilter.toString()+")");			
 		}
 		
-		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.SpeciesID+" = "+selHspen+"."+SpeciesOccursumFields.SpeciesID:"");
+		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+" = "+selHspen+"."+SpeciesOccursumFields.speciesid:"");
 		String query= "Select "+speciesOccurSum+".* "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
-		String count= "Select count("+speciesOccurSum+"."+SpeciesOccursumFields.SpeciesID+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
+		String count= "Select count("+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		logger.trace("filterSpecies: "+query);
 		logger.trace("filterSpecies: "+count);
 		return new String[] {query,count};		
+	}
+	
+	
+	public static String getFilteredHSPEN(String sourceHSPEN, Set<Species> toInsert)throws Exception{
+		DBSession session=null;
+		String tmpHspen=null;
+		logger.trace("Filtering "+sourceHSPEN);
+		try{
+			session=DBSession.getInternalDBSession();
+			tmpHspen=ServiceUtils.generateId("filteredhspen", "");
+			session.createLikeTable(tmpHspen,sourceHSPEN);
+			logger.trace("going to fill table "+tmpHspen);
+			List<Field> condition=new ArrayList<Field>();
+			condition.add(new Field(SpeciesOccursumFields.speciesid+"","",FieldType.STRING));
+			PreparedStatement ps=session.getPreparedStatementForInsertFromSelect(condition, tmpHspen, sourceHSPEN);
+			int count=0;
+			for(Species s: toInsert){
+				ps.setString(1, s.getId());
+				int inserted=ps.executeUpdate();
+				if(inserted==0)logger.warn("Species ID : "+s.getId()+" hasn't been inserted");
+				else count+=inserted;
+			}
+			logger.trace("Inserted "+count+"/"+toInsert.size()+" species");
+			return tmpHspen;
+		}catch(Exception e){
+			logger.error("Unable to filter against species selection");
+			if(tmpHspen!=null) session.dropTable(tmpHspen);
+			throw e;
+		}finally{
+			session.close();			
+		}
 	}
 	
 	
@@ -154,7 +186,7 @@ public class SpeciesManager {
 			toReturn.append(getCompleteName(hspenTable,settings.getKey())+" = "+settings.getValue().getPerturbationValue()+" , ");
 		}
 		toReturn.deleteCharAt(toReturn.lastIndexOf(","));
-		toReturn.append(" WHERE "+SpeciesOccursumFields.SpeciesID+"= '"+speciesId+"'");
+		toReturn.append(" WHERE "+SpeciesOccursumFields.speciesid+"= '"+speciesId+"'");
 		
 		return toReturn.toString();
 	}
@@ -165,7 +197,7 @@ public class SpeciesManager {
 		for(List<Field> row:rows){
 			Species toAdd=new Species("***");
 			toAdd.attributesList.addAll(row);
-			toAdd.setId(toAdd.getFieldbyName(SpeciesOccursumFields.SpeciesID+"").getValue());
+			toAdd.setId(toAdd.getFieldbyName(SpeciesOccursumFields.speciesid+"").getValue());
 			toReturn.add(toAdd);
 		}
 		return toReturn;

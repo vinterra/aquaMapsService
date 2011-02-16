@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.csv4j.CSVLineProcessor;
@@ -16,13 +17,14 @@ import net.sf.csv4j.CSVReaderProcessor;
 import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.SourceGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.dataModel.Field;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -44,7 +46,7 @@ public class SourceGenerationThread extends Thread {
 		String sourcesFileName=dir.getAbsolutePath()+File.separator+ServiceUtils.generateId("", ".txt");
 		String outputFileName=ServiceUtils.generateId("", "");
 		String csvFileName=outputFileName+".csv";
-		String appTable=ServiceUtils.generateId("HCAFapp", "");
+		String appTable=ServiceUtils.generateId("hcafapp", "");
 		DBSession session=null;
 		try{
 			logger.trace("Started generation Source for requestId : "+requestId);
@@ -82,12 +84,12 @@ public class SourceGenerationThread extends Thread {
 			
 			logger.trace("Creating appTable");
 			
-			session=DBSession.openSession(DBType.mySql);
+			session=DBSession.getInternalDBSession();
 			session.createTable(appTable, new String[]{
 					"CsquareCode varchar(10)",
 					"PrimProdMean int(11)",
 					"primary key (CsquareCode)"
-			}, DBSession.ENGINE.MyISAM);
+			});
 			logger.trace("Importing data from "+csvFileName);
 			long startImport=System.currentTimeMillis();
 			importCSVToAPP(appTable, csvFileName);
@@ -98,7 +100,7 @@ public class SourceGenerationThread extends Thread {
 			//************** MERGING
 			
 			String targetHCAFName=SourceGenerationManager.getGeneratedHCAFName(requestId);
-			String targetHCAFTable=ServiceUtils.generateId("HCAF", "");
+			String targetHCAFTable=ServiceUtils.generateId("hcaf", "");
 			int sourceHCAFId=SourceGenerationManager.getSourceId(requestId);
 			String sourceHCAFName=SourceManager.getSourceName(ResourceType.HCAF, sourceHCAFId);
 			
@@ -114,7 +116,7 @@ public class SourceGenerationThread extends Thread {
 				sourceHCAFName+".SalinityMean, "+	sourceHCAFName+".SalinitySD, "+sourceHCAFName+".SalinityMax, "+sourceHCAFName+".SalinityMin, "+sourceHCAFName+".SalinityBMean, "+
 				appTable+".PrimProdMean, "+
 				sourceHCAFName+".IceConAnn, "+		sourceHCAFName+".IceConSpr, "+sourceHCAFName+".IceConSum, "+sourceHCAFName+".IceConFal, "+sourceHCAFName+".IceConWin "+
-				"from "+sourceHCAFName+" inner join "+appTable+" on "+sourceHCAFName+".CsquareCode = "+appTable+".CsquareCode )";
+				"from "+sourceHCAFName+" INNER JOIN "+appTable+" on "+sourceHCAFName+".CsquareCode = "+appTable+".CsquareCode )";
 			logger.trace("Query is "+insertionQuery);
 			session.executeUpdate(insertionQuery);
 			long mergedCount=session.getTableCount(targetHCAFTable);
@@ -156,8 +158,13 @@ public class SourceGenerationThread extends Thread {
 		processor.setHasHeader(true);		
 		DBSession session=null;
 		try{
-			session=DBSession.openSession(DBType.mySql);
-		final PreparedStatement ps = session.getPreparedStatementForInsert(2, appTableName);				
+			session=DBSession.getInternalDBSession();
+			List<Field> columns= new ArrayList<Field>();
+			columns.add(new Field("csquarecode","",FieldType.STRING));
+			columns.add(new Field("mean","",FieldType.STRING));
+			
+			
+		final PreparedStatement ps = session.getPreparedStatementForInsert(columns, appTableName);				
 		Reader reader= new InputStreamReader(new FileInputStream(csvFile), Charset.defaultCharset());
 		processor.processStream(reader , new CSVLineProcessor(){
 			int csquareCodeIndex=0;

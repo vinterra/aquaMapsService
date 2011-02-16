@@ -3,23 +3,35 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.OccurrenceCellsFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 /**
  * 
@@ -30,200 +42,469 @@ public class HSPECGenerator {
 
 	private static GCUBELog logger= new GCUBELog(HSPECGenerator.class);
 
-	private String hcafViewTable;
+	private static final Map<EnvelopeFields,Boolean> defaultWeights=new HashMap<EnvelopeFields, Boolean>();
+
+	static{
+		defaultWeights.put(EnvelopeFields.Depth, ServiceContext.getContext().isEvaluateDepth());
+		defaultWeights.put(EnvelopeFields.IceConcentration, ServiceContext.getContext().isEvaluateIceConcentration());
+		defaultWeights.put(EnvelopeFields.LandDistance, ServiceContext.getContext().isEvaluateLandDistance());
+		defaultWeights.put(EnvelopeFields.PrimaryProduction, ServiceContext.getContext().isEvaluatePrimaryProduction());
+		defaultWeights.put(EnvelopeFields.Salinity, ServiceContext.getContext().isEvaluateSalinity());
+		defaultWeights.put(EnvelopeFields.Temperature, ServiceContext.getContext().isEvaluateTemperature());
+	}
+
+	public static enum GENERATION_MODE{
+		COMPLETE,LAZY
+	}
+
+	private GENERATION_MODE mode;
+
+	//******** GENERAL PARAMETERS
+	
+	private String hcafViewTable=null;
 	private String hcafStaticTable;
 	private String hcafDynamicTable;
 	private String hspenTable;
-	private String hspecTable;
-	private String resultsTable;
-	private String occurenceCellsTable;
-	private int jobId;
+//	private String resultsTable=null;
+	private String resultsNative=null;
+	private String resultsSuitable=null;
 	
-	private Map<String,Map<EnvelopeFields,Field>> jobWeights; 
+	private String occurenceCellsTable;
+	private String occurrenceCellsViewTable=null;
+	private String hspecTableStructure=SourceManager.getSourceName(ResourceType.HSPEC, SourceManager.getDefaultId(ResourceType.HSPEC));
 
 	
+	//******** LAZY MODE PARAMETERS
+
+	private String hspecNativeTable=null;
+	private String hspecSuitableTable=null;
+	
+	
+	private int jobId;
+
+	private Map<String,Map<EnvelopeFields,Field>> jobWeights; 
+
+
+	//******* GENERATION Variables
+	
+	Set<String> toGenerateSpeciesIds=new HashSet<String>();
+
+	private DBSession session;
+
+	private DecimalFormat formatter = new DecimalFormat("0.00");
+
+	private long startGeneration= System.currentTimeMillis();
+
+	private ResultSet hspenRes;
+	private ResultSet hcafRes;
+	
+
+	private long hspenLoops=0;
+
+	private PreparedStatement psInsertSuitable;
+	private PreparedStatement psInsertNative;
+
+	private PreparedStatement psBound;
+	
+	private PreparedStatement psSeaIce;
+	
+	private int insertedNativeCellCount=0;
+	private int insertedSuitableCellCount=0;
+
+//	private boolean suitableRange=false;
+	
+	private boolean generateSuitable=false;
+	private boolean generateNative=false;
+	
+
+	private String currentSpeciesID;
+
+	private Map<EnvelopeFields,Boolean> currentWeights;
+
+	private PreparedStatement psCopyNative;
+	private PreparedStatement psCopySuitable;
+
+	private List<Field> probabilityRow=new ArrayList<Field>();
+	
+	
+	//*** CONSTRUCTORS
+	//TODO change for allow suitable/native 
+
 	public HSPECGenerator(int jobId,String HCAF_D,String HCAF_S,String HSPEN,Map<String,Map<EnvelopeFields,Field>> envelopeWeights) throws Exception {
 		super();
-		this.hcafViewTable = ServiceUtils.generateId("HCAF", "");
 		this.hcafDynamicTable=HCAF_D;
 		this.hcafStaticTable=HCAF_S;
 		this.hspenTable = HSPEN;
-		this.hspecTable = SourceManager.getSourceName(ResourceType.HSPEC, SourceManager.getDefaultId(ResourceType.HSPEC));
+		this.hspecNativeTable= SourceManager.getSourceName(ResourceType.HSPEC, JobManager.getHSPECTableId(jobId));
 		this.occurenceCellsTable = SpeciesManager.GOOD_CELLS;
 		this.jobId=jobId;
-
 		this.jobWeights=envelopeWeights;
-
-
-		this.resultsTable= ServiceUtils.generateId("HSPEC", "");
+		this.generateNative=true;
+		this.generateSuitable=false;
+		this.mode=GENERATION_MODE.LAZY;
 	}
 
 
+	public HSPECGenerator(String hcaf_d,String hspen,boolean generateNative,boolean generateSuitable)throws Exception{
+		super();
+		
+		
+		this.hcafDynamicTable=hcaf_d;
+		this.hcafStaticTable=CellManager.HCAF_S;
+		this.hspenTable=hspen;
+		this.occurenceCellsTable=SpeciesManager.GOOD_CELLS;
+		currentWeights=defaultWeights;
+		
+		this.generateNative=generateNative;
+		this.generateSuitable=generateSuitable;
+		
+		if(generateNative==false && generateSuitable==false) throw new Exception("Both native and suitable option where false!!");
+		
+		this.mode=GENERATION_MODE.COMPLETE;	
+		
+		logger.trace("Created new Generator ");
+		logger.trace("Mode : "+mode);
+		logger.trace("HCAF_D :"+hcafDynamicTable);
+		logger.trace("HSPEC  :"+hspecTableStructure);
+		logger.trace("HSPEN  :"+hspenTable);
+		logger.trace("generate suitable :"+generateSuitable);
+		logger.trace("generate Native :"+generateNative);
+		logger.trace("Weight Settings :");
+		for(Entry<EnvelopeFields,Boolean> w:currentWeights.entrySet())
+			logger.trace(w.getKey()+" : "+w.getValue());
+		
+	}
+
+	
+	public String getNativeTable(){return resultsNative;}
+	public String getSuitableTable(){return resultsSuitable;}
+	
+	//************* GENERATION
 
 
-
-
+	
+	
+	
 	/**
 	 * 
 	 * @return
 	 * @throws Exception
 	 */
-	public String generate() throws Exception{
-		DBSession session = null;
+	public void generate() throws Exception{
+		logger.trace("Started Generation");
+		
 		long generationStart= System.currentTimeMillis();
-		Set<String> toGenerateSpeciesIds=new HashSet<String>();
-		for(String id: JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate)) toGenerateSpeciesIds.add(id);
-		if((toGenerateSpeciesIds.size()>0)){
+
+		if(mode.equals(GENERATION_MODE.LAZY))
+			for(String id: JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate)) toGenerateSpeciesIds.add(id);
+		
+		
+		if(mode.equals(GENERATION_MODE.COMPLETE)||(toGenerateSpeciesIds.size()>0)){
 			try{
-				session=DBSession.openSession(PoolManager.DBType.mySql);
-				long startGeneration= System.currentTimeMillis();
-				DecimalFormat formatter = new DecimalFormat("0.00");
-				session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS SELECT s.CsquareCode,s.OceanArea,s.CenterLat,s.CenterLong,s.FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean, SalinityBMean,PrimProdMean,IceConAnn,LandDist,s.EEZFirst,s.LME,d.DepthMean FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s.CSquareCode=d.CSquareCode");
-				session.createLikeTable(this.resultsTable, this.hspecTable);
-				String queryhspen="SELECT Layer,SpeciesID,FAOAreas,Pelagic,NMostLat,SMostLat,WMostLong,EMostLong,DepthMin,DepthMax,DepthPrefMin," +
-				"DepthPrefMax,TempMin,TempMax,TempPrefMin,TempPrefMax,SalinityMin,SalinityMax,SalinityPrefMin,SalinityPrefMax,PrimProdMin," +
-				"PrimProdMax,PrimProdPrefMin,PrimProdPrefMax,IceConMin,IceConMax,IceConPrefMin,IceConPrefMax,LandDistMin,LandDistMax,LandDistPrefMin,MeanDepth," +
-				"LandDistPrefMax FROM "+this.hspenTable;
-				logger.trace("species qeury is "+queryhspen);
-				ResultSet hspenRes= session.executeQuery(queryhspen);
+				session=DBSession.getInternalDBSession();
 
-				logger.trace("HSPEN query took "+(System.currentTimeMillis()-startGeneration));
-
-				//I can execute it here cause it not depends on hspen
-				long startHcafQuery= System.currentTimeMillis();
-				String hcafQuery= "SELECT CsquareCode,OceanArea,CenterLat,CenterLong,FAOAreaM,DepthMin,DepthMax,SSTAnMean,SBTAnMean,SalinityMean," +
-				"SalinityBMean,PrimProdMean,IceConAnn,LandDist,EEZFirst,LME,DepthMean	FROM "+this.hcafViewTable+" WHERE OceanArea > 0";
-				logger.trace("HCAF query is "+hcafQuery);
-				ResultSet hcafRes=session.executeQuery(hcafQuery);
-				logger.trace("HCAF query took "+(System.currentTimeMillis()-startHcafQuery));
-
-				//looping on HSPEN
-
-				Map<EnvelopeFields,Boolean> weights=new HashMap<EnvelopeFields, Boolean>();
-
-
-				int hspenLoops=1;
-				String psCopyQuery="INSERT into "+this.resultsTable+" ( Select * from "+this.hspecTable+" where "+SpeciesOccursumFields.SpeciesID+"=?)";
-				PreparedStatement psCopy=session.preparedStatement(psCopyQuery);
-				while (hspenRes.next()){
+				initTablesAndRS();
+				logger.trace("Init phase took "+(System.currentTimeMillis()-generationStart));
+				while (hspenRes.next()){					
 					long startHspenLoop= System.currentTimeMillis();
-					String speciesId= hspenRes.getString("SpeciesID");
-					if(toGenerateSpeciesIds.contains(speciesId)){
-						 
-						for(EnvelopeFields f: EnvelopeFields.values()){
-							if((jobWeights.containsKey(speciesId)))
-								weights.put(f, Boolean.parseBoolean(jobWeights.get(speciesId).get(f).getValue()));
-							else weights.put(f, true);
+					currentSpeciesID= hspenRes.getString(SpeciesOccursumFields.speciesid+"");
+
+					//****** FOR LAZY MODE if no generation needed just copy species probs
+					if(mode.equals(GENERATION_MODE.LAZY)&&!toGenerateSpeciesIds.contains(currentSpeciesID)){
+						if(generateNative){
+							psCopyNative.setString(1, currentSpeciesID);
+							if(psCopyNative.executeUpdate()==0) 
+								logger.warn("Unable to copy "+currentSpeciesID+" into "+resultsNative);
 						}
-						
-						Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLong"),hspenRes.getDouble("WMostLong"), hspenRes.getString("SpeciesID"), session);
-						hcafRes.beforeFirst();
-
-						Double preparedSeaIce= prepareSeaIceForSpecies(hspenRes.getString("SpeciesID"),hspenRes.getDouble("IceConMin"),session);
-						int i =0;
-						//looping on HCAF filter1
-						while (hcafRes.next()){
-							try{
-								boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
-								boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
-								if (inFAO && inBox){
-									//checking if weights are customized
-
-
-									Double landValue=(weights.get(EnvelopeFields.LandDistance))?1.0:1.0; //to understand why is not calculated
-									Double sstValue=(weights.get(EnvelopeFields.Temperature))?this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]):1.0;
-									Double depthValue=(weights.get(EnvelopeFields.Depth))?this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"),hspenRes.getInt("MeanDepth"),hcafRes.getDouble("DepthMean")):1.0;
-									Double salinityValue=(weights.get(EnvelopeFields.Salinity))?this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax")):1.0;
-									Double primaryProductsValue=(weights.get(EnvelopeFields.PrimaryProduction))?this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax")):1.0;
-									Double seaIceConcentration=(weights.get(EnvelopeFields.IceConcentration))?this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session):1.0;
-									Double totalCountProbability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
-
-									if (totalCountProbability>0){
-										String insertQuery = "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
-										//logger.trace("executing insertQuery "+insertQuery);
-										session.executeUpdate(insertQuery);
-										i++;
-									}
-								}
-							}catch(Exception e){logger.warn("error in data found",e);}
+						if(generateSuitable){
+							psCopySuitable.setString(1, currentSpeciesID);
+							if(psCopySuitable.executeUpdate()==0) 
+								logger.warn("Unable to copy "+currentSpeciesID+" into "+resultsSuitable);
 						}
-
-						logger.trace("inserted "+i+" entries for "+hspenRes.getString("SpeciesID")+" species id");
-
-						int k=0;
-						if (i==0) /*no entry inserted in hspec*/{
-							hcafRes.beforeFirst();
-							//looping on HCAF filter2
-							while (hcafRes.next()){
-								try{
-									boolean inFAO= this.getInFao(hcafRes.getInt("FAOAreaM"),hspenRes.getString("FAOAreas"));
-									boolean inBox= this.getInBox(hcafRes.getDouble("CenterLat"), bounds);
-									if (inFAO && !inBox){
-
-										Double landValue=(weights.get(EnvelopeFields.LandDistance))?1.0:1.0; //to understand why is not calculated
-										Double sstValue=(weights.get(EnvelopeFields.Temperature))?this.getSST(hcafRes.getDouble("SSTAnMean"), hcafRes.getDouble("SBTAnMean"), hspenRes.getDouble("TempMin"), hspenRes.getDouble("TempMax"), hspenRes.getDouble("TempPrefMin"), hspenRes.getDouble("TempPrefMax"), hspenRes.getString("Layer").toCharArray()[0]):1.0;
-										Double depthValue=(weights.get(EnvelopeFields.Depth))?this.getDepth(hcafRes.getDouble("DepthMax"), hcafRes.getDouble("DepthMin"), hspenRes.getInt("Pelagic"), hspenRes.getDouble("DepthMax"), hspenRes.getDouble("DepthMin"), hspenRes.getDouble("DepthPrefMax"), hspenRes.getDouble("DepthPrefMin"),hspenRes.getInt("MeanDepth"),hcafRes.getDouble("DepthMean")):1.0;
-										Double salinityValue=(weights.get(EnvelopeFields.Salinity))?this.getSalinity(hcafRes.getDouble("SalinityMean"), hcafRes.getDouble("SalinityBMean"), hspenRes.getString("Layer").toCharArray()[0], hspenRes.getDouble("SalinityMin"), hspenRes.getDouble("SalinityMax"), hspenRes.getDouble("SalinityPrefMin"), hspenRes.getDouble("SalinityPrefMax")):1.0;
-										Double primaryProductsValue=(weights.get(EnvelopeFields.PrimaryProduction))?this.getPrimaryProduction(hcafRes.getInt("PrimProdMean"), hspenRes.getDouble("PrimProdMin"), hspenRes.getDouble("PrimProdPrefMin"), hspenRes.getDouble("PrimProdMax"), hspenRes.getDouble("PrimProdPrefMax")):1.0;
-										Double seaIceConcentration=(weights.get(EnvelopeFields.IceConcentration))?this.getSeaIceConcentration(hcafRes.getDouble("IceConAnn"), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble("IceConMin"), hspenRes.getDouble("IceConPrefMin"), hspenRes.getDouble("IceConMax"), hspenRes.getDouble("IceConPrefMax"), hspenRes.getString("SpeciesID"), session):1.0;
-										Double totalCountProbability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
-
-										if (totalCountProbability!=0){
-											String insertQeury= "INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')";
-											//logger.trace("executing insertQuery "+insertQeury);
-											session.executeUpdate(insertQeury);
-											k++;
-										}	
-									}
-								}catch(Exception e){logger.warn("error in data found",e);}
+					}else{
+						if(mode.equals(GENERATION_MODE.LAZY)){
+						//** Looking for weights
+							currentWeights=new HashMap<EnvelopeFields, Boolean>();						
+							for(EnvelopeFields f: EnvelopeFields.values()){
+								if((jobWeights.containsKey(currentSpeciesID)))
+									currentWeights.put(f, Boolean.parseBoolean(jobWeights.get(currentSpeciesID).get(f).getValue()));
+								else currentWeights.put(f, defaultWeights.get(f));
 							}
 						}
-						logger.trace("inserted "+k+" entries whit inbox false for "+hspenRes.getString("SpeciesID")+" species id");
+						iterateCells();
 						logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
-					}else{
-						psCopy.setString(1, speciesId);
-						if(psCopy.executeUpdate()==0) {
-							logger.warn("Unable to copy "+speciesId+" into "+resultsTable+". Query was "+"INSERT into "+this.resultsTable+" ( Select * from "+this.hspecTable+" where "+SpeciesOccursumFields.SpeciesID+"=?)");
-						}
 					}
-					JobManager.updateSpeciesStatus(jobId,new String[]{hspenRes.getString("SpeciesID")}, SpeciesStatus.Ready);
+					
+					if(mode.equals(GENERATION_MODE.LAZY))
+						JobManager.updateSpeciesStatus(jobId,new String[]{hspenRes.getString(SpeciesOccursumFields.speciesid+"")}, SpeciesStatus.Ready);
+					
 					hspenLoops++;
-				}			
+				}
+				
+				
 			}catch (Exception e) {
 				logger.error("error in generate method",e);
-				try{
-					session.executeUpdate("DROP TABLE "+this.resultsTable);
-				}catch (Exception e1){logger.trace("error deleting resultTable");}	
-				throw e;
+				if(resultsNative!=null)session.dropTable(resultsNative);
+				if(resultsSuitable!=null)session.dropTable(resultsSuitable);
+				
 			}finally{
-				try{
-					session.executeUpdate("DROP TABLE "+this.hcafViewTable);
-				}catch (Exception e){logger.trace("error deleting the hcafTempTable");}
+				if(hcafViewTable!=null) session.dropTable(hcafViewTable);
+				if(occurrenceCellsViewTable!=null) session.dropTable(occurrenceCellsViewTable);
 				session.close();
 			}
-			logger.trace("generation of jobId:"+jobId+" finished in "+((System.currentTimeMillis()-generationStart)/1000)+"secs");
+			logger.trace("generation of HSPEC finished in "+((System.currentTimeMillis()-generationStart)/1000)+"secs");
 		}
 		else {
 			logger.trace("No species to re-generate");
-			this.resultsTable=hspecTable;
+			if(generateNative)resultsNative=hspecNativeTable;
+			if(generateSuitable)resultsSuitable=hspecSuitableTable;
 		}
-		return this.resultsTable;
+	}
+
+	//************************** ROUTINES
+
+	
+	
+	
+	private void initTablesAndRS()throws Exception{
+		//*********** INIT TABLES
+		if(hcafViewTable==null){			
+			hcafViewTable=ServiceUtils.generateId("hcaf", "");
+			logger.trace("Creating HCAF Table :"+hcafViewTable);
+			session.executeUpdate("CREATE TABLE "+this.hcafViewTable+" AS " +
+					"SELECT s."+HCAF_SFields.csquarecode+",s."+HCAF_SFields.oceanarea+",s."+HCAF_SFields.centerlat+",s."+HCAF_SFields.centerlong+
+					",s."+HCAF_SFields.faoaream+",s."+HCAF_SFields.eezfirst+",s."+HCAF_SFields.lme+",d."+HCAF_DFields.depthmin+",d."+HCAF_DFields.depthmax+",d."+HCAF_DFields.sstanmean+",d."+HCAF_DFields.sbtanmean+
+					",d."+HCAF_DFields.salinitymean+",d."+HCAF_DFields.salinitybmean+",d."+HCAF_DFields.primprodmean+",d."+HCAF_DFields.iceconann+",s."+HCAF_SFields.landdist+
+					",d."+HCAF_DFields.depthmean+" FROM "+this.hcafStaticTable+" as s INNER JOIN "+this.hcafDynamicTable+" as d ON s."+HCAF_SFields.csquarecode+"=d."+HCAF_SFields.csquarecode);
+			
+			session.createIndex(this.hcafViewTable, HCAF_SFields.csquarecode+"");
+		}
+
+		if(occurrenceCellsViewTable==null){
+			occurrenceCellsViewTable=ServiceUtils.generateId("occ", "");
+			logger.trace("Creating occurrenceCells table :"+occurrenceCellsViewTable);
+			session.executeUpdate("CREATE TABLE "+occurrenceCellsViewTable+" AS " +
+					" SELECT h."+HCAF_SFields.centerlat+", h."+HCAF_SFields.oceanarea+", h."+HCAF_DFields.iceconann+", h."+HCAF_SFields.csquarecode+
+					" , o."+SpeciesOccursumFields.speciesid+", o."+OccurrenceCellsFields.goodcell+
+					" FROM "+occurenceCellsTable+" AS o INNER JOIN "+hcafViewTable+" AS h ON o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+
+					" WHERE h."+HCAF_SFields.oceanarea+" > 0");
+			
+			session.createIndex(this.occurrenceCellsViewTable,HCAF_SFields.csquarecode+"");
+			session.createIndex(this.occurrenceCellsViewTable,SpeciesOccursumFields.speciesid+"");
+			
+			
+			psBound=session.preparedStatement("SELECT distinct Max("+HCAF_SFields.centerlat+") AS maxclat, Min("+HCAF_SFields.centerlat+") AS minclat " +
+					"FROM "+occurrenceCellsViewTable+" WHERE "+SpeciesOccursumFields.speciesid+"= ? AND "+OccurrenceCellsFields.goodcell+" <> 0");
+			
+			
+//			session.executeUpdate("Select distinct Max("+this.hcafViewTable+".CenterLat) AS maxCLat, Min("+this.hcafViewTable+".CenterLat) AS minCLat" +
+//					" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+//					" Where ((("+this.hcafViewTable+".OceanArea > 0))) AND "+this.occurenceCellsTable+".SpeciesID = '"+speciesId+"' AND "+this.occurenceCellsTable+".GoodCell <> 0");
+			
+			psSeaIce=session.preparedStatement("SELECT distinct "+HCAF_SFields.csquarecode+", "+SpeciesOccursumFields.speciesid+", "+HCAF_DFields.iceconann+
+					" FROM "+occurrenceCellsViewTable+" WHERE "+SpeciesOccursumFields.speciesid+"= ? AND "+HCAF_DFields.iceconann+"<> -9999 AND "+HCAF_DFields.iceconann+" is not null "
+					+" AND "+OccurrenceCellsFields.goodcell+" = -1 order by "+HCAF_DFields.iceconann);
+			
+//			
+//			
+//			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
+//			" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+//			" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
+//			" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesID+ "'" +
+//			" and "+this.hcafViewTable+".IceConAnn <> -9999" +
+//			" and "+this.hcafViewTable+".IceConAnn is not null" +
+//			" and "+this.occurenceCellsTable+".goodcell = -1" +
+//			" order by "+this.hcafViewTable+".IceConAnn";
+//			
+		}
+		
+		if(generateNative){
+			resultsNative=ServiceUtils.generateId("hspec_native", "");
+			logger.trace("Generated Native Table will be "+resultsNative);		
+			session.createLikeTable(this.resultsNative, this.hspecTableStructure);
+		}
+
+		if(generateSuitable){
+			resultsSuitable=ServiceUtils.generateId("hspec_suitable", "");
+			logger.trace("Generated Suitable Table will be "+resultsSuitable);		
+			session.createLikeTable(this.resultsSuitable, this.hspecTableStructure);
+		}
+		
+		//************ QUERY HSPEN
+
+
+//		String queryhspen="SELECT * FROM "+this.hspenTable;
+//		logger.trace("species query is "+queryhspen);
+
+		List<Field> filter=new ArrayList<Field>(); 
+		hspenRes=session.executeFilteredQuery(filter, hspenTable, SpeciesOccursumFields.speciesid+"", "ASC");
+
+		logger.trace("HSPEN query took "+(System.currentTimeMillis()-startGeneration));
+
+		//********** QUERY HCAF
+
+		//I can execute it here cause it not depends on hspen
+		long startHcafQuery= System.currentTimeMillis();
+		
+		String hcafQuery= "SELECT "+HCAF_SFields.csquarecode+","+HCAF_SFields.oceanarea+","+HCAF_SFields.centerlat+","+HCAF_SFields.centerlong+","+HCAF_SFields.faoaream+
+		","+HCAF_DFields.depthmin+","+HCAF_DFields.depthmax+","+HCAF_DFields.sstanmean+","+HCAF_DFields.sbtanmean+","+HCAF_DFields.salinitymean
+		+","+HCAF_DFields.salinitybmean+","+HCAF_DFields.primprodmean+","+HCAF_DFields.iceconann+","+HCAF_SFields.landdist+","+HCAF_SFields.eezfirst+","+HCAF_SFields.lme+","+
+		HCAF_DFields.depthmean+"	FROM "+this.hcafViewTable+" WHERE "+HCAF_SFields.oceanarea+" > 0";
+		logger.trace("HCAF query is "+hcafQuery);
+		hcafRes=session.executeQuery(hcafQuery);
+		logger.trace("HCAF query took "+(System.currentTimeMillis()-startHcafQuery));
+
+
+		//*********** Prepare statement for insert && Copy
+
+		//		psInsert=session.preparedStatement("INSERT INTO "+this.resultsTable+" values('"+hspenRes.getString("SpeciesID")+"','"+hcafRes.getString("CsquareCode")+"',"+formatter.format(totalCountProbability)+","+inBox+","+inFAO+",'"+hcafRes.getString("FAOAreaM")+"','"+hcafRes.getString("EEZFirst")+"','"+hcafRes.getString("LME")+"')");
+		
+		probabilityRow.add(new Field(SpeciesOccursumFields.speciesid+"","",FieldType.STRING));
+		probabilityRow.add(new Field(HCAF_SFields.csquarecode+"","",FieldType.STRING));
+		probabilityRow.add(new Field(HSPECFields.probability+"","",FieldType.DOUBLE));
+		probabilityRow.add(new Field(HSPECFields.boundboxyn+"","",FieldType.BOOLEAN));
+		probabilityRow.add(new Field(HSPECFields.faoareayn+"","",FieldType.BOOLEAN));
+		probabilityRow.add(new Field(HSPECFields.faoaream+"","",FieldType.INTEGER));
+		probabilityRow.add(new Field(HSPECFields.eezall+"","",FieldType.STRING));
+		probabilityRow.add(new Field(HSPECFields.lme+"","",FieldType.INTEGER));
+		
+		List<Field> copyFields=new ArrayList<Field>();
+		copyFields.add(new Field(SpeciesOccursumFields.speciesid+"","",FieldType.STRING));
+		
+		
+		if(generateSuitable){
+			
+			
+			psInsertSuitable=session.getPreparedStatementForInsert(probabilityRow, resultsSuitable);
+			psCopySuitable=session.getPreparedStatementForInsertFromSelect(copyFields, resultsSuitable, hspecSuitableTable);
+		}
+		if(generateNative){
+			psInsertNative=session.getPreparedStatementForInsert(probabilityRow, resultsNative);
+			psCopyNative=session.getPreparedStatementForInsertFromSelect(copyFields, resultsNative, hspecNativeTable);
+		}
+		
 	}
 
 
-	private Bounduary getBounduary(Double north, Double south, Double east, Double west, String speciesId, DBSession session) throws Exception{
+	/**
+	 * iterates hcaf and insert probability in HSPEC
+	 * 
+	 * @return
+	 */
+
+
+
+
+
+	private void iterateCells()throws Exception{
+		logger.trace("Analizing "+currentSpeciesID+"...");
+
+		probabilityRow.get(0).setValue(currentSpeciesID);
+		
+		
+		Bounduary bounds=getBounduary(hspenRes.getDouble(HspenFields.nmostlat+""),hspenRes.getDouble(HspenFields.smostlat+""),
+				hspenRes.getDouble(HspenFields.emostlong+""),hspenRes.getDouble(HspenFields.wmostlong+""),currentSpeciesID);
+		hcafRes.beforeFirst();
+
+		//************ Insert if inFAO && inBox
+		//************ NB for suita
+		insertedNativeCellCount=0;
+		insertedSuitableCellCount=0;
+		while (hcafRes.next())
+			insertProbability(true,true,bounds);
+
+		logger.trace("inserted "+insertedNativeCellCount+" native entries and "+insertedSuitableCellCount+" suitable entries for "+currentSpeciesID+" species id");
+
+		//****************** Insert if inFAO && ! in BBox
+		//****************** Only if native
+
+		if (insertedNativeCellCount==0 && generateNative) {
+			hcafRes.beforeFirst();
+			//looping on HCAF filter2
+			while (hcafRes.next())
+				insertProbability(false,false, bounds);
+			logger.trace("inserted "+insertedNativeCellCount+" native entries with inbox false for "+currentSpeciesID+" species id");
+		}
+
+	}
+
+	private void insertProbability(boolean insertSuitable,boolean expectedInBox,Bounduary bounds){
+		try{
+			Double probability=null;
+			boolean inFAO= this.getInFao(hcafRes.getInt(HCAF_SFields.faoaream+""),hspenRes.getString(HspenFields.faoareas+""));
+			boolean inBox= this.getInBox(hcafRes.getDouble(HCAF_SFields.centerlat+""), bounds);
+			
+			probabilityRow.get(1).setValue(hcafRes.getString(HCAF_SFields.csquarecode+""));
+			
+			probabilityRow.get(3).setValue(inBox+"");
+			probabilityRow.get(4).setValue(inFAO+"");
+			probabilityRow.get(5).setValue(hcafRes.getString(HCAF_SFields.faoaream+""));
+			probabilityRow.get(6).setValue(hcafRes.getString(HCAF_SFields.eezfirst+""));
+			probabilityRow.get(7).setValue(hcafRes.getString(HCAF_SFields.lme+""));
+			
+			
+			if(insertSuitable && generateSuitable){
+				probability=getOverallProbability();
+				probabilityRow.get(2).setValue(formatter.format(probability));
+ 			if (probability>0){
+					insertedSuitableCellCount+=session.fillParameters(probabilityRow, psInsertSuitable).executeUpdate();
+				}
+			}
+			
+			if(generateNative&&(inFAO && (expectedInBox==inBox))){
+
+				if(probability==null){
+					probability=getOverallProbability();
+					probabilityRow.get(2).setValue(formatter.format(probability));
+				}
+
+				if (probability>0){
+					insertedNativeCellCount+=session.fillParameters(probabilityRow, psInsertNative).executeUpdate();
+				}
+			}
+				
+		}catch(Exception e){logger.warn("error in data found",e);}
+	}
+
+
+
+
+
+	private Double getOverallProbability() throws Exception{
+		Double preparedSeaIce= prepareSeaIceForSpecies(currentSpeciesID,hspenRes.getDouble(HspenFields.iceconmin+""),session);
+		Double landValue=(currentWeights.get(EnvelopeFields.LandDistance))?1.0:1.0; //to understand why is not calculated
+		Double sstValue=(currentWeights.get(EnvelopeFields.Temperature))?this.getSST(hcafRes.getDouble(HCAF_DFields.sstanmean+""), hcafRes.getDouble(HCAF_DFields.sbtanmean+""), hspenRes.getDouble(HspenFields.tempmin+""), 
+				hspenRes.getDouble(HspenFields.tempmax+""), hspenRes.getDouble(HspenFields.tempprefmin+""), hspenRes.getDouble(HspenFields.tempprefmax+""), hspenRes.getString(HspenFields.layer+"").toCharArray()[0]):1.0;
+		Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?this.getDepth(hcafRes.getDouble(HCAF_DFields.depthmax+""), hcafRes.getDouble(HCAF_DFields.depthmin+""), hspenRes.getInt(HspenFields.pelagic+""), hspenRes.getDouble(HspenFields.depthmax+""), hspenRes.getDouble(HspenFields.depthmin+""), 
+				hspenRes.getDouble(HspenFields.depthprefmax+""), hspenRes.getDouble(HspenFields.depthprefmin+""),hspenRes.getInt(HspenFields.meandepth+""),hcafRes.getDouble(HCAF_DFields.depthmean+"")):1.0;
+		Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?this.getSalinity(hcafRes.getDouble(HCAF_DFields.salinitymean+""), hcafRes.getDouble(HCAF_DFields.salinitybmean+""), hspenRes.getString(HspenFields.layer+"").toCharArray()[0], hspenRes.getDouble(HspenFields.salinitymin+""), hspenRes.getDouble(HspenFields.salinitymax+""), 
+				hspenRes.getDouble(HspenFields.salinityprefmin+""), hspenRes.getDouble(HspenFields.salinityprefmax+"")):1.0;
+		Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?this.getPrimaryProduction(hcafRes.getInt(HCAF_DFields.primprodmean+""), hspenRes.getDouble(HspenFields.primprodmin+""), hspenRes.getDouble(HspenFields.primprodprefmin+""), hspenRes.getDouble(HspenFields.primprodmax+""), hspenRes.getDouble(HspenFields.primprodprefmax+"")):1.0;
+		Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?this.getSeaIceConcentration(hcafRes.getDouble(HCAF_DFields.iceconann+""), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble(HspenFields.iceconmin+""), hspenRes.getDouble(HspenFields.iceconprefmin+""), hspenRes.getDouble(HspenFields.iceconmax+""), hspenRes.getDouble(HspenFields.iceconprefmax+""), 
+				currentSpeciesID, session):1.0;
+		Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
+//		logger.debug("probability : "+probability+"... landValue("+landValue+"),sstValue("+sstValue+"),depthValue("+depthValue+"),salinityValue("+salinityValue+"),primaryProductsValue("+primaryProductsValue+"),seaIceConcentration("+seaIceConcentration+")");
+		return probability; 
+	}
+
+
+
+	private Bounduary getBounduary(Double north, Double south, Double east, Double west, String speciesId) throws Exception{
 		Bounduary bounduary= new Bounduary(north, south, east, west);
 		if (north==null || south==null || east==null || west==null){
 			if (north!=null && south==null) bounduary.passedNS=true;
 			else if (north!=null) bounduary.passedN=true;
 			else if (south!=null) bounduary.passedS=true;
 			else{
-				ResultSet rsBond=session.executeQuery("Select distinct Max("+this.hcafViewTable+".CenterLat) AS maxCLat, Min("+this.hcafViewTable+".CenterLat) AS minCLat" +
-						" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
-						" Where ((("+this.hcafViewTable+".OceanArea > 0))) AND "+this.occurenceCellsTable+".SpeciesID = '"+speciesId+"' AND "+this.occurenceCellsTable+".GoodCell <> 0");
+				psBound.setString(1, speciesId);
+				ResultSet rsBond=psBound.executeQuery();
+				
+//				ResultSet rsBond=session.executeQuery("Select distinct Max("+this.hcafViewTable+".CenterLat) AS maxCLat, Min("+this.hcafViewTable+".CenterLat) AS minCLat" +
+//						" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+//						" Where ((("+this.hcafViewTable+".OceanArea > 0))) AND "+this.occurenceCellsTable+".SpeciesID = '"+speciesId+"' AND "+this.occurenceCellsTable+".GoodCell <> 0");
 				rsBond.next();
-				double maxCLat=rsBond.getDouble("maxCLat");
-				double minCLat=rsBond.getDouble("minCLat");
+				double maxCLat=rsBond.getDouble("maxclat");
+				double minCLat=rsBond.getDouble("minclat");
 				if (minCLat>10){
 					bounduary.setSouth(0.0);
 					bounduary.setSouthernEmisphereAdjusted(true);
@@ -347,20 +628,24 @@ public class HSPECGenerator {
 	private Double prepareSeaIceForSpecies(String speciesID, Double hspenIceConMin, DBSession session) throws Exception{
 		if(hspenIceConMin == 0){
 			Double sumIce = 0.0, meanIce = 0.0, adjVal = -1.0;
-			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
-			" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
-			" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
-			" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesID+ "'" +
-			" and "+this.hcafViewTable+".IceConAnn <> -9999" +
-			" and "+this.hcafViewTable+".IceConAnn is not null" +
-			" and "+this.occurenceCellsTable+".goodcell = -1" +
-			" order by "+this.hcafViewTable+".IceConAnn";
-			logger.trace("Sea Ice Concentration query: "+query);
-
-			ResultSet iceConRes=session.executeQuery(query);
+//			String query="SELECT distinct "+this.occurenceCellsTable+".CsquareCode, "+this.occurenceCellsTable+".SpeciesID, "+this.hcafViewTable+".IceConAnn" +
+//			" FROM "+this.occurenceCellsTable+" INNER JOIN "+this.hcafViewTable+" ON "+this.occurenceCellsTable+".CsquareCode = "+this.hcafViewTable+".CsquareCode" +
+//			" WHERE (  (("+this.hcafViewTable+".OceanArea)>0))" +
+//			" and "+this.occurenceCellsTable+".SpeciesID = '" +speciesID+ "'" +
+//			" and "+this.hcafViewTable+".IceConAnn <> -9999" +
+//			" and "+this.hcafViewTable+".IceConAnn is not null" +
+//			" and "+this.occurenceCellsTable+".goodcell = -1" +
+//			" order by "+this.hcafViewTable+".IceConAnn";
+////			logger.debug("Sea Ice Concentration query: "+query);
+//
+//			ResultSet iceConRes=session.executeQuery(query);
+			
+			psSeaIce.setString(1,speciesID);
+			ResultSet iceConRes=psSeaIce.executeQuery();
+			
 			int recordCount=0;
 			while (iceConRes.next()){
-				sumIce+=iceConRes.getDouble("IceConAnn");
+				sumIce+=iceConRes.getDouble(HCAF_DFields.iceconann+"");
 				recordCount++;
 			}
 
@@ -520,6 +805,8 @@ public class HSPECGenerator {
 		}
 
 	}
+
+	
 
 
 

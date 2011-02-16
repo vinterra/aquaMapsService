@@ -35,7 +35,7 @@ public class AquaMapsServiceTester {
 
 //	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
-	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 	public static void main(String[] args){
 		try{
@@ -114,7 +114,7 @@ public class AquaMapsServiceTester {
 		}
 		
 		if(customization){
-			toReturn.setCustomization(basket.iterator().next(), new Field(HspenFields.DepthMax+"","15"), new Perturbation(PerturbationType.ASSIGN, "25"));
+			toReturn.setCustomization(basket.iterator().next(), new Field(HspenFields.depthmax+"","15"), new Perturbation(PerturbationType.ASSIGN, "25"));
 		}
 		if(weights){
 			List<Field> settedWeights= new ArrayList<Field>();

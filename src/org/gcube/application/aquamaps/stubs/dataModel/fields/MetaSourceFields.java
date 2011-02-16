@@ -3,18 +3,18 @@ package org.gcube.application.aquamaps.stubs.dataModel.fields;
 public enum MetaSourceFields {
 
 
-		searchId,
+		searchid,
 		title,
-		tableName,
+		tablename,
 		description,
 		author,
 		disclaimer,
 		provenience,
 		data,
-		sourceId,
+		sourceid,
 		parameters,
 		status,
-		sourceName,
+		sourcename,
 	
 	
 	

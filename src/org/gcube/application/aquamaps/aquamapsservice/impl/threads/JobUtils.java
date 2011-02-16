@@ -7,12 +7,19 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.stubs.Job;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -20,11 +27,11 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class JobUtils {
 
 	private static GCUBELog logger= new GCUBELog(JobUtils.class);
-//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
 	public static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
-	
-public static final Map<String,String> imageFileAndName= new HashMap<String, String>();
-	
+
+	public static final Map<String,String> imageFileAndName= new HashMap<String, String>();
+
 	static {
 		imageFileAndName.put("_map_pic.jpg", "Earth");
 		imageFileAndName.put("_afr.jpg", "Continent View : Africa");
@@ -41,18 +48,18 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 		imageFileAndName.put("_xmapS.jpg", "Pole View : Antarctic");
 		imageFileAndName.put("_xmapSAtlan.jpg", "Ocean View : South Atlantic");		
 	}
-	
 
-	
-/**
- *  Clusterize rs in N stringBuilders compliant with CsquareCode convention
- * @param rs 			
- * @param maxIndex				the column index to retrieve max value 
- * @param toClusterIndex 		the column index of CsquareCodes
- * @param probabilityIndex		the column index of probability
- * @return
- * @throws SQLException
- */
+
+
+	/**
+	 *  Clusterize rs in N stringBuilders compliant with CsquareCode convention
+	 * @param rs 			
+	 * @param maxIndex				the column index to retrieve max value 
+	 * @param toClusterIndex 		the column index of CsquareCodes
+	 * @param probabilityIndex		the column index of probability
+	 * @return
+	 * @throws SQLException
+	 */
 	public static StringBuilder[] clusterize(ResultSet rs,int maxIndex,int toClusterIndex,int probabilityIndex,boolean bioDiversity) throws SQLException{
 		StringBuilder csq_str1 = new StringBuilder();
 		StringBuilder csq_str2 = new StringBuilder();
@@ -78,8 +85,8 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 				r4= 0.8;
 			}
 			logger.debug("Clustering by "+r1+" , "+r2+" , "+r3+" , "+r4);
-			
-			
+
+
 			do{
 				double currentValue=rs.getDouble(probabilityIndex);
 				String toAppendCode=rs.getString(toClusterIndex);
@@ -130,123 +137,8 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 	}
 
 
-
-	
-	
-	
-	
-	
-
-	
-	
-	
-//	public static void updateAquaMapStatus(int aquamapsId,JobManager.Status status)throws SQLException,IOException, Exception{
-////		toUpdate.setStatus(status.toString());
-//		DBSession c=DBSession.openSession(PoolManager.DBType.mySql);
-//		PreparedStatement ps=c.preparedStatement(DBCostants.submittedStatusUpdating);
-//		ps.setString(1, status.toString());
-//		ps.setInt(2,aquamapsId);		
-//		ps.execute();	
-//		c.close();
-////		updateProfile(toUpdate.getName(),toUpdate.getId(),makeAquaMapProfile(toUpdate),generationDetails.getFirstLevelDirName(),generationDetails.getSecondLevelDirName(),c);
-//		logger.trace("done AquaMap status updateing status : "+status.toString());
-//		
-//	}
-	
-
-	
-//	public static String projectCitation=	"Kaschner, K., J. S. Ready, E. Agbayani, J. Rius, K. Kesner-Reyes, P. D. Eastwood, A. B. South, "+
-// 	"S. O. Kullander, T. Rees, C. H. Close, R. Watson, D. Pauly, and R. Froese. 2008 AquaMaps: "+
-// 	"Predicted range maps for aquatic species. World wide web electronic publication, www.aquamaps.org, Version 10/2008.";
-	
-//	public static String makeAquaMapProfile(AquaMap obj){
-//		return StubsToModel.translateToClient(obj).toXML();
-//	}
-	
-	public static String makeJobProfile(Job obj){
-		return "<Job></Job>"; //TODO implement job profile
-	}
-	
-//	public static String resourceToXML(Resource toParse){
-//		StringBuilder doc=new StringBuilder();
-//		doc.append("<Resource>");
-//		doc.append("<Type>"+toParse.getType()+"</Type>");
-//		doc.append("<Attributes>");
-////		FieldArray fields=toParse.getAdditionalField();
-//		if((fields!=null)&&(fields.getFields()!=null))
-//		for(Field field:fields.getFields())
-//			doc.append(fieldToXML(field));
-//		doc.append("</Attributes>");		
-//		doc.append("</Resource>");
-//		return doc.toString();
-//	}
-	
-//	public static String fieldToXML(Field field){
-//		StringBuilder doc=new StringBuilder();
-//		doc.append("<Field>");
-//		doc.append("<Type>"+field.getType()+"</Type>");
-//		doc.append("<Name>"+field.getName()+"</Name>");
-//		doc.append("<Value>"+field.getValue()+"</Value>");
-//		doc.append("</Field>");
-//		return doc.toString();
-//	}
-//	public static String weightToXML(Weight weight){
-//		StringBuilder doc=new StringBuilder();
-//		doc.append("<Field>");
-//		doc.append("<Type>"+"float"+"</Type>");
-//		doc.append("<Name>"+weight.getParameterName()+"</Name>");
-//		//doc.append("<Value>"+weight.getChosenWeight()+"</Value>");
-//		doc.append("</Field>");
-//		return doc.toString();
-//	}
-//	public static String areaToXML(Area area){
-//		StringBuilder toReturn=new StringBuilder();
-//		toReturn.append("<Area>");
-//		toReturn.append("<code>"+area.getCode()+"</code>");
-//		toReturn.append("<type>"+area.getType()+"</type>");
-//		toReturn.append("<name>"+area.getName()+"</name>");
-//		toReturn.append("<Attributes>");
-//		FieldArray fields=area.getAdditionalField();
-//		if((fields!=null)&&(fields.getFields()!=null))
-//		for(Field field:fields.getFields())
-//			toReturn.append(fieldToXML(field));
-//		toReturn.append("</Attributes>");
-//		toReturn.append("</Area>");
-//		return toReturn.toString();
-//	}
-	
-//	public static String cellToXML(Cell cell){
-//		StringBuilder toReturn=new StringBuilder();
-//		toReturn.append("<Cell>");
-//		toReturn.append("<"+DBCostants.cSquareCode+">"+cell.getCode()+"</"+DBCostants.cSquareCode+">");
-//		toReturn.append("<Attributes>");
-//		FieldArray fields=cell.getAdditionalField();
-//		if((fields!=null)&&(fields.getFields()!=null))
-//		for(Field field:fields.getFields())
-//			toReturn.append(fieldToXML(field));
-//		toReturn.append("</Attributes>");
-//		toReturn.append("</Cell>");
-//		return toReturn.toString();
-//	}
-//	public static String speciesToXML(Specie spec){
-//		StringBuilder toReturn=new StringBuilder();
-//		toReturn.append("<Species>");
-//		toReturn.append("<"+DBCostants.SpeciesID+">"+spec.getId()+"</"+DBCostants.SpeciesID+">");
-//		toReturn.append("<Attributes>");
-//		FieldArray fields=spec.getAdditionalField();
-//		if((fields!=null)&&(fields.getFields()!=null))
-//		for(Field field:fields.getFields())
-//			toReturn.append(fieldToXML(field));
-//		toReturn.append("</Attributes>");
-//		toReturn.append("</Species>");
-//		return toReturn.toString();
-//	}
-//	
-	
-
-	
 	public static String createClusteringFile(String objectName,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
-		
+
 		String to_out = "color=FFFF84 fill=Y color2=FFDE6B fill2=Y color3=FFAD6B fill3=Y color4=FF6B6B fill4=Y color5=DE4242 fill5=Y "+
 		((csq_str[0].toString().compareTo("")!=0)?" csq="+csq_str[0].toString():" csq=0000:000:0")+
 		((csq_str[1].toString().compareTo("")!=0)?" csq2="+csq_str[1].toString():"")+
@@ -268,24 +160,24 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 		String toReturn=file.getAbsolutePath();		
 		return toReturn;
 	}
-	
+
 	public static Map<String,String> getToPublishList(String basePath,String aquamapName){
 		Map<String,String> toReturn=new HashMap<String, String>();
 		File f1 = new File(basePath+"csq_map127.0.0.1_"+aquamapName+"_map_pic.jpg");
 		if (f1.exists())
 			toReturn.put("Earth",f1.getAbsolutePath());			
-		
+
 		for(String suffix:imageFileAndName.keySet()){
 			File f2 = new File(basePath+aquamapName+"/"+aquamapName+suffix);
 			if (f2.exists())
 				toReturn.put(imageFileAndName.get(suffix), f2.getAbsolutePath());
 		}
-		
-		
-		
+
+
+
 		return toReturn;
 	}
-	
+
 	public static Map<String,String> parsePublished(List<String> publishedUrls){
 		Map<String,String> toReturn=new HashMap<String, String>();		
 		for(String url : publishedUrls){
@@ -298,8 +190,31 @@ public static final Map<String,String> imageFileAndName= new HashMap<String, Str
 		}
 		return toReturn;
 	}
-	
-	
-	
-	
+
+	/**
+	 *  Creates Images and sends them to the publisher
+	 *  
+	 * @return list of published Images
+	 * @throws Exception 
+	 */
+	public static List<org.gcube.application.aquamaps.stubs.dataModel.File> createImages(int objId,String clusterFile,String header,Set<String> speciesCoverage, GCUBEScope actualScope, boolean hasCustomizations) throws Exception{
+
+		List<org.gcube.application.aquamaps.stubs.dataModel.File> toReturn=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.File>();
+		logger.trace(objId+" gonna call perl with file " +clusterFile);
+		SubmittedManager.updateStatus(objId, SubmittedStatus.Publishing);
+		boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
+
+		logger.trace(objId+" Perl execution exit message :"+result);		
+		if(!result) logger.warn("No images were generated");
+		else {
+			Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
+
+			logger.trace(" found "+app.size()+" files to publish");
+
+			if(app.size()>0)
+				toReturn.addAll(PublisherImpl.getPublisher().publishImages(objId, speciesCoverage, app,actualScope,hasCustomizations));
+		}
+		return toReturn;
+	}
+
 }

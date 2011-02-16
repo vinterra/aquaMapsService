@@ -31,12 +31,12 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -tex
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/MySQLDBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PostGresSQLDBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CellManager.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/FileManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/JobManager.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/MapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationStatus.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManager.java -text
@@ -55,6 +55,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/BadRequestExc
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GISGeneratorFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationUtils.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/Generator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GeneratorManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/ImageGeneratorRequest.java -text
@@ -71,7 +72,9 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGene
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/StatusMonitorThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/LayerType.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/PublisherImpl.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobSubmissionThread.java -text
@@ -112,8 +115,6 @@ src/org/gcube/application/aquamaps/stubs/dataModel/fields/MetaSourceFields.java 
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/OccurrenceCellsFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SpeciesOccursumFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SubmittedFields.java -text
-src/org/gcube/application/aquamaps/stubs/dataModel/util/CustomizationConverter.java -text
-src/org/gcube/application/aquamaps/stubs/dataModel/util/MetaDataHandler.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/util/XMLUtils.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/AquaMapsServiceWrapper.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/PagedRequestSettings.java -text
@@ -124,9 +125,11 @@ test/testClient/BrokenPipeIssueTest.java -text
 test/testClient/DBConnectionTest.java -text
 test/testClient/DataModelTest.java -text
 test/testClient/HCAFGenerationTest.java -text
+test/testClient/HSPECGeneratorTest.java -text
 test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
-test/testClient/MetaDataTest.java -text
 test/testClient/ProfileRetrievalTest.java -text
+test/testClient/PublisherTesting.java -text
 test/testClient/StyleGeneration.java -text
+test/testClient/WrapperTest.java -text
 test/testClient/XStreamTest.java -text

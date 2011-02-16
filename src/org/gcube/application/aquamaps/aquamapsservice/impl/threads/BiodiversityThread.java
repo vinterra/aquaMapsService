@@ -1,9 +1,10 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
-import java.awt.Color;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -12,28 +13,31 @@ import java.util.Set;
 import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.FileManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.dataModel.Area;
+import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
+import org.gcube.application.aquamaps.stubs.dataModel.Field;
+import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
 
 public class BiodiversityThread extends Thread {	
 	private static final GCUBELog logger=new GCUBELog(BiodiversityThread.class);
 	private static final int waitTime=10*1000;
-	//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
+	
 
 	private int aquamapsId;
 	private int jobId;
@@ -45,8 +49,14 @@ public class BiodiversityThread extends Thread {
 	private boolean gisEnabled=false;
 	private GCUBEScope actualScope;
 
+	
+	private Map<String,Map<String,Perturbation>> envelopeCustomization=new HashMap<String, Map<String,Perturbation>>();
+	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights= new HashMap<String, Map<EnvelopeFields,Field>>();
+	private Set<Area> selectedAreas;
+	private BoundingBox bb;
 
-	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold,GCUBEScope scope) {
+	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold,GCUBEScope scope,
+			Set<Area> selectedAreas,BoundingBox bb) {
 		super(group,"BioD_AquaMapObj:"+aquamapsName);	
 		this.threshold=threshold;
 		this.aquamapsId=aquamapsId;
@@ -54,11 +64,17 @@ public class BiodiversityThread extends Thread {
 		this.jobId=jobId;	
 		logger.trace("Passed scope : "+scope.toString());
 		this.actualScope=scope;
+		this.selectedAreas=selectedAreas;
+		this.bb=bb;
 	}
 
-	public void setRelatedSpeciesList(Set<Species> ids){		
-		for(Species s:ids)
-			species.add(s.getId());		
+	public void setRelatedSpeciesList(Set<Species> ids,Map<String,Map<String,Perturbation>> envelopeCustomization,
+	Map<String,Map<EnvelopeFields,Field>> envelopeWeights){		
+		for(Species s:ids){
+			species.add(s.getId());
+			this.envelopeCustomization.put(s.getId(), envelopeCustomization.get(s.getId()));
+			this.envelopeWeights.put(s.getId(), envelopeWeights.get(s.getId()));
+		}
 	}
 	public void setGis(boolean gis){
 		gisEnabled=gis;
@@ -75,45 +91,40 @@ public class BiodiversityThread extends Thread {
 				logger.trace("waiting for selected species to be ready");
 			}
 
-			boolean needToGenerate=true;
-			List<String> publishedMaps=null;
 			boolean hasCustomizations=JobManager.isSpeciesSetCustomized(jobId,species);
-			//			if(hasCustomizations) {
-			//				needToGenerate=true;
-			//				logger.trace(this.getName()+" has Customizations, going to generate..");
-			//			}
-			//			else{
-			//				logger.trace(this.getName()+" hasn't Customizations, looking for default maps..");
-			//				publishedMaps=Publisher.getPublisher().getPublishedMaps(species,JobGenerationDetails.getHSPENTable(jobId),JobGenerationDetails.getHCAFTable(jobId),this.actualScope);
-			//				logger.trace(this.getName()+" found "+publishedMaps.size()+" default images");
-			//				if(publishedMaps.size()==0) needToGenerate=true;
-			//			}
-			if(needToGenerate){
+			
 				//*********************************** GENERATION
 
 				logger.trace(this.getName()+" entering image generation phase");
 
-				session=DBSession.openSession(PoolManager.DBType.mySql);
+				session=DBSession.getInternalDBSession();
 				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Generating);
-				String tableName=ServiceUtils.generateId("S", "");
+				String tableName=ServiceUtils.generateId("s", "");
 				PreparedStatement prep=null;
-				String creationSQL="CREATE TABLE "+tableName+" ("+SpeciesOccursumFields.SpeciesID+" varchar(50) PRIMARY KEY )";
-				logger.trace("Going to execute query : "+creationSQL);
-
-				session.executeUpdate(creationSQL);
+				
+				session.createTable(tableName, new String[]{
+						SpeciesOccursumFields.speciesid+" varchar(50) PRIMARY KEY"
+				});
+				
 
 				JobManager.addToDropTableList(jobId, tableName);	
+				List<List<Field>> toInsertSpecies= new ArrayList<List<Field>>();
 				for(String specId: species){
-					session.executeUpdate("INSERT INTO "+tableName+" VALUES('"+specId+"')");
-					logger.trace("INSERT INTO "+tableName+" VALUES('"+specId+"')");
+					List<Field> row=new ArrayList<Field>();
+					row.add(new Field(SpeciesOccursumFields.speciesid+"",specId,FieldType.STRING));
+					toInsertSpecies.add(row);
 					;}
+				session.insertOperation(tableName, toInsertSpecies);
+				
+				
 				logger.trace(this.getName()+" species temp table filled, gonna select relevant HSPEC records");
 				HSPECName=JobManager.getWorkingHSPEC(jobId);
 				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Simulating);
 				prep=session.preparedStatement(clusteringBiodiversityQuery(HSPECName,tableName));				
 				prep.setFloat(1,threshold);
 				ResultSet rs=prep.executeQuery();
-
+				List<org.gcube.application.aquamaps.stubs.dataModel.File> references=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.File>();
+				
 				if(rs.first()){
 						//RS not empty
 					String header=jobId+"_"+aquamapsName;
@@ -124,8 +135,8 @@ public class BiodiversityThread extends Thread {
 					int maxValue=rs.getInt(2);
 					rs.last();
 					int minValue=rs.getInt(2);
-					String attributeName=rs.getMetaData().getColumnLabel(2);
-					logger.trace(this.getName()+" Found minValue : "+minValue+"; maxValue : "+maxValue+" for AttributeName :"+attributeName);
+//					String attributeName=rs.getMetaData().getColumnLabel(2);
+					logger.trace(this.getName()+" Found minValue : "+minValue+"; maxValue : "+maxValue+" for AttributeName :"+AquaMapsManager.maxSpeciesCountInACell);
 					String csvFile=null;
 					if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 						csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
@@ -142,76 +153,40 @@ public class BiodiversityThread extends Thread {
 					else {
 						String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
 						JobManager.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
-						logger.trace(this.getName()+"Clustering completed, gonna call perl with file " +clusterFile);
-						SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Publishing);
-						boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
-						//				JobUtils.generateImages(clusterFile);
-						logger.trace(this.getName()+" Perl execution exit message :"+result);		
-						if(!result) logger.warn("No images were generated");
-						else {
-							Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
-
-
-							logger.trace(this.getName()+" found "+app.size()+" files to publish");
-							if(app.size()>0){
-								String basePath=Publisher.getPublisher().publishImages(this.jobId, species, app.values(),actualScope,hasCustomizations);
-								logger.trace(this.getName()+" files moved to public access location, inserting information in DB");
-								logger.trace(this.getName()+" "+FileManager.linkImagesInDB(app, basePath,aquamapsId)+" file information inserted in DB");
-
-							}
-						}
-
+						
+						references.addAll(JobUtils.createImages(aquamapsId, clusterFile, header_map, species, actualScope, hasCustomizations));
+						
 						/// *************************** GIS GENERATION
 
 						if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 							logger.trace(this.getName()+"is gisEnabled");
-							StyleGenerationRequest styleReq=new StyleGenerationRequest();
-							styleReq.setAttributeName(attributeName);
-							styleReq.setC1(Color.YELLOW);
-							styleReq.setC2(Color.RED);
-							styleReq.setMax(String.valueOf(maxValue));
-							styleReq.setMin(String.valueOf(minValue));					
-							styleReq.setNameStyle(ServiceUtils.generateId(aquamapsName, "style"));					
-							int Nclasses=((maxValue-minValue)>4)?5:maxValue-minValue;
-							logger.debug("Found "+Nclasses+" classes for style");
-							styleReq.setNClasses(Nclasses);
-							styleReq.setTypeValue(Integer.class);
+							
 
 
-							if(GeneratorManager.requestGeneration(styleReq)){
 
-								LayerGenerationRequest request= new LayerGenerationRequest();
-								request.setCsvFile(csvFile);
-								request.setFeatureLabel(attributeName);
-								request.setFeatureDefinition("integer");
-								request.setLayerName(aquamapsName);
-								request.setDefaultStyle(styleReq.getNameStyle());
-								request.setSubmittedId(aquamapsId);
-								logger.trace("submitting Gis layer generation for obj Id :"+aquamapsId);
-								if(GeneratorManager.requestGeneration(request))
+								LayerGenerationRequest request=LayerGenerationRequest.getBioDiversityRequest(species,
+										JobManager.getHCAFTableId(jobId),JobManager.getHSPENTableId(jobId),envelopeCustomization,envelopeWeights,
+										selectedAreas,bb,threshold,csvFile,aquamapsName,minValue,maxValue);
+								if(GeneratorManager.requestGeneration(request)){
 									logger.trace("generated layer for obj Id : "+aquamapsId);
+									//TODO Add references to generated Layer
+									
+									LayerInfoType published=request.getGeneratedLayer();
+									
+								}
 								else throw new Exception("unable to generate layer for obj Id : "+aquamapsId);
-							}else throw new Exception("Unable to generate/submit style for "+aquamapsId);
 						}
 
 					}	
 				}
 				else{
-					//ResultSet empty
 					logger.trace("Query returned empty result set, nothing to generate");
 				}
-			}else{
-				// ********************************** Using already published Images
-				logger.trace(this.getName()+" using already published Images");
-
-				Map<String,String> imagesNameAndLink=JobUtils.parsePublished(publishedMaps);
-				String firstUrl=publishedMaps.get(0);
-				String basePath=firstUrl.substring(0, firstUrl.lastIndexOf("/")+1);
-				logger.trace(this.getName()+" "+FileManager.linkImagesInDB(imagesNameAndLink, basePath,aquamapsId)+" file information inserted in DB");
-
-			}
-
-			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Completed);
+				
+				
+				AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
+				
+				
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			try {
@@ -231,8 +206,8 @@ public class BiodiversityThread extends Thread {
 
 
 	public static String clusteringBiodiversityQuery(String hspecName, String tmpTable){
-		String query= "Select "+HCAF_SFields.CSquareCode+", count("+hspecName+"."+SpeciesOccursumFields.SpeciesID+") AS MaxSpeciesCountInACell FROM "+hspecName+
-		" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesOccursumFields.SpeciesID+" = "+tmpTable+"."+SpeciesOccursumFields.SpeciesID+" where probability > ? GROUP BY "+HCAF_SFields.CSquareCode+" ORDER BY MaxSpeciesCountInACell DESC";
+		String query= "Select "+HCAF_SFields.csquarecode+", count("+hspecName+"."+SpeciesOccursumFields.speciesid+") AS "+AquaMapsManager.maxSpeciesCountInACell+" FROM "+hspecName+
+		" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesOccursumFields.speciesid+" = "+tmpTable+"."+SpeciesOccursumFields.speciesid+" where probability > ? GROUP BY "+HCAF_SFields.csquarecode+" ORDER BY MaxSpeciesCountInACell DESC";
 		logger.trace("clusteringBiodiversityQuery: "+query);
 		return query;
 	}
