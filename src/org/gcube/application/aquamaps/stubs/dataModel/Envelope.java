@@ -105,7 +105,8 @@ public class Envelope {
 		 * 		eg:
 		 * 		Depth -> min-> 100
 		 */
-		
+
+	
 		private Map<EnvelopeFields,Map<HspenFields,Double>> parameters=new HashMap<EnvelopeFields, Map<HspenFields,Double>> ();
 		
 		public Envelope(){
@@ -150,14 +151,14 @@ public class Envelope {
 		public Set<HspenFields> getValueNames(EnvelopeFields parameterName){
 			return parameters.get(parameterName).keySet();
 		}
-		public float getValue(EnvelopeFields parameterName,HspenFields depthprefmax){
-			return parameters.get(parameterName).get(depthprefmax).floatValue();
+		public Double getValue(EnvelopeFields parameterName,HspenFields depthprefmax){
+			return parameters.get(parameterName).get(depthprefmax);
 		}
 		public void setValue(EnvelopeFields parameterName,HspenFields valueName,double d){
 			parameters.get(parameterName).put(valueName,new Double(d));
 		}
 		
-		public float getMinValue(EnvelopeFields parameter){
+		public Double getMinValue(EnvelopeFields parameter){
 			switch(parameter){
 			case Depth : return getValue(parameter,HspenFields.depthmin);
 			case IceConcentration : return getValue(parameter,HspenFields.iceconmin);
@@ -181,7 +182,7 @@ public class Envelope {
 			}
 		}
 		
-		public float getMaxValue(EnvelopeFields parameter){
+		public Double getMaxValue(EnvelopeFields parameter){
 			switch(parameter){
 			case Depth : return getValue(parameter,HspenFields.depthmax);
 			case IceConcentration : return getValue(parameter,HspenFields.iceconmax);
@@ -206,7 +207,7 @@ public class Envelope {
 		}
 		
 		
-		public float getPrefMinValue(EnvelopeFields parameter){
+		public Double getPrefMinValue(EnvelopeFields parameter){
 			switch(parameter){
 			case Depth : return getValue(parameter,HspenFields.depthprefmin);
 			case IceConcentration : return getValue(parameter,HspenFields.iceconprefmin);
@@ -231,7 +232,7 @@ public class Envelope {
 		}
 		
 		
-		public float getPrefMaxValue(EnvelopeFields parameter){
+		public Double getPrefMaxValue(EnvelopeFields parameter){
 			switch(parameter){
 			case Depth : return getValue(parameter,HspenFields.depthprefmax);
 			case IceConcentration : return getValue(parameter,HspenFields.iceconprefmax);

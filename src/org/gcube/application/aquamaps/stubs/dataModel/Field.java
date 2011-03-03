@@ -5,14 +5,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
-import org.w3c.dom.Element;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("Field")
 public class Field {
-
+	@XStreamAsAttribute
 	private FieldType type=FieldType.STRING;
+	@XStreamAsAttribute
 	private String name;
+	@XStreamAsAttribute
 	private String value;
 
 	public FieldType getType() {
@@ -99,12 +102,12 @@ public class Field {
 		return doc.toString();
 	}
 
-	public Field (Element el){
-		Element typeElement=(Element) el.getElementsByTagName("FieldType").item(0);
-		this.setType(FieldType.valueOf(XMLUtils.getTextContent(typeElement)));
-		Element nameElement=(Element) el.getElementsByTagName("Name").item(0);
-		this.setName(XMLUtils.getTextContent(nameElement));
-		Element valueElement=(Element) el.getElementsByTagName("Value").item(0);
-		this.setValue(XMLUtils.getTextContent(valueElement));
-	}
+//	public Field (Element el){
+//		Element typeElement=(Element) el.getElementsByTagName("FieldType").item(0);
+//		this.setType(FieldType.valueOf(XMLUtils.getTextContent(typeElement)));
+//		Element nameElement=(Element) el.getElementsByTagName("Name").item(0);
+//		this.setName(XMLUtils.getTextContent(nameElement));
+//		Element valueElement=(Element) el.getElementsByTagName("Value").item(0);
+//		this.setValue(XMLUtils.getTextContent(valueElement));
+//	}
 }

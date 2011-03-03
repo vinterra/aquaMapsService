@@ -8,12 +8,10 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.gcube.application.aquamaps.stubs.LayerArray;
+import org.gcube.application.aquamaps.stubs.LayerInfoType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 
 public class AquaMapsObject {
@@ -43,12 +41,15 @@ public class AquaMapsObject {
 	private String date;
 	
 	private Boolean gis=false;
-	private String layerId;
 	private ObjectType type=ObjectType.Biodiversity;
 	
 	
 	private Set<Species> selectedSpecies=new HashSet<Species>();
-	private List<File> relatedResources=new ArrayList<File>();
+
+	private List<File> images=new ArrayList<File>();
+	private List<File> additionalMeta=new ArrayList<File>();
+	private List<LayerInfoType> layers=new ArrayList<LayerInfoType>();
+	
 	private float threshold=0.5f;	
 	private BoundingBox boundingBox=new BoundingBox();
 	
@@ -94,12 +95,7 @@ public class AquaMapsObject {
 	public void setSelectedSpecies(Set<Species> selectedSpecies) {
 		this.selectedSpecies = selectedSpecies;
 	}
-	public List<File> getRelatedResources() {
-		return relatedResources;
-	}
-	public void setRelatedResources(List<File> relatedResources) {
-		this.relatedResources = relatedResources;
-	}
+	
 	public float getThreshold() {
 		return threshold;
 	}
@@ -228,39 +224,39 @@ public class AquaMapsObject {
 	@Deprecated
 	public AquaMapsObject(String profile) throws ParserConfigurationException{
 		super();
-		Document doc=XMLUtils.getDocumentGivenXML(profile);
+//		Document doc=XMLUtils.getDocumentGivenXML(profile);
 
-		Element nameElement=(Element) doc.getElementsByTagName("Name").item(0);
-		this.setName(XMLUtils.getTextContent(nameElement));
-		Element idElement=(Element) doc.getElementsByTagName("Identifier").item(0);
-		this.setId(Integer.parseInt(XMLUtils.getTextContent(idElement)));
-		Element dateElement=(Element) doc.getElementsByTagName("Date").item(0);
-		this.setDate(XMLUtils.getTextContent(dateElement));
-		Element authorElement=(Element) doc.getElementsByTagName("Author").item(0);
-		this.setAuthor(XMLUtils.getTextContent(authorElement));
-		Element typeElement=(Element) doc.getElementsByTagName("Type").item(0);
-		this.setType(ObjectType.valueOf(XMLUtils.getTextContent(typeElement)));
-		Element statusElement=(Element) doc.getElementsByTagName("Status").item(0);
-		this.setStatus(SubmittedStatus.valueOf(XMLUtils.getTextContent(statusElement)));
-		Element bbElement=(Element) doc.getElementsByTagName("BoundingBox").item(0);
-		this.getBoundingBox().parse(XMLUtils.getTextContent(bbElement));
-		Element thresholdElement=(Element) doc.getElementsByTagName("Threshold").item(0);
-		this.setThreshold(Float.parseFloat(XMLUtils.getTextContent(thresholdElement)));
-		try{
-			Element gisElement=(Element) doc.getElementsByTagName("Threshold").item(0);
-			this.setGis(Boolean.valueOf(XMLUtils.getTextContent(gisElement)));
-		}catch(Exception e){
-			//Backward compatibility
-			this.setGis(false);
-		}
-
-		NodeList speciesNodes=doc.getElementsByTagName("Species");
-		ArrayList<Species> specList=new ArrayList<Species>(); 
-		for(int i=0;i<speciesNodes.getLength();i++){
-			Element speciesEl=(Element) speciesNodes.item(i);
-			specList.add(new Species(speciesEl));
-		}
-		this.addSpecies(specList);
+//		Element nameElement=(Element) doc.getElementsByTagName("Name").item(0);
+//		this.setName(XMLUtils.getTextContent(nameElement));
+//		Element idElement=(Element) doc.getElementsByTagName("Identifier").item(0);
+//		this.setId(Integer.parseInt(XMLUtils.getTextContent(idElement)));
+//		Element dateElement=(Element) doc.getElementsByTagName("Date").item(0);
+//		this.setDate(XMLUtils.getTextContent(dateElement));
+//		Element authorElement=(Element) doc.getElementsByTagName("Author").item(0);
+//		this.setAuthor(XMLUtils.getTextContent(authorElement));
+//		Element typeElement=(Element) doc.getElementsByTagName("Type").item(0);
+//		this.setType(ObjectType.valueOf(XMLUtils.getTextContent(typeElement)));
+//		Element statusElement=(Element) doc.getElementsByTagName("Status").item(0);
+//		this.setStatus(SubmittedStatus.valueOf(XMLUtils.getTextContent(statusElement)));
+//		Element bbElement=(Element) doc.getElementsByTagName("BoundingBox").item(0);
+//		this.getBoundingBox().parse(XMLUtils.getTextContent(bbElement));
+//		Element thresholdElement=(Element) doc.getElementsByTagName("Threshold").item(0);
+//		this.setThreshold(Float.parseFloat(XMLUtils.getTextContent(thresholdElement)));
+//		try{
+//			Element gisElement=(Element) doc.getElementsByTagName("Threshold").item(0);
+//			this.setGis(Boolean.valueOf(XMLUtils.getTextContent(gisElement)));
+//		}catch(Exception e){
+//			//Backward compatibility
+//			this.setGis(false);
+//		}
+//
+//		NodeList speciesNodes=doc.getElementsByTagName("Species");
+//		ArrayList<Species> specList=new ArrayList<Species>(); 
+//		for(int i=0;i<speciesNodes.getLength();i++){
+//			Element speciesEl=(Element) speciesNodes.item(i);
+//			specList.add(new Species(speciesEl));
+//		}
+//		this.addSpecies(specList);
 
 		//		Element envelopeElement =(Element)doc.getElementsByTagName(Tags.envelopeCustomization).item(0);
 		//		if(envelopeElement!=null){
@@ -309,7 +305,10 @@ public class AquaMapsObject {
 		this.setAuthor(toLoad.getAuthor());
 		this.getBoundingBox().parse(toLoad.getBoundingBox());
 		this.setDate(toLoad.getDate());
-		this.getRelatedResources().addAll(File.load(toLoad.getRelatedResources()));
+		this.getImages().addAll(File.load(toLoad.getImages()));
+		this.getAdditionalMeta().addAll(File.load(toLoad.getAdditionalFiles()));
+		for(LayerInfoType l: toLoad.getLayers().getName())
+			this.getLayers().add(l);
 		this.getSelectedSpecies().addAll(Species.load(toLoad.getSelectedSpecies()));
 		this.setGis(toLoad.isGis());
 		this.setId(toLoad.getId());
@@ -317,8 +316,8 @@ public class AquaMapsObject {
 		this.setStatus(SubmittedStatus.valueOf(toLoad.getStatus()));
 		this.setThreshold(toLoad.getThreshold());
 		this.setType(ObjectType.valueOf(toLoad.getType()));	
-		this.setLayerId(toLoad.getLayerId());
 	}
+
 	public static List<AquaMapsObject> load(org.gcube.application.aquamaps.stubs.AquaMapArray toLoad){
 		List<AquaMapsObject> toReturn= new ArrayList<AquaMapsObject>();
 		if((toLoad!=null)&&(toLoad.getAquaMapList()!=null))
@@ -343,12 +342,16 @@ public class AquaMapsObject {
 		toReturn.setGis(this.gis);
 		toReturn.setId(this.id);
 		toReturn.setName(this.name);
-		toReturn.setRelatedResources(File.toStubsVersion(this.relatedResources));
+		
+		toReturn.setAdditionalFiles(File.toStubsVersion(this.getAdditionalMeta()));
+		toReturn.setImages(File.toStubsVersion(this.getImages()));
+		toReturn.setLayers(new LayerArray(this.getLayers().toArray(new LayerInfoType[this.getLayers().size()])));
+//		toReturn.setRelatedResources(File.toStubsVersion(this.relatedResources));
 		toReturn.setSelectedSpecies(Species.toStubsVersion(this.selectedSpecies));
 		toReturn.setStatus(this.status+"");
 		toReturn.setThreshold(this.threshold);
 		toReturn.setType(this.type.toString());
-		toReturn.setLayerId(this.layerId);
+//		toReturn.setLayerId(this.layerId);
 		return toReturn;
 	}
 
@@ -360,11 +363,22 @@ public class AquaMapsObject {
 	public AquaMapsObject(){}
 	
 	
-	
-	public void setLayerId(String layerId) {
-		this.layerId = layerId;
+	public List<File> getImages() {
+		return images;
 	}
-	public String getLayerId() {
-		return layerId;
+	public void setImages(List<File> images) {
+		this.images = images;
+	}
+	public List<File> getAdditionalMeta() {
+		return additionalMeta;
+	}
+	public void setAdditionalMeta(List<File> additionalMeta) {
+		this.additionalMeta = additionalMeta;
+	}
+	public List<LayerInfoType> getLayers() {
+		return layers;
+	}
+	public void setLayers(List<LayerInfoType> layers) {
+		this.layers = layers;
 	}
 }

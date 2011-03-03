@@ -403,7 +403,8 @@ public class JobManager extends SubmittedManager{
 			objRow.add(sourceHSPEN);
 			objRow.add(sourceHSPEC);
 			objRow.add(jobIdField);
-			objRow.add(new Field(SubmittedFields.gis+"",obj.getLayerId(),FieldType.STRING));			
+			//FIXME Comment
+//			objRow.add(new Field(SubmittedFields.gisenabled+"",obj.()+"",FieldType.STRING));			
 			objRow.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.STRING));
 			aquamapsList.add(objRow);
 		}
@@ -423,7 +424,8 @@ public class JobManager extends SubmittedManager{
 		jobRow.add(sourceHSPEN);
 		jobRow.add(sourceHSPEC);
 		jobRow.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
-		jobRow.add(new Field(SubmittedFields.gis+"",toPerform.getWmsContextId(),FieldType.STRING));
+		//FIXME Comment
+//		jobRow.add(new Field(SubmittedFields.gis+"",toPerform.getWmsContextId(),FieldType.STRING));
 		jobList.add(jobRow);
 		session.insertOperation(submittedTable, jobList);
 		

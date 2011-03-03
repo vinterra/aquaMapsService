@@ -241,7 +241,7 @@ public class AquaMapsServiceWrapper {
 		}
 	}
 
-	public Envelope loadEnvelope(String speciesId, int hspenId)throws Exception{
+	public Species loadEnvelope(String speciesId, int hspenId)throws Exception{
 		try{
 			Species spec=new Species(speciesId);
 			GetSpeciesEnvelopeRequestType req=new GetSpeciesEnvelopeRequestType(hspenId, speciesId);
@@ -249,7 +249,8 @@ public class AquaMapsServiceWrapper {
 			//			System.out.println("Loaded Fields : ");
 			//			for(Field f:spec.attributesList)
 			//				System.out.println(f.getName()+" : "+f.getValue());
-			return spec.extractEnvelope();
+//			return spec.extractEnvelope();
+			return spec;
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

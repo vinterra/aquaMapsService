@@ -7,15 +7,15 @@ import java.util.Set;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.stubs.dataModel.util.XMLUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
+@XStreamAlias("Species")
 public class Species {
 
 	private String id;
-	
+	@XStreamImplicit
 	public List<Field> attributesList=new ArrayList<Field>();
 	public List<Field> getAttributesList() {
 		return attributesList;
@@ -118,15 +118,15 @@ public class Species {
 			return false;
 		return true;
 	}
-
-	public Species (Element el){
-		Element idEl=(Element) el.getElementsByTagName(SpeciesOccursumFields.speciesid.toString()).item(0);
-		this.setId(XMLUtils.getTextContent(idEl));
-		NodeList fieldNodes=el.getElementsByTagName("Field");
-		for(int i=0;i<fieldNodes.getLength();i++){
-			this.addField(new Field((Element)fieldNodes.item(i)));
-		}
-	}
+//
+//	public Species (Element el){
+//		Element idEl=(Element) el.getElementsByTagName(SpeciesOccursumFields.speciesid.toString()).item(0);
+//		this.setId(XMLUtils.getTextContent(idEl));
+//		NodeList fieldNodes=el.getElementsByTagName("Field");
+//		for(int i=0;i<fieldNodes.getLength();i++){
+//			this.addField(new Field((Element)fieldNodes.item(i)));
+//		}
+//	}
 
 	public Species(org.gcube.application.aquamaps.stubs.Specie toLoad){
 		super();

@@ -15,8 +15,9 @@ public enum SubmittedFields {
 	sourcehcaf        ,
 	sourcehspec       ,
 	sourcehspen       ,
-	gis  ,
-	mapid,   
+	gisenabled  ,
+	gispublishedid,
+	geoserverreference,
 	
 	
 }

@@ -188,6 +188,7 @@ public abstract class DBSession {
 
 	public abstract PreparedStatement getFilterCellByAreaQuery(HSPECFields filterByCodeType, String sourceTableName, String destinationTableName)throws Exception;
 
+	
 	protected PreparedStatement getPreparedStatementForCount(List<Field> filters, String tableName)throws SQLException{
 		return connection.prepareStatement(formSelectCountString(filters, tableName));
 	}
@@ -229,6 +230,9 @@ public abstract class DBSession {
 		return ps;
 	}
 
+	
+	public abstract PreparedStatement getPreparedStatementForInsertOnDuplicate(List<Field> fields, String table,Integer[] keyIndexes) throws Exception;
+	
 	public PreparedStatement getPreparedStatementForDelete(List<Field> fields, String table) throws Exception{
 		PreparedStatement ps= preparedStatement(formDeletetQueryStringFromFields(fields, table));
 		return ps;

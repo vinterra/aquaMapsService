@@ -68,6 +68,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenera
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GroupGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/LayerGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/RemovalRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
@@ -115,10 +116,11 @@ src/org/gcube/application/aquamaps/stubs/dataModel/fields/MetaSourceFields.java 
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/OccurrenceCellsFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SpeciesOccursumFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SubmittedFields.java -text
-src/org/gcube/application/aquamaps/stubs/dataModel/util/XMLUtils.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/xstreamconverters/EnvelopeConverter.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/AquaMapsServiceWrapper.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/ServiceException.java -text
+src/org/gcube/application/aquamaps/stubs/wrapper/WrapperUtils.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text

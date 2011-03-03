@@ -196,5 +196,39 @@ public class MySQLDBSession extends DBSession {
 				statement.executeUpdate(createQuery.toString());
 				statement.close();
 			}
-	
+
+
+	@Override
+	public PreparedStatement getPreparedStatementForInsertOnDuplicate(
+			List<Field> fields, String table, Integer[] keyIndexes)
+			throws Exception {
+		// TODO Auto-generated method stub
+		throw new Exception ("YET TO IMPLEMENT");
+	}
+
+
+//	@Override
+//	public PreparedStatement getPreparedStatementForInsert(List<Field> fields,
+//			String table, Integer[] keysIndexes) throws Exception {
+//				StringBuilder fieldsName=new StringBuilder("(");
+//				StringBuilder fieldsValues=new StringBuilder("(");
+//				for (Field f: fields){
+//					fieldsValues.append("?,");
+//					fieldsName.append(f.getName()+",");
+//				}
+//
+//				logger.debug(" the values are "+ fields.size());
+//
+//				fieldsValues.deleteCharAt(fieldsValues.length()-1);
+//				fieldsValues.append(")");
+//				fieldsName.deleteCharAt(fieldsName.length()-1);
+//				fieldsName.append(")");
+//
+//				String query="INSERT INTO "+table+" "+fieldsName+" VALUES "+fieldsValues+ 
+//				"ON ";
+//				logger.trace("the prepared statement is :"+ query);
+//				PreparedStatement ps= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+//				return ps;
+//			}
+//	
 }

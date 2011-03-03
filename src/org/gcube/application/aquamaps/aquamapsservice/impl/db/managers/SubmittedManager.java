@@ -17,6 +17,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Submitted;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SubmittedFields;
+import org.gcube.application.aquamaps.stubs.wrapper.WrapperUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SubmittedManager {
@@ -97,9 +98,16 @@ public class SubmittedManager {
 	public static int getHSPECTableId(int jobId)throws Exception{
 		return (Integer) getField(jobId,SubmittedFields.sourcehspec);		
 	}
-	public static String getGIS(int submittedId) throws Exception{
-		return (String) getField(submittedId,SubmittedFields.gis);
+	public static Boolean isGIS(int submittedId) throws Exception{
+		return ((Integer) getField(submittedId,SubmittedFields.gisenabled)==1);
 	}
+	public static List<String> getGisReference(int submittedId)throws Exception{
+		return WrapperUtils.CSVToList((String) getField(submittedId,SubmittedFields.geoserverreference));
+	}
+	public static List<String> getGisId(int submittedId)throws Exception{
+		return WrapperUtils.CSVToList((String) getField(submittedId,SubmittedFields.gispublishedid));
+	}
+	
 	public static SubmittedStatus getStatus(int submittedId)throws Exception{
 		return SubmittedStatus.valueOf((String) getField(submittedId,SubmittedFields.status));
 	}
@@ -108,11 +116,13 @@ public class SubmittedManager {
 	}
 
 	public static Boolean isAquaMap(int submittedId)throws Exception{
-		return (Boolean) getField(submittedId,SubmittedFields.isaquamap);
+		return ((Integer) getField(submittedId,SubmittedFields.isaquamap)==1);
 	}
 
 	public static int getMapId(int submittedId)throws Exception{
-		return (Integer) getField(submittedId,SubmittedFields.mapid);
+		//FIXME Comment
+//		return (Integer) getField(submittedId,SubmittedFields.mapid);
+		return 0;
 	}
 
 
@@ -129,14 +139,22 @@ public class SubmittedManager {
 	//		return updateField(jobId,SubmittedFields.sourceHCAF,HCAFId);
 	//	}
 
-	public static int updateGISData(int submittedId,String GeoId)throws Exception{
-		return updateField(submittedId,SubmittedFields.gis,FieldType.STRING,GeoId);
+	public static int updateGISData(int submittedId,Boolean gisEnabled)throws Exception{
+		return updateField(submittedId,SubmittedFields.gisenabled,FieldType.BOOLEAN,gisEnabled+"");
 	}
 
 	public static int markSaved(int submittedId)throws Exception{
 		return updateField(submittedId,SubmittedFields.saved,FieldType.BOOLEAN,true);
 	}
 
+	public static int setGisPublishedId(int submittedId,List<String> gisId)throws Exception{
+		return updateField(submittedId,SubmittedFields.gispublishedid,FieldType.STRING,WrapperUtils.listToCSV(gisId));
+	}
+	public static int setGisReference(int submittedId,List<String> gisreference)throws Exception{
+		return updateField(submittedId,SubmittedFields.geoserverreference,FieldType.STRING,WrapperUtils.listToCSV(gisreference));
+	}
+	
+	
 	//******** Logic
 
 	/**

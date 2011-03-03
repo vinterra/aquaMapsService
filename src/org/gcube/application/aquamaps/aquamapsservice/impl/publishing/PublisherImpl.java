@@ -9,6 +9,7 @@ import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
+import org.gcube.application.aquamaps.stubs.LayerInfoType;
 import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
@@ -26,7 +27,6 @@ import org.gcube.common.core.resources.GCUBERunningInstance;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.AquaMapsPublisherPortType;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.service.AquaMapsPublisherServiceAddressingLocator;
 
@@ -274,11 +274,12 @@ public class PublisherImpl implements Publisher{
 
 	public Job getJobById(int id) throws Exception {
 		AquaMapsPublisherPortType pt=getPortType();
-		return new Job((org.gcube.application.aquamaps.stubs.Job)(Object)pt.getJobById(String.valueOf(id)));
+		return new Job((org.gcube.application.aquamaps.stubs.Job)(Object)pt.getJobById(id));
 	}
 
 	public int publishAquaMapsObject(AquaMapsObject toPublish) throws Exception {
 		AquaMapsPublisherPortType pt=getPortType();
+		
 		throw new Exception ("Not Yet Implemented");
 	}
 
@@ -289,7 +290,7 @@ public class PublisherImpl implements Publisher{
 
 	public AquaMapsObject getAquaMapsObjectById(int id) throws Exception {
 		AquaMapsPublisherPortType pt=getPortType();
-		return new AquaMapsObject((org.gcube.application.aquamaps.stubs.AquaMap)(Object)pt.getAquaMapObjectById(String.valueOf(id)));		
+		return new AquaMapsObject((org.gcube.application.aquamaps.stubs.AquaMap)(Object)pt.getAquaMapObjectById(id));		
 	}
 
 	public LayerInfoType getExistingLayer(Set<String> speciesCoverage,
@@ -346,6 +347,90 @@ public class PublisherImpl implements Publisher{
 	public void removeJob(int Id) throws Exception {
 		// TODO Auto-generated method stub
 		throw new Exception ("Not Yet Implemented");
+	}
+
+	public LayerInfoType getBiodiversityLayer(Set<String> speciesCoverage,
+			int hcafId, int hspenId, Set<Area> areaSelection,
+			Map<String, Map<String, Perturbation>> envelopeCustomization,
+			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
+			BoundingBox bounds, float threshold) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType getDistributionLayer(String speciesId, int hcafId,
+			int hspenId, Set<Area> areaSelection,
+			Map<String, Map<String, Perturbation>> envelopeCustomization,
+			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
+			BoundingBox bounds, boolean getNative) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType getEnvironmentalLayer(EnvelopeFields parameter,
+			int hcafId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType getLayerById(int id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType getOccurrenceLayer(String speciesId) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public WMSContextInfoType getWMSContextInfoTypeById(int id)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public WMSContextInfoType getWMSContextInfoTypeById(List<Integer> layers)
+			throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType publishBiodiversityLayer(Set<String> speciesCoverage,
+			int hcafId, int hspenId, Set<Area> areaSelection,
+			Map<String, Map<String, Perturbation>> envelopeCustomization,
+			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
+			BoundingBox bounds, float threshold, List<String> styles,
+			int defaultStyleIndex) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType publishDistributionLayer(String speciesId, int hcafId,
+			int hspenId, Set<Area> areaSelection,
+			Map<String, Map<String, Perturbation>> envelopeCustomization,
+			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
+			BoundingBox bounds, List<String> styles, int defaultStyleIndex,
+			boolean isNativeRange) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType publishEnvironmentalLayer(EnvelopeFields parameter,
+			List<String> styles, int defaultStyleIndex) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public LayerInfoType publishOccurrenceLayer(String speciesId,
+			List<String> styles, int defaultStyleIndex) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public WMSContextInfoType publishWMSContext(String groupName,
+			List<LayerInfoType> layers) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	

@@ -26,11 +26,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generation
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.LayerInfoType;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
 import org.json.JSONException;
 
@@ -58,8 +58,10 @@ public class GISGenerator implements Generator{
 
 	public boolean getResponse() throws Exception {
 		if(request==null) throw new Exception("No request setted");
-		else if (request instanceof LayerGenerationRequest) return generateLayer((LayerGenerationRequest)request);
-		else if (request instanceof GroupGenerationRequest) return generateGroup((GroupGenerationRequest)request);
+//		else if (request instanceof LayerGenerationRequest) return generateLayer();
+//		else if (request instanceof GroupGenerationRequest) return generateGroup();
+//		else if (request instanceof RemovalRequest) return removeFromGeoServer();
+		//FIXME Comment
 		else return generateStyle((StyleGenerationRequest)request);
 	}
 
@@ -75,85 +77,89 @@ public class GISGenerator implements Generator{
 
 
 	private static synchronized boolean generateLayer(LayerGenerationRequest request) throws Exception{
-		//***** Check if existing
-		LayerInfoType published= PublisherImpl.getPublisher().getExistingLayer(
-				request.getSpeciesCoverage(), 
-				request.getHcafId(), 
-				request.getHspenId(),
-				request.getEnvelopeCustomization(), 
-				request.getEnvelopeWeights(), request.getSelectedAreas(), request.getBb(),request.getThreshold());
+//		//***** Check if existing
+//		
+//		LayerInfoType published= PublisherImpl.getPublisher().getExistingLayer(
+//				request.getSpeciesCoverage(), 
+//				request.getHcafId(), 
+//				request.getHspenId(),
+//				request.getEnvelopeCustomization(), 
+//				request.getEnvelopeWeights(), request.getSelectedAreas(), request.getBb(),request.getThreshold());
+//
+//		if(published==null){
+//			DBSession session=null;
+//			try{
+//				//***** Create Layer table in postGIS
+//				session=DBSession.getPostGisDBSession();
+//				session.disableAutoCommit();
+//				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);			
+//				String layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
+//				session.dropTable(appTableName);
+//
+//				//**** Needed wait for data synch 
+//				//**** POSTGIS - GEOServer limitation
+//				try {
+//					Thread.sleep(4*1000);
+//				} catch (InterruptedException e) {}
+//
+//				//***** update GeoServerBox
+//
+//				//****** Styles generation
+//
+//				ArrayList<String> generatedStyles= new ArrayList<String>();
+//
+//				for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
+//					//					String linearStyle=layerTable+"_linearStyle";
+//					//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
+//					if(generateStyle(styleReq))generatedStyles.add(styleReq.getNameStyle());
+//					else logger.warn("Style "+styleReq.getNameStyle()+" was not generated!!");
+//
+//				//**** Layer Generation
+//
+//				generatedStyles.addAll(request.getToAssociateStyles());
+//				if(generatedStyles.size()==0)
+//					throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
+//
+//				if(!createLayer(layerTable, request.getMapName(), generatedStyles, 0))
+//					throw new Exception("Unable to generate Layer "+request.getMapName());
+//
+//				request.setGeServerLayerId(layerTable);
+//
+//				//***** create reference in Publisher
+//				published=PublisherImpl.getPublisher().publishNewLayer(
+//						request.getSpeciesCoverage(), 
+//						request.getHcafId(), 
+//						request.getHspenId(),
+//						request.getEnvelopeCustomization(), 
+//						request.getEnvelopeWeights(), request.getSelectedAreas(), request.getBb(),request.getThreshold(),
+//						request.getMapName(), generatedStyles,0);
+//				session.commit();
+//			}catch (Exception e ){
+//				logger.error("Unable to create Layer ", e);
+//				throw e;
+//			}finally {
+//				session.close();
+//			}
+//		}
+//
+//
+//		//***** insert reference in request
+//		request.setGeneratedLayer(published);
 
-		if(published==null){
-			DBSession session=null;
-			try{
-				//***** Create Layer table in postGIS
-				session=DBSession.getPostGisDBSession();
-				session.disableAutoCommit();
-				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);			
-				String layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
-				session.dropTable(appTableName);
-
-				//**** Needed wait for data synch 
-				//**** POSTGIS - GEOServer limitation
-				try {
-					Thread.sleep(4*1000);
-				} catch (InterruptedException e) {}
-
-				//***** update GeoServerBox
-
-				//****** Styles generation
-
-				ArrayList<String> generatedStyles= new ArrayList<String>();
-
-				for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
-					//					String linearStyle=layerTable+"_linearStyle";
-					//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
-					if(generateStyle(styleReq))generatedStyles.add(styleReq.getNameStyle());
-					else logger.warn("Style "+styleReq.getNameStyle()+" was not generated!!");
-
-				//**** Layer Generation
-
-				generatedStyles.addAll(request.getToAssociateStyles());
-				if(generatedStyles.size()==0)
-					throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
-
-				if(!createLayer(layerTable, request.getMapName(), generatedStyles, 0))
-					throw new Exception("Unable to generate Layer "+request.getMapName());
-
-				request.setGeServerLayerId(layerTable);
-
-				//***** create reference in Publisher
-				published=PublisherImpl.getPublisher().publishNewLayer(
-						request.getSpeciesCoverage(), 
-						request.getHcafId(), 
-						request.getHspenId(),
-						request.getEnvelopeCustomization(), 
-						request.getEnvelopeWeights(), request.getSelectedAreas(), request.getBb(),request.getThreshold(),
-						request.getMapName(), generatedStyles,0);
-				session.commit();
-			}catch (Exception e ){
-				logger.error("Unable to create Layer ", e);
-				throw e;
-			}finally {
-				session.close();
-			}
-		}
-
-
-		//***** insert reference in request
-		request.setGeneratedLayer(published);
+		//FIXME Comment
 		return true;
 	}
 
 
 	private static synchronized boolean generateGroup(GroupGenerationRequest request)throws Exception{
-		WMSContextInfoType published=PublisherImpl.getPublisher().getExistingWMSContext(request.getPublishedLayer());
-		if(published==null){
-			if(!createGroupOnGeoServer(request.getGeoServerLayers(), request.getStyles(), request.getToCreateGroupName()))
-				throw new Exception("Unable to create group "+request.getToCreateGroupName()+"on GEOServer");
-			published=PublisherImpl.getPublisher().publishNewWMSContext(request.getToCreateGroupName(),request.getPublishedLayer());
-		}
-		request.setAssociatedContext(published);
+//		WMSContextInfoType published=PublisherImpl.getPublisher().getExistingWMSContext(request.getPublishedLayer());
+//		if(published==null){
+//			if(!createGroupOnGeoServer(request.getGeoServerLayers(), request.getStyles(), request.getToCreateGroupName()))
+//				throw new Exception("Unable to create group "+request.getToCreateGroupName()+"on GEOServer");
+//			published=PublisherImpl.getPublisher().publishNewWMSContext(request.getToCreateGroupName(),request.getPublishedLayer());
+//		}
+//		request.setAssociatedContext(published);
+		//FIXME Comment
 		return true;
 	}
 

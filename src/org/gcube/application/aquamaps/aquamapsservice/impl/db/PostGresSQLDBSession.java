@@ -31,10 +31,10 @@ public class PostGresSQLDBSession extends DBSession {
 	
 	@Override
 	public PreparedStatement fillParameters(List<Field> fields, PreparedStatement ps) throws SQLException{
-		logger.debug("Fillin prepared statement : ");
+//		logger.debug("Fillin prepared statement : ");
 		for(int i=0;i<fields.size();i++){
 			Field f=fields.get(i);
-			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
+//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
 			switch(f.getType()){
 			case BOOLEAN:{ 
 							Integer value=Boolean.parseBoolean(f.getValue())?1:0;
@@ -82,17 +82,30 @@ public class PostGresSQLDBSession extends DBSession {
 	@Override
 	public PreparedStatement getFilterCellByAreaQuery(HSPECFields filterByCodeType,
 			String sourceTableName, String destinationTableName) throws Exception {
-//		switch(filterByCodeType){
-//		case faoaream : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-//						" where "+sourceTableName+"."+HSPECFields.faoaream+" = ? ) ";
+		
+		String conditionString=null;
+		
+		switch(filterByCodeType){
+		case eezall : conditionString=" ? NOT IN s."+filterByCodeType;
+		break;
+		default : conditionString=" s."+filterByCodeType+"= ? ";
+		break;
+		
+		
+		
+//		case faoaream : return preparedStatement("INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
+//						" where "+sourceTableName+"."+HSPECFields.faoaream+" = ? ) ");
 //		case eezall : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
 //						" where find_in_set( ? , "+sourceTableName+"."+HSPECFields.eezall+")) ";
 //		case lme : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
 //						" where "+sourceTableName+"."+HSPECFields.lme+" = ? ) ";
 //		default : throw new SQLException("Invalid Field "+filterByCodeType);
-//		}
-		throw new SQLException("Not Implemented");
-		//TODO Implement
+		}
+		String query="INSERT INTO "+destinationTableName+" (SELECT * FROM "+sourceTableName+" s WHERE "+conditionString+" EXCEPT "+
+		"( SELECT * FROM "+destinationTableName+" ) )";
+		logger.trace("FILTER STRING : "+query);
+		
+		return preparedStatement(query);
 	}
 
 
@@ -189,11 +202,23 @@ public class PostGresSQLDBSession extends DBSession {
 			createQuery.append(singleColumnDef+",");
 		
 		createQuery.deleteCharAt(createQuery.length()-1);
-		createQuery.append(") CHARACTER SET utf8 COLLATE utf8_general_ci ;");
+		createQuery.append(") ");
 		
 		logger.debug("the query is: " + createQuery.toString());
 		statement.executeUpdate(createQuery.toString());
 		statement.close();
+	}
+
+
+
+
+
+	@Override
+	public PreparedStatement getPreparedStatementForInsertOnDuplicate(
+			List<Field> fields, String table, Integer[] keyIndexes)
+			throws Exception {
+		//TODO
+		throw new Exception("YET TO IMPLEMENT");
 	}
 	
 }

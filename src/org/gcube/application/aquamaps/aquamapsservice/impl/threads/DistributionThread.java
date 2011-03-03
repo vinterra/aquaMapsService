@@ -18,6 +18,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
+import org.gcube.application.aquamaps.stubs.LayerInfoType;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
@@ -30,7 +31,6 @@ import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
 
 public class DistributionThread extends Thread {
 
@@ -128,7 +128,8 @@ public class DistributionThread extends Thread {
 							envelopeCustomization, envelopeWeights, selectedAreas, bb, csvFile);
 
 					if(!GeneratorManager.requestGeneration(request)){
-						SubmittedManager.updateGISData(aquamapsId, request.getGeServerLayerId());
+						//FIXME Comment
+//						SubmittedManager.updateGISData(aquamapsId, request.getGeServerLayerId());
 						//FIXME references per publisher
 						LayerInfoType published=request.getGeneratedLayer();
 					}else {
@@ -138,8 +139,8 @@ public class DistributionThread extends Thread {
 				}
 
 			}	
-
-			AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
+			//FIXME Comment
+//			AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
 
 
 		} catch (Exception e) {

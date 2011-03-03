@@ -2,10 +2,12 @@ package org.gcube.application.aquamaps.stubs.dataModel;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SubmittedFields;
+import org.gcube.application.aquamaps.stubs.wrapper.WrapperUtils;
 
 public class Submitted {
 
@@ -23,8 +25,9 @@ public class Submitted {
 	private Integer sourceHCAF;
 	private Integer sourceHSPEN;
 	private Integer sourceHSPEC;
-	private String gis;
-	private Integer mapId;
+	private Boolean gisEnabled;
+	private List<String> gisPublishedId=new ArrayList<String>();
+	private List<String> gisReferences=new ArrayList<String>();
 	
 	@Deprecated
 	public Submitted(Integer searchId){
@@ -109,18 +112,6 @@ public class Submitted {
 	public void setSourceHSPEC(Integer sourceHSPEC) {
 		this.sourceHSPEC = sourceHSPEC;
 	}
-	public String getGis() {
-		return gis;
-	}
-	public void setGis(String gis) {
-		this.gis = gis;
-	}
-	public Integer getMapId() {
-		return mapId;
-	}
-	public void setMapId(Integer mapId) {
-		this.mapId = mapId;
-	}
 	
 	public static ArrayList<Submitted> loadResultSet(ResultSet rs)throws Exception{
 		ArrayList<Submitted> toReturn=new ArrayList<Submitted>();
@@ -128,10 +119,9 @@ public class Submitted {
 			Submitted obj=new Submitted();
 			obj.setAuthor(rs.getString(SubmittedFields.author.toString()));
 			obj.setDate(rs.getString(SubmittedFields.date.toString()));
-			obj.setGis(rs.getString(SubmittedFields.gis.toString()));
+			obj.setGisEnabled((rs.getInt(SubmittedFields.gisenabled+"")==1));
 			obj.setIsAquaMap(rs.getBoolean(SubmittedFields.isaquamap.toString()));
 			obj.setJobId(rs.getInt(SubmittedFields.jobid.toString()));
-			obj.setMapId(rs.getInt(SubmittedFields.mapid.toString()));
 			obj.setSaved(rs.getBoolean(SubmittedFields.saved.toString()));
 			obj.setSearchId(rs.getInt(SubmittedFields.searchid.toString()));
 			obj.setSelectionCriteria(rs.getString(SubmittedFields.selectioncriteria.toString()));
@@ -141,6 +131,8 @@ public class Submitted {
 			obj.setStatus(SubmittedStatus.valueOf(rs.getString(SubmittedFields.status.toString())));
 			obj.setTitle(rs.getString(SubmittedFields.title.toString()));
 			obj.setType(ObjectType.valueOf(rs.getString(SubmittedFields.type.toString())));
+			obj.setGisPublishedId(WrapperUtils.CSVToList(rs.getString(SubmittedFields.gispublishedid+"")));
+			obj.setGisReferences(WrapperUtils.CSVToList(rs.getString(SubmittedFields.geoserverreference+"")));
 			toReturn.add(obj);
 		}
 		return toReturn;
@@ -151,10 +143,11 @@ public class Submitted {
 		super();
 		this.author=toLoad.getAuthor();
 		this.date=toLoad.getDate();
-		this.gis=toLoad.getGis();
+		//FIXME
+//		this.gis=toLoad.getGis();
 		this.isAquaMap=toLoad.isIsAquaMap();
 		this.jobId=toLoad.getJobId();
-		this.mapId=toLoad.getMapId();
+//		this.mapId=toLoad.getMapId();
 		this.saved=toLoad.isSaved();
 		this.searchId=toLoad.getSearchId();
 		this.selectionCriteria=toLoad.getSelectionCriteria();
@@ -170,10 +163,11 @@ public class Submitted {
 		org.gcube.application.aquamaps.stubs.Submitted toReturn=new org.gcube.application.aquamaps.stubs.Submitted();
 		toReturn.setAuthor(author);
 		toReturn.setDate(date);
-		toReturn.setGis(gis);
+		//FIXME
+//		toReturn.setGis(gis);
 		toReturn.setIsAquaMap(isAquaMap);
 		toReturn.setJobId(jobId);
-		toReturn.setMapId(mapId);
+//		toReturn.setMapId(mapId);
 		toReturn.setSaved(saved);
 		toReturn.setSearchId(searchId);
 		toReturn.setSelectionCriteria(selectionCriteria);
@@ -210,6 +204,30 @@ public class Submitted {
 		} else if (!searchId.equals(other.searchId))
 			return false;
 		return true;
+	}
+
+	public void setGisEnabled(Boolean gisEnabled) {
+		this.gisEnabled = gisEnabled;
+	}
+
+	public Boolean getGisEnabled() {
+		return gisEnabled;
+	}
+
+	public void setGisPublishedId(List<String> gisPublishedId) {
+		this.gisPublishedId = gisPublishedId;
+	}
+
+	public List<String> getGisPublishedId() {
+		return gisPublishedId;
+	}
+
+	public void setGisReferences(List<String> gisReferences) {
+		this.gisReferences = gisReferences;
+	}
+
+	public List<String> getGisReferences() {
+		return gisReferences;
 	}
 	
 	

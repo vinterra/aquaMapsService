@@ -20,6 +20,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generation
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.stubs.LayerInfoType;
 import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
@@ -32,7 +33,6 @@ import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.LayerInfoType;
 
 public class BiodiversityThread extends Thread {	
 	private static final GCUBELog logger=new GCUBELog(BiodiversityThread.class);
@@ -183,8 +183,8 @@ public class BiodiversityThread extends Thread {
 					logger.trace("Query returned empty result set, nothing to generate");
 				}
 				
-				
-				AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
+				//FIXME Comment
+//				AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
 				
 				
 		} catch (Exception e) {

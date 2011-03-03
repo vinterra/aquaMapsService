@@ -55,7 +55,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 	}
 
 	public String getPhylogeny(GetPhylogenyRequestType req) throws GCUBEFault{
-		//FIXME
+		//FIXME implement getPhilogenyMethod
 		throw new GCUBEFault("Method not yet implemented");
 	}
 
