@@ -212,7 +212,8 @@ public class HSPECGenerator {
 						Double.parseDouble(s.getFieldbyName(HspenFields.tempprefmin+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.tempprefmax+"").getValue()), 
 						s.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0]):1.0;
-				Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?getDepth(Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmax+"").getValue()), 
+		Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?
+				getDepth(Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmax+"").getValue()), 
 						Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmin+"").getValue()), 
 						Integer.parseInt(s.getFieldbyName(HspenFields.pelagic+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.depthmax+"").getValue()), 
@@ -221,36 +222,37 @@ public class HSPECGenerator {
 						Double.parseDouble(s.getFieldbyName(HspenFields.depthprefmin+"").getValue()),
 						Integer.parseInt(s.getFieldbyName(HspenFields.meandepth+"").getValue()),
 						Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmean+"").getValue())):1.0;
-				Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?getSalinity(Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitymean+"").getValue()),
+		Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?
+				getSalinity(Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitymean+"").getValue()),
 						Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitybmean+"").getValue()),
 						s.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0], 
 						Double.parseDouble(s.getFieldbyName(HspenFields.salinitymin+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.salinitymax+"").getValue()),				
 						Double.parseDouble(s.getFieldbyName(HspenFields.salinityprefmin+"").getValue()),
 						Double.parseDouble(s.getFieldbyName(HspenFields.salinityprefmax+"").getValue())):1.0;
-				Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?getPrimaryProduction(
-						Integer.parseInt(c.getFieldbyName(HCAF_DFields.primprodmean+"").getValue()), 
+		Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?
+				getPrimaryProduction(Integer.parseInt(c.getFieldbyName(HCAF_DFields.primprodmean+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.primprodmin+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.primprodprefmin+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.primprodmax+"").getValue()), 
 						Double.parseDouble(s.getFieldbyName(HspenFields.primprodprefmax+"").getValue())):1.0;
-						Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?getSeaIceConcentration(
-								Double.parseDouble(c.getFieldbyName(HCAF_DFields.iceconann+"").getValue()), 
+		Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?
+				getSeaIceConcentration(Double.parseDouble(c.getFieldbyName(HCAF_DFields.iceconann+"").getValue()), 
 								(preparedSeaIce!=-9999.0)?preparedSeaIce:Double.parseDouble(s.getFieldbyName(HspenFields.iceconmin+"").getValue()),
 										Double.parseDouble(s.getFieldbyName(HspenFields.iceconprefmin+"").getValue()), 
 										Double.parseDouble(s.getFieldbyName(HspenFields.iceconmax+"").getValue()), 
 										Double.parseDouble(s.getFieldbyName(HspenFields.iceconprefmax+"").getValue()),currentSpeciesID):1.0;
-								Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
+		Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
 
 
-								toReturn.add(new Field(EnvelopeFields.Depth+"",depthValue+"",FieldType.DOUBLE));
-								toReturn.add(new Field(EnvelopeFields.Salinity+"",salinityValue+"",FieldType.DOUBLE));
-								toReturn.add(new Field(EnvelopeFields.IceConcentration+"",seaIceConcentration+"",FieldType.DOUBLE));
-								toReturn.add(new Field(EnvelopeFields.LandDistance+"",landValue+"",FieldType.DOUBLE));
-								toReturn.add(new Field(EnvelopeFields.PrimaryProduction+"",primaryProductsValue+"",FieldType.DOUBLE));
-								toReturn.add(new Field(EnvelopeFields.Temperature+"",sstValue+"",FieldType.DOUBLE));
-								toReturn.add(new Field(HSPECFields.probability+"",probability+"",FieldType.DOUBLE));
-								return toReturn;
+		toReturn.add(new Field(EnvelopeFields.Depth+"",depthValue+"",FieldType.DOUBLE));
+		toReturn.add(new Field(EnvelopeFields.Salinity+"",salinityValue+"",FieldType.DOUBLE));
+		toReturn.add(new Field(EnvelopeFields.IceConcentration+"",seaIceConcentration+"",FieldType.DOUBLE));
+		toReturn.add(new Field(EnvelopeFields.LandDistance+"",landValue+"",FieldType.DOUBLE));
+		toReturn.add(new Field(EnvelopeFields.PrimaryProduction+"",primaryProductsValue+"",FieldType.DOUBLE));
+		toReturn.add(new Field(EnvelopeFields.Temperature+"",sstValue+"",FieldType.DOUBLE));
+		toReturn.add(new Field(HSPECFields.probability+"",probability+"",FieldType.DOUBLE));
+		return toReturn;
 	}
 
 
@@ -524,7 +526,7 @@ public class HSPECGenerator {
 		//****************** Only if native
 
 		if (insertedNativeCellCount==0 && generateNative) {
-				insertProbability(false,false, bounds,true);
+			insertProbability(false,false, bounds,true);
 			logger.trace("inserted "+insertedNativeCellCount+" native entries with inbox false for "+currentSpeciesID+" species id");
 		}
 
@@ -539,7 +541,7 @@ public class HSPECGenerator {
 			List<Field> filters=new ArrayList<Field>();
 			filters.add(new Field(SpeciesOccursumFields.speciesid+"",currentSpeciesID,FieldType.STRING));			
 			ResultSet rs =session.executeFilteredQuery(filters, resultsSuitable, HCAF_SFields.csquarecode+"", "ASC");
-			
+
 			while(rs.next()){
 				boolean inBox=rs.getBoolean(HSPECFields.boundboxyn+"");
 				boolean inFAO=rs.getBoolean(HSPECFields.faoareayn+"");
@@ -556,7 +558,7 @@ public class HSPECGenerator {
 			}
 		}else		
 			//Normal Execution
-			
+
 			while(hcafRes.next())
 				try{
 					Double probability=null;
