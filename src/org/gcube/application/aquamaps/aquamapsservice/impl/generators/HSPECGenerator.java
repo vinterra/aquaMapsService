@@ -697,6 +697,7 @@ public class HSPECGenerator {
 		if (hcafDepthMax == -9999 || hspenMinDepth == null ) return 1.0;
 		if (hcafDepthMax < hspenMinDepth) return 0.0;
 		if 	((hcafDepthMax < hspenDepthPrefMin) &&(hcafDepthMax >= hspenMinDepth)) return (hcafDepthMax - hspenMinDepth) / (hspenDepthPrefMin - hspenMinDepth);
+		//TODO check vprovider value (meanDepth)
 		if (hspenPelagic != 0) {return 1.0;}		
 		if (hspenDepthPrefMax!=null)
 		{

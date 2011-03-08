@@ -1,22 +1,11 @@
 package testClient;
 
-import java.util.ArrayList;
-
-import org.gcube.application.aquamaps.stubs.dataModel.Envelope;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.MetaSourceFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.stubs.dataModel.xstreamconverters.EnvelopeConverter;
+import org.gcube.application.aquamaps.stubs.dataModel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.stubs.wrapper.AquaMapsServiceWrapper;
-import org.gcube.application.aquamaps.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
 
-import com.thoughtworks.xstream.XStream;
 
 public class WrapperTest {
 
@@ -28,9 +17,7 @@ public class WrapperTest {
 		session.setScope("/gcube/devsec");
 		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(session, AquaMapsServiceTester.SERVICE_URI);
 		
-		XStream stream = new XStream();
-		stream.processAnnotations(Envelope.class);
-stream.registerConverter(new EnvelopeConverter());
+		
 		
 //		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", "ASC")));
 ////		System.out.println(wrapper.getJSONPhilogeny());
@@ -44,7 +31,7 @@ stream.registerConverter(new EnvelopeConverter());
 		
 		
 		
-		System.out.println(stream.toXML((wrapper.loadEnvelope(s.getId(), 1))));
+		System.out.println(AquaMapsXStream.getInstance().toXML((wrapper.loadEnvelope(s.getId(), 1))));
 		
 		
 		

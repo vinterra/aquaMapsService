@@ -21,7 +21,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_DFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
 import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.stubs.dataModel.xstreamconverters.EnvelopeConverter;
+import org.gcube.application.aquamaps.stubs.dataModel.xstream.EnvelopeConverter;
 import org.gcube.application.aquamaps.stubs.wrapper.AquaMapsServiceWrapper;
 import org.gcube.application.aquamaps.stubs.wrapper.WrapperUtils;
 import org.gcube.application.framework.core.session.ASLSession;
@@ -38,8 +38,8 @@ public class HSPECGeneratorTest {
 	 * @param args
 	 */
 	public static void main(String[] args)throws Exception {
-//		fromSpeciesAndCell();
-		fromCSVList();
+		fromSpeciesAndCell();
+//		fromCSVList();
 		System.out.println("END");
 	}
 	

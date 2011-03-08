@@ -47,6 +47,7 @@
 					<xsd:element name="sourceHCAFId" 		type="xsd:int" />
 					<xsd:element name="sourceHSPENId" 		type="xsd:int" />
 					<xsd:element name="speciesSelection"    type="coretypes:stringArray"/>
+					<xsd:element name="enableLog" 		type="xsd:boolean"/>
 				</xsd:sequence>
 			</xsd:complexType>
 			

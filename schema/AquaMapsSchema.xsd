@@ -3,6 +3,7 @@
 	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/types"
 	xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/types"
 	xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/03/addressing" 
+	xmlns:coretypes="http://gcube-system.org/namespaces/common/core/types"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	
@@ -84,6 +85,46 @@
 				</xsd:sequence>
 			</xsd:complexType>
   
+  <xsd:complexType name="boundsInfoType">
+				<xsd:sequence>
+					<xsd:element name="minx" type="xsd:double" />
+					<xsd:element name="maxx" type="xsd:double" />
+					<xsd:element name="miny" type="xsd:double" />
+					<xsd:element name="maxy" type="xsd:double" />
+					<xsd:element name="crs" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+	
+	
+			
+  
+  
+  <xsd:complexType name="layerInfoType">
+				<xsd:sequence>
+					<xsd:element name="id" type="xsd:string" />
+					<xsd:element name="name" type="xsd:string" />
+					<xsd:element name="title" type="xsd:string" />
+					<xsd:element name="abstract" type="xsd:string" />
+					<xsd:element name="url" type="xsd:string" />
+					<xsd:element name="srs" type="xsd:string" />
+					<xsd:element name="type" type="xsd:string" />
+					<xsd:element name="trasparent" type="xsd:boolean" />
+					<xsd:element name="baseLayer" type="xsd:boolean" />
+					<xsd:element name="buffer" type="xsd:int" />
+					<xsd:element name="hasLegend" type="xsd:boolean" />
+					<xsd:element name="visible" type="xsd:boolean" />
+					<xsd:element name="selected" type="xsd:boolean" />
+					<xsd:element name="queryable" type="xsd:boolean" />
+					<xsd:element name="maxExtent" type="tns:boundsInfoType" />
+					<xsd:element name="minExtent" type="tns:boundsInfoType" />
+					<xsd:element name="defaultStyle" type="xsd:string" />
+					<xsd:element name="opacity" type="xsd:double" />
+					<xsd:element name="styles" type="coretypes:stringArray" />
+				</xsd:sequence>
+			</xsd:complexType>
+  
+  
+  
 			<xsd:complexType name="AquaMap">
 				<xsd:sequence>
 					<xsd:element name="boundingBox" type="xsd:string" />
@@ -93,11 +134,12 @@
 					<xsd:element name="id" type="xsd:int" />
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="selectedSpecies" type="tns:speciesArray" />
-					<xsd:element name="relatedResources" type="tns:fileArray" />
+					<xsd:element name="layers" type="tns:layerArray"/>
+					<xsd:element name="images" type="tns:fileArray" />
+					<xsd:element name="additionalFiles" type="tns:fileArray"/>
 					<xsd:element name="threshold" type="xsd:float" />
 					<xsd:element name="status" type="xsd:string" />
 					<xsd:element name="gis" type="xsd:boolean" />
-					<xsd:element name="layerId" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -153,6 +195,14 @@
 			
 
 			<!-- Arrays -->
+
+<xsd:complexType name="layerArray">
+				<xsd:sequence>
+					<xsd:element name="name" type="tns:layerInfoType" 
+							minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
 
 			<xsd:complexType name="fileArray">
 				<xsd:sequence>

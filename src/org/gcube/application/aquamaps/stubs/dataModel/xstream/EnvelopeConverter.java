@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.stubs.dataModel.xstreamconverters;
+package org.gcube.application.aquamaps.stubs.dataModel.xstream;
 
 import java.util.HashMap;
 import java.util.Map;

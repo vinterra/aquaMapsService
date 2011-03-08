@@ -116,7 +116,8 @@ src/org/gcube/application/aquamaps/stubs/dataModel/fields/MetaSourceFields.java 
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/OccurrenceCellsFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SpeciesOccursumFields.java -text
 src/org/gcube/application/aquamaps/stubs/dataModel/fields/SubmittedFields.java -text
-src/org/gcube/application/aquamaps/stubs/dataModel/xstreamconverters/EnvelopeConverter.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/xstream/AquaMapsXStream.java -text
+src/org/gcube/application/aquamaps/stubs/dataModel/xstream/EnvelopeConverter.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/AquaMapsServiceWrapper.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/stubs/wrapper/ServiceException.java -text
