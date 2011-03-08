@@ -28,12 +28,14 @@ public class AquaMapsServiceTester {
 
 //	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
-	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	private static final String SERVICE_URI="http://wn02.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	
+	private static final String Scope="/d4science.research-infrastructures.eu/FARM/AquaMaps";
 	
 	public static void main(String[] args){
 		try{
 		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/gcube/devsec");
+		session.setScope(Scope);
 		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(session, SERVICE_URI);
 		
 		Species spec=new Species("Fis-29501");
@@ -68,8 +70,9 @@ public class AquaMapsServiceTester {
 //		r=wrapper.loadResource(1, ResourceType.HSPEC);
 //		r=wrapper.loadResource(1, ResourceType.HSPEN);
 //		
-		wrapper.submitJob(createDummyJob(true,true,true));
+//		wrapper.submitJob(createDummyJob(true,true,true));
 		
+		System.out.println(wrapper.loadObject(639).toXML());
 		
 		System.out.println("Done");
 		}catch(Exception e){
