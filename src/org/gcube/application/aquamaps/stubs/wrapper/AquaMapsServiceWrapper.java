@@ -18,6 +18,7 @@ import org.gcube.application.aquamaps.stubs.dataModel.Area;
 import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
 import org.gcube.application.aquamaps.stubs.dataModel.Envelope;
 import org.gcube.application.aquamaps.stubs.dataModel.Field;
+import org.gcube.application.aquamaps.stubs.dataModel.File;
 import org.gcube.application.aquamaps.stubs.dataModel.Filter;
 import org.gcube.application.aquamaps.stubs.dataModel.Job;
 import org.gcube.application.aquamaps.stubs.dataModel.Resource;
@@ -191,8 +192,12 @@ try{
 	 */
 	public AquaMapsObject loadObject(int objectId)throws Exception{
 try{
+		logger.trace("Loading obj "+objectId);
 			String profile=pt.getProfile(objectId);
-			return new AquaMapsObject(profile);
+			AquaMapsObject obj=new AquaMapsObject(profile);
+			logger.trace("loading related files..");
+			obj.getRelatedResources().addAll(File.load(pt.getRelatedFiles(objectId+"")));
+			return obj;
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

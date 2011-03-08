@@ -140,7 +140,8 @@ public class Submitted {
 			obj.setSourceHSPEN(rs.getInt(SubmittedFields.sourceHCAF.toString()));
 			obj.setStatus(SubmittedStatus.valueOf(rs.getString(SubmittedFields.status.toString())));
 			obj.setTitle(rs.getString(SubmittedFields.title.toString()));
-			obj.setType(ObjectType.valueOf(rs.getString(SubmittedFields.type.toString())));
+			if(obj.isAquaMap)
+				obj.setType(ObjectType.valueOf(rs.getString(SubmittedFields.type.toString())));
 			toReturn.add(obj);
 		}
 		return toReturn;

@@ -239,9 +239,15 @@ public class AquaMapsObject {
 		Element authorElement=(Element) doc.getElementsByTagName("Author").item(0);
 		this.setAuthor(XMLUtils.getTextContent(authorElement));
 		Element typeElement=(Element) doc.getElementsByTagName("Type").item(0);
+		
+		//FIXME Workaround for old profiles without Status value
+		try{
 		this.setType(ObjectType.valueOf(XMLUtils.getTextContent(typeElement)));
 		Element statusElement=(Element) doc.getElementsByTagName("Status").item(0);
 		this.setStatus(SubmittedStatus.valueOf(XMLUtils.getTextContent(statusElement)));
+		}catch(Exception e){
+			this.setStatus(SubmittedStatus.Completed);
+		}
 		Element bbElement=(Element) doc.getElementsByTagName("BoundingBox").item(0);
 		this.getBoundingBox().parse(XMLUtils.getTextContent(bbElement));
 		Element thresholdElement=(Element) doc.getElementsByTagName("Threshold").item(0);

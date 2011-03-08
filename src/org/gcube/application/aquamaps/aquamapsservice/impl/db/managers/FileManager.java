@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.application.aquamaps.stubs.dataModel.Types.FileType;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class FileManager {
@@ -24,7 +25,7 @@ public class FileManager {
 			pps.setBoolean(1,true);
 			pps.setString(2,mapName);
 			pps.setString(3, basePath+f.getName());
-			pps.setString(4,"IMG");
+			pps.setString(4,FileType.Image+"");
 			pps.setInt(5,aquamapsId);
 			count+=pps.executeUpdate();
 		}

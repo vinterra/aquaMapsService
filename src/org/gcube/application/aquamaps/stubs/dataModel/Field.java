@@ -100,8 +100,13 @@ public class Field {
 	}
 
 	public Field (Element el){
+		//FIXME FieldType value missing
+		try{
 		Element typeElement=(Element) el.getElementsByTagName("FieldType").item(0);
 		this.setType(FieldType.valueOf(XMLUtils.getTextContent(typeElement)));
+		}catch(Exception e ){
+			this.setType(FieldType.STRING);
+		}
 		Element nameElement=(Element) el.getElementsByTagName("Name").item(0);
 		this.setName(XMLUtils.getTextContent(nameElement));
 		Element valueElement=(Element) el.getElementsByTagName("Value").item(0);
