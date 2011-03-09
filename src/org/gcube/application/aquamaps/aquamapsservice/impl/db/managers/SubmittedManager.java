@@ -225,7 +225,7 @@ public class SubmittedManager {
 		DBSession session=null;
 		try{
 			session=DBSession.openSession(DBType.mySql);
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,null,null),offset, offset+limit);
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,orderBy,orderDir),offset, offset+limit);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
