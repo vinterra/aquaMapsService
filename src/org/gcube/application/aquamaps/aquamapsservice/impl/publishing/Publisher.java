@@ -241,10 +241,14 @@ public class Publisher{
 			session= DBSession.openSession(PoolManager.DBType.mySql);
 			PreparedStatement ps= session.preparedStatement("SELECT internalId from speciesoccursum where speciesID = ?");
 			for(String id:coverageSpeciesId){
+				
 				ps.setString(1,id);
 				ResultSet rs = ps.executeQuery();
-				rs.first();
-				internals.add(rs.getInt(1));
+				if(rs.first()){
+					int internal=rs.getInt(1);
+					internals.add(internal);
+					logger.trace("SpeciesId ("+id+") -> internal species ID = "+internal);
+				}else logger.warn("UNABLE TO FIND INTERNAL SPECIES ID ON "+id);
 			}
 			return internals;
 		}catch (Exception e){

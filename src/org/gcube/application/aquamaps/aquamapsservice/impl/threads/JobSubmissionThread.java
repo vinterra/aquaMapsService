@@ -86,8 +86,12 @@ public class JobSubmissionThread extends Thread {
 				logger.trace(this.getName()+" waiting for simulation process ");			
 				logger.trace(waitingGroup.toString());
 			}
-			if(JobManager.getStatus(jobId).equals(SubmittedStatus.Error)) 
+			if(JobManager.getStatus(jobId).equals(SubmittedStatus.Error)){
+				for(AquaMapsObject aquaMapObj:toPerform.getAquaMapsObjectList())
+					SubmittedManager.updateStatus(aquaMapObj.getId(), SubmittedStatus.Error);				
 				throw new Exception("Job "+jobId+" failed simulation phase");
+				
+			}
 			else {
 				logger.trace(this.getName()+" Launching maps generation");
 			}

@@ -306,7 +306,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsPortType{
 			logger.trace("Filtering parameters : ");
 			for(Field f:parameters)
 				logger.trace(f.getName()+" = "+f.getValue()+" ("+f.getType()+")");
-			
+			logger.trace("ORDER BY "+arg0.getSortColumn()+" "+arg0.getSortDirection());
 			return SubmittedManager.getJsonList(parameters, arg0.getSortColumn(), arg0.getSortDirection(), arg0.getLimit(), arg0.getOffset()); 			
 		}catch(Exception e ){
 			logger.error("Exception while trying to serve -getAquaMapsPerUser : user = "+arg0.getUserID(),e);

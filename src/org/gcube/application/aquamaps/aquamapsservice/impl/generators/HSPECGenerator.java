@@ -38,10 +38,10 @@ public class HSPECGenerator {
 	private String resultsTable;
 	private String occurenceCellsTable;
 	private int jobId;
-	
+
 	private Map<String,Map<EnvelopeFields,Field>> jobWeights; 
 
-	
+
 	public HSPECGenerator(int jobId,String HCAF_D,String HCAF_S,String HSPEN,Map<String,Map<EnvelopeFields,Field>> envelopeWeights) throws Exception {
 		super();
 		this.hcafViewTable = ServiceUtils.generateId("HCAF", "");
@@ -109,13 +109,13 @@ public class HSPECGenerator {
 					long startHspenLoop= System.currentTimeMillis();
 					String speciesId= hspenRes.getString("SpeciesID");
 					if(toGenerateSpeciesIds.contains(speciesId)){
-						 
-						for(EnvelopeFields f: EnvelopeFields.values()){
-							if((jobWeights.containsKey(speciesId)))
-								weights.put(f, Boolean.parseBoolean(jobWeights.get(speciesId).get(f).getValue()));
-							else weights.put(f, true);
-						}
-						
+						if((jobWeights.containsKey(speciesId)))
+							for(EnvelopeFields f: EnvelopeFields.values()){
+								if((jobWeights.get(speciesId).get(f)!=null)&&(jobWeights.get(speciesId).get(f).getValue()!=null))
+									weights.put(f, Boolean.parseBoolean(jobWeights.get(speciesId).get(f).getValue()));
+								else weights.put(f, true);
+							}
+
 						Bounduary bounds=getBounduary(hspenRes.getDouble("NMostLat"),hspenRes.getDouble("SMostLat"),hspenRes.getDouble("EMostLong"),hspenRes.getDouble("WMostLong"), hspenRes.getString("SpeciesID"), session);
 						hcafRes.beforeFirst();
 

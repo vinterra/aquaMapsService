@@ -105,7 +105,7 @@ public class AquaMapsServiceWrapper {
 			s.getAttributesList().addAll(Field.load(pt.calculateEnvelope(request)));
 			return s.extractEnvelope();
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -119,7 +119,7 @@ public class AquaMapsServiceWrapper {
 			s.getAttributesList().addAll(Field.load(pt.calculateEnvelopefromCellSelection(request)));
 			return s.extractEnvelope();
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -130,7 +130,7 @@ public class AquaMapsServiceWrapper {
 			for(int i=0;i<ids.size();i++) array[i]=String.valueOf(ids.get(i));
 			return pt.deleteSubmitted(new StringArray(array));
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -156,7 +156,7 @@ public class AquaMapsServiceWrapper {
 			if(objType!=null)request.setTypeValue(objType.toString());
 			return pt.getAquaMapsPerUser(request);
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -171,7 +171,7 @@ try{
 			request.setLimit(settings.getLimit());
 			return pt.getOccurrenceCells(request);
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}
@@ -180,7 +180,7 @@ try{
 try{
 			throw new GCUBEFault("Not Implemented");
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}
@@ -199,7 +199,7 @@ try{
 			obj.getRelatedResources().addAll(File.load(pt.getRelatedFiles(objectId+"")));
 			return obj;
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -209,7 +209,7 @@ try{
 		Resource request=new Resource(type,resId);
 		return	new Resource(pt.getResourceInfo(request.toStubsVersion()));
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -224,7 +224,7 @@ try{
 			request.setLimit(settings.getLimit());
 			return pt.getResourceList(request);
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -242,7 +242,7 @@ try{
 	request.setLimit(settings.getLimit());
 		return	pt.getSpeciesByFilters(request);			
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -257,7 +257,7 @@ try{
 				System.out.println(f.getName()+" : "+f.getValue());
 			return spec.extractEnvelope();
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
@@ -268,7 +268,7 @@ try{
 	for(Integer id:submittedIds)ids.add(String.valueOf(id));
 			pt.markSaved(new StringArray(new String[ids.size()]));
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}
@@ -277,7 +277,7 @@ try{
 		try{
 			pt.submitJob(toSubmit.toStubsVersion());
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}
@@ -286,7 +286,7 @@ try{
 		try{
 			return new Submitted(pt.loadSubmittedById(id));
 		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
+			logger.error("Service thrown Fault "+f.getMessage(),f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}

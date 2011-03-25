@@ -151,7 +151,7 @@ public class CellManager {
 			List<Field> cellFilter=new ArrayList<Field>();
 			cellFilter.add(new Field(SpeciesOccursumFields.SpeciesID+"",speciesID,FieldType.STRING));
 			Set<Cell> toReturn = loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.CSquareCode+"", "ASC"));
-			
+			session.close();
 			for(Cell c : toReturn){
 				//Cehcking BB
 				try{

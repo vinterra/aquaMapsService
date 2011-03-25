@@ -245,14 +245,15 @@ public class SubmittedManager {
 		String path=FileManager.publishInternal(firstLevelDir,secondLevelDir,toUpdateProfile);
 		logger.trace("Profile for "+resName+" created, gonna update DB");
 		PreparedStatement ps=c.preparedStatement("Update Files set Path=? where owner=? and type ='XML'");
-		ps.setString(1, path+file.getName());
+		String uri=(path+file.getName()).replaceAll(" ", "%20");
+		ps.setString(1, uri);
 		ps.setInt(2, resId);		
 		if(ps.executeUpdate()==0){
 			logger.trace("Entry not found for profile, gonna create it");
 			PreparedStatement pps =c.preparedStatement("INSERT INTO Files (published, nameHuman , Path, Type, owner) VALUE(?, ?, ?, ?, ?)");
 			pps.setBoolean(1,true);
 			pps.setString(2,"Metadata");
-			pps.setString(3, path+file.getName());
+			pps.setString(3, uri);
 			pps.setString(4,"XML");
 			pps.setInt(5,resId);
 			pps.execute();			

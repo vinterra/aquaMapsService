@@ -6,11 +6,12 @@ import java.sql.Statement;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class MapsManager {
 
 	
-	
+	private static GCUBELog logger= new GCUBELog(MapsManager.class);
 	
 	
 		public static final String name="distributionMaps";
@@ -88,17 +89,22 @@ public class MapsManager {
 	 */
 	
 	
-	public static int getDistributionMapId(int hcaf,int hspen, int species)throws Exception{
+	public static int getDistributionMapId(int hcafvalue,int hspenvalue , int speciesvalue)throws Exception{
 		DBSession session=null;
 		try{
 			session= DBSession.openSession(PoolManager.DBType.mySql);
+			logger.trace("looking for mapId for speciesId = "+speciesvalue+", hcaf = "+hcafvalue+", hspen = "+hspenvalue);
 			PreparedStatement ps= session.preparedStatement("SELECT "+Id+" from "+name+" where "+hcaf+"=? AND "+hspen+"=? AND "+species+"=?");
-			ps.setInt(1, hcaf);
-			ps.setInt(2, hspen);
-			ps.setInt(3,species);
+			ps.setInt(1, hcafvalue);
+			ps.setInt(2, hspenvalue);
+			ps.setInt(3,speciesvalue);
 			ResultSet rs= ps.executeQuery();
-			if(rs.first()) return rs.getInt(Id);
-			else return 0;
+			int toReturn=0;
+			if(rs.next()) {
+				toReturn=rs.getInt(Id);
+				logger.trace("found id "+toReturn);
+			}else logger.trace(" no maps found");
+			return toReturn;
 		}catch (Exception e){
 			throw e;
 		}finally {

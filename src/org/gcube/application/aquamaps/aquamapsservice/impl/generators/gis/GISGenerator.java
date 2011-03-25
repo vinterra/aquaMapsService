@@ -194,9 +194,16 @@ public class GISGenerator {
 	
 	
 	public boolean generateStyle(StyleGenerationRequest req)throws Exception{
-		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
+		try{
+		logger.trace("Generating style... ");
 		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 		String style;
+		logger.trace("Style parameters : ");
+		logger.trace("Name : "+req.getNameStyle());
+		logger.trace("Attribute : "+req.getAttributeName().toLowerCase());
+		logger.trace("Min : "+req.getMin()+", Max : "+req.getMax()+", NClasses : "+req.getNClasses());
+		logger.trace("Colors 1 : "+req.getC1()+","+req.getC2());
+		logger.trace("Type : " +req.getTypeValue());
 		if(req.getTypeValue()==Integer.class)
 			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
 		else if(req.getTypeValue()==Float.class)
@@ -207,6 +214,10 @@ public class GISGenerator {
 		toReturn=caller.sendStyleSDL(style);
 		logger.trace("Submitting style result : "+toReturn);
 		return toReturn;
+		}catch(Exception e){
+			logger.error("Unexpected Error ",e);
+			throw e;
+		}
 	}
 	
 	

@@ -22,9 +22,10 @@ public class FileManager {
 		int count=0;
 		for(String mapName:imagesNameAndLink.keySet()){
 			File f= new File(imagesNameAndLink.get(mapName));
+			String path=(basePath+f.getName()).replaceAll(" ", "%20");
 			pps.setBoolean(1,true);
 			pps.setString(2,mapName);
-			pps.setString(3, basePath+f.getName());
+			pps.setString(3, path);
 			pps.setString(4,FileType.Image+"");
 			pps.setInt(5,aquamapsId);
 			count+=pps.executeUpdate();

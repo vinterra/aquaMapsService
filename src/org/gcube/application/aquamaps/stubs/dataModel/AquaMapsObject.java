@@ -248,6 +248,14 @@ public class AquaMapsObject {
 		}catch(Exception e){
 			this.setStatus(SubmittedStatus.Completed);
 		}
+		
+		try{
+			Element gisElement=(Element) doc.getElementsByTagName("Gis").item(0);
+			this.setGis(Boolean.parseBoolean(XMLUtils.getTextContent(gisElement)));
+		}catch(Exception e){/* GIS TAG non trovato*/}			
+		
+		
+		
 		Element bbElement=(Element) doc.getElementsByTagName("BoundingBox").item(0);
 		this.getBoundingBox().parse(XMLUtils.getTextContent(bbElement));
 		Element thresholdElement=(Element) doc.getElementsByTagName("Threshold").item(0);
