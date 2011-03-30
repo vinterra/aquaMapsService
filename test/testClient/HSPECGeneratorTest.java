@@ -93,21 +93,21 @@ public class HSPECGeneratorTest {
 
 	private static void fromCSVList()throws Exception{
 		List<String> ids=new ArrayList<String>();
-//		ids.add("Fis-22836");
+		ids.add("ITS-180495");
+////		
 //		
-		
-		System.out.println("Loading csv...");
-		 
-		for(List<Field> row: WrapperUtils.loadCSV(csvPath, ','))
-			for(Field f : row) if(f.getName().equalsIgnoreCase(SpeciesOccursumFields.speciesid+""))ids.add(f.getValue());
-		
+//		System.out.println("Loading csv...");
+//		 
+//		for(List<Field> row: WrapperUtils.loadCSV(csvPath, ','))
+//			for(Field f : row) if(f.getName().equalsIgnoreCase(SpeciesOccursumFields.speciesid+""))ids.add(f.getValue());
+//		
 		System.out.println("Loaded "+ids.size()+" ids");
 		
 		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
 		session.setScope("/gcube/devsec");
 		DataManagementPortType pt=HCAFGenerationTest.getPortType(session);
 		GenerateHSPECRequestType req= new GenerateHSPECRequestType();
-		req.setGenerateNative(true);
+		req.setGenerateNative(false);
 		req.setGenerateSuitable(true);
 		req.setSourceHCAFId(1);
 		req.setSourceHSPENId(1);
