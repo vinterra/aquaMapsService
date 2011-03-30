@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/types"
-	xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/types"
-	xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/03/addressing" 
+	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/datamodel"
+	xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/datamodel"
 	xmlns:coretypes="http://gcube-system.org/namespaces/common/core/types"
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	
-		<xsd:complexType name="perturbation">
+			<xsd:complexType name="perturbation">
 				<xsd:sequence>
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="field" type="xsd:string" />
 					<xsd:element name="toPerturbId" type="xsd:string" />
 					<xsd:element name="value" type="xsd:string" />
 				</xsd:sequence>
-			</xsd:complexType>
-
-			
+			</xsd:complexType> 
 
 			<xsd:complexType name="envelopeWeights">
 				<xsd:sequence>
@@ -84,8 +81,8 @@
 					<xsd:element name="id" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
-  
-  <xsd:complexType name="boundsInfoType">
+
+			<xsd:complexType name="boundsInfoType">
 				<xsd:sequence>
 					<xsd:element name="minx" type="xsd:double" />
 					<xsd:element name="maxx" type="xsd:double" />
@@ -94,12 +91,12 @@
 					<xsd:element name="crs" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
-	
-	
-			
-  
-  
-  <xsd:complexType name="layerInfoType">
+
+
+
+
+
+			<xsd:complexType name="layerInfoType">
 				<xsd:sequence>
 					<xsd:element name="id" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
@@ -122,9 +119,9 @@
 					<xsd:element name="styles" type="coretypes:stringArray" />
 				</xsd:sequence>
 			</xsd:complexType>
-  
-  
-  
+
+
+
 			<xsd:complexType name="AquaMap">
 				<xsd:sequence>
 					<xsd:element name="boundingBox" type="xsd:string" />
@@ -134,9 +131,9 @@
 					<xsd:element name="id" type="xsd:int" />
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="selectedSpecies" type="tns:speciesArray" />
-					<xsd:element name="layers" type="tns:layerArray"/>
+					<xsd:element name="layers" type="tns:layerArray" />
 					<xsd:element name="images" type="tns:fileArray" />
-					<xsd:element name="additionalFiles" type="tns:fileArray"/>
+					<xsd:element name="additionalFiles" type="tns:fileArray" />
 					<xsd:element name="threshold" type="xsd:float" />
 					<xsd:element name="status" type="xsd:string" />
 					<xsd:element name="gis" type="xsd:boolean" />
@@ -160,7 +157,7 @@
 					<xsd:element name="date" type="xsd:string" />
 					<xsd:element name="relatedResources" type="tns:fileArray" />
 					<xsd:element name="gis" type="xsd:boolean" />
-					<xsd:element name="groupId" type="xsd:string"/>
+					<xsd:element name="groupId" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -174,32 +171,32 @@
 			</xsd:complexType>
 
 			<xsd:complexType name="submitted">
-			<xsd:sequence>
-				<xsd:element name="author" type="xsd:string"/>
-				<xsd:element name="date" type="xsd:string"/>
-				<xsd:element name="gis" type="xsd:string"/>
-				<xsd:element name="isAquaMap" type="xsd:boolean"/>
-				<xsd:element name="jobId" type="xsd:int"/>
-				<xsd:element name="mapId" type="xsd:int"/>
-				<xsd:element name="saved" type="xsd:boolean"/>
-				<xsd:element name="searchId" type="xsd:int"/>
-				<xsd:element name="selectionCriteria" type="xsd:string"/>
-				<xsd:element name="sourceHCAF" type="xsd:int"/>
-				<xsd:element name="sourceHSPEC" type="xsd:int"/>
-				<xsd:element name="sourceHSPEN" type="xsd:int"/>
-				<xsd:element name="status" type="xsd:string"/>
-				<xsd:element name="title" type="xsd:string"/>
-				<xsd:element name="type" type="xsd:string"/>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="author" type="xsd:string" />
+					<xsd:element name="date" type="xsd:string" />
+					<xsd:element name="gis" type="xsd:string" />
+					<xsd:element name="isAquaMap" type="xsd:boolean" />
+					<xsd:element name="jobId" type="xsd:int" />
+					<xsd:element name="mapId" type="xsd:int" />
+					<xsd:element name="saved" type="xsd:boolean" />
+					<xsd:element name="searchId" type="xsd:int" />
+					<xsd:element name="selectionCriteria" type="xsd:string" />
+					<xsd:element name="sourceHCAF" type="xsd:int" />
+					<xsd:element name="sourceHSPEC" type="xsd:int" />
+					<xsd:element name="sourceHSPEN" type="xsd:int" />
+					<xsd:element name="status" type="xsd:string" />
+					<xsd:element name="title" type="xsd:string" />
+					<xsd:element name="type" type="xsd:string" />
+				</xsd:sequence>
 			</xsd:complexType>
-			
+
 
 			<!-- Arrays -->
-
-<xsd:complexType name="layerArray">
+ 
+			<xsd:complexType name="layerArray">
 				<xsd:sequence>
-					<xsd:element name="name" type="tns:layerInfoType" 
-							minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="name" type="tns:layerInfoType"
+						minOccurs="0" maxOccurs="unbounded" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -235,7 +232,7 @@
 			</xsd:complexType>
 
 
-			
+
 
 			<xsd:complexType name="envelopeWeightArray">
 				<xsd:sequence>
@@ -278,5 +275,7 @@
 						maxOccurs="unbounded" />
 				</xsd:sequence>
 			</xsd:complexType>
-</xsd:schema>
+
+
+		</xsd:schema>
 	
