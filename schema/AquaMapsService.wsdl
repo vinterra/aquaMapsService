@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions name="AquaMaps"
-	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps"
-	xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps"
+<definitions name="AquaMapsService"
+	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice"
+	xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsdlpp="http://www.globus.org/namespaces/2004/10/WSDLPreprocessor"
 	xmlns:wsrp="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.xsd"
@@ -9,17 +9,17 @@
 	xmlns:corefaults="http://gcube-system.org/namespaces/common/core/faults"
 	xmlns:wsntw="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.wsdl"
 	xmlns:provider="http://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider"
-	xmlns:aqtypes="http://gcube-system.org/namespaces/application/aquamaps/types">
+	xmlns:aqtypes="http://gcube-system.org/namespaces/application/aquamaps/datamodel">
 	
 	<import namespace="http://gcube-system.org/namespaces/common/core/faults"
 		location="../gcube/common/core/faults/GCUBEFaults.wsdl" />
 
 	<types>
-		<xsd:schema targetNamespace="http://gcube-system.org/namespaces/application/aquamaps"
-			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps">
+		<xsd:schema targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice"
+			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice">
 			<xsd:import namespace="http://gcube-system.org/namespaces/common/core/types"
 				schemaLocation="../gcube/common/core/types/GCUBETypes.xsd" />
-		<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/types"
+		<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/datamodel"
 		 schemaLocation="AquaMapsSchema.xsd"/>
 		
 
@@ -308,7 +308,7 @@
 
 
 
-	<portType name="AquaMapsPortType">
+	<portType name="AquaMapsServicePortType">
 
 		<!-- operation part -->
 

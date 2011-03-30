@@ -18,7 +18,7 @@
 	</service>
 	
 	
-	<service name="gcube/application/aquamaps/AquaMaps">
+	<service name="gcube/application/aquamaps/AquaMapsService">
     	 	<environment 
 			name="frequentUserLimit" 
 	 		value="3" 

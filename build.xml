@@ -334,7 +334,32 @@ full.stubs:   			(optional) Set to 'false', it excludes auxiliary stub code plac
 	<target name="generateStubs" depends="generateMappings,generateStubs.1,generateStubs.2,generateStubs.3,generateStubs.4,generateStubs.5,generateStubs.6" description="generate stub classes for all porttypes" />
 	
 	<target name="generateMappings"> 
+		<echo message="Generate Mappings "/>
+		
+		<echo message="namespace.additional.1 =${namespace.additional.1} "/>
+		
 		<var name="mappings" value=""/>
+		
+		
+		<!-- Additional Packages mappings -->
+		<if name="namespace.additional.1">
+			<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.1}"/>
+		</if>
+		<if name="namespace.additional.2">
+					<var name="mappings" value="${mappings} -N${namespace.additional.2}=${package.additional.2}"/>
+				</if>
+		<if name="namespace.additional.3">
+					<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.3}"/>
+				</if>
+		<if name="namespace.additional.4">
+					<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.4}"/>
+				</if>
+		<if name="namespace.additional.5">
+					<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.5}"/>
+				</if>
+		
+		
+		
 	    <if name="namespace.1">
 	    	<if name="package.1">
 	    		<var name="package.1" value="${stubs.package}.${package.1}"/>
@@ -383,6 +408,7 @@ full.stubs:   			(optional) Set to 'false', it excludes auxiliary stub code plac
 	    	</if>
 	        <var name="mappings" value="${mappings} -N${namespace.6}=${package.6} -N${namespace.6}/service=${package.6}.service -N${namespace.6}/bindings=${package.6}.bindings"/>
 	    </if>
+		<echo message="mappings = ${mappings}"/>
 	</target>
 		    
 	
