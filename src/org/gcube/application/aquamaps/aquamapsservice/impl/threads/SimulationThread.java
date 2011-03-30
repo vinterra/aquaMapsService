@@ -13,14 +13,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesSt
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Job;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.mortbay.log.Log;
 

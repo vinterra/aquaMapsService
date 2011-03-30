@@ -7,20 +7,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Filter;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
+import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {
@@ -38,12 +38,12 @@ public class SpeciesManager {
 			filters.add(new Field(SpeciesOccursumFields.speciesid+"", id, FieldType.STRING));
 			Species toReturn=new Species(id);
 			if(fetchStatic){
-				List<Field> row=DBUtils.toFields(session.executeFilteredQuery(filters, speciesOccurSum,null,null)).get(0);
+				List<Field> row=Field.loadResultSet(session.executeFilteredQuery(filters, speciesOccurSum,null,null)).get(0);
 				if(row!=null) toReturn.attributesList.addAll(row);
 			}
 			if(fetchEnvelope){
 				String hspenTable=SourceManager.getSourceName(ResourceType.HSPEN, hspenId);
-				List<Field> row=DBUtils.toFields(session.executeFilteredQuery(filters, hspenTable,null,null)).get(0);
+				List<Field> row=Field.loadResultSet(session.executeFilteredQuery(filters, hspenTable,null,null)).get(0);
 				if(row!=null) toReturn.attributesList.addAll(row);
 			}
 			return toReturn;
@@ -193,7 +193,7 @@ public class SpeciesManager {
 	
 	private static Set<Species> loadRS(ResultSet rs) throws SQLException{
 		HashSet<Species> toReturn=new HashSet<Species>();
-		List<List<Field>> rows=DBUtils.toFields(rs);
+		List<List<Field>> rows=Field.loadResultSet(rs);
 		for(List<Field> row:rows){
 			Species toAdd=new Species("***");
 			toAdd.attributesList.addAll(row);

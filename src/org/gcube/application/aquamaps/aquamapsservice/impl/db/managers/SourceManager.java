@@ -9,11 +9,11 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Resource;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.MetaSourceFields;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceManager {
@@ -158,7 +158,7 @@ public class SourceManager {
 	
 	private static Set<Resource> loadRS(ResultSet rs) throws SQLException{
 		HashSet<Resource> toReturn=new HashSet<Resource>();
-		List<List<Field>> rows=DBUtils.toFields(rs);
+		List<List<Field>> rows=Field.loadResultSet(rs);
 		for(List<Field> row:rows){
 			Resource toAdd=new Resource(ResourceType.HCAF, 0);
 			for(Field f : row){

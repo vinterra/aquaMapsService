@@ -1,6 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 
 
 public class SourceGeneratorRequest implements GenerationRequest{

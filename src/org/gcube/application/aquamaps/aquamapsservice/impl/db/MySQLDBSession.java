@@ -8,8 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 
 public class MySQLDBSession extends DBSession {
 

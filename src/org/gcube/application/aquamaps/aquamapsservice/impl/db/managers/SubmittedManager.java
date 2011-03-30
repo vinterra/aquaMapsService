@@ -10,14 +10,14 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Job;
-import org.gcube.application.aquamaps.stubs.dataModel.Submitted;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.stubs.wrapper.WrapperUtils;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
+import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
+import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SubmittedManager {
@@ -102,10 +102,10 @@ public class SubmittedManager {
 		return ((Integer) getField(submittedId,SubmittedFields.gisenabled)==1);
 	}
 	public static List<String> getGisReference(int submittedId)throws Exception{
-		return WrapperUtils.CSVToList((String) getField(submittedId,SubmittedFields.geoserverreference));
+		return CSVUtils.CSVToList((String) getField(submittedId,SubmittedFields.geoserverreference));
 	}
 	public static List<String> getGisId(int submittedId)throws Exception{
-		return WrapperUtils.CSVToList((String) getField(submittedId,SubmittedFields.gispublishedid));
+		return CSVUtils.CSVToList((String) getField(submittedId,SubmittedFields.gispublishedid));
 	}
 	
 	public static SubmittedStatus getStatus(int submittedId)throws Exception{
@@ -148,10 +148,10 @@ public class SubmittedManager {
 	}
 
 	public static int setGisPublishedId(int submittedId,List<String> gisId)throws Exception{
-		return updateField(submittedId,SubmittedFields.gispublishedid,FieldType.STRING,WrapperUtils.listToCSV(gisId));
+		return updateField(submittedId,SubmittedFields.gispublishedid,FieldType.STRING,CSVUtils.listToCSV(gisId));
 	}
 	public static int setGisReference(int submittedId,List<String> gisreference)throws Exception{
-		return updateField(submittedId,SubmittedFields.geoserverreference,FieldType.STRING,WrapperUtils.listToCSV(gisreference));
+		return updateField(submittedId,SubmittedFields.geoserverreference,FieldType.STRING,CSVUtils.listToCSV(gisreference));
 	}
 	
 	
@@ -196,7 +196,7 @@ public class SubmittedManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,null,null),offset, offset+limit);
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,orderBy,orderDir),offset, offset+limit);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}

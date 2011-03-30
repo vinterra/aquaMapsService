@@ -18,7 +18,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -197,9 +199,9 @@ public class JobUtils {
 	 * @return list of published Images
 	 * @throws Exception 
 	 */
-	public static List<org.gcube.application.aquamaps.stubs.dataModel.File> createImages(int objId,String clusterFile,String header,Set<String> speciesCoverage, GCUBEScope actualScope, boolean hasCustomizations) throws Exception{
+	public static List<org.gcube.application.aquamaps.dataModel.enhanced.File> createImages(int objId,String clusterFile,String header,Set<String> speciesCoverage, GCUBEScope actualScope, boolean hasCustomizations) throws Exception{
 
-		List<org.gcube.application.aquamaps.stubs.dataModel.File> toReturn=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.File>();
+		List<org.gcube.application.aquamaps.dataModel.enhanced.File> toReturn=new ArrayList<org.gcube.application.aquamaps.dataModel.enhanced.File>();
 		logger.trace(objId+" gonna call perl with file " +clusterFile);
 		SubmittedManager.updateStatus(objId, SubmittedStatus.Publishing);
 		boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));

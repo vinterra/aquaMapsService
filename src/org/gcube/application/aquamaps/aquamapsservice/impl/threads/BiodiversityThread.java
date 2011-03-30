@@ -20,17 +20,17 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generation
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.LayerInfoType;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Area;
+import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -123,7 +123,7 @@ public class BiodiversityThread extends Thread {
 				prep=session.preparedStatement(clusteringBiodiversityQuery(HSPECName,tableName));				
 				prep.setFloat(1,threshold);
 				ResultSet rs=prep.executeQuery();
-				List<org.gcube.application.aquamaps.stubs.dataModel.File> references=new ArrayList<org.gcube.application.aquamaps.stubs.dataModel.File>();
+				List<org.gcube.application.aquamaps.dataModel.enhanced.File> references=new ArrayList<org.gcube.application.aquamaps.dataModel.enhanced.File>();
 				
 				if(rs.first()){
 						//RS not empty

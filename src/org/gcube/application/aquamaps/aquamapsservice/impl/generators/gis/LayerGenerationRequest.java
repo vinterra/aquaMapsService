@@ -8,14 +8,15 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest.ClusterScaleType;
-import org.gcube.application.aquamaps.stubs.LayerInfoType;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.dataModel.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Area;
+import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
+
 
 
 public class LayerGenerationRequest implements GISGenerationRequest {

@@ -10,16 +10,9 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.AreaType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.OccurrenceCellsFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CellManager {
@@ -93,7 +86,7 @@ public class CellManager {
 //	
 	private static Set<Cell> loadRS(ResultSet rs) throws SQLException{
 		HashSet<Cell> toReturn=new HashSet<Cell>();
-		List<List<Field>> rows=DBUtils.toFields(rs);
+		List<List<Field>> rows=Field.loadResultSet(rs);
 		for(List<Field> row:rows){
 			toReturn.add(new Cell(row));
 		}
@@ -123,7 +116,7 @@ public class CellManager {
 //			PreparedStatement ps=session.preparedStatement("Select * from "+HCAFName+" where "+HCAF_SFields.CSquareCode+" = ?");
 			for(Cell c: toUpdate){
 				ps.setString(1,c.getCode());
-				c.attributesList.addAll(DBUtils.toFields(ps.executeQuery()).get(0));
+				c.attributesList.addAll(Field.loadResultSet(ps.executeQuery()).get(0));
 			}
 			return toUpdate;
 		}catch(Exception e){throw e;}
@@ -142,7 +135,7 @@ public class CellManager {
 			ps.setString(2,SpeciesID);
 			for(Cell c: toUpdate){
 				ps.setString(1,c.getCode());
-				c.attributesList.addAll(DBUtils.toFields(ps.executeQuery()).get(0));
+				c.attributesList.addAll(Field.loadResultSet(ps.executeQuery()).get(0));
 			}
 			return toUpdate;
 		}catch(Exception e){throw e;}
@@ -192,7 +185,7 @@ public class CellManager {
 			Set<Cell> toReturn=new HashSet<Cell>();
 			for(String code:ids){
 				ps.setString(1,code);
-				toReturn.add(new Cell(DBUtils.toFields(ps.executeQuery()).get(0)));
+				toReturn.add(new Cell(Field.loadResultSet(ps.executeQuery()).get(0)));
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}

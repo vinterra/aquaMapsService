@@ -3,10 +3,6 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
 
 public class DBUtils {
 	public static String toJSon(ResultSet resultSet ) throws SQLException
@@ -190,18 +186,6 @@ public class DBUtils {
 
 	}
 	
-	public static List<List<Field>> toFields(ResultSet rs)throws SQLException{
-		List<List<Field>> toReturn=new ArrayList<List<Field>>();
-		ResultSetMetaData rsMeta=rs.getMetaData();
-		int colCount=rsMeta.getColumnCount();
-		while(rs.next()){
-			List<Field> row=new ArrayList<Field>();
-			for(int i=1;i<=colCount;i++)
-				row.add(new Field(rsMeta.getColumnName(i),rs.getString(i)));
-			toReturn.add(row);
-		}
-		return toReturn;
-	}
 	
 	
 }

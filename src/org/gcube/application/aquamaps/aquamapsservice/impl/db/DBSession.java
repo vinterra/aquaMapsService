@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 

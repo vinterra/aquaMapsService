@@ -3,9 +3,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.env;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-
+import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 
 public abstract class EnvEngine {
 	

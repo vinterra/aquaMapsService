@@ -5,28 +5,28 @@ import java.util.List;
 
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
-import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
-import org.gcube.application.aquamaps.stubs.CalculateEnvelopeRequestType;
-import org.gcube.application.aquamaps.stubs.CalculateEnvelopefromCellSelectionRequestType;
-import org.gcube.application.aquamaps.stubs.GetAquaMapsPerUserRequestType;
-import org.gcube.application.aquamaps.stubs.GetOccurrenceCellsRequestType;
-import org.gcube.application.aquamaps.stubs.GetResourceListRequestType;
-import org.gcube.application.aquamaps.stubs.GetSpeciesByFiltersRequestType;
-import org.gcube.application.aquamaps.stubs.GetSpeciesEnvelopeRequestType;
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.stubs.dataModel.Envelope;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Filter;
-import org.gcube.application.aquamaps.stubs.dataModel.Job;
-import org.gcube.application.aquamaps.stubs.dataModel.Resource;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Submitted;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetAquaMapsPerUserRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetOccurrenceCellsRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.service.AquaMapsServiceAddressingLocator;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Area;
+import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.contexts.GHNContext;
@@ -54,7 +54,7 @@ public class AquaMapsServiceWrapper {
 	}
 
 
-	private AquaMapsPortType pt;
+	private AquaMapsServicePortType pt;
 	private ASLSession session;
 
 	public AquaMapsServiceWrapper(ASLSession session, String defaultURI)throws Exception {
@@ -62,7 +62,7 @@ public class AquaMapsServiceWrapper {
 		this.pt=getPortType(session,defaultURI);		
 	}
 
-	private static AquaMapsPortType getPortType(ASLSession session,String defaultURI) throws Exception{
+	private static AquaMapsServicePortType getPortType(ASLSession session,String defaultURI) throws Exception{
 		AquaMapsServiceAddressingLocator asal= new AquaMapsServiceAddressingLocator();
 		EndpointReferenceType epr;
 		GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
@@ -74,10 +74,10 @@ public class AquaMapsServiceWrapper {
 			epr=new EndpointReferenceType();
 			epr.setAddress(new AttributedURI(defaultURI));
 		}else{
-			epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/AquaMaps");
+			epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/AquaMapsService");
 			System.out.println("Found RI @ : "+epr.getAddress().getHost());
 		}
-		AquaMapsPortType aquamapsPT=asal.getAquaMapsPortTypePort(epr);
+		AquaMapsServicePortType aquamapsPT=asal.getAquaMapsServicePortTypePort(epr);
 		return GCUBERemotePortTypeContext.getProxy(aquamapsPT, session.getScope());	
 	}
 

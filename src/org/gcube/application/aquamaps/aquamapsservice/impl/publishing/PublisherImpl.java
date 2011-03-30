@@ -9,15 +9,10 @@ import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.stubs.LayerInfoType;
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Job;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.AtomicCondition;
@@ -274,7 +269,7 @@ public class PublisherImpl implements Publisher{
 
 	public Job getJobById(int id) throws Exception {
 		AquaMapsPublisherPortType pt=getPortType();
-		return new Job((org.gcube.application.aquamaps.stubs.Job)(Object)pt.getJobById(id));
+		return new Job(pt.getJobById(id));
 	}
 
 	public int publishAquaMapsObject(AquaMapsObject toPublish) throws Exception {

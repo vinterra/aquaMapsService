@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 
 
 //###################################################################################

@@ -4,15 +4,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.stubs.LayerInfoType;
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
-import org.gcube.application.aquamaps.stubs.dataModel.Area;
-import org.gcube.application.aquamaps.stubs.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.File;
-import org.gcube.application.aquamaps.stubs.dataModel.Job;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.dataModel.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
 

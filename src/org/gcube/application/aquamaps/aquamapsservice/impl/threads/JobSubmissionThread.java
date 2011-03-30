@@ -11,10 +11,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManage
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
-import org.gcube.application.aquamaps.stubs.dataModel.Job;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -90,9 +89,12 @@ public class JobSubmissionThread extends Thread {
 						logger.trace(this.getName()+" waiting for simulation process ");			
 						logger.trace(waitingGroup.toString());
 					}
-					if(JobManager.getStatus(jobId).equals(SubmittedStatus.Error)) 
+					if(JobManager.getStatus(jobId).equals(SubmittedStatus.Error)){
+						for(AquaMapsObject aquaMapObj:toPerform.getAquaMapsObjectList())
+							SubmittedManager.updateStatus(aquaMapObj.getId(), SubmittedStatus.Error);				
 						throw new Exception("Job "+jobId+" failed simulation phase");
-					else {
+						
+					}else {
 						logger.trace(this.getName()+" Launching maps generation");
 					}
 

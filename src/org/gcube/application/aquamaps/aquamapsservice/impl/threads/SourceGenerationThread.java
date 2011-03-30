@@ -23,9 +23,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.SourceGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceGenerationThread extends Thread {

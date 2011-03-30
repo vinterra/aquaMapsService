@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.stubs.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.LayerInfoType;
 import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
 
 public class GroupGenerationRequest implements GISGenerationRequest {

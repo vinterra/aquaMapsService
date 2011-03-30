@@ -11,10 +11,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.stubs.dataModel.Perturbation;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesPerturbationThread extends Thread {

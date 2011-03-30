@@ -2,15 +2,14 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
@@ -20,18 +19,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Cell;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_DFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HSPECFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.HspenFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.OccurrenceCellsFields;
-import org.gcube.application.aquamaps.stubs.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 /**
@@ -43,8 +33,17 @@ public class HSPECGenerator {
 
 	private static GCUBELog logger= new GCUBELog(HSPECGenerator.class);
 
-	private final Map<EnvelopeFields,Boolean> defaultWeights=new HashMap<EnvelopeFields, Boolean>();
+	private static Map<EnvelopeFields,Boolean> defaultWeights=new HashMap<EnvelopeFields, Boolean>();
 
+	static {
+		defaultWeights.put(EnvelopeFields.Depth, ServiceContext.getContext().isEvaluateDepth());
+		defaultWeights.put(EnvelopeFields.IceConcentration, ServiceContext.getContext().isEvaluateIceConcentration());
+		defaultWeights.put(EnvelopeFields.LandDistance, ServiceContext.getContext().isEvaluateLandDistance());
+		defaultWeights.put(EnvelopeFields.PrimaryProduction, ServiceContext.getContext().isEvaluatePrimaryProduction());
+		defaultWeights.put(EnvelopeFields.Salinity, ServiceContext.getContext().isEvaluateSalinity());
+		defaultWeights.put(EnvelopeFields.Temperature, ServiceContext.getContext().isEvaluateTemperature());
+	}
+	
 
 	public static enum GENERATION_MODE{
 		COMPLETE,LAZY
@@ -115,7 +114,10 @@ public class HSPECGenerator {
 	private boolean generateNative=false;
 
 
-	private String currentSpeciesID;
+	//	private String currentSpeciesID;
+
+	private Cell currentCell;
+	private Species currentSpecies;
 
 	private Map<EnvelopeFields,Boolean> currentWeights;
 
@@ -203,56 +205,62 @@ public class HSPECGenerator {
 
 		Double preparedSeaIce=-9999.0;
 
-		Double landValue=(currentWeights.get(EnvelopeFields.LandDistance))?1.0:1.0; //to understand why is not calculated
-		Double sstValue=(currentWeights.get(EnvelopeFields.Temperature))?
-				getSST(Double.parseDouble(c.getFieldbyName(HCAF_DFields.sstanmean+"").getValue()),
-						Double.parseDouble(c.getFieldbyName(HCAF_DFields.sbtanmean+"").getValue()),
-						Double.parseDouble(s.getFieldbyName(HspenFields.tempmin+"").getValue()),						
-						Double.parseDouble(s.getFieldbyName(HspenFields.tempmax+"").getValue()),
-						Double.parseDouble(s.getFieldbyName(HspenFields.tempprefmin+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.tempprefmax+"").getValue()), 
-						s.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0]):1.0;
-		Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?
-				getDepth(Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmax+"").getValue()), 
-						Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmin+"").getValue()), 
-						Integer.parseInt(s.getFieldbyName(HspenFields.pelagic+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.depthmax+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.depthmin+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.depthprefmax+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.depthprefmin+"").getValue()),
-						Integer.parseInt(s.getFieldbyName(HspenFields.meandepth+"").getValue()),
-						Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmean+"").getValue())):1.0;
-		Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?
-				getSalinity(Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitymean+"").getValue()),
-						Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitybmean+"").getValue()),
-						s.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0], 
-						Double.parseDouble(s.getFieldbyName(HspenFields.salinitymin+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.salinitymax+"").getValue()),				
-						Double.parseDouble(s.getFieldbyName(HspenFields.salinityprefmin+"").getValue()),
-						Double.parseDouble(s.getFieldbyName(HspenFields.salinityprefmax+"").getValue())):1.0;
-		Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?
-				getPrimaryProduction(Integer.parseInt(c.getFieldbyName(HCAF_DFields.primprodmean+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.primprodmin+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.primprodprefmin+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.primprodmax+"").getValue()), 
-						Double.parseDouble(s.getFieldbyName(HspenFields.primprodprefmax+"").getValue())):1.0;
-		Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?
-				getSeaIceConcentration(Double.parseDouble(c.getFieldbyName(HCAF_DFields.iceconann+"").getValue()), 
-								(preparedSeaIce!=-9999.0)?preparedSeaIce:Double.parseDouble(s.getFieldbyName(HspenFields.iceconmin+"").getValue()),
-										Double.parseDouble(s.getFieldbyName(HspenFields.iceconprefmin+"").getValue()), 
-										Double.parseDouble(s.getFieldbyName(HspenFields.iceconmax+"").getValue()), 
-										Double.parseDouble(s.getFieldbyName(HspenFields.iceconprefmax+"").getValue()),currentSpeciesID):1.0;
-		Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
+		Double landValue=(currentWeights.get(EnvelopeFields.LandDistance))?
+				getLandDistance(Integer.parseInt(c.getFieldbyName(HspenFields.landdistyn+"").getValue()),
+						Double.parseDouble(s.getFieldbyName(HCAF_SFields.landdist+"").getValue()),
+						Double.parseDouble(s.getFieldbyName(HspenFields.landdistmin+"").getValue()),
+						Double.parseDouble(s.getFieldbyName(HspenFields.landdistprefmin+"").getValue()),
+						Double.parseDouble(s.getFieldbyName(HspenFields.landdistprefmax+"").getValue()),
+						Double.parseDouble(s.getFieldbyName(HspenFields.landdistmax+"").getValue())):1.0;
+				Double sstValue=(currentWeights.get(EnvelopeFields.Temperature))?
+						getSST(Double.parseDouble(c.getFieldbyName(HCAF_DFields.sstanmean+"").getValue()),
+								Double.parseDouble(c.getFieldbyName(HCAF_DFields.sbtanmean+"").getValue()),
+								Double.parseDouble(s.getFieldbyName(HspenFields.tempmin+"").getValue()),						
+								Double.parseDouble(s.getFieldbyName(HspenFields.tempmax+"").getValue()),
+								Double.parseDouble(s.getFieldbyName(HspenFields.tempprefmin+"").getValue()), 
+								Double.parseDouble(s.getFieldbyName(HspenFields.tempprefmax+"").getValue()), 
+								s.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0]):1.0;
+						Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?
+								getDepth(Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmax+"").getValue()), 
+										Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmin+"").getValue()), 
+										Integer.parseInt(s.getFieldbyName(HspenFields.pelagic+"").getValue()), 
+										Double.parseDouble(s.getFieldbyName(HspenFields.depthmax+"").getValue()), 
+										Double.parseDouble(s.getFieldbyName(HspenFields.depthmin+"").getValue()), 
+										Double.parseDouble(s.getFieldbyName(HspenFields.depthprefmax+"").getValue()), 
+										Double.parseDouble(s.getFieldbyName(HspenFields.depthprefmin+"").getValue()),
+										Integer.parseInt(s.getFieldbyName(HspenFields.meandepth+"").getValue()),
+										Double.parseDouble(c.getFieldbyName(HCAF_DFields.depthmean+"").getValue())):1.0;
+								Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?
+										getSalinity(Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitymean+"").getValue()),
+												Double.parseDouble(c.getFieldbyName(HCAF_DFields.salinitybmean+"").getValue()),
+												s.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0], 
+												Double.parseDouble(s.getFieldbyName(HspenFields.salinitymin+"").getValue()), 
+												Double.parseDouble(s.getFieldbyName(HspenFields.salinitymax+"").getValue()),				
+												Double.parseDouble(s.getFieldbyName(HspenFields.salinityprefmin+"").getValue()),
+												Double.parseDouble(s.getFieldbyName(HspenFields.salinityprefmax+"").getValue())):1.0;
+										Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?
+												getPrimaryProduction(Integer.parseInt(c.getFieldbyName(HCAF_DFields.primprodmean+"").getValue()), 
+														Double.parseDouble(s.getFieldbyName(HspenFields.primprodmin+"").getValue()), 
+														Double.parseDouble(s.getFieldbyName(HspenFields.primprodprefmin+"").getValue()), 
+														Double.parseDouble(s.getFieldbyName(HspenFields.primprodmax+"").getValue()), 
+														Double.parseDouble(s.getFieldbyName(HspenFields.primprodprefmax+"").getValue())):1.0;
+												Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?
+														getSeaIceConcentration(Double.parseDouble(c.getFieldbyName(HCAF_DFields.iceconann+"").getValue()), 
+																(preparedSeaIce!=-9999.0)?preparedSeaIce:Double.parseDouble(s.getFieldbyName(HspenFields.iceconmin+"").getValue()),
+																		Double.parseDouble(s.getFieldbyName(HspenFields.iceconprefmin+"").getValue()), 
+																		Double.parseDouble(s.getFieldbyName(HspenFields.iceconmax+"").getValue()), 
+																		Double.parseDouble(s.getFieldbyName(HspenFields.iceconprefmax+"").getValue()),currentSpeciesID):1.0;
+														Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
 
 
-		toReturn.add(new Field(EnvelopeFields.Depth+"",depthValue+"",FieldType.DOUBLE));
-		toReturn.add(new Field(EnvelopeFields.Salinity+"",salinityValue+"",FieldType.DOUBLE));
-		toReturn.add(new Field(EnvelopeFields.IceConcentration+"",seaIceConcentration+"",FieldType.DOUBLE));
-		toReturn.add(new Field(EnvelopeFields.LandDistance+"",landValue+"",FieldType.DOUBLE));
-		toReturn.add(new Field(EnvelopeFields.PrimaryProduction+"",primaryProductsValue+"",FieldType.DOUBLE));
-		toReturn.add(new Field(EnvelopeFields.Temperature+"",sstValue+"",FieldType.DOUBLE));
-		toReturn.add(new Field(HSPECFields.probability+"",probability+"",FieldType.DOUBLE));
-		return toReturn;
+														toReturn.add(new Field(EnvelopeFields.Depth+"",depthValue+"",FieldType.DOUBLE));
+														toReturn.add(new Field(EnvelopeFields.Salinity+"",salinityValue+"",FieldType.DOUBLE));
+														toReturn.add(new Field(EnvelopeFields.IceConcentration+"",seaIceConcentration+"",FieldType.DOUBLE));
+														toReturn.add(new Field(EnvelopeFields.LandDistance+"",landValue+"",FieldType.DOUBLE));
+														toReturn.add(new Field(EnvelopeFields.PrimaryProduction+"",primaryProductsValue+"",FieldType.DOUBLE));
+														toReturn.add(new Field(EnvelopeFields.Temperature+"",sstValue+"",FieldType.DOUBLE));
+														toReturn.add(new Field(HSPECFields.probability+"",probability+"",FieldType.DOUBLE));
+														return toReturn;
 	}
 
 
@@ -262,12 +270,7 @@ public class HSPECGenerator {
 	 * @throws Exception
 	 */
 	public void generate() throws Exception{
-		defaultWeights.put(EnvelopeFields.Depth, ServiceContext.getContext().isEvaluateDepth());
-		defaultWeights.put(EnvelopeFields.IceConcentration, ServiceContext.getContext().isEvaluateIceConcentration());
-		defaultWeights.put(EnvelopeFields.LandDistance, ServiceContext.getContext().isEvaluateLandDistance());
-		defaultWeights.put(EnvelopeFields.PrimaryProduction, ServiceContext.getContext().isEvaluatePrimaryProduction());
-		defaultWeights.put(EnvelopeFields.Salinity, ServiceContext.getContext().isEvaluateSalinity());
-		defaultWeights.put(EnvelopeFields.Temperature, ServiceContext.getContext().isEvaluateTemperature());
+		
 
 
 
@@ -288,36 +291,38 @@ public class HSPECGenerator {
 				logger.trace("Init phase took "+(System.currentTimeMillis()-generationStart));
 				while (hspenRes.next()){					
 					long startHspenLoop= System.currentTimeMillis();
-					currentSpeciesID= hspenRes.getString(SpeciesOccursumFields.speciesid+"");
+					currentSpecies=new Species(hspenRes.getString(SpeciesOccursumFields.speciesid+""));
+					currentSpecies.attributesList.addAll(Field.loadRow(hspenRes));
 
 					//****** FOR LAZY MODE if no generation needed just copy species probs
-					if(mode.equals(GENERATION_MODE.LAZY)&&!toGenerateSpeciesIds.contains(currentSpeciesID)){
+					if(mode.equals(GENERATION_MODE.LAZY)&&!toGenerateSpeciesIds.contains(currentSpecies.getId())){
 						if(generateNative){
-							psCopyNative.setString(1, currentSpeciesID);
+							psCopyNative.setString(1, currentSpecies.getId());
 							if(psCopyNative.executeUpdate()==0) 
-								logger.warn("Unable to copy "+currentSpeciesID+" into "+resultsNative);
+								logger.warn("Unable to copy "+currentSpecies.getId()+" into "+resultsNative);
 						}
 						if(generateSuitable){
-							psCopySuitable.setString(1, currentSpeciesID);
+							psCopySuitable.setString(1, currentSpecies.getId());
 							if(psCopySuitable.executeUpdate()==0) 
-								logger.warn("Unable to copy "+currentSpeciesID+" into "+resultsSuitable);
+								logger.warn("Unable to copy "+currentSpecies.getId()+" into "+resultsSuitable);
 						}
 					}else{
 						if(mode.equals(GENERATION_MODE.LAZY)){
 							//** Looking for weights
-							currentWeights=new HashMap<EnvelopeFields, Boolean>();						
-							for(EnvelopeFields f: EnvelopeFields.values()){
-								if((jobWeights.containsKey(currentSpeciesID)))
-									currentWeights.put(f, Boolean.parseBoolean(jobWeights.get(currentSpeciesID).get(f).getValue()));
-								else currentWeights.put(f, defaultWeights.get(f));
-							}
+							currentWeights=new HashMap<EnvelopeFields, Boolean>();
+							if((jobWeights.containsKey(currentSpecies.getId())))
+								for(EnvelopeFields f: EnvelopeFields.values()){
+									if((jobWeights.get(currentSpecies.getId()).get(f)!=null)&&(jobWeights.get(currentSpecies.getId()).get(f).getValue()!=null))
+										currentWeights.put(f, Boolean.parseBoolean(jobWeights.get(currentSpecies.getId()).get(f).getValue()));
+									else currentWeights.put(f, defaultWeights.get(f));
+								}
 						}
 						iterateCells();
 						logger.trace("HSPEN loop number "+hspenLoops+" took "+(System.currentTimeMillis()-startHspenLoop));
 					}
 
 					if(mode.equals(GENERATION_MODE.LAZY))
-						JobManager.updateSpeciesStatus(jobId,new String[]{hspenRes.getString(SpeciesOccursumFields.speciesid+"")}, SpeciesStatus.Ready);
+						JobManager.updateSpeciesStatus(jobId,new String[]{currentSpecies.getId()}, SpeciesStatus.Ready);
 
 					hspenLoops++;
 				}
@@ -507,27 +512,29 @@ public class HSPECGenerator {
 
 
 	private void iterateCells()throws Exception{
-		logger.trace("Analizing "+currentSpeciesID+"...");
+		logger.trace("Analizing "+currentSpecies.getId()+"...");
 
-		probabilityRow.get(0).setValue(currentSpeciesID);
+		probabilityRow.get(0).setValue(currentSpecies.getId());
 		if(isEnableProbabilitiesLog())
-			probabilityLogRow.get(0).setValue(currentSpeciesID);
+			probabilityLogRow.get(0).setValue(currentSpecies.getId());
 
-		Bounduary bounds=getBounduary(hspenRes.getDouble(HspenFields.nmostlat+""),hspenRes.getDouble(HspenFields.smostlat+""),
-				hspenRes.getDouble(HspenFields.emostlong+""),hspenRes.getDouble(HspenFields.wmostlong+""),currentSpeciesID);
+		Bounduary bounds=getBounduary(currentSpecies.getFieldbyName(HspenFields.nmostlat+"").getValueAsDouble(),
+				currentSpecies.getFieldbyName(HspenFields.smostlat+"").getValueAsDouble(),
+				currentSpecies.getFieldbyName(HspenFields.emostlong+"").getValueAsDouble(),
+				currentSpecies.getFieldbyName(HspenFields.wmostlong+"").getValueAsDouble(),currentSpecies.getId());
 
 		//************ Insert if inFAO && inBox
 		//************ NB for suita
 		insertProbability(true,true,bounds,true);
 
-		logger.trace("inserted "+insertedNativeCellCount+" native entries and "+insertedSuitableCellCount+" suitable entries for "+currentSpeciesID+" species id");
+		logger.trace("inserted "+insertedNativeCellCount+" native entries and "+insertedSuitableCellCount+" suitable entries for "+currentSpecies.getId()+" species id");
 
 		//****************** Insert if inFAO && ! in BBox
 		//****************** Only if native
 
 		if (insertedNativeCellCount==0 && generateNative) {
 			insertProbability(false,false, bounds,true);
-			logger.trace("inserted "+insertedNativeCellCount+" native entries with inbox false for "+currentSpeciesID+" species id");
+			logger.trace("inserted "+insertedNativeCellCount+" native entries with inbox false for "+currentSpecies.getId()+" species id");
 		}
 
 	}
@@ -539,7 +546,7 @@ public class HSPECGenerator {
 		if((!insertSuitable)&&(generateSuitable)){
 			//Copy from suitable
 			List<Field> filters=new ArrayList<Field>();
-			filters.add(new Field(SpeciesOccursumFields.speciesid+"",currentSpeciesID,FieldType.STRING));			
+			filters.add(new Field(SpeciesOccursumFields.speciesid+"",currentSpecies.getId(),FieldType.STRING));			
 			ResultSet rs =session.executeFilteredQuery(filters, resultsSuitable, HCAF_SFields.csquarecode+"", "ASC");
 
 			while(rs.next()){
@@ -559,19 +566,23 @@ public class HSPECGenerator {
 		}else		
 			//Normal Execution
 
-			while(hcafRes.next())
+			while(hcafRes.next()){
+				// Load Cell
+				currentCell= new Cell(hcafRes.getString(HCAF_SFields.csquarecode+""));
+				currentCell.attributesList.addAll(Field.loadRow(hcafRes));
 				try{
 					Double probability=null;
-					boolean inFAO= this.getInFao(hcafRes.getInt(HCAF_SFields.faoaream+""),hspenRes.getString(HspenFields.faoareas+""));
-					boolean inBox= this.getInBox(hcafRes.getDouble(HCAF_SFields.centerlat+""), bounds);
+					boolean inFAO= this.getInFao(currentCell.getFieldbyName(HCAF_SFields.faoaream+"").getValueAsInteger(),
+							currentSpecies.getFieldbyName(HspenFields.faoareas+"").getValue());
+					boolean inBox= this.getInBox(currentCell.getFieldbyName(HCAF_SFields.centerlat+"").getValueAsDouble(), bounds);
 
-					probabilityRow.get(1).setValue(hcafRes.getString(HCAF_SFields.csquarecode+""));
+					probabilityRow.get(1).setValue(currentCell.getCode());
 
 					probabilityRow.get(3).setValue(inBox+"");
 					probabilityRow.get(4).setValue(inFAO+"");
-					probabilityRow.get(5).setValue(hcafRes.getString(HCAF_SFields.faoaream+""));
-					probabilityRow.get(6).setValue(hcafRes.getString(HCAF_SFields.eezfirst+""));
-					probabilityRow.get(7).setValue(hcafRes.getString(HCAF_SFields.lme+""));
+					probabilityRow.get(5).setValue(currentCell.getFieldbyName(HCAF_SFields.faoaream+"").getValue());
+					probabilityRow.get(6).setValue(currentCell.getFieldbyName(HCAF_SFields.eezfirst+"").getValue());
+					probabilityRow.get(7).setValue(currentCell.getFieldbyName(HCAF_SFields.lme+"").getValue());
 
 
 					if(insertSuitable && generateSuitable){
@@ -596,11 +607,10 @@ public class HSPECGenerator {
 						}
 					}
 
-				}catch(Exception e){try {
-					logger.warn("error in data found : "+e.getMessage()+" speciesID : "+currentSpeciesID+", cell: "+hcafRes.getString(HCAF_SFields.csquarecode+""));
-				} catch (SQLException e1) {
-					logger.error("UNEXPECTED ERROR ",e1);
-				}}
+				}catch(Exception e){
+					logger.warn("error in data found : "+e.getMessage()+" speciesID : "+currentSpecies.getId()+", cell: "+currentCell.getCode(),e);
+				}
+			}
 	}
 
 
@@ -608,39 +618,124 @@ public class HSPECGenerator {
 
 
 	private Double getOverallProbability() throws Exception{
-		Double preparedSeaIce= prepareSeaIceForSpecies(currentSpeciesID,hspenRes.getDouble(HspenFields.iceconmin+""),session);
-		Double landValue=(currentWeights.get(EnvelopeFields.LandDistance))?1.0:1.0; //to understand why is not calculated
+		Double preparedSeaIce= prepareSeaIceForSpecies(currentSpecies.getId(),
+				currentSpecies.getFieldbyName(HspenFields.iceconmin+"").getValueAsDouble(),session);
+		Double landValue=(currentWeights.get(EnvelopeFields.LandDistance))?
+				getLandDistance(currentSpecies.getFieldbyName(HspenFields.landdistyn+"").getValueAsInteger(),
+						currentCell.getFieldbyName(HCAF_SFields.landdist+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.landdistmin+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.landdistprefmin+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.landdistprefmax+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.landdistmax+"").getValueAsDouble()):1.0; 
 		Double sstValue=(currentWeights.get(EnvelopeFields.Temperature))?
-				getSST(hcafRes.getDouble(HCAF_DFields.sstanmean+""),
-						hcafRes.getDouble(HCAF_DFields.sbtanmean+""),
-						hspenRes.getDouble(HspenFields.tempmin+""),						
-						hspenRes.getDouble(HspenFields.tempmax+""),
-						hspenRes.getDouble(HspenFields.tempprefmin+""), 
-						hspenRes.getDouble(HspenFields.tempprefmax+""), 
-						hspenRes.getString(HspenFields.layer+"").toCharArray()[0]):1.0;
-				Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?getDepth(hcafRes.getDouble(HCAF_DFields.depthmax+""), hcafRes.getDouble(HCAF_DFields.depthmin+""), hspenRes.getInt(HspenFields.pelagic+""), hspenRes.getDouble(HspenFields.depthmax+""), hspenRes.getDouble(HspenFields.depthmin+""), 
-						hspenRes.getDouble(HspenFields.depthprefmax+""), hspenRes.getDouble(HspenFields.depthprefmin+""),hspenRes.getInt(HspenFields.meandepth+""),hcafRes.getDouble(HCAF_DFields.depthmean+"")):1.0;
-				Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?getSalinity(hcafRes.getDouble(HCAF_DFields.salinitymean+""), hcafRes.getDouble(HCAF_DFields.salinitybmean+""), hspenRes.getString(HspenFields.layer+"").toCharArray()[0], hspenRes.getDouble(HspenFields.salinitymin+""), hspenRes.getDouble(HspenFields.salinitymax+""), 
-						hspenRes.getDouble(HspenFields.salinityprefmin+""), hspenRes.getDouble(HspenFields.salinityprefmax+"")):1.0;
-				Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?getPrimaryProduction(hcafRes.getInt(HCAF_DFields.primprodmean+""), hspenRes.getDouble(HspenFields.primprodmin+""), hspenRes.getDouble(HspenFields.primprodprefmin+""), hspenRes.getDouble(HspenFields.primprodmax+""), hspenRes.getDouble(HspenFields.primprodprefmax+"")):1.0;
-				Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?getSeaIceConcentration(hcafRes.getDouble(HCAF_DFields.iceconann+""), (preparedSeaIce!=-9999.0)?preparedSeaIce:hspenRes.getDouble(HspenFields.iceconmin+""), hspenRes.getDouble(HspenFields.iceconprefmin+""), hspenRes.getDouble(HspenFields.iceconmax+""), hspenRes.getDouble(HspenFields.iceconprefmax+""), 
-						currentSpeciesID):1.0;
-				Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
-				if(isEnableProbabilitiesLog()){
-					try{
-						probabilityLogRow.get(1).setValue(hcafRes.getString(HCAF_SFields.csquarecode+""));
-						probabilityLogRow.get(2).setValue(depthValue+"");
-						probabilityLogRow.get(3).setValue(seaIceConcentration+"");
-						probabilityLogRow.get(4).setValue(landValue+"");
-						probabilityLogRow.get(5).setValue(primaryProductsValue+"");
-						probabilityLogRow.get(6).setValue(sstValue+"");
-						probabilityLogRow.get(7).setValue(probability+"");
-						session.fillParameters(probabilityLogRow, probabilitiesLogInsert).executeUpdate();
-					}catch(Exception e){
-						// duplicate key on second run per species
-					}
-				}			
-				return probability; 
+				getSST(currentCell.getFieldbyName(HCAF_DFields.sstanmean+"").getValueAsDouble(),
+						currentCell.getFieldbyName(HCAF_DFields.sbtanmean+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.tempmin+"").getValueAsDouble(),						
+						currentSpecies.getFieldbyName(HspenFields.tempmax+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.tempprefmin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.tempprefmax+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0]):1.0;
+				
+//				Double cellDepthMax=currentCell.getFieldbyName(HCAF_DFields.depthmax+"").getValueAsDouble(); 
+//				Double cellDepthMin=currentCell.getFieldbyName(HCAF_DFields.depthmin+"").getValueAsDouble(); 
+//				Integer speciesPelagic=currentSpecies.getFieldbyName(HspenFields.pelagic+"").getValueAsInteger(); 
+//				Double speciesDepthMax=currentSpecies.getFieldbyName(HspenFields.depthmax+"").getValueAsDouble();
+//				Double speciesDepthMin=currentSpecies.getFieldbyName(HspenFields.depthmin+"").getValueAsDouble(); 
+//				Double speciesDepthPrefMax=currentSpecies.getFieldbyName(HspenFields.depthprefmax+"").getValueAsDouble();
+//				Double speciesDepthPrefMin=currentSpecies.getFieldbyName(HspenFields.depthprefmin+"").getValueAsDouble();
+//				Integer speciesMeanDepth=currentSpecies.getFieldbyName(HspenFields.meandepth+"").getValueAsInteger();
+//				Double cellDepthMean=currentCell.getFieldbyName(HCAF_DFields.depthmean+"").getValueAsDouble();
+//				
+				
+					
+//		Double depthValue=new Double(1);
+//		try{
+//			if(currentWeights.get(EnvelopeFields.Depth)){
+//				logger.trace(currentCell.getFieldbyName(HCAF_DFields.depthmax+"").getValueAsDouble()); 
+//				logger.trace(currentCell.getFieldbyName(HCAF_DFields.depthmin+"").getValueAsDouble()); 
+//				logger.trace(currentSpecies.getFieldbyName(HspenFields.pelagic+"").getValueAsInteger()); 
+//				logger.trace(currentSpecies.getFieldbyName(HspenFields.depthmax+"").getValueAsDouble());
+//				logger.trace(currentSpecies.getFieldbyName(HspenFields.depthmin+"").getValueAsDouble()); 
+//				logger.trace(currentSpecies.getFieldbyName(HspenFields.depthprefmax+"").getValueAsDouble());
+//				logger.trace(currentSpecies.getFieldbyName(HspenFields.depthprefmin+"").getValueAsDouble());
+//				logger.trace(currentSpecies.getFieldbyName(HspenFields.meandepth+"").getValueAsInteger());
+//				logger.trace(currentCell.getFieldbyName(HCAF_DFields.depthmean+"").getValueAsDouble());
+//				
+//				
+//		depthValue=getDepth(
+//				currentCell.getFieldbyName(HCAF_DFields.depthmax+"").getValueAsDouble(), 
+//				currentCell.getFieldbyName(HCAF_DFields.depthmin+"").getValueAsDouble(), 
+//				currentSpecies.getFieldbyName(HspenFields.pelagic+"").getValueAsInteger(), 
+//				currentSpecies.getFieldbyName(HspenFields.depthmax+"").getValueAsDouble(),
+//				currentSpecies.getFieldbyName(HspenFields.depthmin+"").getValueAsDouble(), 
+//				currentSpecies.getFieldbyName(HspenFields.depthprefmax+"").getValueAsDouble(),
+//				currentSpecies.getFieldbyName(HspenFields.depthprefmin+"").getValueAsDouble(),
+//				currentSpecies.getFieldbyName(HspenFields.meandepth+"").getValueAsInteger(),
+//				currentCell.getFieldbyName(HCAF_DFields.depthmean+"").getValueAsDouble());
+//			}
+////				Double depthValue=new Double (1);
+////				try{
+////					if(currentWeights.get(EnvelopeFields.Depth+""))
+////						depthValue=getDepth(cellDepthMax,cellDepthMin,
+////						speciesPelagic,speciesDepthMax,speciesDepthMin,speciesDepthPrefMax,speciesDepthPrefMin,speciesMeanDepth,cellDepthMean);
+//				}catch(Exception e ){
+//					logger.trace("Dpeth weight : "+currentWeights.get(EnvelopeFields.Depth));
+//					
+//					logger.error("UNEXPECTED EXCEPTION ",e);
+//					for(Entry<EnvelopeFields,Boolean> w:currentWeights.entrySet())
+//						logger.trace(w.getKey()+" : "+currentWeights.get(w.getKey()));
+//					throw e;
+//				}
+				
+				Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?getDepth(
+						currentCell.getFieldbyName(HCAF_DFields.depthmax+"").getValueAsDouble(), 
+						currentCell.getFieldbyName(HCAF_DFields.depthmin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.pelagic+"").getValueAsInteger(), 
+						currentSpecies.getFieldbyName(HspenFields.depthmax+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.depthmin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.depthprefmax+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.depthprefmin+"").getValueAsDouble(),
+						currentSpecies.getFieldbyName(HspenFields.meandepth+"").getValueAsInteger(),
+						currentCell.getFieldbyName(HCAF_DFields.depthmean+"").getValueAsDouble()):1.0;
+				
+				
+		Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?
+				getSalinity(currentCell.getFieldbyName(HCAF_DFields.salinitymean+"").getValueAsDouble(), 
+						currentCell.getFieldbyName(HCAF_DFields.salinitybmean+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0], 
+						currentSpecies.getFieldbyName(HspenFields.salinitymin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.salinitymax+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.salinityprefmin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.salinityprefmax+"").getValueAsDouble()):1.0;
+		Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?
+					getPrimaryProduction(currentCell.getFieldbyName(HCAF_DFields.primprodmean+"").getValueAsInteger(), 
+						currentSpecies.getFieldbyName(HspenFields.primprodmin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.primprodprefmin+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.primprodmax+"").getValueAsDouble(), 
+						currentSpecies.getFieldbyName(HspenFields.primprodprefmax+"").getValueAsDouble()):1.0;
+		Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?
+				getSeaIceConcentration(currentCell.getFieldbyName(HCAF_DFields.iceconann+"").getValueAsDouble(),
+						(preparedSeaIce!=-9999.0)?preparedSeaIce:currentSpecies.getFieldbyName(HspenFields.iceconmin+"").getValueAsDouble(),
+								currentSpecies.getFieldbyName(HspenFields.iceconprefmin+"").getValueAsDouble(),
+								currentSpecies.getFieldbyName(HspenFields.iceconmax+"").getValueAsDouble(),
+								currentSpecies.getFieldbyName(HspenFields.iceconprefmax+"").getValueAsDouble(), 
+								currentSpecies.getId()):1.0;
+		Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
+		if(isEnableProbabilitiesLog()){
+			try{
+				probabilityLogRow.get(1).setValue(currentCell.getFieldbyName(HCAF_SFields.csquarecode+"").getValue());
+				probabilityLogRow.get(2).setValue(depthValue+"");
+				probabilityLogRow.get(3).setValue(seaIceConcentration+"");
+				probabilityLogRow.get(4).setValue(landValue+"");
+				probabilityLogRow.get(5).setValue(primaryProductsValue+"");
+				probabilityLogRow.get(6).setValue(sstValue+"");
+				probabilityLogRow.get(7).setValue(probability+"");
+				session.fillParameters(probabilityLogRow, probabilitiesLogInsert).executeUpdate();
+			}catch(Exception e){
+				// duplicate key on second run per species
+			}
+		}			
+		return probability; 
 	}
 
 
@@ -687,7 +782,7 @@ public class HSPECGenerator {
 	 * @param hspenDepthPrefMin
 	 * @return depth
 	 */
-	public static Double getDepth(Double hcafDepthMax, Double hcafDepthMin, int hspenPelagic, Double hspenMaxDepth,Double hspenMinDepth,Double hspenDepthPrefMax, Double hspenDepthPrefMin, int hspenMeanDepth, Double hcafDepthMean ){
+	public static Double getDepth(Double hcafDepthMax, Double hcafDepthMin, Integer hspenPelagic, Double hspenMaxDepth,Double hspenMinDepth,Double hspenDepthPrefMax, Double hspenDepthPrefMin, Integer hspenMeanDepth, Double hcafDepthMean ){
 		// Check on hspenMeanDepth added from HSPEC version 2 (used from release 1.7)
 		if(hspenMinDepth == null) return 1.0;
 		if(hspenMeanDepth == 1) {
@@ -771,7 +866,7 @@ public class HSPECGenerator {
 	 * @param hspenPrimProdPrefMax
 	 * @return
 	 */
-	public static Double getPrimaryProduction(int hcafPrimProdMean,Double hspenPrimProdMin, Double hspenPrimProdPrefMin,Double hspenPrimProdMax, Double hspenPrimProdPrefMax){
+	public static Double getPrimaryProduction(Integer hcafPrimProdMean,Double hspenPrimProdMin, Double hspenPrimProdPrefMin,Double hspenPrimProdMax, Double hspenPrimProdPrefMax){
 		if (hcafPrimProdMean == 0) return 1.0;
 		if (hcafPrimProdMean < hspenPrimProdMin ) return 0.0;
 		if ((hcafPrimProdMean >= hspenPrimProdMin) && (hcafPrimProdMean < hspenPrimProdPrefMin ))
@@ -781,6 +876,30 @@ public class HSPECGenerator {
 			return (hspenPrimProdMax - hcafPrimProdMean) / (hspenPrimProdMax - hspenPrimProdPrefMax);
 		else return 0.0;
 	}
+
+
+	/**
+	 * 
+	 * @param distanceToLandYN
+	 * @param hcafLandDistance
+	 * @param hspenLandDistMin
+	 * @param hspenLandDistPrefMin
+	 * @param hspenLandDistPrefMax
+	 * @param hspenLandDistMax
+	 * @return
+	 */
+
+	public static Double getLandDistance(Integer distanceToLandYN,Double hcafLandDistance, Double hspenLandDistMin,Double hspenLandDistPrefMin, Double hspenLandDistPrefMax,Double hspenLandDistMax){
+		if(distanceToLandYN == 0) return 1.0;
+		if(hcafLandDistance==-9999 || hspenLandDistMin== null) return 1.0;
+		if(hcafLandDistance< hspenLandDistMin) return 0.0;
+		if(hcafLandDistance>= hspenLandDistMin && hcafLandDistance<hspenLandDistPrefMin) return (hcafLandDistance-hspenLandDistMin) /(hspenLandDistPrefMin-hspenLandDistMin);
+		if(hspenLandDistPrefMax>1000)return 1.0;
+		if(hcafLandDistance>=hspenLandDistPrefMin && hcafLandDistance <=hspenLandDistPrefMax) return 1.0;
+		if(hcafLandDistance>hspenLandDistPrefMax && hcafLandDistance<=hspenLandDistMax) return (hspenLandDistMax-hcafLandDistance) / (hspenLandDistMax-hspenLandDistPrefMax);
+		else return 0.0;
+	}
+
 
 	private Double prepareSeaIceForSpecies(String speciesID, Double hspenIceConMin, DBSession session) throws Exception{
 		if(hspenIceConMin == 0){

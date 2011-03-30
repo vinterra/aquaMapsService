@@ -7,11 +7,11 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
-
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
 
 public class WrapperUtils {
 
@@ -42,22 +42,5 @@ public class WrapperUtils {
 	 * 
 	 * @return
 	 */
-	public static List<String> CSVToList(String theString){
-		List<String> toReturn= new ArrayList<String>();
-		if(theString!=null)
-			for(String s:theString.split("'"))
-				toReturn.add(s.trim());
-		return toReturn;
-	}
-
-	public static String listToCSV(List<String> values){
-		StringBuilder toReturn=new StringBuilder();
-		if(values!=null){
-			for(String v:values)
-				toReturn.append(v.trim()+",");
-			toReturn.deleteCharAt(toReturn.lastIndexOf(","));
-		}
-		return toReturn.toString();
-	}
-
+	
 }

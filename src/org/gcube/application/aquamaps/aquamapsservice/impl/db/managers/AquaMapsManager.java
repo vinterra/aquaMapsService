@@ -3,11 +3,10 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
-import org.gcube.application.aquamaps.stubs.LayerInfoType;
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
-import org.gcube.application.aquamaps.stubs.dataModel.File;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FileType;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.enhanced.*;
+import org.gcube.application.aquamaps.dataModel.Types.*;
+import org.gcube.application.aquamaps.dataModel.fields.*;
 
 public class AquaMapsManager extends SubmittedManager{
 
