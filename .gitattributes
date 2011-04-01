@@ -25,8 +25,8 @@ schema/AquaMapsService.wsdl -text
 schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
 schema/GISTypes.xsd -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text

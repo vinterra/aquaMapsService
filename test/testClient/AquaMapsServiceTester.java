@@ -28,7 +28,7 @@ public class AquaMapsServiceTester {
 
 //	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
-	static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/AquaMaps";
+	static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	
 	public static void main(String[] args){
 		try{

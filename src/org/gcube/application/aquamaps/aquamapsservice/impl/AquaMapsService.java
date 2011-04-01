@@ -43,7 +43,7 @@ import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
 
 
-public class AquaMaps extends GCUBEPortType implements AquaMapsServicePortType{
+public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePortType{
 
 
 

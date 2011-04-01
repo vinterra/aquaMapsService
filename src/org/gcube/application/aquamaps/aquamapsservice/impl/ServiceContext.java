@@ -33,7 +33,7 @@ public class ServiceContext extends GCUBEServiceContext {
 	
 	
 	/** {@inheritDoc} */
-	protected String getJNDIName() {return "gcube/application/aquamaps";}
+	protected String getJNDIName() {return "gcube/application/aquamaps/aquamapsservice";}
 
 	
 	private String webServerUrl=null;

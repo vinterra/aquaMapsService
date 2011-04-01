@@ -67,14 +67,14 @@ public class AquaMapsServiceWrapper {
 		EndpointReferenceType epr;
 		GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
 		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass","Application"));
-		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName","AquaMaps"));
+		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName","AquaMapsService"));
 		List<GCUBERunningInstance> toReturn= isClient.execute(query, session.getScope());
 		if(toReturn.isEmpty()) {				
 			System.out.println("No runnning instance found, using default service @ : "+defaultURI);
 			epr=new EndpointReferenceType();
 			epr.setAddress(new AttributedURI(defaultURI));
 		}else{
-			epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/AquaMapsService");
+			epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/aquamapsservice/AquaMapsService");
 			System.out.println("Found RI @ : "+epr.getAddress().getHost());
 		}
 		AquaMapsServicePortType aquamapsPT=asal.getAquaMapsServicePortTypePort(epr);
