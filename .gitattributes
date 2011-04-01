@@ -84,6 +84,10 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SimulationThread
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SourceGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SpeciesPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsServiceWrapper.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PagedRequestSettings.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/WrapperUtils.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text
