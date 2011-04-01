@@ -15,7 +15,7 @@
     <Content xsi:type="agg:AggregatorContent">
         
         <agg:AggregatorConfig>
-            <agg:GetMultipleResourcePropertiesPollType xmlns:aquamaps="http://gcube-system.org/namespaces/application/aquamaps">
+            <agg:GetMultipleResourcePropertiesPollType xmlns:aquamaps="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice">
                 <agg:PollIntervalMillis>60000</agg:PollIntervalMillis>                
             </agg:GetMultipleResourcePropertiesPollType>
         </agg:AggregatorConfig>

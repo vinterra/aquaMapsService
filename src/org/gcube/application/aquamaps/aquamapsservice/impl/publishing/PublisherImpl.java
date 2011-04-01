@@ -7,12 +7,18 @@ import java.util.Set;
 
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.AquaMapsPublisherPortType;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.service.AquaMapsPublisherServiceAddressingLocator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.dataModel.LayerInfoType;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Area;
+import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.AtomicCondition;
@@ -21,9 +27,8 @@ import org.gcube.common.core.informationsystem.client.queries.GCUBERIQuery;
 import org.gcube.common.core.resources.GCUBERunningInstance;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.AquaMapsPublisherPortType;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.service.AquaMapsPublisherServiceAddressingLocator;
+import org.gcube.common.gis.dataModel.LayerInfoType;
+import org.gcube.common.gis.dataModel.WMSContextInfoType;
 
 public class PublisherImpl implements Publisher{
 
@@ -280,12 +285,12 @@ public class PublisherImpl implements Publisher{
 
 	public int publishJob(Job toPublish) throws Exception {
 		AquaMapsPublisherPortType pt=getPortType();
-		return pt.storeJob((org.gcube.application.aquamaps.aquamapspublisher.stubs.Job)(Object)toPublish.toStubsVersion());
+		return pt.storeJob(toPublish.toStubsVersion());
 	}
 
 	public AquaMapsObject getAquaMapsObjectById(int id) throws Exception {
 		AquaMapsPublisherPortType pt=getPortType();
-		return new AquaMapsObject((org.gcube.application.aquamaps.stubs.AquaMap)(Object)pt.getAquaMapObjectById(id));		
+		return new AquaMapsObject(pt.getAquaMapObjectById(id));		
 	}
 
 	public LayerInfoType getExistingLayer(Set<String> speciesCoverage,
@@ -310,7 +315,7 @@ public class PublisherImpl implements Publisher{
 		throw new Exception ("Not Yet Implemented");
 	}
 
-	public List<org.gcube.application.aquamaps.stubs.dataModel.File> publishImages(
+	public List<org.gcube.application.aquamaps.dataModel.enhanced.File> publishImages(
 			int mapId, Set<String> speciesCoverage,
 			Map<String, String> toPublishList, GCUBEScope scope,
 			boolean hasCustomizations) throws Exception {

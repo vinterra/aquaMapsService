@@ -24,13 +24,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequestException;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.WMSContextInfoType;
 import org.json.JSONException;
 
 public class GISGenerator implements Generator{

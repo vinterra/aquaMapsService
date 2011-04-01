@@ -6,6 +6,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ASL"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gCore"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AquaMapsService"/>
-	<classpathentry kind="lib" path="/home/fabio/workspace/Dependencies/org.gcube.application.aquamaps.datamodel.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

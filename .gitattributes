@@ -21,9 +21,10 @@ lib/commons-httpclient.jar -text
 lib/csv4j_gcube.jar -text
 lib/geoserverInt.jar -text
 lib/postgresql-8.4-701.jdbc3.jar -text
-schema/AquaMapsSchema.xsd -text
 schema/AquaMapsService.wsdl -text
+schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
+schema/GISTypes.xsd -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMaps.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text

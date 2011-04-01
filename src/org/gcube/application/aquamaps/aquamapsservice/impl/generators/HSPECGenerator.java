@@ -785,7 +785,7 @@ public class HSPECGenerator {
 	public static Double getDepth(Double hcafDepthMax, Double hcafDepthMin, Integer hspenPelagic, Double hspenMaxDepth,Double hspenMinDepth,Double hspenDepthPrefMax, Double hspenDepthPrefMin, Integer hspenMeanDepth, Double hcafDepthMean ){
 		// Check on hspenMeanDepth added from HSPEC version 2 (used from release 1.7)
 		if(hspenMinDepth == null) return 1.0;
-		if(hspenMeanDepth == 1) {
+		if((hspenMeanDepth!=null)&&(hspenMeanDepth == 1)) {
 			hcafDepthMax = hcafDepthMean;
 			hcafDepthMin = hcafDepthMean;
 		}

@@ -2,12 +2,9 @@ package testClient;
 
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.SourceGeneratorRequest;
-import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
-import org.gcube.application.aquamaps.stubs.DataManagementPortType;
-import org.gcube.application.aquamaps.stubs.GenerateHCAFRequestType;
-import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
-import org.gcube.application.aquamaps.stubs.service.DataManagementServiceAddressingLocator;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;

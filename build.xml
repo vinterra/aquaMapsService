@@ -349,13 +349,13 @@ full.stubs:   			(optional) Set to 'false', it excludes auxiliary stub code plac
 					<var name="mappings" value="${mappings} -N${namespace.additional.2}=${package.additional.2}"/>
 				</if>
 		<if name="namespace.additional.3">
-					<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.3}"/>
+					<var name="mappings" value="${mappings} -N${namespace.additional.3}=${package.additional.3}"/>
 				</if>
 		<if name="namespace.additional.4">
-					<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.4}"/>
+					<var name="mappings" value="${mappings} -N${namespace.additional.4}=${package.additional.4}"/>
 				</if>
 		<if name="namespace.additional.5">
-					<var name="mappings" value="${mappings} -N${namespace.additional.1}=${package.additional.5}"/>
+					<var name="mappings" value="${mappings} -N${namespace.additional.5}=${package.additional.5}"/>
 				</if>
 		
 		

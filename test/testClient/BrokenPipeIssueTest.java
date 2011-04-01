@@ -1,9 +1,5 @@
 package testClient;
 
-import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
-import org.json.JSONObject;
 
 public class BrokenPipeIssueTest {
 

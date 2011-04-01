@@ -5,12 +5,12 @@
 	<Profile>
 		<Description>Aquamaps Service</Description>
 		<Class>Application</Class>
-		<Name>AquaMaps</Name>
+		<Name>AquaMapsService</Name>
 		<Version>2.5.0</Version>
 		<Packages>
 			<Main>
 				<Description>Aquamaps Stateless Service</Description>
-				<Name>AquaMaps-Service</Name>
+				<Name>AquaMapsService</Name>
 				<Version>2.5.0</Version>
 				<GHNRequirements>
 					<Requirement category="Site"  requirement="string" value="java1.5" operator="le"/>
@@ -25,7 +25,7 @@
 							<Name>AquaMapsService</Name>
 							<Version>2.5.0</Version>
 						</Service>
-						<Package>AquaMaps-stubs</Package>
+						<Package>AquaMapsService-stubs</Package>
 						<Version>2.5.0</Version>
 						<Scope level="GHN"/>
 						<Optional>false</Optional>
@@ -64,21 +64,21 @@
 						<Optional>false</Optional>
 					</Dependency>					
 				</Dependencies>
-				<GARArchive>org.gcube.application.aquamaps.gar</GARArchive>
+				<GARArchive>org.gcube.application.aquamaps.aquamapsservice.gar</GARArchive>
 				<PortType>
-					<Name>gcube/application/aquamaps/AquaMapsService</Name>
+					<Name>gcube/application/aquamaps/aquamapsservice/AquaMapsService</Name>
 					<WSDL></WSDL>
 				</PortType>
 				<PortType>
-					<Name>gcube/application/aquamaps/DataManagement</Name>
+					<Name>gcube/application/aquamaps/aquamapsservice/DataManagement</Name>
 					<WSDL></WSDL>
 				</PortType>
 			</Main>
 			<Software>
-				<Description>Aquamaps stubs</Description>
-				<Name>AquaMaps-stubs</Name>
+				<Description>AquaMapsService stubs</Description>
+				<Name>AquaMapsService-stubs</Name>
 				<Version>2.5.0</Version>
-				<Files><File>org.gcube.application.aquamaps.stubs.jar</File></Files>
+				<Files><File>org.gcube.application.aquamaps.aquamapsservice.stubs.jar</File></Files>
 			</Software>
 		</Packages>
 	</Profile>

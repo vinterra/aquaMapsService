@@ -4,9 +4,9 @@
     xmlns:java="http://xml.apache.org/axis/wsdd/providers/java" 
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-   <service name="gcube/application/aquamaps/AquaMaps" provider="Handler" use="literal" style="document">
+   <service name="gcube/application/aquamaps/aquamapsservice/AquaMapsService" provider="Handler" use="literal" style="document">
         <parameter name="className" value="org.gcube.application.aquamaps.aquamapsservice.impl.AquaMaps"/>
-        <wsdlFile>share/schema/org.gcube.application.aquamaps/AquaMaps_service.wsdl</wsdlFile>
+        <wsdlFile>share/schema/org.gcube.application.aquamaps.aquamapsservice/AquaMapsService_service.wsdl</wsdlFile>
         <parameter name="allowedMethods" value="*"/>
         <parameter name="handlerClass" value="org.globus.axis.providers.RPCProvider"/>
         <parameter name="scope" value="Application"/>
@@ -14,9 +14,9 @@
         <parameter name="loadOnStartup" value="true"/>
        	<!--<parameter name="securityDescriptor" value="@config.dir@/security_descriptor.xml"/> -->
     </service>
-    <service name="gcube/application/aquamaps/DataManagement" provider="Handler" use="literal" style="document">
+    <service name="gcube/application/aquamaps/aquamapsservice/DataManagement" provider="Handler" use="literal" style="document">
         <parameter name="className" value="org.gcube.application.aquamaps.aquamapsservice.impl.DataManagement"/>
-        <wsdlFile>share/schema/org.gcube.application.aquamaps/DataManagement_service.wsdl</wsdlFile>
+        <wsdlFile>share/schema/org.gcube.application.aquamaps.aquamapsservice/DataManagement_service.wsdl</wsdlFile>
         <parameter name="allowedMethods" value="*"/>
         <parameter name="handlerClass" value="org.globus.axis.providers.RPCProvider"/>
         <parameter name="scope" value="Application"/>

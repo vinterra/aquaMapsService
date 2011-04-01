@@ -1,13 +1,10 @@
 package testClient;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.Field;
-import org.gcube.application.aquamaps.stubs.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 
 public class DBConnectionTest {
 

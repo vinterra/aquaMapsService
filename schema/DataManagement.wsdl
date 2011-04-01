@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions name="DataManagement"
-	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/datamanagement"
-	xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/datamanagement"
+	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
+	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsdlpp="http://www.globus.org/namespaces/2004/10/WSDLPreprocessor"
 	xmlns:wsrp="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.xsd"
@@ -14,8 +15,8 @@
 		location="../gcube/common/core/faults/GCUBEFaults.wsdl" />
 
 	<types>
-		<xsd:schema targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/datamanagement"
-			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/datamanagement">
+		<xsd:schema targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
+			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement">
 			<xsd:import namespace="http://gcube-system.org/namespaces/common/core/types"
 				schemaLocation="../gcube/common/core/types/GCUBETypes.xsd" />
 

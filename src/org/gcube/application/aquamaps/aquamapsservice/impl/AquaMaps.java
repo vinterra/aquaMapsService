@@ -12,20 +12,28 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
-import org.gcube.application.aquamaps.aquamapsservice.AquaMapsServicePortType;
-import org.gcube.application.aquamaps.aquamapsservice.*;
-import org.gcube.application.aquamaps.dataModel.*;
-import org.gcube.application.aquamaps.dataModel.Area;
-import org.gcube.application.aquamaps.dataModel.BoundingBox;
-import org.gcube.application.aquamaps.dataModel.Cell;
-import org.gcube.application.aquamaps.dataModel.Field;
-import org.gcube.application.aquamaps.dataModel.Filter;
-import org.gcube.application.aquamaps.dataModel.Job;
-import org.gcube.application.aquamaps.dataModel.Resource;
-import org.gcube.application.aquamaps.dataModel.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetAquaMapsPerUserRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetOccurrenceCellsRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetPhylogenyRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
+import org.gcube.application.aquamaps.dataModel.AquaMap;
+import org.gcube.application.aquamaps.dataModel.FieldArray;
 import org.gcube.application.aquamaps.dataModel.Types.AreaType;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Area;
+import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
@@ -145,7 +153,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsServicePortType{
 		}
 	}
 
-	public String submitJob(org.gcube.application.aquamaps.Job req)throws GCUBEFault{
+	public String submitJob(org.gcube.application.aquamaps.dataModel.Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
 		JobSubmissionThread thread=new JobSubmissionThread(new Job(req),ServiceContext.getContext().getScope());		
@@ -227,7 +235,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsServicePortType{
 
 
 
-	public org.gcube.application.aquamaps.Resource getResourceInfo(org.gcube.application.aquamaps.Resource myResource) throws GCUBEFault{
+	public org.gcube.application.aquamaps.dataModel.Resource getResourceInfo(org.gcube.application.aquamaps.dataModel.Resource myResource) throws GCUBEFault{
 		Resource toReturn=new Resource(myResource);		
 		
 		try{
@@ -302,7 +310,7 @@ public class AquaMaps extends GCUBEPortType implements AquaMapsServicePortType{
 		
 	}
 
-	public org.gcube.application.aquamaps.Submitted loadSubmittedById(int arg0) throws RemoteException,
+	public org.gcube.application.aquamaps.dataModel.Submitted loadSubmittedById(int arg0) throws RemoteException,
 			GCUBEFault {
 		try{
 			logger.trace("Loading submitted id : "+arg0);

@@ -5,9 +5,8 @@ import java.util.List;
 
 import org.apache.axis.message.addressing.AttributedURI;
 import org.apache.axis.message.addressing.EndpointReferenceType;
-import org.gcube.application.aquamaps.stubs.AquaMapsPortType;
-import org.gcube.application.aquamaps.stubs.service.AquaMapsServiceAddressingLocator;
-import org.gcube.application.aquamaps.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.AquaMapsPublisherPortType;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.service.AquaMapsPublisherServiceAddressingLocator;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
@@ -18,8 +17,6 @@ import org.gcube.common.core.informationsystem.client.queries.GCUBERIQuery;
 import org.gcube.common.core.resources.GCUBERunningInstance;
 import org.gcube.common.core.types.VOID;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.AquaMapsPublisherPortType;
-import org.gcube_system.namespaces.application.aquamaps.aquamapspublisher.service.AquaMapsPublisherServiceAddressingLocator;
 
 public class PublisherTesting {
 

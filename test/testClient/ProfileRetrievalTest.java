@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.stubs.dataModel.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 
 public class ProfileRetrievalTest {
 
@@ -17,7 +17,7 @@ public class ProfileRetrievalTest {
 	public static void main(String[] args) throws IOException, ParserConfigurationException {
 		String profile=ServiceUtils.URLtoString("http://wn06.research-infrastructures.eu:6900/HSPEC/286/Default.xml");
 		System.out.println(profile);
-		System.out.println(new AquaMapsObject(profile).toXML());
+//		System.out.println(new AquaMapsObject(profile).toXML());
 	}
 
 }

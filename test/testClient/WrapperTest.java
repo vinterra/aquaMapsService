@@ -1,8 +1,8 @@
 package testClient;
 
-import org.gcube.application.aquamaps.stubs.dataModel.Species;
-import org.gcube.application.aquamaps.stubs.dataModel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
 
