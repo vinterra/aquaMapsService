@@ -15,6 +15,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.enhanced.*;
 import org.gcube.application.aquamaps.dataModel.Types.*;
 import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
+import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 
 public class JobManager extends SubmittedManager{
 
@@ -396,8 +398,16 @@ public class JobManager extends SubmittedManager{
 			objRow.add(sourceHSPEN);
 			objRow.add(sourceHSPEC);
 			objRow.add(jobIdField);
-			//FIXME Comment
-//			objRow.add(new Field(SubmittedFields.gisenabled+"",obj.()+"",FieldType.STRING));			
+			objRow.add(new Field(SubmittedFields.gisenabled+"",obj.getGis()+"",FieldType.BOOLEAN));
+			ArrayList<String> layersId=new ArrayList<String>();
+			ArrayList<String> layersUri=new ArrayList<String>();
+			for(LayerInfo info: obj.getLayers()){
+				layersId.add(info.getId());
+				layersUri.add(info.getUrl());
+			}
+			
+			objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
+			objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
 			objRow.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.STRING));
 			aquamapsList.add(objRow);
 		}
@@ -417,8 +427,8 @@ public class JobManager extends SubmittedManager{
 		jobRow.add(sourceHSPEN);
 		jobRow.add(sourceHSPEC);
 		jobRow.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
-		//FIXME Comment
-//		jobRow.add(new Field(SubmittedFields.gis+"",toPerform.getWmsContextId(),FieldType.STRING));
+		jobRow.add(new Field(SubmittedFields.gisenabled+"",toPerform.getIsGis()+"",FieldType.BOOLEAN));
+		jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
 		jobList.add(jobRow);
 		session.insertOperation(submittedTable, jobList);
 		

@@ -119,11 +119,6 @@ public class SubmittedManager {
 		return ((Integer) getField(submittedId,SubmittedFields.isaquamap)==1);
 	}
 
-	public static int getMapId(int submittedId)throws Exception{
-		//FIXME Comment
-//		return (Integer) getField(submittedId,SubmittedFields.mapid);
-		return 0;
-	}
 
 
 
@@ -163,7 +158,8 @@ public class SubmittedManager {
 	
 	public static void updateStatus(int jobId,SubmittedStatus statusValue)throws SQLException, IOException, Exception{
 		updateField(jobId,SubmittedFields.status,FieldType.STRING,statusValue.toString());
-		if(statusValue.equals(SubmittedStatus.Error)){
+		if(statusValue.equals(SubmittedStatus.Error)||statusValue.equals(SubmittedStatus.Completed)){
+			logger.trace("Found status "+statusValue+", updateing Publisher..");
 			Publisher pub=PublisherImpl.getPublisher();
 			if(isAquaMap(jobId)){
 				AquaMapsObject obj = pub.getAquaMapsObjectById(jobId);

@@ -24,11 +24,15 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequestException;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
+import org.gcube.common.gis.dataModel.types.LayersType;
 import org.json.JSONException;
 
 public class GISGenerator implements Generator{
@@ -37,13 +41,16 @@ public class GISGenerator implements Generator{
 	public static char delimiter=',';
 	public static boolean hasHeader=false;
 
-
+	private static Publisher publisher=PublisherImpl.getPublisher();
+	
+	
+	
 	private static final String crs="GEOGCS[\"WGS 84\", DATUM[\"World Geodetic System 1984\", SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]],"+ 
 	"AUTHORITY[\"EPSG\",\"6326\"]], PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]],  UNIT[\"degree\", 0.017453292519943295],"+ 
 	"AXIS[\"Geodetic longitude\", EAST],  AXIS[\"Geodetic latitude\", NORTH],  AUTHORITY[\"EPSG\",\"4326\"]]";
 
 
-	private GISGenerationRequest request=null;
+	private GISRequest request=null;
 
 
 	private static String cSquareCodeDefinition=HCAF_SFields.csquarecode+" varchar(10)";
@@ -55,117 +62,152 @@ public class GISGenerator implements Generator{
 
 	public boolean getResponse() throws Exception {
 		if(request==null) throw new Exception("No request setted");
-//		else if (request instanceof LayerGenerationRequest) return generateLayer();
-//		else if (request instanceof GroupGenerationRequest) return generateGroup();
-//		else if (request instanceof RemovalRequest) return removeFromGeoServer();
-		//FIXME Comment
-		else return generateStyle((StyleGenerationRequest)request);
+		else if (request instanceof LayerGenerationRequest) return generateLayer((LayerGenerationRequest) request);
+		else if (request instanceof GroupGenerationRequest) return generateGroup((GroupGenerationRequest) request);
+		else if (request instanceof RemovalRequest) return removeGISData((RemovalRequest) request);
+		else return generateStyle((StyleGenerationRequest) request);
 	}
 
 	public void setRequest(GenerationRequest theRequest)
 	throws BadRequestException {
-		if(theRequest instanceof GISGenerationRequest)
-			request=(GISGenerationRequest) theRequest;
+		if(theRequest instanceof GISRequest)
+			request=(GISRequest) theRequest;
 		else throw new BadRequestException();
 	}
 
 
 	//************************* DATA Generation with Publisher synchronization
 
+	private static synchronized boolean removeGISData(RemovalRequest request)throws Exception{
+		//TODO IMPLEMENT
+		throw new Exception("Not yet Implemented");
+	}
+	
 
 	private static synchronized boolean generateLayer(LayerGenerationRequest request) throws Exception{
-//		//***** Check if existing
-//		
-//		LayerInfoType published= PublisherImpl.getPublisher().getExistingLayer(
-//				request.getSpeciesCoverage(), 
-//				request.getHcafId(), 
-//				request.getHspenId(),
-//				request.getEnvelopeCustomization(), 
-//				request.getEnvelopeWeights(), request.getSelectedAreas(), request.getBb(),request.getThreshold());
-//
-//		if(published==null){
-//			DBSession session=null;
-//			try{
-//				//***** Create Layer table in postGIS
-//				session=DBSession.getPostGisDBSession();
-//				session.disableAutoCommit();
-//				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);			
-//				String layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
-//				session.dropTable(appTableName);
-//
-//				//**** Needed wait for data synch 
-//				//**** POSTGIS - GEOServer limitation
-//				try {
-//					Thread.sleep(4*1000);
-//				} catch (InterruptedException e) {}
-//
-//				//***** update GeoServerBox
-//
-//				//****** Styles generation
-//
-//				ArrayList<String> generatedStyles= new ArrayList<String>();
-//
-//				for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
-//					//					String linearStyle=layerTable+"_linearStyle";
-//					//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
-//					if(generateStyle(styleReq))generatedStyles.add(styleReq.getNameStyle());
-//					else logger.warn("Style "+styleReq.getNameStyle()+" was not generated!!");
-//
-//				//**** Layer Generation
-//
-//				generatedStyles.addAll(request.getToAssociateStyles());
-//				if(generatedStyles.size()==0)
-//					throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
-//
-//				if(!createLayer(layerTable, request.getMapName(), generatedStyles, 0))
-//					throw new Exception("Unable to generate Layer "+request.getMapName());
-//
-//				request.setGeServerLayerId(layerTable);
-//
-//				//***** create reference in Publisher
-//				published=PublisherImpl.getPublisher().publishNewLayer(
-//						request.getSpeciesCoverage(), 
-//						request.getHcafId(), 
-//						request.getHspenId(),
-//						request.getEnvelopeCustomization(), 
-//						request.getEnvelopeWeights(), request.getSelectedAreas(), request.getBb(),request.getThreshold(),
-//						request.getMapName(), generatedStyles,0);
-//				session.commit();
-//			}catch (Exception e ){
-//				logger.error("Unable to create Layer ", e);
-//				throw e;
-//			}finally {
-//				session.close();
-//			}
-//		}
-//
-//
-//		//***** insert reference in request
-//		request.setGeneratedLayer(published);
+		//***** Check if existing
+		LayerInfo published= getExisting(request);
 
-		//FIXME Comment
-		return true;
+		if(published==null){
+			logger.trace("Layer not found for request : "+request);
+			DBSession session=null;
+			try{
+				//***** Create Layer table in postGIS
+				session=DBSession.getPostGisDBSession();
+				session.disableAutoCommit();
+				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);			
+				String layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
+				session.dropTable(appTableName);
+
+				//**** Needed wait for data synch 
+				//**** POSTGIS - GEOServer limitation
+				try {
+					Thread.sleep(4*1000);
+				} catch (InterruptedException e) {}
+
+				//***** update GeoServerBox
+
+				//****** Styles generation
+
+				for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
+					//					String linearStyle=layerTable+"_linearStyle";
+					//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
+					if(generateStyle(styleReq))request.getToAssociateStyles().add(styleReq.getNameStyle());
+					else logger.warn("Style "+styleReq.getNameStyle()+" was not generated!!");
+
+				//**** Layer Generation
+
+				if(request.getToAssociateStyles().size()==0)
+					throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
+
+				if(!createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle()))
+					throw new Exception("Unable to generate Layer "+request.getMapName());
+
+				String url = ServiceContext.getContext().getGeoServerUrl()+"/wms/"+layerTable;
+				logger.trace("Layer url : "+layerTable);
+				
+				request.setGeServerLayerId(layerTable);
+
+				
+				//***** create reference in Publisher
+				request.setGeneratedLayer(publishLayer(request));
+				session.commit();
+				return true;
+			}catch (Exception e ){
+				logger.error("Unable to create Layer ", e);
+				throw e;
+			}finally {
+				session.close();
+			}
+		}else {
+			//***** insert reference in request
+			request.setGeneratedLayer(published.getId());
+			request.setGeServerLayerId(published.getUrl());
+			logger.trace("Found Published layer for request "+request);
+			return true;
+		}
 	}
 
 
 	private static synchronized boolean generateGroup(GroupGenerationRequest request)throws Exception{
-//		WMSContextInfoType published=PublisherImpl.getPublisher().getExistingWMSContext(request.getPublishedLayer());
-//		if(published==null){
-//			if(!createGroupOnGeoServer(request.getGeoServerLayers(), request.getStyles(), request.getToCreateGroupName()))
-//				throw new Exception("Unable to create group "+request.getToCreateGroupName()+"on GEOServer");
-//			published=PublisherImpl.getPublisher().publishNewWMSContext(request.getToCreateGroupName(),request.getPublishedLayer());
-//		}
-//		request.setAssociatedContext(published);
-		//FIXME Comment
-		return true;
+		//TODO IMPLEMENT
+		throw new Exception("Not yet Implemented");
 	}
 
 
 	private static synchronized boolean generateAndPublishStyle(StyleGenerationRequest request)throws Exception{
+		//TODO IMPLEMENT
 		throw new Exception("NOT IMPLEMENTED");
 	}
 
-
+	private static synchronized LayerInfo getExisting(LayerGenerationRequest request)throws Exception{
+		LayerInfo toReturn=null;
+		switch(request.getMapType()){
+		case Biodiversity: {
+				PredictionLayerGenerationRequest req=(PredictionLayerGenerationRequest) request;
+				toReturn=publisher.getBiodiversityLayer(req.getSpeciesCoverage(), 
+						req.getHcaf(), req.getHspen(), req.getSelectedAreas(), req.getEnvelopeCustomization(), req.getEnvelopeWeights(), req.getBb(), req.getThreshold());
+				break;
+			}
+		case Environment:{
+			EnvironmentalLayerGenerationRequest req=(EnvironmentalLayerGenerationRequest)request;
+			toReturn=publisher.getEnvironmentalLayer(req.getParameter(), req.getHcaf());
+			break;
+		}
+		case PointMap:{
+			PointMapGenerationRequest req=(PointMapGenerationRequest) request;
+			toReturn=publisher.getPointMapLayer(req.getSpecies().getId());
+		}
+		default : {
+			PredictionLayerGenerationRequest req=(PredictionLayerGenerationRequest) request;
+			toReturn=publisher.getDistributionLayer(req.getSpeciesCoverage().iterator().next(), req.getHcaf(), req.getHspen(), req.getSelectedAreas(), 
+					req.getEnvelopeCustomization(), req.getEnvelopeWeights(), req.getBb(), req.getMapType().equals(LayersType.NativeRange));
+			break;
+		}
+		}
+		return toReturn;
+	}
+	
+	
+	private static synchronized String publishLayer(LayerGenerationRequest request)throws Exception{
+		switch(request.getMapType()){
+		case PointMap : {
+			PointMapGenerationRequest req=(PointMapGenerationRequest) request;
+			return publisher.publishPointMapLayer(req.getSpecies().getId(), req.getToAssociateStyles(), req.getDefaultStyle(), req.getMapName(), req.getGeServerLayerId());
+		}
+		case Environment : {
+			EnvironmentalLayerGenerationRequest req=(EnvironmentalLayerGenerationRequest)request;
+			return publisher.publishEnvironmentalLayer(req.getHcaf(), req.getParameter(), req.getToAssociateStyles(), req.getDefaultStyle(), req.getMapName(), req.getGeServerLayerId());
+		}
+		default :{
+			PredictionLayerGenerationRequest req= (PredictionLayerGenerationRequest) request;
+			return publisher.publishLayer(req.getObjectId(), request.getMapType(), req.getToAssociateStyles(), req.getDefaultStyle(), req.getMapName(), req.getGeServerLayerId());
+		}
+		}
+	}
+	
+	
+	
 
 	// ***************** Routines
 
@@ -252,10 +294,22 @@ public class GISGenerator implements Generator{
 		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
 		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 		String style;
-		if(req.getTypeValue()==Integer.class)
-			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
-		else if(req.getTypeValue()==Float.class)
-			style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
+		if(req.getTypeValue()==Integer.class){
+			switch(req.getClusterScaleType()){
+			case logarithmic : style=MakeStyle.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
+							break;
+			default 	: style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
+							break;
+							
+			}
+		}
+		else if(req.getTypeValue()==Float.class){
+			switch(req.getClusterScaleType()){
+			case logarithmic : style=MakeStyle.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
+			default : 	style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
+						break;
+			}
+		}
 		else throw new BadRequestException();
 		logger.trace("Submitting style "+req.getNameStyle());
 		boolean toReturn=false;

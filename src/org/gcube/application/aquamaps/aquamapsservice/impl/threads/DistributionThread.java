@@ -12,16 +12,19 @@ import java.util.Set;
 import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.PredictionLayerGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
@@ -29,7 +32,6 @@ import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube.common.gis.dataModel.LayerInfoType;
 
 public class DistributionThread extends Thread {
 
@@ -94,7 +96,7 @@ public class DistributionThread extends Thread {
 
 
 			ResultSet rs=queryForProbabilities();
-
+			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Generating);
 			String csvFile=null;
 			if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 				csvFile=generateCsvFile(rs);	
@@ -122,25 +124,28 @@ public class DistributionThread extends Thread {
 
 				if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 
-					LayerGenerationRequest request= LayerGenerationRequest.getSpeciesDistributionRequest(speciesId.iterator().next(), 
-							JobManager.getHCAFTableId(jobId), JobManager.getHSPENTableId(jobId), 
-							envelopeCustomization, envelopeWeights, selectedAreas, bb, csvFile);
+					Resource hcaf= new Resource (ResourceType.HCAF,SubmittedManager.getHCAFTableId(jobId));
+					Resource hspen=new Resource (ResourceType.HSPEN,SubmittedManager.getHSPENTableId(jobId));
+					ArrayList<String> layersId=new ArrayList<String>();
+					ArrayList<String> layersUri=new ArrayList<String>();
+					
+					//TODO check algorithm
+					PredictionLayerGenerationRequest request= new PredictionLayerGenerationRequest(aquamapsId, new Species(speciesId.iterator().next()), hcaf, hspen, 
+							envelopeCustomization, envelopeWeights, selectedAreas, bb, csvFile, true);
+					
 
 					if(!GeneratorManager.requestGeneration(request)){
-						//FIXME Comment
-//						SubmittedManager.updateGISData(aquamapsId, request.getGeServerLayerId());
-						//FIXME references per publisher
-						LayerInfoType published=request.getGeneratedLayer();
+						layersId.add(request.getGeneratedLayer());
+						layersId.add(request.getGeServerLayerId());
 					}else {
-						throw new Exception("Gis Generation returned false, nothing has been generated ");
+						throw new Exception("Gis Generation returned false, request was "+request);
 					}
-						
+					AquaMapsManager.updateGISReferences(aquamapsId, layersId, layersUri);
 				}
 
 			}	
-			//FIXME Comment
-//			AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
-
+			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Completed);
+			
 
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -170,7 +175,6 @@ public class DistributionThread extends Thread {
 
 	private ResultSet queryForProbabilities()throws Exception{
 		String HSPECName=JobManager.getWorkingHSPEC(jobId);
-		//FIXME Simulating -> Generating
 		SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Simulating);
 		session=DBSession.getInternalDBSession();
 

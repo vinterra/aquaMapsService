@@ -102,6 +102,7 @@
 					<xsd:element name="threshold" type="xsd:float" />
 					<xsd:element name="status" type="xsd:string" />
 					<xsd:element name="gis" type="xsd:boolean" />
+					<xsd:element name="algorithmType" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -139,10 +140,11 @@
 			<xsd:sequence>
 				<xsd:element name="author" type="xsd:string"/>
 				<xsd:element name="date" type="xsd:string"/>
-				<xsd:element name="gis" type="xsd:string"/>
+				<xsd:element name="gisEnabled" type="xsd:boolean"/>
+				<xsd:element name="publishedIds" type="xsd:string"/>
+				<xsd:element name="gisReferences" type="xsd:string"/>
 				<xsd:element name="isAquaMap" type="xsd:boolean"/>
 				<xsd:element name="jobId" type="xsd:int"/>
-				<xsd:element name="mapId" type="xsd:int"/>
 				<xsd:element name="saved" type="xsd:boolean"/>
 				<xsd:element name="searchId" type="xsd:int"/>
 				<xsd:element name="selectionCriteria" type="xsd:string"/>

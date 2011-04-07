@@ -11,6 +11,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.HSPECGener
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.WrapperUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
@@ -18,6 +19,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.xstream.EnvelopeConverter;
 import org.gcube.application.framework.core.session.ASLSession;
 import org.gcube.application.framework.core.session.SessionManager;
@@ -33,8 +35,8 @@ public class HSPECGeneratorTest {
 	 * @param args
 	 */
 	public static void main(String[] args)throws Exception {
-		fromSpeciesAndCell();
-//		fromCSVList();
+//		fromSpeciesAndCell();
+		fromCSVList();
 		System.out.println("END");
 	}
 	
@@ -88,14 +90,14 @@ public class HSPECGeneratorTest {
 
 	private static void fromCSVList()throws Exception{
 		List<String> ids=new ArrayList<String>();
-		ids.add("ITS-180495");
-////		
+//		ids.add("ITS-180495");
 //		
-//		System.out.println("Loading csv...");
-//		 
-//		for(List<Field> row: WrapperUtils.loadCSV(csvPath, ','))
-//			for(Field f : row) if(f.getName().equalsIgnoreCase(SpeciesOccursumFields.speciesid+""))ids.add(f.getValue());
-//		
+		
+		System.out.println("Loading csv...");
+		 
+		for(List<Field> row: WrapperUtils.loadCSV(csvPath, ','))
+			for(Field f : row) if(f.getName().equalsIgnoreCase(SpeciesOccursumFields.speciesid+""))ids.add(f.getValue());
+		
 		System.out.println("Loaded "+ids.size()+" ids");
 		
 		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		

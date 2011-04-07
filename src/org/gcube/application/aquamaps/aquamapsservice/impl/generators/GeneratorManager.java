@@ -3,7 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
 
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GISGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GISRequest;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class GeneratorManager {
@@ -104,7 +104,7 @@ public class GeneratorManager {
 		GenericObjectPool thePool;
 		if(request instanceof ImageGeneratorRequest)
 			thePool=perlPool;
-		else if(request instanceof GISGenerationRequest)
+		else if(request instanceof GISRequest)
 			thePool=gisPool;
 		else if(request instanceof SourceGeneratorRequest)
 			thePool=sourceGeneratorPool;

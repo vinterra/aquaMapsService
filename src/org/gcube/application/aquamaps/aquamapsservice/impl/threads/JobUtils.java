@@ -214,7 +214,7 @@ public class JobUtils {
 			logger.trace(" found "+app.size()+" files to publish");
 
 			if(app.size()>0)
-				toReturn.addAll(PublisherImpl.getPublisher().publishImages(objId, speciesCoverage, app,actualScope,hasCustomizations));
+				toReturn.addAll(PublisherImpl.getPublisher().publishImages(objId,app));
 		}
 		return toReturn;
 	}

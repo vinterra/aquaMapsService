@@ -65,10 +65,13 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/PerlImageGene
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/SourceGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/SourceGeneratorFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/SourceGeneratorRequest.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/EnvironmentalLayerGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISGenerator.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GISRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/GroupGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/LayerGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/PointMapGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/PredictionLayerGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/RemovalRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/gis/StyleGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text

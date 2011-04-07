@@ -3,6 +3,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 
 public class AquaMapsManager extends SubmittedManager{
 
@@ -17,31 +19,8 @@ public class AquaMapsManager extends SubmittedManager{
 	}
 
 	public static void updateGISReferences(int objId,List<String> layerIds,List<String> layerReference)throws Exception{
-		//FIXME Comment
-//		setGisPublishedId(objId, layerId);
-		
+		setGisPublishedId(objId, layerIds);
 		setGisReference(objId, layerReference);
 	}
-	
-	
-//	public static void updateLayerAndImagesReferences(int objId,List<File> images,List<LayerInfoType> layers)throws Exception{
-//		AquaMapsObject obj =PublisherImpl.getPublisher().getAquaMapsObjectById(objId);
-//		
-//		for(File f: references){
-//			if(f.getType().equals(FileType.Layer)){
-//				obj.setLayerId(f.getUuri());
-//				break;
-//			}
-//		}
-//		obj.getRelatedResources().addAll(references);
-//		obj.setStatus(SubmittedStatus.Completed);
-//		PublisherImpl.getPublisher().publishAquaMapsObject(obj);
-//		updateStatus(objId, SubmittedStatus.Completed);
-//		
-//		//TODO 
-//		throw new Exception("NOT IMPLEMENTED");
-//		
-//	}
-//	
 
 }

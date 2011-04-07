@@ -18,21 +18,22 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManage
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.LayerGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.PredictionLayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube.common.gis.dataModel.LayerInfoType;
 
 public class BiodiversityThread extends Thread {	
 	private static final GCUBELog logger=new GCUBELog(BiodiversityThread.class);
@@ -123,6 +124,7 @@ public class BiodiversityThread extends Thread {
 				prep=session.preparedStatement(clusteringBiodiversityQuery(HSPECName,tableName));				
 				prep.setFloat(1,threshold);
 				ResultSet rs=prep.executeQuery();
+				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Generating);
 				List<org.gcube.application.aquamaps.dataModel.enhanced.File> references=new ArrayList<org.gcube.application.aquamaps.dataModel.enhanced.File>();
 				
 				if(rs.first()){
@@ -161,20 +163,20 @@ public class BiodiversityThread extends Thread {
 						if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
 							logger.trace(this.getName()+"is gisEnabled");
 							
+							Resource hcaf= new Resource (ResourceType.HCAF,SubmittedManager.getHCAFTableId(jobId));
+							Resource hspen=new Resource (ResourceType.HSPEN,SubmittedManager.getHSPENTableId(jobId));
+							ArrayList<String> layersId=new ArrayList<String>();
+							ArrayList<String> layersUri=new ArrayList<String>();
 
-
-
-								LayerGenerationRequest request=LayerGenerationRequest.getBioDiversityRequest(species,
-										JobManager.getHCAFTableId(jobId),JobManager.getHSPENTableId(jobId),envelopeCustomization,envelopeWeights,
-										selectedAreas,bb,threshold,csvFile,aquamapsName,minValue,maxValue);
-								if(GeneratorManager.requestGeneration(request)){
-									logger.trace("generated layer for obj Id : "+aquamapsId);
-									//TODO Add references to generated Layer
-									
-									LayerInfoType published=request.getGeneratedLayer();
-									
-								}
-								else throw new Exception("unable to generate layer for obj Id : "+aquamapsId);
+							PredictionLayerGenerationRequest request= new PredictionLayerGenerationRequest(aquamapsId,species,hcaf,hspen,envelopeCustomization,
+									envelopeWeights,selectedAreas,bb,threshold,csvFile,aquamapsName,minValue,maxValue);
+							if(!GeneratorManager.requestGeneration(request)){
+								layersId.add(request.getGeneratedLayer());
+								layersId.add(request.getGeServerLayerId());
+							}else {
+								throw new Exception("Gis Generation returned false, request was "+request);
+							}
+							AquaMapsManager.updateGISReferences(aquamapsId, layersId, layersUri);
 						}
 
 					}	
@@ -182,9 +184,7 @@ public class BiodiversityThread extends Thread {
 				else{
 					logger.trace("Query returned empty result set, nothing to generate");
 				}
-				
-				//FIXME Comment
-//				AquaMapsManager.updateLayerAndImagesReferences(aquamapsId, references);
+				SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Completed);
 				
 				
 		} catch (Exception e) {

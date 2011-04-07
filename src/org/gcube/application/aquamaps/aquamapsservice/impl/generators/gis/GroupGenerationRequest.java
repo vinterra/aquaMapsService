@@ -9,7 +9,7 @@ import java.util.Set;
 import org.gcube.common.gis.dataModel.LayerInfoType;
 import org.gcube.common.gis.dataModel.WMSContextInfoType;
 
-public class GroupGenerationRequest implements GISGenerationRequest {
+public class GroupGenerationRequest implements GISRequest {
 
 	
 	private Map<String,String> geoServerLayers=new HashMap<String, String>();

@@ -6,7 +6,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsM
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-public class StyleGenerationRequest implements GISGenerationRequest {
+public class StyleGenerationRequest implements GISRequest {
 
 	private static final GCUBELog logger=new GCUBELog(StyleGenerationRequest.class);
 	

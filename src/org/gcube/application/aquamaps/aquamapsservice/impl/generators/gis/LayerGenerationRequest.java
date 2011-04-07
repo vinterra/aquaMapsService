@@ -2,24 +2,12 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest.ClusterScaleType;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
-import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
-import org.gcube.common.gis.dataModel.LayerInfoType;
+import org.gcube.common.gis.dataModel.types.LayersType;
 
 
 
-public class LayerGenerationRequest implements GISGenerationRequest {
+public abstract class LayerGenerationRequest implements GISRequest {
 
 
 	//************ Layer Generation details
@@ -27,69 +15,34 @@ public class LayerGenerationRequest implements GISGenerationRequest {
 	private String featureLabel;
 	private String FeatureDefinition;
 	private String mapName;
-	private ObjectType mapType;
+	private LayersType mapType;
 	
 	private List<StyleGenerationRequest> toGenerateStyles=new ArrayList<StyleGenerationRequest>();
 	private List<String> toAssociateStyles=new ArrayList<String>();
-	
-	//************ Layer Info Type identification parameters 
-	
-	private Set<String> speciesCoverage; 
-	private int hcafId;
-	private int hspenId; 
-	private Map<String,Map<String,Perturbation>> envelopeCustomization;
-	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights;
-	private Set<Area> selectedAreas;
-	private BoundingBox bb;
-	private float threshold;
-	
-	
+	private int defaultStyle=0;
+		
 	//************ Generated Layer references
 	
-	private LayerInfoType generatedLayer;
-	private String geServerLayerId;
+	private String generatedLayer;
+	private String geoServerLayerId;
 	
 	
-	public static LayerGenerationRequest getBioDiversityRequest(Set<String> speciesCoverage, int hcafId,int hspenId,
-			Map<String,Map<String,Perturbation>> envelopeCustomization, Map<String,Map<EnvelopeFields,Field>> envelopeWeights,
-			Set<Area> areaSelection, BoundingBox bb,float threshold, String csvFile,String objectName, int min,int max ){
-		LayerGenerationRequest toReturn= new LayerGenerationRequest(hcafId,hspenId,areaSelection,bb,csvFile);
-		toReturn.setMapName(objectName);
-		toReturn.getSpeciesCoverage().addAll(speciesCoverage);
-		toReturn.setEnvelopeCustomization(envelopeCustomization);
-		toReturn.setEnvelopeWeights(envelopeWeights);
-		toReturn.setFeatureLabel(AquaMapsManager.maxSpeciesCountInACell);
-		toReturn.setFeatureDefinition("integer");
-		toReturn.setMapType(ObjectType.Biodiversity);
-		toReturn.setThreshold(threshold);
-		toReturn.toGenerateStyles.add(
-				StyleGenerationRequest.getBiodiversityStyle(min,max,ClusterScaleType.linear,objectName));
-		return toReturn;
+	
+	
+	protected LayerGenerationRequest(String csvFile,String featureLabel,String featureDefinition,String mapName){
+		this.setCsvFile(csvFile);
+		this.setFeatureDefinition(featureDefinition);
+		this.setFeatureLabel(featureLabel);
+		this.setMapName(mapName);
 	}
 
-	public static LayerGenerationRequest getSpeciesDistributionRequest(String speciesId, int hcafId,int hspenId,
-			Map<String,Perturbation> envelopeCustomization, Map<EnvelopeFields,Field> envelopeWeights,
-			Set<Area> areaSelection, BoundingBox bb, String csvFile){
-		LayerGenerationRequest toReturn= new LayerGenerationRequest(hcafId,hspenId,areaSelection,bb,csvFile);
-		toReturn.getSpeciesCoverage().add(speciesId);
-		toReturn.getEnvelopeCustomization().put(speciesId, envelopeCustomization);
-		toReturn.getEnvelopeWeights().put(speciesId, envelopeWeights);
-		toReturn.setMapName(speciesId);
-		toReturn.setMapType(ObjectType.SpeciesDistribution);
-		toReturn.setFeatureLabel(HSPECFields.probability+"");
-		toReturn.setFeatureDefinition("real");
-		toReturn.getToAssociateStyles().add(ServiceContext.getContext().getDistributionDefaultStyle());
-		return toReturn;
-	}
 	
-
-	private LayerGenerationRequest(int hcafId,int hspenId,Set<Area> areaSelection, BoundingBox bb, String csvFile){
-		this.setHcafId(hcafId);
-		this.setHspenId(hspenId);
-		this.setBb(bb);
-		this.setSelectedAreas(areaSelection);
-		this.csvFile=csvFile;
-	}
+	
+	//TODO getOccurrenceCells Request
+	//TODO getEnvironmentalLayerRequest
+	
+	
+	
 	
 
 
@@ -149,14 +102,14 @@ public class LayerGenerationRequest implements GISGenerationRequest {
 
 
 
-	public ObjectType getMapType() {
+	public LayersType getMapType() {
 		return mapType;
 	}
 
 
 
 
-	public void setMapType(ObjectType mapType) {
+	public void setMapType(LayersType mapType) {
 		this.mapType = mapType;
 	}
 
@@ -191,148 +144,51 @@ public class LayerGenerationRequest implements GISGenerationRequest {
 
 
 
-	public Set<String> getSpeciesCoverage() {
-		return speciesCoverage;
-	}
+	
 
 
 
 
-	public void setSpeciesCoverage(Set<String> speciesCoverage) {
-		this.speciesCoverage = speciesCoverage;
-	}
-
-
-
-
-	public int getHcafId() {
-		return hcafId;
-	}
-
-
-
-
-	public void setHcafId(int hcafId) {
-		this.hcafId = hcafId;
-	}
-
-
-
-
-	public int getHspenId() {
-		return hspenId;
-	}
-
-
-
-
-	public void setHspenId(int hspenId) {
-		this.hspenId = hspenId;
-	}
-
-
-
-
-	public Map<String, Map<String, Perturbation>> getEnvelopeCustomization() {
-		return envelopeCustomization;
-	}
-
-
-
-
-	public void setEnvelopeCustomization(
-			Map<String, Map<String, Perturbation>> envelopeCustomization) {
-		this.envelopeCustomization = envelopeCustomization;
-	}
-
-
-
-
-	public Map<String, Map<EnvelopeFields, Field>> getEnvelopeWeights() {
-		return envelopeWeights;
-	}
-
-
-
-
-	public void setEnvelopeWeights(
-			Map<String, Map<EnvelopeFields, Field>> envelopeWeights) {
-		this.envelopeWeights = envelopeWeights;
-	}
-
-
-
-
-	public Set<Area> getSelectedAreas() {
-		return selectedAreas;
-	}
-
-
-
-
-	public void setSelectedAreas(Set<Area> selectedAreas) {
-		this.selectedAreas = selectedAreas;
-	}
-
-
-
-
-	public BoundingBox getBb() {
-		return bb;
-	}
-
-
-
-
-	public void setBb(BoundingBox bb) {
-		this.bb = bb;
-	}
-
-
-
-
-	public void setGeneratedLayer(LayerInfoType generatedLayer) {
+	public void setGeneratedLayer(String generatedLayer) {
 		this.generatedLayer = generatedLayer;
 	}
 
 
 
 
-	public LayerInfoType getGeneratedLayer() {
+	public String getGeneratedLayer() {
 		return generatedLayer;
 	}
 
 	public String getGeServerLayerId() {
-		return geServerLayerId;
+		return geoServerLayerId;
 	}
 
 	public void setGeServerLayerId(String geServerLayerId) {
-		this.geServerLayerId = geServerLayerId;
+		this.geoServerLayerId = geServerLayerId;
 	}
 
-	public void setThreshold(float threshold) {
-		this.threshold = threshold;
+
+
+	public void setDefaultStyle(int defaultStyle) {
+		this.defaultStyle = defaultStyle;
 	}
 
-	public float getThreshold() {
-		return threshold;
+
+
+	public int getDefaultStyle() {
+		return defaultStyle;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return "LayerGenerationRequest [mapName=" + mapName + ", mapType="
+				+ mapType + ", generatedLayer=" + generatedLayer
+				+ ", geoServerLayerId=" + geoServerLayerId + "]";
+	}
+
 	
 	
-	
-//	
-//	
-//	public void setStyleGenerationParameter(int maxValue,int minValue){
-//		styleDefinition=new StyleGenerationRequest();
-//		styleDefinition.setAttributeName(this.getFeatureLabel());
-//		styleDefinition.setC1(Color.YELLOW);
-//		styleDefinition.setC2(Color.RED);
-//		styleDefinition.setMax(String.valueOf(maxValue));
-//		styleDefinition.setMin(String.valueOf(minValue));					
-//		styleDefinition.setNameStyle(ServiceUtils.generateId(this.getLayerName(), "style"));					
-//		int Nclasses=((maxValue-minValue)>4)?5:maxValue-minValue;
-//		styleDefinition.setNClasses(Nclasses);
-//		styleDefinition.setTypeValue(Integer.class);
-//	}
-//	
 }
