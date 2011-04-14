@@ -74,7 +74,7 @@ public class PostGresSQLDBSession extends DBSession {
 	public int getCount(String tableName, List<Field> filters) throws Exception {
 		PreparedStatement ps=getPreparedStatementForCount(filters, tableName);
 		ResultSet rs=fillParameters(filters, ps).executeQuery();
-		if(rs.next()) return rs.getInt(0);
+		if(rs.next()) return rs.getInt(1);
 		else return 0;
 	}
 
@@ -142,35 +142,38 @@ public class PostGresSQLDBSession extends DBSession {
 		
 		for(int i=0;i<rows.size();i++){
 			//Setting 
-			for(Field f:rows.get(i))
+			for(int j=0;j<rows.get(i).size();j++){
+				Field f=rows.get(i).get(j);
 				switch(f.getType()){
 				case BOOLEAN:{ 
 					Integer value=Boolean.parseBoolean(f.getValue())?1:0;
-					ps.setInt(i+1, value);
+					ps.setInt(j+1, value);
 					break;
 					}
-				case DOUBLE: ps.setDouble(i+1, Double.parseDouble(f.getValue()));
+				case DOUBLE: ps.setDouble(j+1, Double.parseDouble(f.getValue()));
 								break;
-				case INTEGER: ps.setInt(i+1, Integer.parseInt(f.getValue()));
+				case INTEGER: ps.setInt(j+1, Integer.parseInt(f.getValue()));
 				break;				
-				case STRING: ps.setString(i+1,f.getValue());
+				case STRING: ps.setString(j+1,f.getValue());
 				break;
 				}
-
-			for(Field f:keys.get(i))
+			}
+			for(int j=0;j<keys.get(i).size();j++){
+				Field f=keys.get(i).get(j);
 				switch(f.getType()){
 				case BOOLEAN:{ 
 					Integer value=Boolean.parseBoolean(f.getValue())?1:0;
-					ps.setInt(i+1, value);
+					ps.setInt(j+1+rows.get(i).size(), value);
 					break;
 					}
-				case DOUBLE: ps.setDouble(i+1+rows.get(i).size(), Double.parseDouble(f.getValue()));
+				case DOUBLE: ps.setDouble(j+1+rows.get(i).size(), Double.parseDouble(f.getValue()));
 								break;
-				case INTEGER: ps.setInt(i+1+rows.get(i).size(), Integer.parseInt(f.getValue()));
+				case INTEGER: ps.setInt(j+1+rows.get(i).size(), Integer.parseInt(f.getValue()));
 				break;				
-				case STRING: ps.setString(i+1+rows.get(i).size(),f.getValue());
+				case STRING: ps.setString(j+1+rows.get(i).size(),f.getValue());
 				break;
 				}
+			}
 			
 			count+=ps.executeUpdate();
 		}

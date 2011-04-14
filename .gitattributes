@@ -88,7 +88,11 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SimulationThread
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SourceGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SpeciesPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsCall.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsServiceCall.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsServiceInterface.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsServiceWrapper.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/Constant.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/WrapperUtils.java -text
@@ -102,7 +106,6 @@ test/testClient/HSPECGeneratorTest.java -text
 test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
 test/testClient/ProfileRetrievalTest.java -text
-test/testClient/PublisherTesting.java -text
 test/testClient/StyleGeneration.java -text
 test/testClient/WrapperTest.java -text
 test/testClient/XStreamTest.java -text

@@ -8,7 +8,6 @@ import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.File;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;

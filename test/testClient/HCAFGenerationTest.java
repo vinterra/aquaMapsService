@@ -5,9 +5,8 @@ import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 
 public class HCAFGenerationTest {
@@ -16,19 +15,18 @@ public class HCAFGenerationTest {
 	
 	private static final String SERVICE_URI="http://wn06.research-infrastructures.eu:9001/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
 	
-	public static DataManagementPortType getPortType(ASLSession session)throws Exception{
+	public static DataManagementPortType getPortType(GCUBEScope scope)throws Exception{
 		DataManagementServiceAddressingLocator asal= new DataManagementServiceAddressingLocator();
 		EndpointReferenceType epr= new EndpointReferenceType();
 		epr.setAddress(new AttributedURI(SERVICE_URI));		
 		DataManagementPortType aquamapsPT=asal.getDataManagementPortTypePort(epr);
-		return GCUBERemotePortTypeContext.getProxy(aquamapsPT, session.getScope());
+		return GCUBERemotePortTypeContext.getProxy(aquamapsPT, scope);
 	}
 	
 	
 	public static void main(String[] args) throws Exception{
-		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/d4science.research-infrastructures.eu/FARM/AquaMaps");
-		DataManagementPortType pt=getPortType(session);
+		
+		DataManagementPortType pt=getPortType(GCUBEScope.getScope("/gcube/devsec"));
 		GenerateHCAFRequestType request=new GenerateHCAFRequestType();
 		request.setResultingHCAFName("Testing HCAF");
 		request.setSourceHCAFId("1");

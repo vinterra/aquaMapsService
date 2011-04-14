@@ -21,8 +21,7 @@ import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.xstream.EnvelopeConverter;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 
 import com.thoughtworks.xstream.XStream;
@@ -42,9 +41,8 @@ public class HSPECGeneratorTest {
 	
 	
 	private static void fromSpeciesAndCell()throws Exception{
-		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/gcube/devsec");
-		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(session, AquaMapsServiceTester.SERVICE_URI);
+		
+		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
 		
 		Species s=wrapper.loadEnvelope("Fis-22836",1);
 //		Envelope env=wrapper.loadEnvelope(s.getId(), 1);
@@ -100,16 +98,15 @@ public class HSPECGeneratorTest {
 		
 		System.out.println("Loaded "+ids.size()+" ids");
 		
-		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/gcube/devsec");
-		DataManagementPortType pt=HCAFGenerationTest.getPortType(session);
+		
+		DataManagementPortType pt=HCAFGenerationTest.getPortType(GCUBEScope.getScope("/gcube/devsec"));
 		GenerateHSPECRequestType req= new GenerateHSPECRequestType();
 		req.setGenerateNative(false);
 		req.setGenerateSuitable(true);
 		req.setSourceHCAFId(1);
 		req.setSourceHSPENId(1);
 		req.setToGeneratePrefix("TestingHSPEC");
-		req.setUserId(session.getUsername());
+		req.setUserId("Testing");
 		req.setEnableLog(true);
 		req.setSpeciesSelection(new StringArray(ids.toArray(new String[ids.size()])));
 //		req.setSpeciesSelection(new StringArray(new String[]{ids.get(0)}));

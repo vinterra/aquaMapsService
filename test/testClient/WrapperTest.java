@@ -1,10 +1,10 @@
 package testClient;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
+import org.gcube.common.core.scope.GCUBEScope;
 
 
 public class WrapperTest {
@@ -13,9 +13,8 @@ public class WrapperTest {
 	
 	
 	public static void main(String[] args) throws Exception{
-		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/gcube/devsec");
-		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(session, AquaMapsServiceTester.SERVICE_URI);
+		
+		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
 		
 		
 		
@@ -31,9 +30,9 @@ public class WrapperTest {
 		
 		
 		
-		System.out.println(AquaMapsXStream.getInstance().toXML((wrapper.loadEnvelope(s.getId(), 1))));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML((wrapper.loadEnvelope(s.getId(), 1))));
 		
-		
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
 		
 //		System.out.println(wrapper.loadResource(1, ResourceType.HCAF));
 //		System.out.println(wrapper.loadResource(1, ResourceType.HSPEN));

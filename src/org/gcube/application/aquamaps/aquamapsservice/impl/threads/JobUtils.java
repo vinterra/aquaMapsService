@@ -202,20 +202,21 @@ public class JobUtils {
 	public static List<org.gcube.application.aquamaps.dataModel.enhanced.File> createImages(int objId,String clusterFile,String header,Set<String> speciesCoverage, GCUBEScope actualScope, boolean hasCustomizations) throws Exception{
 
 		List<org.gcube.application.aquamaps.dataModel.enhanced.File> toReturn=new ArrayList<org.gcube.application.aquamaps.dataModel.enhanced.File>();
-		logger.trace(objId+" gonna call perl with file " +clusterFile);
-		SubmittedManager.updateStatus(objId, SubmittedStatus.Publishing);
-		boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
-
-		logger.trace(objId+" Perl execution exit message :"+result);		
-		if(!result) logger.warn("No images were generated");
-		else {
-			Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
-
-			logger.trace(" found "+app.size()+" files to publish");
-
-			if(app.size()>0)
-				toReturn.addAll(PublisherImpl.getPublisher().publishImages(objId,app));
-		}
+		//FIXME UNCOMMENT
+//		logger.trace(objId+" gonna call perl with file " +clusterFile);
+//		SubmittedManager.updateStatus(objId, SubmittedStatus.Publishing);
+//		boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
+//
+//		logger.trace(objId+" Perl execution exit message :"+result);		
+//		if(!result) logger.warn("No images were generated");
+//		else {
+//			Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
+//
+//			logger.trace(" found "+app.size()+" files to publish");
+//
+//			if(app.size()>0)
+//				toReturn.addAll(PublisherImpl.getPublisher().publishImages(objId,app));
+//		}
 		return toReturn;
 	}
 

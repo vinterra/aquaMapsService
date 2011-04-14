@@ -88,7 +88,54 @@ public class ServiceContext extends GCUBEServiceContext {
 	private boolean evaluateLandDistance;
 	
 	
+	//************ DEFAULT VALUES FOR DB
 	
+	private String integerDefault=null;
+	private String doubleDefault=null;
+	private String booleanDefault=null;
+	
+	//************ DEFAULT SOURCES
+	
+	private Integer defaultHSPENID=null;
+	private Integer defaultHSPECID=null;
+	private Integer defaultHCAFID=null;
+	
+	public Integer getDefaultHSPENID() {
+		return defaultHSPENID;
+	}
+
+	public void setDefaultHSPENID(Integer defaultHSPENID) {
+		this.defaultHSPENID = defaultHSPENID;
+	}
+
+	public Integer getDefaultHSPECID() {
+		return defaultHSPECID;
+	}
+
+	public void setDefaultHSPECID(Integer defaultHSPECID) {
+		this.defaultHSPECID = defaultHSPECID;
+	}
+
+	public Integer getDefaultHCAFID() {
+		return defaultHCAFID;
+	}
+
+	public void setDefaultHCAFID(Integer defaultHCAFID) {
+		this.defaultHCAFID = defaultHCAFID;
+	}
+
+	public String getIntegerDefault() {
+		return integerDefault;
+	}
+
+	public String getDoubleDefault() {
+		return doubleDefault;
+	}
+
+	public String getBooleanDefault() {
+		return booleanDefault;
+	}
+
 	public String getDefaultPublisherUrl() {
 		return defaultPublisherUrl;
 	}
@@ -179,6 +226,16 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.setEvaluatePrimaryProduction(Boolean.parseBoolean(prop.getProperty("evaluatePrimaryProduction","true").trim()));
 			this.setEvaluateIceConcentration(Boolean.parseBoolean(prop.getProperty("evaluateIceConcentration","true").trim()));
 			this.setEvaluateLandDistance(Boolean.parseBoolean(prop.getProperty("evaluateLandDistance","false").trim()));
+			
+			
+			this.booleanDefault=(prop.getProperty("booleanDefaultValue"));
+			this.doubleDefault=(prop.getProperty("doubleDefaultValue"));
+			this.integerDefault=(prop.getProperty("integerDefaultValue"));
+			
+			
+			this.setDefaultHCAFID(Integer.parseInt(prop.getProperty("defaultHCAFID")));
+			this.setDefaultHSPECID(Integer.parseInt(prop.getProperty("defaultHSPECID")));
+			this.setDefaultHSPENID(Integer.parseInt(prop.getProperty("defaultHSPENID")));
 		}catch(Exception e){
 			logger.fatal("Unable to load properties ",e);
 		}

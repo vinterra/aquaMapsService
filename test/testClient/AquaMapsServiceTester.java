@@ -20,8 +20,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
+import org.gcube.common.core.scope.GCUBEScope;
 
 
 public class AquaMapsServiceTester {
@@ -32,9 +31,7 @@ public class AquaMapsServiceTester {
 	
 	public static void main(String[] args){
 		try{
-		ASLSession session = SessionManager.getInstance().getASLSession(String.valueOf(Math.random()), "Tester");		
-		session.setScope("/gcube/devsec");
-		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(session, SERVICE_URI);
+		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), SERVICE_URI);
 		
 		Species spec=new Species("Fis-29501");
 //		System.out.println("Occurrence cells for ");
@@ -68,7 +65,13 @@ public class AquaMapsServiceTester {
 //		r=wrapper.loadResource(1, ResourceType.HSPEC);
 //		r=wrapper.loadResource(1, ResourceType.HSPEN);
 //		
-		wrapper.submitJob(createDummyJob(true,true,true));
+		
+		Job job= createDummyJob(true,true,true);
+		Job translated=new Job(job.toStubsVersion());
+		AquaMapsObject obj =translated.getAquaMapsObjectList().get(0);
+		System.out.println(obj.getAuthor());
+		wrapper.submitJob(job);
+		
 		
 		
 		System.out.println("Done");

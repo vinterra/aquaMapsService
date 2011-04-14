@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
@@ -21,6 +22,8 @@ public class SourceManager {
 	private static final GCUBELog logger=new GCUBELog(SourceManager.class);	
 	
 	private static String getMetaTable(ResourceType type) throws Exception{
+		
+//		return "meta_sources";
 		switch(type){
 		case HCAF: return "meta_hcaf";
 		case HSPEC: return "meta_hspec";
@@ -30,12 +33,14 @@ public class SourceManager {
 	}
 	
 	public static int getDefaultId(ResourceType type){
-		switch(type){
-		case HCAF: return 1;
-		case HSPEC: return 1;
-		case HSPEN: return 1;
-		}		
-		return 0;
+//		switch(type){
+//		case HCAF: return ServiceContext.getContext().getDefaultHCAFID();
+//		case HSPEC: return ServiceContext.getContext().getDefaultHSPECID();
+//		case HSPEN: return ServiceContext.getContext().getDefaultHSPENID();
+//		}		
+//		return 0;
+		
+		return 1;
 	}
 	
 	public static int registerSource(ResourceType type,String toSetTableName,String toSetDescription,String toSetAuthor, Integer toSetSourceId,ResourceType sourceType)throws Exception{

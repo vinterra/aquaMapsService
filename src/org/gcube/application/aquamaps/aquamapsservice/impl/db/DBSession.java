@@ -264,8 +264,9 @@ public abstract class DBSession {
 	public int getTableCount(String tableName) throws Exception{
 		Statement statement = connection.createStatement();
 		ResultSet rs =statement.executeQuery("SELECT COUNT(*) FROM "+tableName);
-		rs.next();
-		return rs.getInt(1);
+		if(rs.next())
+			return rs.getInt(1);
+		else return 0;
 	}
 
 
@@ -306,7 +307,7 @@ public abstract class DBSession {
 	}
 
 	protected static String formDeletetQueryStringFromFields(List<Field> filters,String table){
-		return "DELETE * FROM "+table+(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"");
+		return "DELETE FROM "+table+(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"");
 	}
 
 	protected static String formUpdateQuery(List<Field> toSet, List<Field> keys,String tableName){

@@ -5,14 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.axis.message.addressing.AttributedURI;
-import org.apache.axis.message.addressing.EndpointReferenceType;
-import org.gcube.application.aquamaps.aquamapspublisher.stubs.AquaMapsPublisherPortType;
-import org.gcube.application.aquamaps.aquamapspublisher.stubs.service.AquaMapsPublisherServiceAddressingLocator;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.TemplateLayerType;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.wrapper.AquaMapsPublisherWrapper;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
@@ -22,17 +18,9 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.framework.core.session.ASLSession;
-import org.gcube.application.framework.core.session.SessionManager;
-import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.contexts.GHNContext;
-import org.gcube.common.core.informationsystem.client.AtomicCondition;
 import org.gcube.common.core.informationsystem.client.ISClient;
-import org.gcube.common.core.informationsystem.client.queries.GCUBERIQuery;
-import org.gcube.common.core.resources.GCUBERunningInstance;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube.common.gis.dataModel.LayerInfoType;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 import org.gcube.common.gis.dataModel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.dataModel.types.LayersType;
@@ -68,33 +56,33 @@ public class PublisherImpl implements Publisher{
 	}
 	
 	
-	
-	private AquaMapsPublisherPortType getPortType() throws Exception{
-		GCUBEScope scope= ServiceContext.getContext().getScope();
-		AquaMapsPublisherServiceAddressingLocator asal= new AquaMapsPublisherServiceAddressingLocator();
-		EndpointReferenceType epr;
-		String url=ServiceContext.getContext().getDefaultPublisherUrl();
-		if(!ServiceContext.getContext().isStandAloneMode()){
-			logger.trace("Looking up for Service RI...");
-			GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
-			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass","Application"));
-			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName","AquaMapsPublisher"));
-			List<GCUBERunningInstance> toReturn= isClient.execute(query, scope);			
-			if(toReturn.size()<1) {
-				logger.warn("No publisher runnning instance found, using default service @ : "+url);
-				epr=new EndpointReferenceType();
-				epr.setAddress(new AttributedURI(url));
-			}else{
-				epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/aquamapspublisher/AquaMapsPublisher");
-				logger.trace("Found RI @ : "+epr.getAddress().getHost());
-			}
-		}else{
-			epr=new EndpointReferenceType();
-			epr.setAddress(new AttributedURI(url));
-		}
-				AquaMapsPublisherPortType aquamapsPT=asal.getAquaMapsPublisherPortTypePort(epr);
-		return GCUBERemotePortTypeContext.getProxy(aquamapsPT, scope);	
-	}
+//	
+//	private AquaMapsPublisherPortType getPortType() throws Exception{
+//		GCUBEScope scope= ServiceContext.getContext().getScope();
+//		AquaMapsPublisherServiceAddressingLocator asal= new AquaMapsPublisherServiceAddressingLocator();
+//		EndpointReferenceType epr;
+//		String url=ServiceContext.getContext().getDefaultPublisherUrl();
+//		if(!ServiceContext.getContext().isStandAloneMode()){
+//			logger.trace("Looking up for Service RI...");
+//			GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
+//			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass","Application"));
+//			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName","AquaMapsPublisher"));
+//			List<GCUBERunningInstance> toReturn= isClient.execute(query, scope);			
+//			if(toReturn.size()<1) {
+//				logger.warn("No publisher runnning instance found, using default service @ : "+url);
+//				epr=new EndpointReferenceType();
+//				epr.setAddress(new AttributedURI(url));
+//			}else{
+//				epr= toReturn.get(0).getAccessPoint().getEndpoint("gcube/application/aquamaps/aquamapspublisher/AquaMapsPublisher");
+//				logger.trace("Found RI @ : "+epr.getAddress().getHost());
+//			}
+//		}else{
+//			epr=new EndpointReferenceType();
+//			epr.setAddress(new AttributedURI(url));
+//		}
+//				AquaMapsPublisherPortType aquamapsPT=asal.getAquaMapsPublisherPortTypePort(epr);
+//		return GCUBERemotePortTypeContext.getProxy(aquamapsPT, scope);	
+//	}
 	
 	
 //	public String publishImages(int submittedId,Set<String> coverageSpeciesId,Collection<String> toPublishSet,GCUBEScope scope, boolean hasCustomizations)throws Exception{
@@ -287,9 +275,9 @@ public class PublisherImpl implements Publisher{
 		if(wrapper==null) {
 			String url=ServiceContext.getContext().getDefaultPublisherUrl();
 			logger.trace("Init publisher wrapper with default url : "+url);
-			ASLSession session= SessionManager.getInstance().getASLSession("AquaMapsService", "AquaMapsService");
-			session.setScope(ServiceContext.getContext().getScope().toString());
-			wrapper=new AquaMapsPublisherWrapper(session,url);
+			logger.trace("Constructing wrapper..");
+			wrapper=new AquaMapsPublisherWrapper(ServiceContext.getContext().getScope(),url);
+			logger.trace("Wrapper initialized");
 		}
 		return wrapper;
 	}
@@ -303,35 +291,31 @@ public class PublisherImpl implements Publisher{
 	public AquaMapsObject getAquaMapsObjectById(int id) throws Exception {return getWrapper().getAquaMapObjectById(id);}
 	
 	
-	
-	
 	@Override
 	public WMSContextInfo getWMSContextById(String id) throws Exception {return getWrapper().getWMSContextById(id);}
 	
-	
+	@Override
 	public LayerInfo getBiodiversityLayer(Set<String> speciesCoverage,
-			int hcafId, int hspenId, Set<Area> areaSelection,
+			Resource hcaf,Resource hspen, Set<Area> areaSelection,
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
-			BoundingBox bounds, float threshold) throws Exception {
+			BoundingBox bounds,float threshold) throws Exception {
 		
 		ArrayList<String> specs=new ArrayList<String>();
 		for(String s : speciesCoverage) specs.add(s);
-		return getWrapper().getLayer(bounds+"", envelopeCustomization, new Resource(ResourceType.HCAF,hcafId), new Resource(ResourceType.HSPEN,hspenId),
-				areaSelection,specs,threshold,envelopeWeights);
+		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,areaSelection,specs,threshold,envelopeWeights);
 	}
-
-	public LayerInfo getDistributionLayer(String speciesId, int hcafId,
-			int hspenId, Set<Area> areaSelection,
+	@Override
+	public LayerInfo getDistributionLayer(String speciesId,
+			Resource hcaf,Resource hspen, Set<Area> areaSelection,
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
-			BoundingBox bounds, boolean getNative) throws Exception {
-		return getWrapper().getLayer(bounds+"", envelopeCustomization, new Resource(ResourceType.HCAF,hcafId), new Resource(ResourceType.HSPEN,hspenId),
-				areaSelection,speciesId,getNative,envelopeWeights);
+			BoundingBox bounds,boolean getNative) throws Exception {
+		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,	areaSelection,speciesId,getNative,envelopeWeights);
 	}
 
 	public LayerInfo getEnvironmentalLayer(EnvelopeFields parameter,
-			int hcafId) throws Exception {
+			Resource hcaf) throws Exception {
 		//TODO call new method on stubs
 		throw new Exception ("NOT IMPLEMENTED");
 	}
@@ -339,23 +323,14 @@ public class PublisherImpl implements Publisher{
 	public LayerInfo getLayerByIdAndType(String id,LayersType type) throws Exception {return getWrapper().getLayerById(id,type);}
 		
 
-	public LayerInfo getOccurrenceLayer(String speciesId) throws Exception {
+	public LayerInfo getPointMapLayer(String speciesId) throws Exception {
 		//TODO call new method on stubs
 		throw new Exception ("NOT IMPLEMENTED");
 	}
 
-
-	
 	public LayerInfo getLayerById(String id) throws Exception{
-		//TODO call new method on stubs
-		throw new Exception ("NOT IMPLEMENTED");
+		return getWrapper().getLayerById(id);
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 	//******************** STORE METHODS
@@ -364,10 +339,8 @@ public class PublisherImpl implements Publisher{
 	
 	public boolean publishAquaMapsObject(AquaMapsObject toPublish) throws Exception {return getWrapper().updateAquaMapObject(toPublish);}
 
-	public List<org.gcube.application.aquamaps.dataModel.enhanced.File> publishImages(
-			int mapId, Set<String> speciesCoverage,
-			Map<String, String> toPublishList, 
-			boolean hasCustomizations) throws Exception {
+	public boolean publishImages(
+			int objectId,Map<String, String> toPublishList) throws Exception {
 		// TODO Auto-generated method stub
 		throw new Exception ("Not Yet Implemented");
 	}
@@ -375,48 +348,32 @@ public class PublisherImpl implements Publisher{
 	
 
 	public String publishLayer(int objId,LayersType type,
-			ArrayList<String> styles, int defaultStyleIndex, String title, String url)throws Exception {
-		
-		
-		
-		LayerInfo info= getWrapper().getLayerTemplate(type);
-		info.setStyles(styles);
-		info.setTitle(title);
-		info.setUrl(url);
-		info.setDefaultStyle(styles.get(defaultStyleIndex));
-		
-		return getWrapper().storeLayer(info,objId);
+			List<String> styles, int defaultStyleIndex, String title, String layerName)throws Exception {
+		LayerInfo layer=getLayer(type, layerName, title, "", styles, defaultStyleIndex);
+		return getWrapper().storeLayer(layer,objId);
 	}
 
 	
-	public LayerInfoType publishOccurrenceLayer(String speciesId,LayersType type,
-			ArrayList<String> styles, int defaultStyleIndex, String title, String url)throws Exception{
-		
-		LayerInfo info= getWrapper().getLayerTemplate(type);
-		info.setStyles(styles);
-		info.setTitle(title);
-		info.setUrl(url);
-		info.setDefaultStyle(styles.get(defaultStyleIndex));
-		
-		return getWrapper().storeLayer(info,speciesId);
+	public String publishPointMapLayer(String speciesId,
+			List<String> list, int defaultStyleIndex, String title, String table)throws Exception{
+		LayerInfo layer=getLayer(LayersType.PointMap, table, title, "", list, defaultStyleIndex);
+		//TODO IMPLEMENT
+		throw new Exception("NOT YET IMPLEMENTED");
+//		return getWrapper().storeLayer(layer,speciesId);
 	}
 	
-	public LayerInfoType publishEnvironmentalLayer(int hcafId,EnvelopeFields parameter,LayersType type,
-			ArrayList<String> styles, int defaultStyleIndex, String title, String url)throws Exception{
-		
-		LayerInfo info= getWrapper().getLayerTemplate(type);
-		info.setStyles(styles);
-		info.setTitle(title);
-		info.setUrl(url);
-		info.setDefaultStyle(styles.get(defaultStyleIndex));
-		
-		return getWrapper().storeLayer(info,new Resource(ResourceType.HCAF,hcafId),parameter+"");
+	public String publishEnvironmentalLayer(Resource hcaf,EnvelopeFields parameter,
+			List<String> styles, int defaultStyleIndex, String title, String table)throws Exception{
+		LayerInfo layer=getLayer(LayersType.Environment, table, title, "", styles, defaultStyleIndex);
+		//TODO IMPLEMENT
+		throw new Exception("NOT YET IMPLEMENTED");
+//		return getWrapper().storeLayer(info,new Resource(ResourceType.HCAF,hcafId),parameter+"");
 	}
 	
 	public String publishWMSContext(String groupName,
-			ArrayList<LayerInfo> layers) throws Exception {
+			List<LayerInfo> layers) throws Exception {
 		WMSContextInfo context= getWrapper().getWMSContextTemplate(); 
-		context.setLayers(layers);
+		context.getLayers().addAll(layers);
 		context.setTitle(groupName);
 		return getWrapper().storeWMSContext(context);
 	}
@@ -432,4 +389,44 @@ public class PublisherImpl implements Publisher{
 	
 	public void removeWMSContext(String id)throws Exception{getWrapper().deleteWMSContext(id);}
 
+	
+	//******************************* UTILS
+	
+	
+	private LayerInfo getLayer(LayersType type, String name, String title, String abstractDescription,List<String> styles, int defaultStyleIndex)throws Exception{
+		LayerInfo layer=null;
+		switch(type){
+		case Biodiversity:{
+			layer=getWrapper().getLayerTemplate(TemplateLayerType.Biodiversity);
+			break;}
+		case Environment :{
+			layer=getWrapper().getLayerTemplate(TemplateLayerType.Environment);
+			break;}
+		case PointMap : {
+			layer=getWrapper().getLayerTemplate(TemplateLayerType.PointMap);
+			break;}
+		default : layer=getWrapper().getLayerTemplate(TemplateLayerType.SpeciesDistribution);
+		}
+		
+		
+		
+		layer.setName(name);
+        layer.setTitle(title);
+        layer.set_abstract(abstractDescription);
+        //GEOSERVER
+        layer.setUrl(ServiceContext.getContext().getGeoServerUrl());
+        layer.setServerProtocol("OGC:WMS");
+        layer.setServerLogin(ServiceContext.getContext().getGeoServerUser());
+        layer.setServerPassword(ServiceContext.getContext().getGeoServerPwd());
+        layer.setServerType("geoserver");
+        layer.setSrs("EPSG:4326");
+        
+        layer.setOpacity(1.0);
+        layer.getStyles().addAll(styles);
+        layer.setDefaultStyle(styles.get(defaultStyleIndex));
+        ArrayList<String> fields = new ArrayList<String>();
+        //TODO Transect Info
+		return layer;
+	}
+	
 }
