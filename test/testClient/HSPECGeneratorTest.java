@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.HSPECGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;

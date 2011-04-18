@@ -11,9 +11,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesPerturbationThread extends Thread {
@@ -47,9 +48,9 @@ public class SpeciesPerturbationThread extends Thread {
 				toInsert.add(new Species(speciesId));
 			String HSPENName=SpeciesManager.getFilteredHSPEN(sourceHSPEN, toInsert);
 			
-			
+			JobManager.setWorkingHSPEN(jobId, HSPENName);
 			logger.trace("Going to Perturb filtered HSPEN "+HSPENName);
-			session=DBSession.getInternalDBSession();
+			session=DBSession.getInternalDBSession();			
 			for(String speciesId : JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize)){
 				if(toPerformPerturbations.containsKey(speciesId)){
 					String query=null;

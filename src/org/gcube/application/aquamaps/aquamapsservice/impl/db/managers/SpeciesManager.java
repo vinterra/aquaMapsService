@@ -183,7 +183,7 @@ public class SpeciesManager {
 		StringBuilder toReturn=new StringBuilder();
 		toReturn.append("UPDATE "+hspenTable+" SET ");
 		for(Entry<String, Perturbation> settings:toSetPerturbations.entrySet()){
-			toReturn.append(getCompleteName(hspenTable,settings.getKey())+" = "+settings.getValue().getPerturbationValue()+" , ");
+			toReturn.append(settings.getKey()+" = "+settings.getValue().getPerturbationValue()+" , ");
 		}
 		toReturn.deleteCharAt(toReturn.lastIndexOf(","));
 		toReturn.append(" WHERE "+SpeciesOccursumFields.speciesid+"= '"+speciesId+"'");

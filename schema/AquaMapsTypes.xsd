@@ -53,20 +53,24 @@
 
 			<xsd:complexType name="resource">
 				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
-					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="searchId" type="xsd:int" />
+					<xsd:element name="title" type="xsd:string" />				
+					<xsd:element name="tableName" type="xsd:string" />
+					<xsd:element name="description" type="xsd:string" />
 					<xsd:element name="author" type="xsd:string" />
 					<xsd:element name="disclaimer" type="xsd:string" />
 					<xsd:element name="provenance" type="xsd:string" />
 					<xsd:element name="date" type="xsd:string" />
-					<xsd:element name="sourceId" type="xsd:int" />
+					<xsd:element name="sourceHCAFId" type="xsd:int" />
+					<xsd:element name="sourceHSPENId" type="xsd:int" />
+					<xsd:element name="sourceHSPECId" type="xsd:int" />
 					<xsd:element name="parameters" type="xsd:string" />
 					<xsd:element name="status" type="xsd:string" />
-					<xsd:element name="sourceName" type="xsd:string" />
-					<xsd:element name="title" type="xsd:string" />
-					<xsd:element name="tableName" type="xsd:string" />
-					<xsd:element name="description" type="xsd:string" />
+					<xsd:element name="sourceHCAFTable" type="xsd:string" />
+					<xsd:element name="sourceHSPENTable" type="xsd:string" />
+					<xsd:element name="sourceHSPECTable" type="xsd:string" />
+					<xsd:element name="type" type="xsd:string" />
+					<xsd:element name="algorithm" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
 

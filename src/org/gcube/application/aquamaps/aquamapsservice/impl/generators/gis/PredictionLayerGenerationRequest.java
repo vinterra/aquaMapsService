@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,9 +24,9 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 	private Set<String> speciesCoverage=new HashSet<String>(); 
 	private Resource hcaf;
 	private Resource hspen; 
-	private Map<String,Map<String,Perturbation>> envelopeCustomization;
-	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights;
-	private Set<Area> selectedAreas;
+	private Map<String,Map<String,Perturbation>> envelopeCustomization=new HashMap<String, Map<String,Perturbation>>();
+	private Map<String,Map<EnvelopeFields,Field>> envelopeWeights=new HashMap<String, Map<EnvelopeFields,Field>>();
+	private Set<Area> selectedAreas= new HashSet<Area>();
 	private BoundingBox bb;
 	private float threshold;
 	private int objectId;

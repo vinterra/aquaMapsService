@@ -1,7 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,50 +22,45 @@ public class SourceManager {
 	
 	private static String getMetaTable(ResourceType type) throws Exception{
 		
-//		return "meta_sources";
-		switch(type){
-		case HCAF: return "meta_hcaf";
-		case HSPEC: return "meta_hspec";
-		case HSPEN: return "meta_hspen";
-		}
-		throw new Exception("Source type not valid "+type.toString());
+		return "meta_sources";
+//		switch(type){
+//		case HCAF: return "meta_hcaf";
+//		case HSPEC: return "meta_hspec";
+//		case HSPEN: return "meta_hspen";
+//		}
+//		throw new Exception("Source type not valid "+type.toString());
 	}
 	
 	public static int getDefaultId(ResourceType type){
-//		switch(type){
-//		case HCAF: return ServiceContext.getContext().getDefaultHCAFID();
-//		case HSPEC: return ServiceContext.getContext().getDefaultHSPECID();
-//		case HSPEN: return ServiceContext.getContext().getDefaultHSPENID();
-//		}		
-//		return 0;
+		switch(type){
+		case HCAF: return ServiceContext.getContext().getDefaultHCAFID();
+		case HSPEC: return ServiceContext.getContext().getDefaultHSPECID();
+		case HSPEN: return ServiceContext.getContext().getDefaultHSPENID();
+		}		
+		return 0;
 		
-		return 1;
+//		return 1;
 	}
 	
-	public static int registerSource(ResourceType type,String toSetTableName,String toSetDescription,String toSetAuthor, Integer toSetSourceId,ResourceType sourceType)throws Exception{
+	public static Resource registerSource(Resource toRegister)throws Exception{
 		DBSession session=null;
-		logger.trace("registering source "+toSetTableName+" ("+type.toString()+")");
-		String toSetSourceName=null;
+		logger.trace("registering source "+toRegister.getTableName()+" ("+toRegister.getType()+")");
+//		String toSetSourceName=null;
+//		try{
+//			toRegister.setSgetSourceName(sourceType, toSetSourceId);
+//		}catch(Exception e){
+//			logger.trace("source not found, skipping..");			
+//		}
 		try{
-		toSetSourceName=getSourceName(sourceType, toSetSourceId);
-		}catch(Exception e){
-			logger.trace("source not found, skipping..");			
-		}
-		try{
-			String metaTable=getMetaTable(type);
+			String metaTable=getMetaTable(toRegister.getType());
 			session=DBSession.getInternalDBSession();
 			List<List<Field>> rows= new ArrayList<List<Field>>();
-			List<Field> row= new ArrayList<Field>();
-			row.add(new Field(MetaSourceFields.tablename+"",toSetTableName,FieldType.STRING));
-			row.add(new Field(MetaSourceFields.description+"",toSetDescription,FieldType.STRING));
-			row.add(new Field(MetaSourceFields.author+"",toSetAuthor,FieldType.STRING));
-			row.add(new Field(MetaSourceFields.sourceid+"",toSetSourceId+"",FieldType.INTEGER));
-			row.add(new Field(MetaSourceFields.sourcename+"",toSetSourceName,FieldType.STRING));
-			rows.add(row);
+			
+			rows.add(toRegister.toRow());
 			List<List<Field>> ids = session.insertOperation(metaTable, rows);
-			int id=Integer.parseInt(ids.get(0).get(0).getValue());
-			logger.trace("registered source with id : "+id);
-			return id;
+			toRegister.setSearchId(Integer.parseInt(ids.get(0).get(0).getValue()));
+			logger.trace("registered source with id : "+toRegister.getSearchId());
+			return toRegister;
 		}catch(Exception e){
 			throw e;
 		}finally {
@@ -98,7 +92,13 @@ public class SourceManager {
 	}
 	
 	public static int getSourceId(ResourceType type,int id)throws Exception{
-		return (Integer) getField(type, id, MetaSourceFields.sourceid);
+		switch(type){
+		case HCAF : return (Integer) getField(type, id, MetaSourceFields.sourcehcaf);
+		case HSPEC: return (Integer) getField(type, id, MetaSourceFields.sourcehspec);
+		case HSPEN : return (Integer) getField(type, id, MetaSourceFields.sourcehspen);
+		default : throw new Exception("INVALID TYPE");
+		}
+		
 	}
 	
 	private static Object getField(ResourceType type, int id, MetaSourceFields field)throws Exception{
@@ -161,26 +161,10 @@ public class SourceManager {
 		finally{session.close();}
 	}
 	
-	private static Set<Resource> loadRS(ResultSet rs) throws SQLException{
+	private static Set<Resource> loadRS(ResultSet rs) throws Exception{
 		HashSet<Resource> toReturn=new HashSet<Resource>();
-		List<List<Field>> rows=Field.loadResultSet(rs);
-		for(List<Field> row:rows){
-			Resource toAdd=new Resource(ResourceType.HCAF, 0);
-			for(Field f : row){
-				if(f.getName().equals(MetaSourceFields.author+""))toAdd.setAuthor(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.data+""))toAdd.setDate(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.description+""))toAdd.setDescription(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.disclaimer+""))toAdd.setDisclaimer(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.parameters+""))toAdd.setParameters(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.provenience+""))toAdd.setProvenance(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.searchid+""))toAdd.setSearchId(Integer.valueOf(f.getValue()));
-				else if(f.getName().equals(MetaSourceFields.sourceid+""))toAdd.setSourceId((f.getValue()!=null&&!f.getValue().equalsIgnoreCase("null"))?Integer.valueOf(f.getValue()):0);
-				else if(f.getName().equals(MetaSourceFields.sourcename+""))toAdd.setSourceName((f.getValue()));
-				else if(f.getName().equals(MetaSourceFields.status+""))toAdd.setStatus(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.tablename+""))toAdd.setTableName(f.getValue());
-				else if(f.getName().equals(MetaSourceFields.title+""))toAdd.setTableName(f.getValue());
-			}
-			toReturn.add(toAdd);
+		while(rs.next()){
+			toReturn.add(new Resource(rs));
 		}
 		return toReturn;
 	}

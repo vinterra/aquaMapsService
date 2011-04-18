@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.publishing;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.TemplateLayerType;
@@ -41,7 +42,9 @@ public class PublisherImpl implements Publisher{
 	
 	private PublisherImpl(){};
 	
-	public static Publisher getPublisher(){return instance;}
+	public static Publisher getPublisher(){
+		if(ServiceContext.getContext().isUseDummyPublisher())return new DummyPublisher();
+		else return instance;}
 	
 	private static GCUBELog logger= new GCUBELog(PublisherImpl.class);
 	
@@ -335,12 +338,16 @@ public class PublisherImpl implements Publisher{
 	
 	//******************** STORE METHODS
 	
-	public int publishJob(Job toPublish) throws Exception {return getWrapper().storeJob(toPublish);}
+	public Job publishJob(Job toPublish) throws Exception {return getWrapper().getJobById(getWrapper().storeJob(toPublish));}
 	
 	public boolean publishAquaMapsObject(AquaMapsObject toPublish) throws Exception {return getWrapper().updateAquaMapObject(toPublish);}
 
 	public boolean publishImages(
 			int objectId,Map<String, String> toPublishList) throws Exception {
+		logger.trace("Received request for publishing images for objId :"+objectId);
+		for(Entry<String,String> toPub:toPublishList.entrySet())
+		logger.trace("key : "+toPub.getKey()+" ; value : "+toPub.getValue());
+		
 		// TODO Auto-generated method stub
 		throw new Exception ("Not Yet Implemented");
 	}

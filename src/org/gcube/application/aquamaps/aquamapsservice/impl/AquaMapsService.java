@@ -9,7 +9,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManag
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.env.SpEnvelope;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.envelope.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;

@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
+package org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -150,6 +150,11 @@ public class HSPECGenerator {
 		this.generateNative=true;
 		this.generateSuitable=false;
 		this.mode=GENERATION_MODE.LAZY;
+		logger.trace("Created new Generator ");
+		logger.trace("Mode : "+mode);
+		logger.trace("HCAF_D :"+hcafDynamicTable);
+		logger.trace("HSPEC  :"+hspecTableStructure);
+		logger.trace("HSPEN  :"+hspenTable);
 	}
 
 

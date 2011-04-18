@@ -71,6 +71,8 @@ public class ServiceContext extends GCUBEServiceContext {
 	
 	private boolean GISMode;
 	private boolean standAloneMode;
+	private boolean useDummyPublisher;
+	
 	
 	private String defaultPublisherUrl;
 	
@@ -236,6 +238,10 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.setDefaultHCAFID(Integer.parseInt(prop.getProperty("defaultHCAFID")));
 			this.setDefaultHSPECID(Integer.parseInt(prop.getProperty("defaultHSPECID")));
 			this.setDefaultHSPENID(Integer.parseInt(prop.getProperty("defaultHSPENID")));
+			
+			this.setUseDummyPublisher(Boolean.parseBoolean(prop.getProperty("useDummyPublisher")));
+			
+			
 		}catch(Exception e){
 			logger.fatal("Unable to load properties ",e);
 		}
@@ -553,6 +559,14 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	public void setEvaluateLandDistance(boolean evaluateLandDistance) {
 		this.evaluateLandDistance = evaluateLandDistance;
+	}
+
+	public void setUseDummyPublisher(boolean useDummyPublisher) {
+		this.useDummyPublisher = useDummyPublisher;
+	}
+
+	public boolean isUseDummyPublisher() {
+		return useDummyPublisher;
 	}
 		
 }

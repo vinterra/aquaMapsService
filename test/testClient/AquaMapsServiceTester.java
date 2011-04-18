@@ -1,25 +1,13 @@
 package testClient;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
-import org.gcube.application.aquamaps.dataModel.Types.AreaType;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.dataModel.Types.PerturbationType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.scope.GCUBEScope;
 
 
@@ -66,14 +54,29 @@ public class AquaMapsServiceTester {
 //		r=wrapper.loadResource(1, ResourceType.HSPEN);
 //		
 		
-		Job job= createDummyJob(true,true,true);
+		Job job= DummyObjects.createDummyJob(false,true,true,true);
 		Job translated=new Job(job.toStubsVersion());
 		AquaMapsObject obj =translated.getAquaMapsObjectList().get(0);
 		System.out.println(obj.getAuthor());
+		
+		System.out.println("ORIGINAL");
+		for(Species s: job.getSelectedSpecies())
+			if(job.getEnvelopeCustomization().containsKey(s.getId()))
+			for(Entry<String,Perturbation> pert:job.getEnvelopeCustomization().get(s.getId()).entrySet())
+				System.out.println(AquaMapsXStream.getXMLInstance().toXML(pert));
+			else System.out.println(s.getId()+" not customized");
+		
+		
+		
+		System.out.println("TRANSLATED");
+		for(Species s: translated.getSelectedSpecies())
+		if(translated.getEnvelopeCustomization().containsKey(s.getId()))
+		for(Entry<String,Perturbation> pert:translated.getEnvelopeCustomization().get(s.getId()).entrySet())
+			System.out.println(AquaMapsXStream.getXMLInstance().toXML(pert));
+		else System.out.println(s.getId()+" not customized");
+		
+		
 		wrapper.submitJob(job);
-		
-		
-		
 		System.out.println("Done");
 		}catch(Exception e){
 			e.printStackTrace();
@@ -84,63 +87,7 @@ public class AquaMapsServiceTester {
 		
 	}
 
-	public static Job createDummyJob(boolean areaSelection,boolean customization,boolean weights){
-		Job toReturn= new Job();
-		toReturn.setName("Dummy Testing Job");
-		toReturn.setAuthor("Tester");
-		toReturn.setDate("2/10/2010");
-		
-		Set<Species> basket= new HashSet<Species>();
-		basket.add(new Species("Fis-22726"));
-		basket.add(new Species("Fis-22850"));
-		toReturn.addSpecies(basket);
-		
-//		Map<String,Perturbation> pert=new HashMap<String, Perturbation>();
-//		pert.put(HspenFields.TempMin+"", new Perturbation(PerturbationType.ASSIGN, "21"));
-//		toReturn.getEnvelopeCustomization().put(basket.iterator().next().getId(), pert);
-////		
-		
-		if(areaSelection){
-		
-		List<Area> areas=new ArrayList<Area>();
-		areas.add(new Area(AreaType.FAO,"18"));
-		areas.add(new Area(AreaType.FAO,"21"));
-		areas.add(new Area(AreaType.FAO,"27"));
-		toReturn.addAreas(areas);
-		}
-		
-		if(customization){
-			toReturn.setCustomization(basket.iterator().next(), new Field(HspenFields.depthmax+"","15"), new Perturbation(PerturbationType.ASSIGN, "25"));
-		}
-		if(weights){
-			List<Field> settedWeights= new ArrayList<Field>();
-			for(EnvelopeFields f: EnvelopeFields.values())
-				settedWeights.add(new Field(f+"","true",FieldType.BOOLEAN));
-			toReturn.setWeights(basket.iterator().next(), settedWeights);
-		}
-		
-		toReturn.setSourceHCAF(new Resource(ResourceType.HCAF, 1));
-		toReturn.setSourceHSPEC(new Resource(ResourceType.HSPEC, 1));
-		toReturn.setSourceHSPEN(new Resource(ResourceType.HSPEN, 1));
-		
-		
-		AquaMapsObject bio=new AquaMapsObject();
-		bio.setType(ObjectType.Biodiversity);
-		bio.setGis(false);
-		bio.setName("BioTest");
-		bio.setSelectedSpecies(basket);
-		toReturn.getAquaMapsObjectList().add(bio);
-		
-		AquaMapsObject specDistr=new AquaMapsObject();
-		specDistr.setType(ObjectType.SpeciesDistribution);
-		specDistr.setGis(false);
-		specDistr.setName("DistrTest");
-		specDistr.getSelectedSpecies().add(basket.iterator().next());
-		toReturn.getAquaMapsObjectList().add(specDistr);
-		
-		return toReturn;
-		
-	}
+	
 
 	
 }

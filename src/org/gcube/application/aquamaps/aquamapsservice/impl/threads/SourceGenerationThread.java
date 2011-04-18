@@ -126,9 +126,16 @@ public class SourceGenerationThread extends Thread {
 			logger.trace("Registering new HCAF table "+targetHCAFName);
 			SourceGenerationManager.setStatus(requestId, SourceGenerationStatus.Registering);
 			String author=SourceGenerationManager.getAuthor(requestId);
-			int generatedHCAFId=SourceManager.registerSource(ResourceType.HCAF, targetHCAFTable, "Imported Clorophyl data", author, sourceHCAFId, ResourceType.HCAF);
-			SourceManager.setTableTitle(ResourceType.HCAF, generatedHCAFId, targetHCAFName);
-			SourceGenerationManager.setGeneratedHCAFId(requestId, generatedHCAFId);
+			
+			//FIXME COMPLETE REGISTRATION
+//			Resource resource= new Resource(ResourceType.HCAF,0);
+//			resource.setTableName(targetHCAFTable);
+//			resource.setTitle(targetHCAFName);
+//			resource.setDescription("Imported Clorophyll data");
+//			
+//			int generatedHCAFId=SourceManager.registerSource(ResourceType.HCAF, targetHCAFTable, "Imported Clorophyl data", author, sourceHCAFId, ResourceType.HCAF);
+//			SourceManager.setTableTitle(ResourceType.HCAF, generatedHCAFId, targetHCAFName);
+//			SourceGenerationManager.setGeneratedHCAFId(requestId, generatedHCAFId);
 			SourceGenerationManager.setStatus(requestId, SourceGenerationStatus.Complete);
 			logger.trace("Complete generation process for request "+requestId);		
 		}catch(Exception e){

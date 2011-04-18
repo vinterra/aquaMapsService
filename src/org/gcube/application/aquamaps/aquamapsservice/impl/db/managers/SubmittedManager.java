@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -174,6 +175,24 @@ public class SubmittedManager {
 		logger.trace("done Job status updateing status : "+statusValue.toString());
 	}
 
+	
+	protected static int insertInTable(String title,boolean isAquaMaps,int jobId)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			List<Field> row=new ArrayList<Field>();
+			row.add(new Field(SubmittedFields.title+"",title,FieldType.STRING));
+			row.add(new Field(SubmittedFields.isaquamap+"",isAquaMaps+"",FieldType.BOOLEAN));
+			row.add(new Field(SubmittedFields.jobid+"",jobId+"",FieldType.INTEGER));
+			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
+			session.fillParameters(row, ps).executeUpdate();
+			ResultSet rs=ps.getGeneratedKeys();
+			if(rs.next())
+				return rs.getInt(SubmittedFields.searchid+"");
+			else return 0;
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
 
 
 

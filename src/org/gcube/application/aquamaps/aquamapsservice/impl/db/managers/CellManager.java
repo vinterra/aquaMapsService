@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.dataModel.enhanced.*;
@@ -148,18 +149,21 @@ public class CellManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> cellFilter=new ArrayList<Field>();
 			cellFilter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
-			Set<Cell> toReturn = loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.csquarecode+"", "ASC"));
+			Set<Cell> cellsInTable = loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.csquarecode+"", "ASC"));
+			Set<Cell> toReturn = new HashSet<Cell>();
 			
-			for(Cell c : toReturn){
+			for(Cell c : cellsInTable){
 				//Cehcking BB
 				try{
-				float latitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.centerlat+"").getValue());
-				float longitude=Float.parseFloat(c.getFieldbyName(OccurrenceCellsFields.centerlong+"").getValue());
-				if((latitude-0.25<bb.getS())||(latitude+0.25>bb.getN())||(longitude-0.25<bb.getE())||(longitude+0.25>bb.getW()))
-						toReturn.remove(c);
+//				double latitude=c.getFieldbyName(OccurrenceCellsFields.centerlat+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+//				double longitude=c.getFieldbyName(OccurrenceCellsFields.centerlong+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+//				if((latitude-0.25<bb.getS())||(latitude+0.25>bb.getN())||(longitude-0.25<bb.getE())||(longitude+0.25>bb.getW()))
+//						cellsInTable.remove(c);
+				if(isInBoundingBox(c,bb)&&(isInFaoAreas(c, areas)))
+					toReturn.add(c);
 				//Checking A
-				Area areaM=new Area(AreaType.FAO,c.getFieldbyName(OccurrenceCellsFields.faoaream+"").getValue());
-				if((areas.size()>0)&&(!areas.contains(areaM))) toReturn.remove(c);
+//				Area areaM=new Area(AreaType.FAO,c.getFieldbyName(OccurrenceCellsFields.faoaream+"").getValue());
+//				if((areas.size()>0)&&(!areas.contains(areaM))) cellsInTable.remove(c);
 				}catch(Exception e){
 					logger.error("Unable to evaluate Cell "+c.getFieldbyName(HCAF_SFields.csquarecode+"").getValue());
 					throw e;
@@ -167,12 +171,21 @@ public class CellManager {
 			}
 			
 			
-			toReturn=loadEnvironmentData(hcafId, toReturn);
-			return toReturn;
+			cellsInTable=loadEnvironmentData(hcafId, cellsInTable);
+			return cellsInTable;
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
 	
+	private static boolean isInBoundingBox(Cell c,BoundingBox bb){
+		//TODO implement check
+		return true;
+	}
+	
+	private static boolean isInFaoAreas(Cell c,List<Area> areas){
+		//TODO implement check
+		return true;
+	}
 	
 	private static Set<Cell> loadCells(String[] ids)throws Exception{
 		DBSession session=null;

@@ -8,7 +8,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.HSPECGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SourceGenerationThread;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
@@ -82,8 +82,9 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				try{
 					logger.trace("generated Native Table "+generatedNative);
 					String nativeTitle=arg0.getToGeneratePrefix().toLowerCase()+"_native";
-					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedNative, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
-					SourceManager.setTableTitle(ResourceType.HSPEC, id, nativeTitle);
+					//FIXME Registration
+//					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedNative, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
+//					SourceManager.setTableTitle(ResourceType.HSPEC, id, nativeTitle);
 				}catch(Exception e){
 					logger.error("UNABLE TO REGISTER GENERATED HSPEC NATIVE table name : "+generatedNative,e);
 				}
@@ -93,8 +94,9 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				try{
 					logger.trace("generated Suitable Table "+generatedSuitable);
 					String suitableTitle=arg0.getToGeneratePrefix().toLowerCase()+"suitable";
-					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedSuitable, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
-					SourceManager.setTableTitle(ResourceType.HSPEC, id, suitableTitle);
+					//FIXME Registration
+//					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedSuitable, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
+//					SourceManager.setTableTitle(ResourceType.HSPEC, id, suitableTitle);
 				}catch(Exception e){
 					logger.error("UNABLE TO REGISTER GENERATED HSPEC SUITABLE table name : "+generatedSuitable,e);
 				}

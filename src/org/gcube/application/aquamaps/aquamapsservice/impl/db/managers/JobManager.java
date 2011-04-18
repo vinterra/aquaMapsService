@@ -12,9 +12,16 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 
@@ -45,15 +52,28 @@ public class JobManager extends SubmittedManager{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			
+			logger.trace("inserting working table reference "+submittedId+", "+tableType+" : "+tableName);
 			List<List<Field>> rows= new ArrayList<List<Field>>();
 			List<Field> row=new ArrayList<Field>();
 			row.add(new Field(SubmittedFields.searchid+"",submittedId+"",FieldType.INTEGER));
 			row.add(new Field(tableTypeField,tableType,FieldType.STRING));
 			row.add(new Field(tableField,tableName,FieldType.STRING));
-			rows.add(row);			
-			session.insertOperation(workingTables, rows);
-			
+			rows.add(row);	
+			try{
+				session.insertOperation(workingTables, rows);
+			}catch(Exception e1){
+				logger.trace("trying toupdate working table reference "+submittedId+", "+tableType+" : "+tableName);
+				List<List<Field>> values= new ArrayList<List<Field>>();
+				List<Field> value=new ArrayList<Field>();
+				value.add(new Field(tableField,tableName,FieldType.STRING));
+				values.add(row);
+				List<List<Field>> keys= new ArrayList<List<Field>>();
+				List<Field> key=new ArrayList<Field>();
+				key.add(new Field(SubmittedFields.searchid+"",submittedId+"",FieldType.INTEGER));
+				key.add(new Field(tableTypeField,tableType,FieldType.STRING));
+				keys.add(key);
+				session.updateOperation(workingTables, keys, values);
+			}
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -127,6 +147,7 @@ public class JobManager extends SubmittedManager{
 			rows.add(row);			
 			session.insertOperation(tempFolders, rows);
 		}catch (Exception e){
+			logger.error("Exception while setting tempFolder "+folderName+" for jobId "+jobId+" : "+e.getMessage());
 			throw e;
 		}finally {
 			session.close();
@@ -149,7 +170,7 @@ public class JobManager extends SubmittedManager{
 				key.add(new Field(selectedSpeciesSpeciesID,id,FieldType.STRING));
 				keys.add(key);
 			}
-			
+			if(values.size()>0)
 			session.updateOperation(selectedSpecies, keys, values);
 		}catch (Exception e){
 			throw e;
@@ -236,6 +257,9 @@ public class JobManager extends SubmittedManager{
 			logger.debug("cleaning speceisSelection for : "+jobId);
 			session.deleteOperation(selectedSpecies, filter);
 			logger.debug("cleaning references to working tables for : "+jobId);
+			
+			filter=new ArrayList<Field>();
+			filter.add(new Field(SubmittedFields.searchid+"",jobId+"",FieldType.INTEGER));
 			session.deleteOperation(workingTables, filter);
 		}catch (Exception e){
 			throw e;
@@ -368,12 +392,18 @@ public class JobManager extends SubmittedManager{
 			session=DBSession.getInternalDBSession();
 		Publisher publisher= PublisherImpl.getPublisher();
 		
-		int jobId=publisher.publishJob(toPerform);
+		////*************** Insert references into local DB
+		toPerform.setId(insertInTable(toPerform.getName(), false, 0));
+		for(AquaMapsObject obj : toPerform.getAquaMapsObjectList())
+			obj.setId(insertInTable(obj.getName(), true, toPerform.getId()));
 		
-		toPerform=publisher.getJobById(jobId);
+		////*************** Send to publisher
+		toPerform=publisher.publishJob(toPerform);		
 		
-		//***************** Now both job and objects has updated references
-		//***************** Store in internal DB
+		////*************** update references in local DB
+		
+				
+		
 		
 		Field author=new Field(SubmittedFields.author+"",toPerform.getAuthor(),FieldType.STRING);
 		Field date= new Field (SubmittedFields.date+"",myData,FieldType.STRING);
@@ -385,8 +415,10 @@ public class JobManager extends SubmittedManager{
 		
 		
 		List<List<Field>> aquamapsList=new ArrayList<List<Field>>();
+		List<List<Field>> aquamapsKeys=new ArrayList<List<Field>>();
 		for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
 			List<Field> objRow= new ArrayList<Field>();
+			List<Field> objKey= new ArrayList<Field>();
 			objRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
 			objRow.add(author);
 			objRow.add(date);
@@ -408,14 +440,18 @@ public class JobManager extends SubmittedManager{
 			
 			objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
 			objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
-			objRow.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.STRING));
 			aquamapsList.add(objRow);
+			objKey.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.INTEGER));
+			aquamapsKeys.add(objKey);
+			
 		}
-		session.insertOperation(submittedTable, aquamapsList);
+		session.updateOperation(submittedTable, aquamapsKeys,aquamapsList);
 		
 		
 		List<List<Field>> jobList=new ArrayList<List<Field>>();
+		List<List<Field>> jobKeys=new ArrayList<List<Field>>();
 		List<Field> jobRow= new ArrayList<Field>();
+		List<Field> jobKey=new ArrayList<Field>();
 		jobRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
 		jobRow.add(author);
 		jobRow.add(date);
@@ -426,12 +462,15 @@ public class JobManager extends SubmittedManager{
 		jobRow.add(sourceHCAF);
 		jobRow.add(sourceHSPEN);
 		jobRow.add(sourceHSPEC);
-		jobRow.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
+
 		jobRow.add(new Field(SubmittedFields.gisenabled+"",toPerform.getIsGis()+"",FieldType.BOOLEAN));
 		jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
 		jobList.add(jobRow);
-		session.insertOperation(submittedTable, jobList);
 		
+		jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
+		jobKeys.add(jobKey);
+		session.updateOperation(submittedTable,jobKeys, jobList);
+
 		
 		if(!toPerform.getStatus().equals(SubmittedStatus.Completed)){
 			//Initialize working variables 
@@ -451,7 +490,7 @@ public class JobManager extends SubmittedManager{
 							fields.add(new Field(selectedSpeciesIsCustomized,"",FieldType.BOOLEAN));
 							
 							PreparedStatement psSpecies=session.getPreparedStatementForInsert(fields, selectedSpecies);
-							fields.get(0).setValue(jobId+"");
+							fields.get(0).setValue(toPerform.getId()+"");
 							for(Species s:toPerform.getSelectedSpecies()){
 								String status=SpeciesStatus.Ready.toString();
 								if((hasWeight)&&(toPerform.getEnvelopeWeights().containsKey(s.getId())))status=SpeciesStatus.toGenerate.toString();
@@ -467,13 +506,13 @@ public class JobManager extends SubmittedManager{
 						
 						//Setting selected sources as working tables
 						
-						setWorkingHCAF(jobId, SourceManager.getSourceName(ResourceType.HCAF, toPerform.getSourceHCAF().getSearchId()));
-						setWorkingHSPEC(jobId, SourceManager.getSourceName(ResourceType.HSPEC, toPerform.getSourceHSPEC().getSearchId()));
-						setWorkingHSPEN(jobId, SourceManager.getSourceName(ResourceType.HSPEN, toPerform.getSourceHSPEN().getSearchId()));
+						setWorkingHCAF(toPerform.getId(), SourceManager.getSourceName(ResourceType.HCAF, toPerform.getSourceHCAF().getSearchId()));
+						setWorkingHSPEC(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEC, toPerform.getSourceHSPEC().getSearchId()));
+						setWorkingHSPEN(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEN, toPerform.getSourceHSPEN().getSearchId()));
 			
 			
 		}
-		return jobId;
+		return toPerform.getId();
 		}catch (Exception e){
 			throw e;
 		}finally {

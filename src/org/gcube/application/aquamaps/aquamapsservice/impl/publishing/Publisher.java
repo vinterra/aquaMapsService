@@ -20,7 +20,7 @@ public interface Publisher {
 
 	//***************STORE - UPDATE
 	
-	public int publishJob(Job toPublish)throws Exception;
+	public Job publishJob(Job toPublish)throws Exception;
 	public boolean publishAquaMapsObject(AquaMapsObject toPublish) throws Exception;
 	public boolean publishImages(int objectId,Map<String,String> toPublishfiles)throws Exception;
 	

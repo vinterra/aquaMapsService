@@ -11,7 +11,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManage
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.HSPECGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.enhanced.*;
 import org.gcube.application.aquamaps.dataModel.Types.*;
@@ -63,7 +63,6 @@ public class SimulationThread extends Thread {
 				JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(ResourceType.HSPEC, JobManager.getHSPECTableId(jobId)));
 			}
 
-			JobManager.updateSpeciesStatus(jobId,JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toGenerate), SpeciesStatus.Ready);
 			SubmittedManager.updateStatus(jobId, SubmittedStatus.Generating);
 		}catch(Exception e){
 			logger.error("Error in generating HSPEC", e);
@@ -109,9 +108,9 @@ public class SimulationThread extends Thread {
 			JobManager.addToDropTableList(jobId, filteredTable);
 
 
-			PreparedStatement psFAO=conn.getFilterCellByAreaQuery(HSPECFields.faoaream,filteredTable, sourceTableName);
-			PreparedStatement psLME=conn.getFilterCellByAreaQuery(HSPECFields.lme,filteredTable, sourceTableName);
-			PreparedStatement psEEZ=conn.getFilterCellByAreaQuery(HSPECFields.eezall,filteredTable, sourceTableName);
+			PreparedStatement psFAO=conn.getFilterCellByAreaQuery(HSPECFields.faoaream,sourceTableName, filteredTable);
+			PreparedStatement psLME=conn.getFilterCellByAreaQuery(HSPECFields.lme,sourceTableName, filteredTable);
+			PreparedStatement psEEZ=conn.getFilterCellByAreaQuery(HSPECFields.eezall,sourceTableName, filteredTable);
 
 
 			for(Area area: areaSelection){
