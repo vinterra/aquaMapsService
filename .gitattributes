@@ -39,14 +39,6 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManage
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesStatus.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SubmittedManager.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvCostants.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/EnvEngine.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_LandDist.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_PrimProd.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Salinity.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_SeaIce.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/Env_Temp.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/env/SpEnvelope.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/BadRequestException.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GISGeneratorFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationRequest.java -text
