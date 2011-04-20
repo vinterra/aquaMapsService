@@ -7,6 +7,7 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 
@@ -29,8 +30,8 @@ public class Env_Temp extends EnvEngine{
 	public void re_computes(Species species, Set<Cell> goodCells) throws Exception {
 		
 		String fld;
-		if (species.getFieldbyName(HspenFields.layer+"").getValue().contentEquals("b")) fld = "SBTAnMean";		
-		else fld = "SSTAnMean"; //s
+		if (species.getFieldbyName(HspenFields.layer+"").getValue().contentEquals("b")) fld = HCAF_DFields.sbtanmean+"";		
+		else fld = HCAF_DFields.sstanmean+""; //s
 /*
 		String strSQL="SELECT DISTINCT "+ocVar+".CsquareCode, "+ocVar+".SpeciesID, HCAF."+fld;
 		strSQL+="FROM "+ocVar+" INNER JOIN HCAF ON "+ocVar+".CsquareCode = HCAF.CsquareCode ";

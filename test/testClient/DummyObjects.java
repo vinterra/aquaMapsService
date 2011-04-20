@@ -102,17 +102,19 @@ public class DummyObjects {
 			bio.setSelectedSpecies(selection);
 			bio.setGis(GIS);
 			toReturn.add(bio);
+			break;
 		}
 		case SpeciesDistribution: {
 			for(Species s : selection){
 			AquaMapsObject specDistr=new AquaMapsObject();
 			specDistr.setType(ObjectType.SpeciesDistribution);
 			specDistr.setGis(false);
-			specDistr.setName("DistrTest");
+			specDistr.setName("Distr"+s.getId());
 			specDistr.getSelectedSpecies().add(s);
 			specDistr.setGis(GIS);
 			toReturn.add(specDistr);
 			}
+			break;
 		}
 		}
 		return toReturn;

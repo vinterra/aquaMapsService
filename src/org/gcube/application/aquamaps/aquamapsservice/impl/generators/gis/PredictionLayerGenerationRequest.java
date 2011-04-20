@@ -50,8 +50,10 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 		super(csvFile,HSPECFields.probability+"","real",species.getFieldbyName(SpeciesOccursumFields.english_name+"").getValue());
 		this.setMapType(isNative?LayersType.NativeRange:LayersType.SuitableRange);
 		this.getSpeciesCoverage().add(species.getId());
-		this.getEnvelopeCustomization().put(species.getId(), envelopeCustomization);
-		this.getEnvelopeWeights().put(species.getId(), envelopeWeights);
+		if(envelopeCustomization!=null)
+			this.getEnvelopeCustomization().put(species.getId(), envelopeCustomization);
+		if(envelopeWeights!=null);
+			this.getEnvelopeWeights().put(species.getId(), envelopeWeights);
 		this.setSelectedAreas(areaSelection);
 		this.setBb(bb);
 		this.setHcaf(hcaf);

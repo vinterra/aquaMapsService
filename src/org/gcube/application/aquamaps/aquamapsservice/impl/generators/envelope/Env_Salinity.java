@@ -7,6 +7,7 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 
@@ -32,11 +33,11 @@ public class Env_Salinity extends EnvEngine {
 		
 		String fld;
 		if (species.getFieldbyName(HspenFields.layer+"").equals("b")) {
-			fld = "SalinityBMean";			
+			fld = HCAF_DFields.salinitybmean+"";			
 			this.salinUp = EnvCostants.salinBUpper; 	//reset absolute min and max for bottom
 			this.salinLow = EnvCostants.salinBLower;
 		} else {
-			fld = "SalinityMean";			
+			fld = HCAF_DFields.salinitymean+"";			
 		    this.salinUp = EnvCostants.salinUpper;
 		    this.salinLow = EnvCostants.salinLower;
 		}
@@ -52,12 +53,17 @@ public class Env_Salinity extends EnvEngine {
 			strSQL+="AND "+goodCells+".inc = 'y' ";
 			strSQL+="ORDER BY HCAF."+fld;
 */
+		
+//		logger.debug("fld : "+fld);
+		
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
 			Double fldValue=cell.getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
 			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
 			if (fldValue != null &&	fldValue != -9999 && oceanArea> 0) {
 				filterCells.add(cell);
+			}else{
+//				logger.debug("skipped "+cell.getCode()+", fld "+fldValue+"(STRING "+cell.getFieldbyName(fld).getValue()+") , oceanArea "+oceanArea+"(STRING "+cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValue()+")");
 			}
 		}
 		

@@ -12,6 +12,7 @@ public class GeneratorManager {
 	private static GenericObjectPool gisPool=new GenericObjectPool(new GISGeneratorFactory());
 	private static GenericObjectPool sourceGeneratorPool=new GenericObjectPool(new SourceGeneratorFactory());
 	static{
+		logger.debug("Initializing pools...");
 		perlPool.setLifo(false);
 		perlPool.setMaxActive(3);
 		perlPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
@@ -19,8 +20,9 @@ public class GeneratorManager {
 			for(int i =0;i<perlPool.getMaxActive();i++){
 				perlPool.addObject();
 			}
+			logger.debug("Added "+perlPool.getMaxActive()+" objects to perl pool");
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error("Unable to init perl pool",e);
 		}
 
 
@@ -31,8 +33,9 @@ public class GeneratorManager {
 			for(int i =0;i<gisPool.getMaxActive();i++){
 				gisPool.addObject();
 			}
+			logger.debug("Added "+gisPool.getMaxActive()+" objects to gis pool");
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error("Unable to init gis pool",e);
 		}
 
 		sourceGeneratorPool.setLifo(false);
@@ -42,62 +45,14 @@ public class GeneratorManager {
 			for(int i =0;i<sourceGeneratorPool.getMaxActive();i++){
 				sourceGeneratorPool.addObject();
 			}
+			logger.debug("Added "+sourceGeneratorPool.getMaxActive()+" objects to source generator pool");
 		}catch(Exception e){
-			e.printStackTrace();
+			logger.error("Unable to init source generator pool",e);
 		}
 
 	}
 
 
-//	private static boolean requestPerlGeneration(ImageGeneratorRequest request) throws Exception{
-//		boolean toReturn=false;
-//		PerlImageGenerator obj = null;
-//		try{
-//			obj=(PerlImageGenerator) perlPool.borrowObject();
-//			obj.setRequest(request);
-//			toReturn= obj.generate();
-//		}catch(Exception e){
-//			throw e;
-//		}finally{
-//			perlPool.returnObject(obj);
-//		}
-//
-//		return toReturn;
-//	}
-
-//	private static boolean requestSourceGeneration(SourceGeneratorRequest request) throws Exception{
-//		boolean toReturn=false;
-//		SourceGenerator obj = null;
-//		try{
-//			obj=(SourceGenerator) sourceGeneratorPool.borrowObject();
-//			obj.setRequest(request);
-//			toReturn= obj.generate();
-//		}catch(Exception e){
-//			throw e;
-//		}finally{
-//			sourceGeneratorPool.returnObject(obj);
-//		}
-//
-//		return toReturn;
-//	}
-	
-	
-//	private static boolean requestGISGeneration(GISGenerationRequest req)throws Exception{
-//		GISGenerator obj=null;
-//		boolean toReturn=false;
-//		try{
-//			obj=(GISGenerator) gisPool.borrowObject();
-//			if(req instanceof GroupGenerationRequest) toReturn=obj.createGroup((GroupGenerationRequest) req);
-//			else if(req instanceof LayerGenerationRequest) toReturn=obj.createLayer((LayerGenerationRequest) req);
-//			else if(req instanceof StyleGenerationRequest) toReturn=obj.generateStyle((StyleGenerationRequest) req);
-//			else throw new BadRequestException();
-//		}catch(Exception e){
-//			throw e;
-//		}finally{
-//			gisPool.returnObject(obj);
-//		}
-//		return toReturn;		
-//	}
 
 	public static boolean requestGeneration(GenerationRequest request)throws Exception{
 		
@@ -122,10 +77,6 @@ public class GeneratorManager {
 		}
 		
 		
-//		if(request instanceof ImageGeneratorRequest) return requestPerlGeneration((ImageGeneratorRequest) request);
-//		else if(request instanceof GISGenerationRequest) return requestGISGeneration((GISGenerationRequest) request);
-//		else if(request instanceof SourceGeneratorRequest) return requestSourceGeneration((SourceGeneratorRequest)request);
-//		else throw new BadRequestException();
 	}
 
 }

@@ -23,6 +23,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 
 public class JobManager extends SubmittedManager{
@@ -148,6 +149,17 @@ public class JobManager extends SubmittedManager{
 			session.insertOperation(tempFolders, rows);
 		}catch (Exception e){
 			logger.error("Exception while setting tempFolder "+folderName+" for jobId "+jobId+" : "+e.getMessage());
+			try{
+				session=DBSession.getInternalDBSession();
+				logger.error("checking already inserted temp folders..");
+				List<Field> row=new ArrayList<Field>();
+				row.add(new Field(tempFoldersJobId,jobId+"",FieldType.INTEGER));
+				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(row, tempFolders, tempFoldersJobId, "ASC"))){
+					for(Field g:f)
+						if(g.getName().equals(tempFoldersFolderName))
+							logger.error(AquaMapsXStream.getXMLInstance().toXML(g));
+				}
+			}catch(Exception j){throw j;}
 			throw e;
 		}finally {
 			session.close();
@@ -437,7 +449,7 @@ public class JobManager extends SubmittedManager{
 				layersId.add(info.getId());
 				layersUri.add(info.getUrl());
 			}
-			
+			objRow.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
 			objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
 			objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
 			aquamapsList.add(objRow);

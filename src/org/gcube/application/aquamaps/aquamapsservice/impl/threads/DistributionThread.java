@@ -102,7 +102,7 @@ public class DistributionThread extends Thread {
 				csvFile=generateCsvFile(rs);	
 			}
 
-			String header=jobId+"_"+aquamapsName;
+			String header=jobId+"_"+aquamapsName+"_"+aquamapsId;
 			String header_map = header+"_maps";
 			StringBuilder[] csq_str;
 			csq_str=JobUtils.clusterize(rs, 2, 1, 2,false);

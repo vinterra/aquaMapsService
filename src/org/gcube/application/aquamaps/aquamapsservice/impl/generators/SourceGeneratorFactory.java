@@ -11,7 +11,7 @@ public class SourceGeneratorFactory extends BasePoolableObjectFactory{
 	public void activateObject(Object obj) throws Exception {
 		
 //		super.activateObject(obj);
-		((SourceGenerator)obj).setRequest(null);
+//		((SourceGenerator)obj).setRequest(null);
 	}
 	@Override
 	public void destroyObject(Object obj) throws Exception {		
@@ -21,7 +21,7 @@ public class SourceGeneratorFactory extends BasePoolableObjectFactory{
 	public void passivateObject(Object obj) throws Exception {
 
 //		super.passivateObject(obj);
-		((SourceGenerator)obj).setRequest(null);
+//		((SourceGenerator)obj).setRequest(null);
 	}
 
 }

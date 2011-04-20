@@ -6,8 +6,12 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public abstract class EnvEngine {
+	
+	protected static final GCUBELog logger=new GCUBELog(EnvEngine.class);
+	
 	
 	private long rec25;
 	private long rec75;

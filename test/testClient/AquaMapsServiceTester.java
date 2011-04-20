@@ -76,6 +76,8 @@ public class AquaMapsServiceTester {
 		else System.out.println(s.getId()+" not customized");
 		
 		
+		System.out.println("Going to submit : "+AquaMapsXStream.getXMLInstance().toXML(translated));
+		
 		wrapper.submitJob(job);
 		System.out.println("Done");
 		}catch(Exception e){

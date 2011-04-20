@@ -1,6 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.publishing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -306,6 +308,40 @@ public class PublisherImpl implements Publisher{
 		
 		ArrayList<String> specs=new ArrayList<String>();
 		for(String s : speciesCoverage) specs.add(s);
+		
+		
+		if(bounds==null)bounds=new BoundingBox();
+		if(envelopeWeights==null) envelopeWeights= new HashMap<String, Map<EnvelopeFields,Field>>();
+ 		//****purging null species ids
+		//Weights
+		logger.trace("Checking weights...");
+		Set<String> toPurge=new HashSet<String>();
+		for(String specId: envelopeWeights.keySet()){
+			if(envelopeWeights.get(specId)==null) toPurge.add(specId);
+		}
+		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
+		for(String s: toPurge)
+			envelopeWeights.remove(s);
+
+		
+		//Customization
+		logger.trace("Checking customizations ...");
+		toPurge=new HashSet<String>();
+		for(String specId: envelopeCustomization.keySet()){
+			if(envelopeCustomization.get(specId)==null) toPurge.add(specId);
+		}
+		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
+		for(String s: toPurge)
+			envelopeCustomization.remove(s);
+
+		
+		areaSelection.remove(null);
+		
+		
+		
+		
+		
+		
 		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,areaSelection,specs,threshold,envelopeWeights);
 	}
 	@Override
@@ -314,6 +350,34 @@ public class PublisherImpl implements Publisher{
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
 			BoundingBox bounds,boolean getNative) throws Exception {
+		if(bounds==null)bounds=new BoundingBox();
+		if(envelopeWeights==null) envelopeWeights= new HashMap<String, Map<EnvelopeFields,Field>>();
+		//****purging null species ids
+		//Weights
+		logger.trace("Checking weights...");
+		Set<String> toPurge=new HashSet<String>();
+		for(String specId: envelopeWeights.keySet()){
+			if(envelopeWeights.get(specId)==null) toPurge.add(specId);
+		}
+		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
+		for(String s: toPurge)
+			envelopeWeights.remove(s);
+
+		
+		//Customization
+		logger.trace("Checking customizations ...");
+		toPurge=new HashSet<String>();
+		for(String specId: envelopeCustomization.keySet()){
+			if(envelopeCustomization.get(specId)==null) toPurge.add(specId);
+		}
+		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
+		for(String s: toPurge)
+			envelopeCustomization.remove(s);
+
+		
+		areaSelection.remove(null);
+		
+				
 		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,	areaSelection,speciesId,getNative,envelopeWeights);
 	}
 

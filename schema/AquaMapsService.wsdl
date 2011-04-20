@@ -54,10 +54,10 @@
 				<xsd:sequence>
 					<xsd:element name="speciesID" type="xsd:string" />
 					<xsd:element name="FaoAreas" type="xsd:string" />
-					<xsd:element name="BoundingNorth" type="xsd:float" />
-					<xsd:element name="BoundingSouth" type="xsd:float" />
-					<xsd:element name="BoundingEast" type="xsd:float" />
-					<xsd:element name="BoundingWest" type="xsd:float" />
+					<xsd:element name="BoundingNorth" type="xsd:double" />
+					<xsd:element name="BoundingSouth" type="xsd:double" />
+					<xsd:element name="BoundingEast" type="xsd:double" />
+					<xsd:element name="BoundingWest" type="xsd:double" />
 					<xsd:element name="useFAO" type="xsd:boolean" />
 					<xsd:element name="useBounding" type="xsd:boolean" />
 					<xsd:element name="useBottomSeaTempAndSalinity" type="xsd:boolean" />

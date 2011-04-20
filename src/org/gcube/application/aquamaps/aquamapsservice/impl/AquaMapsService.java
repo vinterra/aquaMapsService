@@ -94,7 +94,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 					areas.add(new Area(AreaType.FAO, code.trim()));
 			}
 			
-			Set<Cell> foundCells= CellManager.getGoodCells(bb,areas,req.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HCAF));
+			Set<Cell> foundCells= CellManager.calculateGoodCells(bb,areas,req.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HCAF));
  			logger.trace("found "+foundCells.size()+" cells");
 
  			Species species=SpeciesManager.getSpeciesById(true,true,req.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HSPEN));
@@ -117,6 +117,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
 		try{
 			
+			
 			Set<Cell> selected=CellManager.getCellsByIds(true,request.getSpeciesID(),true,SourceManager.getDefaultId(ResourceType.HCAF),
 					request.getCellIds().getItems());
 			Species spec=SpeciesManager.getSpeciesById(true,true,request.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HSPEN));
@@ -130,18 +131,6 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
-	public String getProfile(int id)throws GCUBEFault{
-		logger.trace("getting profile for owner id : "+id);
-		
-		try{
-			//TODO profile retrieval -> object retrieval
-			throw new Exception ("Not Yet Implemented");
-			
-		} catch (Exception e){
-			logger.error("General Exception, unable to serve request",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		} 
-	}
 
 	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
 		try{
@@ -166,31 +155,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	}
 
 
-//	public FileArray getRelatedFiles(String owner)throws GCUBEFault{
-//		logger.trace("getting file List for owner id : "+owner);
-//		FileArray toReturn=null;
-//		DBSession conn=null;
-//		try{
-//			conn = DBSession.openSession(PoolManager.DBType.mySql);			
-//			ResultSet rs=conn.executeQuery("Select * from Files where owner = "+owner);
-//			ArrayList<org.gcube.application.aquamaps.File> files=new ArrayList<org.gcube.application.aquamaps.File>();
-//			while(rs.next()){
-//				org.gcube.application.aquamaps.File f=new org.gcube.application.aquamaps.File();
-//				f.setName(rs.getString(4));
-//				f.setType(rs.getString(5));
-//				f.setUrl(rs.getString(3));
-//				files.add(f);			
-//			}
-//			toReturn=new FileArray(files.toArray(new org.gcube.application.aquamaps.File[files.size()]));
-//			rs.close();			
-//			conn.close();
-//		} catch (Exception e){
-//			logger.error("General Exception, unable to serve request",e);
-//			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-//		}finally{try {conn.close();} 
-//		catch (Exception e) {logger.error("Unrecoverable while attempitng to close session",e);}}
-//		return toReturn;
-//	}
+
 
 
 
@@ -239,9 +204,6 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		Resource toReturn=new Resource(myResource);		
 		
 		try{
-//		String title=SourceManager.getSourceTitle(toReturn.getType(), toReturn.getSearchId());
-//		
-//		toReturn.setTitle(title);
 		
 		return SourceManager.getById(toReturn.getType(), toReturn.getSearchId()).toStubsVersion();
 		}catch(Exception e){

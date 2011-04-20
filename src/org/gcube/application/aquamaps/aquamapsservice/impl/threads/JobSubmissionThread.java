@@ -135,7 +135,8 @@ public class JobSubmissionThread extends Thread {
 
 
 					if(ServiceContext.getContext().isGISMode())
-						JobManager.createGroup(jobId);
+						if(toPerform.getIsGis())
+							JobManager.createGroup(jobId);
 
 
 
