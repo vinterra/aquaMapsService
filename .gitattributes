@@ -12,6 +12,8 @@ etc/build.properties -text
 etc/config.properties -text
 etc/deploy-jndi-config.xml -text
 etc/deploy-server.wsdd -text
+etc/generator/ALog.properties -text
+etc/generator/DestinationDBHibernate.cfg.xml -text
 etc/profile.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
