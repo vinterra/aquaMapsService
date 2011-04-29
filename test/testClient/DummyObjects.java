@@ -31,8 +31,8 @@ public class DummyObjects {
 	
 	public static Set<Species> getSpeciesBasket(){
 		Set<Species> basket= new HashSet<Species>();
-		basket.add(new Species("Fis-22726"));
-		basket.add(new Species("Fis-22850"));
+		basket.add(new Species("Alg-106"));
+		basket.add(new Species("AFD-Pul-494"));
 		return basket;
 	}
 	
