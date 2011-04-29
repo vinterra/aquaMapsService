@@ -32,7 +32,6 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class BiodiversityThread extends Thread {	
@@ -48,7 +47,6 @@ public class BiodiversityThread extends Thread {
 	private Set<String> species=new HashSet<String>();
 	private DBSession session;
 	private boolean gisEnabled=false;
-	private GCUBEScope actualScope;
 
 	
 	private Map<String,Map<String,Perturbation>> envelopeCustomization=new HashMap<String, Map<String,Perturbation>>();
@@ -56,15 +54,13 @@ public class BiodiversityThread extends Thread {
 	private Set<Area> selectedAreas;
 	private BoundingBox bb;
 
-	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold,GCUBEScope scope,
+	public BiodiversityThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,float threshold,
 			Set<Area> selectedAreas,BoundingBox bb) {
 		super(group,"BioD_AquaMapObj:"+aquamapsName);	
 		this.threshold=threshold;
 		this.aquamapsId=aquamapsId;
 		this.aquamapsName=aquamapsName;
 		this.jobId=jobId;	
-		logger.trace("Passed scope : "+scope.toString());
-		this.actualScope=scope;
 		this.selectedAreas=selectedAreas;
 		this.bb=bb;
 	}
@@ -129,8 +125,6 @@ public class BiodiversityThread extends Thread {
 				
 				if(rs.first()){
 						//RS not empty
-					String header=jobId+"_"+aquamapsName+"_"+aquamapsId;
-					String header_map = header+"_maps";
 					StringBuilder[] csq_str;
 					csq_str=JobUtils.clusterize(rs, 2, 1, 2,true);
 					rs.first();
@@ -153,10 +147,9 @@ public class BiodiversityThread extends Thread {
 
 					if(csq_str==null) logger.trace(this.getName()+"Empty selection, nothing to render");
 					else {
-						String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
-						JobManager.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
+						if(!JobUtils.createImages(aquamapsId,csq_str))
+							throw new Exception("NO IMAGES GENERATED OR PUBLISHED");
 						
-						references.addAll(JobUtils.createImages(aquamapsId, clusterFile, header_map, species, actualScope, hasCustomizations));
 						
 						/// *************************** GIS GENERATION
 

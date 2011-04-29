@@ -1,27 +1,20 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.FileWriter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
-import org.gcube.common.core.scope.GCUBEScope;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -30,9 +23,9 @@ public class JobUtils {
 
 	private static GCUBELog logger= new GCUBELog(JobUtils.class);
 	//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-	public static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
+//	private static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
 
-	public static final Map<String,String> imageFileAndName= new HashMap<String, String>();
+	private static final Map<String,String> imageFileAndName= new HashMap<String, String>();
 
 	static {
 		imageFileAndName.put("_map_pic.jpg", "Earth");
@@ -139,7 +132,7 @@ public class JobUtils {
 	}
 
 
-	public static String createClusteringFile(String objectName,StringBuilder[] csq_str,String header,String header_map,String dirName) throws FileNotFoundException{
+	private static String createClusteringFile(String objectName,StringBuilder[] csq_str,String header,String header_map,String dirName) throws Exception{
 
 		String to_out = "color=FFFF84 fill=Y color2=FFDE6B fill2=Y color3=FFAD6B fill3=Y color4=FF6B6B fill4=Y color5=DE4242 fill5=Y "+
 		((csq_str[0].toString().compareTo("")!=0)?" csq="+csq_str[0].toString():" csq=0000:000:0")+
@@ -149,49 +142,39 @@ public class JobUtils {
 		((csq_str[4].toString().compareTo("")!=0)?" csq5="+csq_str[4].toString():"")+
 		" header="+header+" enlarge=7200 title="+header_map+
 		" dilate=N cSub popup=Y landmask=1 filedesc=map_pic legend=  mapsize=large";
-
+		String dirPath=ServiceContext.getContext().getPersistenceRoot()+File.separator+dirName;
 		String fileName=objectName+"_clustering";
-		File dir=new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+dirName);
-		dir.mkdirs();
-		File file=new File(dir.getAbsolutePath(),fileName);
-		//file.mkdirs();
-		FileOutputStream myStream = new FileOutputStream(file);
-		PrintStream myOutput = new PrintStream(myStream);
-
-		myOutput.print(to_out);
-		String toReturn=file.getAbsolutePath();		
-		return toReturn;
-	}
-
-	public static Map<String,String> getToPublishList(String basePath,String aquamapName){
-		Map<String,String> toReturn=new HashMap<String, String>();
-		File f1 = new File(basePath+"csq_map127.0.0.1_"+aquamapName+"_map_pic.jpg");
-		if (f1.exists())
-			toReturn.put("Earth",f1.getAbsolutePath());			
-
-		for(String suffix:imageFileAndName.keySet()){
-			File f2 = new File(basePath+aquamapName+"/"+aquamapName+suffix);
-			if (f2.exists())
-				toReturn.put(imageFileAndName.get(suffix), f2.getAbsolutePath());
+		try {
+			File d=new File(dirPath);
+			d.mkdirs();
+			File f=new File(d,fileName);
+			f.createNewFile();
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(to_out);
+			out.close();
+			String toReturn=f.getAbsolutePath();
+			logger.debug("Clustering string saved into "+toReturn);
+			return toReturn;
+		} catch(Exception e){
+				logger.error("Unable to write clutering file ",e);
+				throw  e;
 		}
-
-
-
-		return toReturn;
 	}
 
-	public static Map<String,String> parsePublished(List<String> publishedUrls){
-		Map<String,String> toReturn=new HashMap<String, String>();		
-		for(String url : publishedUrls){
-			for(String suffix: imageFileAndName.keySet()){
-				if(url.endsWith(suffix)){
-					toReturn.put(imageFileAndName.get(suffix), url);
-					break;
-				}
-			}
-		}
-		return toReturn;
-	}
+	
+
+//	public static Map<String,String> parsePublished(List<String> publishedUrls){
+//		Map<String,String> toReturn=new HashMap<String, String>();		
+//		for(String url : publishedUrls){
+//			for(String suffix: imageFileAndName.keySet()){
+//				if(url.endsWith(suffix)){
+//					toReturn.put(imageFileAndName.get(suffix), url);
+//					break;
+//				}
+//			}
+//		}
+//		return toReturn;
+//	}
 
 	/**
 	 *  Creates Images and sends them to the publisher
@@ -199,26 +182,23 @@ public class JobUtils {
 	 * @return list of published Images
 	 * @throws Exception 
 	 */
-	public static List<org.gcube.application.aquamaps.dataModel.enhanced.File> createImages(int objId,String clusterFile,String header,Set<String> speciesCoverage, GCUBEScope actualScope, boolean hasCustomizations) throws Exception{
-
-		List<org.gcube.application.aquamaps.dataModel.enhanced.File> toReturn=new ArrayList<org.gcube.application.aquamaps.dataModel.enhanced.File>();
-		//FIXME UNCOMMENT
-		logger.trace(objId+" gonna call perl with file " +clusterFile);
+	public static boolean createImages(int objId, StringBuilder[] csq_str) throws Exception{
+		logger.trace("Submitting image generation for obj "+objId);
 		SubmittedManager.updateStatus(objId, SubmittedStatus.Publishing);
-		boolean result=GeneratorManager.requestGeneration(new ImageGeneratorRequest(clusterFile));
-
-		logger.trace(objId+" Perl execution exit message :"+result);		
+		ImageGeneratorRequest request=new ImageGeneratorRequest(csq_str,objId);
+		boolean result=GeneratorManager.requestGeneration(request);
+		logger.trace(objId+" Image generation exit message :"+result);		
 		if(!result) logger.warn("No images were generated");
 		else {
-			Map<String,String> app=JobUtils.getToPublishList(System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/",header);
+			Map<String,String> app=request.getGeneratedImagesNameAndPath();
 
 			logger.trace(" found "+app.size()+" files to publish");
-
+			result=PublisherImpl.getPublisher().publishImages(objId,app);
 			if(app.size()>0)
-				if(!PublisherImpl.getPublisher().publishImages(objId,app)) throw new Exception("Couldn't publish images for objId "+objId+", publisher returned false");
+				if(!result) throw new Exception("Couldn't publish images for objId "+objId+", publisher returned false");
 				else logger.trace("Published Images for object "+objId);
 		}
-		return toReturn;
+		return result;
 	}
 
 }

@@ -1,21 +1,46 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class ImageGeneratorRequest implements GenerationRequest{
 
-	private String clusterfile;
 	
-	public void setClusterFile(String file) {
-		this.clusterfile = file;
+	private StringBuilder[] csq_str=null;
+	
+	private int objId=0;
+	
+	private Map<String,String> generatedImagesNameAndPath=new HashMap<String, String>(); 
+	
+	
+	public ImageGeneratorRequest(StringBuilder[] strings, int objId) {
+		this.csq_str=strings;
+		this.objId=objId;
 	}
 
-	public String getClusterFile() {
-		return clusterfile;
-	}
-	public ImageGeneratorRequest(String clusterfile){
-		setClusterFile(clusterfile);
+
+	public Map<String, String> getGeneratedImagesNameAndPath() {
+		return generatedImagesNameAndPath;
 	}
 
+
+	public void setGeneratedImagesNameAndPath(
+			Map<String, String> generatedImagesNameAndPath) {
+		this.generatedImagesNameAndPath = generatedImagesNameAndPath;
+	}
+
+
+	public StringBuilder[] getCsq_str() {
+		return csq_str;
+	}
+
+
+	public int getObjId() {
+		return objId;
+	}
+	
+	
 	
 	
 }

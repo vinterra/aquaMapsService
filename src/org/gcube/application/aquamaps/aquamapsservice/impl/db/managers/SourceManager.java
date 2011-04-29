@@ -156,7 +156,9 @@ public class SourceManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), getMetaTable(type), orderBy, orderDir), offset, limit+offset);
+			List<Field> filter= new ArrayList<Field>();
+			filter.add(new Field(MetaSourceFields.type+"",type+"",FieldType.STRING));
+			return DBUtils.toJSon(session.executeFilteredQuery(filter, getMetaTable(type), orderBy, orderDir), offset, limit+offset);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}

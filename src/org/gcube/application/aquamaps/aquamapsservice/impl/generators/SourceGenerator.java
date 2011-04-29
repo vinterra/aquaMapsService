@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceGenerator implements Generator{
@@ -41,6 +42,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 		String line = null;
 		while ((line = input.readLine())!=null){
+			if(ServiceContext.getContext().isEnableScriptLogging())
 			logger.trace(line);
 		}
 

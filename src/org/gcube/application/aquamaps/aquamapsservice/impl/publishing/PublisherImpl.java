@@ -1,14 +1,19 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.publishing;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.TemplateLayerType;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.RSWrapper;
+import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.ZipUtils;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.wrapper.AquaMapsPublisherWrapper;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
@@ -23,10 +28,13 @@ import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.ISClient;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 import org.gcube.common.gis.dataModel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.dataModel.types.LayersType;
+
+import com.Ostermiller.util.Base64;
 
 public class PublisherImpl implements Publisher{
 
@@ -272,6 +280,12 @@ public class PublisherImpl implements Publisher{
 //		}
 //	}
 
+	private static GCUBEScope getScope(){
+		GCUBEScope scope=ServiceContext.getContext().getScope();
+		if(scope==null) scope=ServiceContext.getContext().getStartScopes().length>0?ServiceContext.getContext().getStartScopes()[0]:null;
+		return scope;
+	}
+	
 	
 	private AquaMapsPublisherWrapper wrapper=null;
 	
@@ -281,7 +295,8 @@ public class PublisherImpl implements Publisher{
 			String url=ServiceContext.getContext().getDefaultPublisherUrl();
 			logger.trace("Init publisher wrapper with default url : "+url);
 			logger.trace("Constructing wrapper..");
-			wrapper=new AquaMapsPublisherWrapper(ServiceContext.getContext().getScope(),url);
+			
+			wrapper=new AquaMapsPublisherWrapper(getScope(),url);
 			logger.trace("Wrapper initialized");
 		}
 		return wrapper;
@@ -409,11 +424,47 @@ public class PublisherImpl implements Publisher{
 	public boolean publishImages(
 			int objectId,Map<String, String> toPublishList) throws Exception {
 		logger.trace("Received request for publishing images for objId :"+objectId);
-		for(Entry<String,String> toPub:toPublishList.entrySet())
-		logger.trace("key : "+toPub.getKey()+" ; value : "+toPub.getValue());
+
 		
-		// TODO Auto-generated method stub
-		throw new Exception ("Not Yet Implemented");
+		File zipped=null;		
+		FileInputStream fis=null;
+		File base64Zipped=null;
+		try{
+			zipped=File.createTempFile("imgSet", ".zip");
+			ZipUtils.zipFiles(toPublishList.values(), zipped.getAbsolutePath());	
+			base64Zipped=File.createTempFile("imgSet", "base64");
+			Base64.encode(zipped, base64Zipped);
+			RSWrapper wrapper=null;
+			int attemptsCount=0;
+			GCUBEScope scope=getScope();
+			while(wrapper==null){
+				try{
+					attemptsCount++;
+					logger.trace("Looking for ResultSet service in scope : "+scope+" attempt N "+attemptsCount);
+					wrapper=new RSWrapper(scope);				
+				}catch(Exception e){				
+					logger.debug("No ResultSet service found",e);
+					try {
+						Thread.sleep(20*1000);
+					} catch (InterruptedException e1) {}
+				}
+			}
+						
+			fis=new FileInputStream(base64Zipped);
+			wrapper.add(fis);
+			wrapper.close();			
+			getWrapper().storeImage(wrapper.getLocator(), objectId);
+			
+			return true;
+		}catch(Exception e){
+			logger.error("",e);
+			throw e;
+		}finally{
+			if(zipped!=null)FileUtils.forceDelete(zipped);
+			logger.trace("temp zip : "+zipped.getAbsolutePath());
+			if(base64Zipped!=null)FileUtils.forceDelete(base64Zipped);			
+			if(fis!=null)IOUtils.closeQuietly(fis);
+		}
 	}
 
 	
@@ -421,7 +472,11 @@ public class PublisherImpl implements Publisher{
 	public String publishLayer(int objId,LayersType type,
 			List<String> styles, int defaultStyleIndex, String title, String layerName)throws Exception {
 		LayerInfo layer=getLayer(type, layerName, title, "", styles, defaultStyleIndex);
-		return getWrapper().storeLayer(layer,objId);
+		logger.trace("Requesting store layer...");
+		long start=System.currentTimeMillis();
+		String found= getWrapper().storeLayer(layer,objId);
+		logger.trace("Received layer id "+found+" after "+(System.currentTimeMillis()-start)+"ms");
+		return found;
 	}
 
 	

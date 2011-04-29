@@ -216,4 +216,11 @@ public class SubmittedManager {
 		finally{session.close();}
 	}
 
+	public static Submitted getSubmittedById(int objId) throws Exception{
+		List<Field> filter=new ArrayList<Field>();
+		filter.add(new Field(SubmittedFields.searchid+"",objId+"",FieldType.INTEGER));
+		List<Submitted> found= getList(filter);
+		return found.get(0);
+	}
+
 }

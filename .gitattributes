@@ -22,11 +22,12 @@ schema/AquaMapsService.wsdl -text
 schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
 schema/GISTypes.xsd -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBConnectionParameters.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBCredentialDescriptor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/MySQLDBSession.java -text
@@ -76,6 +77,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/G
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/HSPECGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/SimpleGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/SimpleGeneratorI.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/utils/ModelTranslation.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/StatusMonitorThread.java -text

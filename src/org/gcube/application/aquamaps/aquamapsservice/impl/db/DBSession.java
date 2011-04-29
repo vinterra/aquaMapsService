@@ -29,7 +29,8 @@ public abstract class DBSession {
 	protected static GCUBELog logger= new GCUBELog(DBSession.class);
 
 
-
+	
+	
 	protected Connection connection;
 
 	/**
@@ -49,6 +50,23 @@ public abstract class DBSession {
 	 * @throws Exception
 	 */
 
+	public static DBCredentialDescriptor getInternalCredentials(){
+		return new DBCredentialDescriptor(
+				ServiceContext.getContext().getInternalDBHost(),
+				ServiceContext.getContext().getInternalDBPort(),
+				ServiceContext.getContext().getInternalDBName(),
+				ServiceContext.getContext().getInternalDbUsername(),
+				ServiceContext.getContext().getInternalDbPassword());
+	}
+	public static DBCredentialDescriptor getPostGisCredentials(){
+		return new DBCredentialDescriptor(
+				ServiceContext.getContext().getPostGis_host(),
+				ServiceContext.getContext().getPostGis_port(),
+				ServiceContext.getContext().getPostGis_database(),
+				ServiceContext.getContext().getPostGis_user(),
+				ServiceContext.getContext().getPostGis_passwd());
+	}
+	
 
 	public static DBSession getInternalDBSession()throws Exception{
 		try{

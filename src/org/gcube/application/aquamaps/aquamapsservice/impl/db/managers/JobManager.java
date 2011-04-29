@@ -23,7 +23,6 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 
 public class JobManager extends SubmittedManager{
@@ -146,20 +145,21 @@ public class JobManager extends SubmittedManager{
 			row.add(new Field(tempFoldersJobId,jobId+"",FieldType.INTEGER));
 			row.add(new Field(tempFoldersFolderName,folderName,FieldType.STRING));
 			rows.add(row);			
-			session.insertOperation(tempFolders, rows);
-		}catch (Exception e){
-			logger.error("Exception while setting tempFolder "+folderName+" for jobId "+jobId+" : "+e.getMessage());
 			try{
-				session=DBSession.getInternalDBSession();
+			session.insertOperation(tempFolders, rows);
+			}catch(Exception e ){
 				logger.error("checking already inserted temp folders..");
-				List<Field> row=new ArrayList<Field>();
-				row.add(new Field(tempFoldersJobId,jobId+"",FieldType.INTEGER));
-				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(row, tempFolders, tempFoldersJobId, "ASC"))){
+				List<Field> filter=new ArrayList<Field>();
+				filter.add(new Field(tempFoldersJobId,jobId+"",FieldType.INTEGER));
+				boolean found= false;
+				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(filter, tempFolders, tempFoldersJobId, "ASC"))){
 					for(Field g:f)
-						if(g.getName().equals(tempFoldersFolderName))
-							logger.error(AquaMapsXStream.getXMLInstance().toXML(g));
+						if(g.getName().equals(tempFoldersFolderName)&&g.getValue().equals(folderName));
+							found=true;
 				}
-			}catch(Exception j){throw j;}
+				if(!found)logger.warn("Unable to register temp folder "+folderName);
+			}
+		}catch (Exception e){
 			throw e;
 		}finally {
 			session.close();
@@ -222,10 +222,10 @@ public class JobManager extends SubmittedManager{
 			Field statusField=new Field(SubmittedFields.status+"",SubmittedStatus.Error+"",FieldType.STRING);
 			filter.add(statusField);
 			long errorCount=session.getCount(submittedTable, filter);
-			logger.debug("Found "+count+" ERROR aquamaps object for jobId ");
+			logger.debug("Found "+errorCount+" ERROR aquamaps object for jobId ");
 			statusField.setValue(SubmittedStatus.Completed+"");
 			long completedCount=session.getCount(submittedTable, filter);
-			logger.debug("Found "+count+" COMPLETED aquamaps object for jobId ");
+			logger.debug("Found "+completedCount+" COMPLETED aquamaps object for jobId ");
 			return (completedCount+errorCount-count==0);
 			
 		}catch (Exception e){
@@ -431,7 +431,7 @@ public class JobManager extends SubmittedManager{
 		for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
 			List<Field> objRow= new ArrayList<Field>();
 			List<Field> objKey= new ArrayList<Field>();
-			objRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
+			objRow.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
 			objRow.add(author);
 			objRow.add(date);
 			
@@ -536,10 +536,11 @@ public class JobManager extends SubmittedManager{
 		logger.trace("Deleting job "+submittedId);
 		List<Submitted> objects=getObjects(submittedId);
 		logger.trace("Found "+objects.size()+" object(s) to delete..");
+		
 		int count=0;
 		for(Submitted obj:objects) {
 			try{
-				count+=deleteFromTables(obj.getSearchId());
+				count+=AquaMapsManager.deleteObject(obj.getSearchId());
 			}catch(Exception e){
 				logger.error("Unable to delete object "+obj);
 			}

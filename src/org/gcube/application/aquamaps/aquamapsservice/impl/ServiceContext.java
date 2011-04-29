@@ -9,6 +9,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
@@ -72,6 +73,8 @@ public class ServiceContext extends GCUBEServiceContext {
 	private boolean GISMode;
 	private boolean standAloneMode;
 	private boolean useDummyPublisher;
+	private boolean useEnvironmentModelingLib;
+	private boolean enableScriptLogging;
 	
 	
 	private String defaultPublisherUrl;
@@ -230,17 +233,20 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.setEvaluateLandDistance(Boolean.parseBoolean(prop.getProperty("evaluateLandDistance","false").trim()));
 			
 			
-			this.booleanDefault=(prop.getProperty("booleanDefaultValue"));
-			this.doubleDefault=(prop.getProperty("doubleDefaultValue"));
-			this.integerDefault=(prop.getProperty("integerDefaultValue"));
+			this.booleanDefault=(prop.getProperty("booleanDefaultValue").trim());
+			this.doubleDefault=(prop.getProperty("doubleDefaultValue").trim());
+			this.integerDefault=(prop.getProperty("integerDefaultValue").trim());
 			
 			
-			this.setDefaultHCAFID(Integer.parseInt(prop.getProperty("defaultHCAFID")));
-			this.setDefaultHSPECID(Integer.parseInt(prop.getProperty("defaultHSPECID")));
-			this.setDefaultHSPENID(Integer.parseInt(prop.getProperty("defaultHSPENID")));
+			this.setDefaultHCAFID(Integer.parseInt(prop.getProperty("defaultHCAFID").trim()));
+			this.setDefaultHSPECID(Integer.parseInt(prop.getProperty("defaultHSPECID").trim()));
+			this.setDefaultHSPENID(Integer.parseInt(prop.getProperty("defaultHSPENID").trim()));
 			
-			this.setUseDummyPublisher(Boolean.parseBoolean(prop.getProperty("useDummyPublisher")));
+			this.setUseDummyPublisher(Boolean.parseBoolean(prop.getProperty("useDummyPublisher").trim()));
+			this.setUseEnvironmentModelingLib(Boolean.parseBoolean(prop.getProperty("useEnvironmentModelingLib").trim()));
+			this.setEnableScriptLogging(Boolean.parseBoolean(prop.getProperty("enableScriptLogging").trim()));
 			
+		
 			
 		}catch(Exception e){
 			logger.fatal("Unable to load properties ",e);
@@ -248,6 +254,7 @@ public class ServiceContext extends GCUBEServiceContext {
 			
 			
 	}
+	
 	
 	public String getWebServiceURL(){
 		return this.webServerUrl;
@@ -567,6 +574,22 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	public boolean isUseDummyPublisher() {
 		return useDummyPublisher;
+	}
+
+	public void setUseEnvironmentModelingLib(boolean useEnvironmentModelingLib) {
+		this.useEnvironmentModelingLib = useEnvironmentModelingLib;
+	}
+
+	public boolean isUseEnvironmentModelingLib() {
+		return useEnvironmentModelingLib;
+	}
+
+	public void setEnableScriptLogging(boolean enableScriptLogging) {
+		this.enableScriptLogging = enableScriptLogging;
+	}
+
+	public boolean isEnableScriptLogging() {
+		return enableScriptLogging;
 	}
 		
 }

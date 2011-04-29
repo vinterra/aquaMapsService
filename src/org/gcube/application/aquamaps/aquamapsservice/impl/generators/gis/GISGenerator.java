@@ -43,6 +43,7 @@ public class GISGenerator implements Generator{
 
 	private static Publisher publisher=PublisherImpl.getPublisher();
 	
+	private static Integer insertedLineFromCSV=0;
 	
 	
 	private static final String crs="GEOGCS[\"WGS 84\", DATUM[\"World Geodetic System 1984\", SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]],"+ 
@@ -93,22 +94,28 @@ public class GISGenerator implements Generator{
 			DBSession session=null;
 			try{
 				//***** Create Layer table in postGIS
+				long start=System.currentTimeMillis();
+				logger.debug("Generating layer..");
 				session=DBSession.getPostGisDBSession();
 				session.disableAutoCommit();
-				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);			
+				logger.debug("Importing data..");
+				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);
+				logger.debug("Created "+appTableName+" in "+(System.currentTimeMillis()-start));
 				String layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
+				logger.debug("Created "+layerTable+" in "+(System.currentTimeMillis()-start));
 				session.dropTable(appTableName);
 
 				//**** Needed wait for data synch 
 				//**** POSTGIS - GEOServer limitation
 				try {
+					logger.debug("Waiting for postgis-geoserver sync..");
 					Thread.sleep(4*1000);
 				} catch (InterruptedException e) {}
 
 				//***** update GeoServerBox
 
 				//****** Styles generation
-
+				
 				for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
 					//					String linearStyle=layerTable+"_linearStyle";
 					//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
@@ -130,8 +137,10 @@ public class GISGenerator implements Generator{
 
 				
 				//***** create reference in Publisher
+				logger.trace("invoking publisher");
 				request.setGeneratedLayer(publishLayer(request));
 				session.commit();
+				logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start));
 				return true;
 			}catch (Exception e ){
 				logger.error("Unable to create Layer ", e);
@@ -238,19 +247,22 @@ public class GISGenerator implements Generator{
 
 		final PreparedStatement ps = session.getPreparedStatementForInsert(toInsertFields, tableName);
 		Reader reader= new InputStreamReader(new FileInputStream(fileName), Charset.defaultCharset());
-
+		
+		insertedLineFromCSV=0;
+		long start=System.currentTimeMillis();
 		processor.processStream(reader , new CSVLineProcessor(){
 			public boolean continueProcessing() {return true;}
 			public void processDataLine(int arg0, List<String> arg1) {
 				try{
 					ps.setString(1, arg1.get(0));				
 					ps.setFloat(2, Float.parseFloat(arg1.get(1)));
-					ps.executeUpdate();
+					insertedLineFromCSV+=ps.executeUpdate();
 				}catch(Exception e){
 					logger.warn("Unable to complete insertion from file "+fileName, e);
 				}
 			}
 			public void processHeaderLine(int arg0, List<String> arg1) {}});
+		logger.debug("Inserted "+insertedLineFromCSV+" in "+(System.currentTimeMillis()-start));
 		return tableName;
 	}
 

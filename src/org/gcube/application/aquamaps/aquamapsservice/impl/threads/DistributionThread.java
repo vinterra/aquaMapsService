@@ -30,7 +30,6 @@ import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class DistributionThread extends Thread {
@@ -46,7 +45,6 @@ public class DistributionThread extends Thread {
 	private int jobId;	
 	private boolean gisEnabled=false;
 
-	private GCUBEScope actualScope;
 
 	private Map<String,Perturbation> envelopeCustomization;
 	private Map<EnvelopeFields,Field> envelopeWeights;
@@ -54,15 +52,12 @@ public class DistributionThread extends Thread {
 	private BoundingBox bb;
 	
 	
-	public DistributionThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,GCUBEScope scope,
+	public DistributionThread(ThreadGroup group,int jobId,int aquamapsId,String aquamapsName,
 			Set<Area> selectedAreas,BoundingBox bb ) {
 		super(group,"SAD_AquaMapObj:"+aquamapsName);
 		this.aquamapsId=aquamapsId;
 		this.aquamapsName=aquamapsName;
 		this.jobId=jobId;
-		logger.trace("Passed scope : "+scope.toString());
-		this.actualScope=scope;
-
 		this.selectedAreas=selectedAreas;
 		this.bb=bb;
 	}
@@ -114,10 +109,9 @@ public class DistributionThread extends Thread {
 
 				///************************ PERL IMAGES GENERATION AND PUBBLICATION
 
-				String clusterFile=JobUtils.createClusteringFile(aquamapsName, csq_str, header, header_map, jobId+File.separator+aquamapsName+"_clustering");
-				JobManager.addToDeleteTempFolder(jobId, System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/"+header);
-
-				references.addAll(JobUtils.createImages(aquamapsId, clusterFile, header_map, speciesId, actualScope, hasCustomizations));
+				if(!JobUtils.createImages(aquamapsId,csq_str))
+					throw new Exception("NO IMAGES GENERATED OR PUBLISHED");
+				
 
 
 				/// *************************** GIS GENERATION

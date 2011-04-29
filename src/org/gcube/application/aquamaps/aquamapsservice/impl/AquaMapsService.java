@@ -145,7 +145,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	public String submitJob(org.gcube.application.aquamaps.dataModel.Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
-		JobSubmissionThread thread=new JobSubmissionThread(new Job(req),ServiceContext.getContext().getScope());		
+		JobSubmissionThread thread=new JobSubmissionThread(new Job(req));
+		ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
 		ThreadManager.getExecutor().execute(thread);
 		return String.valueOf(thread.getId());
 		}catch(Exception e){

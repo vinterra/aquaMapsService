@@ -1,21 +1,30 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.Area;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.mortbay.log.Log;
 
@@ -141,17 +150,40 @@ public class SimulationThread extends Thread {
 		}
 	}
 
-
+	/**
+	 * Uses previos embedded generator
+	 * @param jobId
+	 * @param weights
+	 * @param makeTemp
+	 * @return
+	 * @throws Exception
+	 */
 	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp)throws Exception{
-		String HCAF_DName=JobManager.getWorkingHCAF(jobId);		
-		String HSPENName=JobManager.getWorkingHSPEN(jobId);
-		HSPECGenerator generator= new HSPECGenerator(jobId,HCAF_DName,CellManager.HCAF_S,HSPENName,weights);
-		generator.generate();
-		String generatedHspecName=generator.getNativeTable();
-		System.out.println("table generated:"+generatedHspecName);
-		if (makeTemp)JobManager.addToDropTableList(jobId,generatedHspecName);
-		//		return SourceManager.registerSource(ResourceType.HSPEC, generatedHspecName, "generated HSPEC", JobManager.getAuthor(jobId), HCAF_id, ResourceType.HCAF);
-		return generatedHspecName;
+		if(ServiceContext.getContext().isUseEnvironmentModelingLib()){
+			logger.trace("HSPEC Generation with Environmental Modeling..");
+			//************ fine processing
+//			// TODO implement for less then (config param) species
+//			//copy species from hspec
+//			//for every species
+//				//load species
+//					//load cell
+//					//insert probability
+//			
+			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator,
+					DBSession.getInternalCredentials());
+			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), AlgorithmType.NativeRange, false);
+		}else{
+			logger.trace("Embedded HSPEC Generation");
+			String HCAF_DName=JobManager.getWorkingHCAF(jobId);		
+			String HSPENName=JobManager.getWorkingHSPEN(jobId);
+			HSPECGenerator generator= new HSPECGenerator(jobId,HCAF_DName,CellManager.HCAF_S,HSPENName,weights);
+			generator.generate();
+			String generatedHspecName=generator.getNativeTable();
+			System.out.println("table generated:"+generatedHspecName);
+			if (makeTemp)JobManager.addToDropTableList(jobId,generatedHspecName);
+			return generatedHspecName;
+		}
 	}
 
+	
 }

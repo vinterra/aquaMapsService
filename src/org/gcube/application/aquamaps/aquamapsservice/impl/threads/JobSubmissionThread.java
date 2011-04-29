@@ -10,11 +10,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
-import org.gcube.common.core.scope.GCUBEScope;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -27,19 +26,16 @@ public class JobSubmissionThread extends Thread {
 	private Job toPerform;
 	private int jobId;
 
-	private GCUBEScope actualScope;
 
 	Map<String,File> toPublishPaths=new HashMap<String, File>();
 	ThreadGroup waitingGroup;
 
-	public JobSubmissionThread(Job toPerform,GCUBEScope scope) throws Exception{
+	public JobSubmissionThread(Job toPerform) throws Exception{
 		super(toPerform.getName()+"_thread");
 		this.setPriority(MIN_PRIORITY+1);
 		this.toPerform=toPerform;
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName());
 		waitingGroup=new ThreadGroup(toPerform.getName());
-		logger.trace("Passed scope : "+scope.toString());
-		this.actualScope=scope;
 		this.jobId=JobManager.insertNewJob(toPerform);
 	}
 
@@ -57,7 +53,8 @@ public class JobSubmissionThread extends Thread {
 						logger.trace("Found customizations, going to filter and schedule working HSPEN creation");
 						SpeciesPerturbationThread specThread=new SpeciesPerturbationThread(waitingGroup,toPerform.getName(),jobId,toPerform.getEnvelopeCustomization());
 						specThread.setPriority(MIN_PRIORITY);
-						ThreadManager.getExecutor().execute(specThread);				
+						ThreadManager.getExecutor().execute(specThread);	
+						ServiceContext.getContext().setScope(specThread, ServiceContext.getContext().getScope());
 					}else{
 						logger.trace("No customized species found");
 					}
@@ -80,6 +77,7 @@ public class JobSubmissionThread extends Thread {
 					SubmittedManager.updateStatus(jobId, SubmittedStatus.Simulating);
 					SimulationThread simT=new SimulationThread(waitingGroup,toPerform);
 					simT.setPriority(MIN_PRIORITY);
+					ServiceContext.getContext().setScope(simT,ServiceContext.getContext().getScope());
 					ThreadManager.getExecutor().execute(simT);
 
 					while(JobManager.getStatus(jobId).equals(SubmittedStatus.Simulating)&&(JobManager.getStatus(jobId)!=SubmittedStatus.Error)){
@@ -109,16 +107,17 @@ public class JobSubmissionThread extends Thread {
 
 								if(aquaMapObj.getType().equals(ObjectType.Biodiversity)){
 									t=new BiodiversityThread(waitingGroup,jobId,aquaMapObj.getId(),aquaMapObj.getName(),aquaMapObj.getThreshold(),
-											actualScope,toPerform.getSelectedAreas(),aquaMapObj.getBoundingBox());						
+											toPerform.getSelectedAreas(),aquaMapObj.getBoundingBox());						
 									((BiodiversityThread)t).setRelatedSpeciesList(aquaMapObj.getSelectedSpecies(),toPerform.getEnvelopeCustomization(),toPerform.getEnvelopeWeights());
 									((BiodiversityThread)t).setGis(aquaMapObj.getGis());
 								}else{
-									t=new DistributionThread(waitingGroup,jobId,aquaMapObj.getId(),aquaMapObj.getName(),actualScope,
+									t=new DistributionThread(waitingGroup,jobId,aquaMapObj.getId(),aquaMapObj.getName(),
 											toPerform.getSelectedAreas(),aquaMapObj.getBoundingBox());
 									((DistributionThread)t).setRelatedSpeciesId(aquaMapObj.getSelectedSpecies().iterator().next(),toPerform.getEnvelopeCustomization(),toPerform.getEnvelopeWeights());
 									((DistributionThread)t).setGis(aquaMapObj.getGis());
 								}					
 								t.setPriority(MIN_PRIORITY);
+								ServiceContext.getContext().setScope(t,ServiceContext.getContext().getScope());
 								ThreadManager.getExecutor().execute(t);
 							}else{
 								SubmittedManager.updateStatus(aquaMapObj.getId(), SubmittedStatus.Error);
