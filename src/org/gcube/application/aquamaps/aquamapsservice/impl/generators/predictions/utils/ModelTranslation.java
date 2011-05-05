@@ -77,7 +77,7 @@ public class ModelTranslation {
 	
 	public static Hcaf Cell2Hcaf(Cell c){
 		Hcaf toReturn= new Hcaf();
-		toReturn.setCsquarecode(c.getCode());
+		toReturn.setCsquareCode(c.getCode());
 		toReturn.setCenterlat(c.getFieldbyName(HCAF_SFields.centerlat+"").getValue());
 		toReturn.setCenterlong(c.getFieldbyName(HCAF_SFields.centerlong+"").getValue());
 		toReturn.setDepthmax(c.getFieldbyName(HCAF_DFields.depthmax+"").getValue());

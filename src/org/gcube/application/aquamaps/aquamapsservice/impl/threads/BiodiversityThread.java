@@ -163,7 +163,7 @@ public class BiodiversityThread extends Thread {
 
 							PredictionLayerGenerationRequest request= new PredictionLayerGenerationRequest(aquamapsId,species,hcaf,hspen,envelopeCustomization,
 									envelopeWeights,selectedAreas,bb,threshold,csvFile,aquamapsName,minValue,maxValue);
-							if(!GeneratorManager.requestGeneration(request)){
+							if(GeneratorManager.requestGeneration(request)){
 								layersId.add(request.getGeneratedLayer());
 								layersId.add(request.getGeServerLayerId());
 							}else {

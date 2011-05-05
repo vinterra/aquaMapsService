@@ -15,6 +15,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestT
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportByTypeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
@@ -120,6 +121,10 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		return null;
 	}
 
+	private String generateMaps(Resource selectedHSPEC) throws RemoteException,GCUBEFault{
+		
+		return null;
+	}
 
 
 }

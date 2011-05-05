@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest.ClusterScaleType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
@@ -59,6 +60,8 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 		this.setHcaf(hcaf);
 		this.setHspen(hspen);
 		this.setObjectId(objectId);
+		this.getToAssociateStyles().add(ServiceContext.getContext().getDistributionDefaultStyle());
+		this.setDefaultStyle(0);
 	}
 	
 	

@@ -128,7 +128,7 @@ public class DistributionThread extends Thread {
 							envelopeCustomization, envelopeWeights, selectedAreas, bb, csvFile, true);
 					
 
-					if(!GeneratorManager.requestGeneration(request)){
+					if(GeneratorManager.requestGeneration(request)){
 						layersId.add(request.getGeneratedLayer());
 						layersId.add(request.getGeServerLayerId());
 					}else {

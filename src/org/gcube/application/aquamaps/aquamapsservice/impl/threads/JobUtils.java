@@ -191,12 +191,12 @@ public class JobUtils {
 		if(!result) logger.warn("No images were generated");
 		else {
 			Map<String,String> app=request.getGeneratedImagesNameAndPath();
-
 			logger.trace(" found "+app.size()+" files to publish");
-			result=PublisherImpl.getPublisher().publishImages(objId,app);
-			if(app.size()>0)
+			if(app.size()>0){
+				result=PublisherImpl.getPublisher().publishImages(objId,app);
 				if(!result) throw new Exception("Couldn't publish images for objId "+objId+", publisher returned false");
 				else logger.trace("Published Images for object "+objId);
+			}else logger.warn("Generator returned true but no files where found for objId "+objId);
 		}
 		return result;
 	}

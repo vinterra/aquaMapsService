@@ -124,15 +124,15 @@ public class SimulationThread extends Thread {
 
 			for(Area area: areaSelection){
 				switch(area.getType()){
-				case LME: 	{psLME.setString(1, area.getCode());
+				case LME: 	{psLME.setInt(1, Integer.parseInt(area.getCode()));
 								psLME.executeUpdate();
 								break;
 				}
-				case FAO:   {psFAO.setString(1, area.getCode());
+				case FAO:   {psFAO.setInt(1, Integer.parseInt(area.getCode()));
 								psFAO.executeUpdate();
 								break;
 				}
-				case EEZ:	{psEEZ.setString(1, area.getCode());
+				case EEZ:	{psEEZ.setInt(1, Integer.parseInt(area.getCode()));
 								psEEZ.executeUpdate();
 								break;
 				}

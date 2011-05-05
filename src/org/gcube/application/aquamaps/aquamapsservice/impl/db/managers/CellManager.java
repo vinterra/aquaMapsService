@@ -120,16 +120,16 @@ public class CellManager {
 		finally{session.close();}
 	}
 
-	private static Set<Cell> loadGoodCellsData(String SpeciesID, Set<Cell> toUpdate)throws Exception{
+	private static Set<Cell> loadGoodCellsData(String speciesID, Set<Cell> toUpdate)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			logger.trace("loading good Cells data for species "+SpeciesID+" for" +toUpdate.size()+" cells" );
+			logger.trace("loading good Cells data for species "+speciesID+" for" +toUpdate.size()+" cells" );
 			PreparedStatement ps= null;
 			for(Cell c: toUpdate){
 				List<Field> filter=new ArrayList<Field>();
 				filter.add(new Field(HCAF_SFields.csquarecode+"",c.getCode(),FieldType.STRING));
-				filter.add(new Field(SpeciesOccursumFields.speciesid+"","",FieldType.STRING));
+				filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
 				if(ps==null)ps=session.getPreparedStatementForQuery(filter, occurrenceCells,HCAF_SFields.csquarecode+"","ASC");
 				ResultSet rs=session.fillParameters(filter, ps).executeQuery();
 				if(rs.next())				

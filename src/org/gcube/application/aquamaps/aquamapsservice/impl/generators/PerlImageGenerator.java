@@ -87,6 +87,10 @@ public class PerlImageGenerator implements Generator{
 		
 		Submitted obj=SubmittedManager.getSubmittedById(request.getObjId());
 		String header=obj.getJobId()+"_"+obj.getSearchId()+"_"+obj.getTitle();
+		header=header.replaceAll(" ", "_");
+		
+		
+		
 		String clusterFile=createClusteringFile(obj.getSearchId(),obj.getJobId(),request.getCsq_str(),header);
 		
 		int result=generateImages(clusterFile);
@@ -94,7 +98,7 @@ public class PerlImageGenerator implements Generator{
 		if(result==0){
 			request.setGeneratedImagesNameAndPath(getToPublishList(header));
 			JobManager.addToDeleteTempFolder(obj.getJobId(), GENERATED_IMAGES+header+File.separator);
-			return true;
+			return request.getGeneratedImagesNameAndPath().size()>0;
 		}else return false;
 	}
 
@@ -170,7 +174,7 @@ public class PerlImageGenerator implements Generator{
 		String basePath=GENERATED_IMAGES+header+File.separator;
 		logger.trace("Checking generated images...");
 		logger.trace("base path : "+basePath);
-		
+		logger.trace("header is "+header);
 		File f1 = new File(GENERATED_IMAGES+"csq_map127.0.0.1_"+header+"_pic.jpg");
 		logger.trace("Checking file "+f1.getAbsolutePath());
 		if (f1.exists())

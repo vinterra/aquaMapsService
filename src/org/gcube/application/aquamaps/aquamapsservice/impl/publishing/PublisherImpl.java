@@ -24,8 +24,10 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.ISClient;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -417,7 +419,17 @@ public class PublisherImpl implements Publisher{
 	
 	//******************** STORE METHODS
 	
-	public Job publishJob(Job toPublish) throws Exception {return getWrapper().getJobById(getWrapper().storeJob(toPublish));}
+	public Job publishJob(Job toPublish) throws Exception {
+//		logger.trace("Publishing Job "+toPublish.getName()+" - "+toPublish.getId());
+//		logger.trace("Checking job species taxonomy ..");
+//		for(Species s: toPublish.getSelectedSpecies())
+//			logger.trace(AquaMapsXStream.getXMLInstance().toXML(s));
+//		logger.trace("Checking object species taxonomy..");
+//		for(AquaMapsObject object : toPublish.getAquaMapsObjectList())
+//			for(Species s: object.getSelectedSpecies())
+//				logger.trace(AquaMapsXStream.getXMLInstance().toXML(s));
+//		
+		return getWrapper().getJobById(getWrapper().storeJob(toPublish));}
 	
 	public boolean publishAquaMapsObject(AquaMapsObject toPublish) throws Exception {return getWrapper().updateAquaMapObject(toPublish);}
 
@@ -457,7 +469,10 @@ public class PublisherImpl implements Publisher{
 			
 			return true;
 		}catch(Exception e){
-			logger.error("",e);
+			logger.error("Unable to send files to publisher",e);
+//			logger.error("Passed File set is ");
+//			for(Entry<String,String> entry:toPublishList.entrySet())
+//				logger.error("")
 			throw e;
 		}finally{
 			if(zipped!=null)FileUtils.forceDelete(zipped);
@@ -507,13 +522,13 @@ public class PublisherImpl implements Publisher{
 	
 	//***************************** REMOVE METHODS
 	
-	public void removeAquaMapsObject(int id) throws Exception {	getWrapper().deleteAquaMapObject(id);}
+	public void removeAquaMapsObject(int id) throws Exception {	getWrapper().deleteAquaMapObject(id,true);}
 
-	public void removeJob(int Id) throws Exception {getWrapper().deleteJob(Id);}
+	public void removeJob(int Id) throws Exception {getWrapper().deleteJob(Id,true);}
 
 	public void removeLayer(String id)throws Exception{getWrapper().deleteLayer(id);}
 	
-	public void removeWMSContext(String id)throws Exception{getWrapper().deleteWMSContext(id);}
+	public void removeWMSContext(String id)throws Exception{getWrapper().deleteWMSContext(id,true);}
 
 	
 	//******************************* UTILS
@@ -548,6 +563,7 @@ public class PublisherImpl implements Publisher{
         layer.setSrs("EPSG:4326");
         
         layer.setOpacity(1.0);
+        layer.setStyles(new ArrayList<String>());
         layer.getStyles().addAll(styles);
         layer.setDefaultStyle(styles.get(defaultStyleIndex));
         ArrayList<String> fields = new ArrayList<String>();

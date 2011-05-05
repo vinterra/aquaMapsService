@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -405,10 +406,23 @@ public class JobManager extends SubmittedManager{
 		Publisher publisher= PublisherImpl.getPublisher();
 		
 		////*************** Insert references into local DB
+		logger.trace("Inserting references into internal DB...");
 		toPerform.setId(insertInTable(toPerform.getName(), false, 0));
 		for(AquaMapsObject obj : toPerform.getAquaMapsObjectList())
 			obj.setId(insertInTable(obj.getName(), true, toPerform.getId()));
 		
+		logger.trace("Preparing taxonomy for species selections");
+		for(Species s:toPerform.getSelectedSpecies()){
+			Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEC().getSearchId());
+			s.attributesList=updated.getAttributesList();
+			for(AquaMapsObject obj:toPerform.getAquaMapsObjectList())
+				if(obj.getSelectedSpecies().contains(s)){ 
+					obj.getSelectedSpecies().remove(s);
+					obj.getSelectedSpecies().add(updated);
+				}
+		}
+		
+		logger.trace("Sending job to publisher..");
 		////*************** Send to publisher
 		toPerform=publisher.publishJob(toPerform);		
 		
