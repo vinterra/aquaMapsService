@@ -48,7 +48,6 @@ public class DummyObjects {
 //		Map<String,Perturbation> pert=new HashMap<String, Perturbation>();
 //		pert.put(HspenFields.TempMin+"", new Perturbation(PerturbationType.ASSIGN, "21"));
 //		toReturn.getEnvelopeCustomization().put(basket.iterator().next().getId(), pert);
-////		
 		
 		if(areaSelection){
 		

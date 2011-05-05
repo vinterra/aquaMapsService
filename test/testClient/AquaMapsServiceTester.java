@@ -54,7 +54,7 @@ public class AquaMapsServiceTester {
 //		r=wrapper.loadResource(1, ResourceType.HSPEN);
 //		
 		
-		Job job= DummyObjects.createDummyJob(false,false,false,false);
+		Job job= DummyObjects.createDummyJob(false,false,false,true);
 		Job translated=new Job(job.toStubsVersion());
 		AquaMapsObject obj =translated.getAquaMapsObjectList().get(0);
 		System.out.println(obj.getAuthor());
