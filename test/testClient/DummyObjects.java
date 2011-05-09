@@ -39,7 +39,7 @@ public class DummyObjects {
 	public static Job createDummyJob(boolean areaSelection,boolean customization,boolean weights,boolean GIS){
 		Job toReturn= new Job();
 		toReturn.setName("Dummy Testing Job");
-		toReturn.setAuthor("Tester");
+		toReturn.setAuthor("fabio.sinibaldi");
 		toReturn.setDate("2/10/2010");
 		toReturn.setIsGis(false);
 		Set<Species> basket=getSpeciesBasket();

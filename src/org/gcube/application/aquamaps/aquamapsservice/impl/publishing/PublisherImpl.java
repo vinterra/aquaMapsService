@@ -24,10 +24,8 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.ISClient;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -429,7 +427,27 @@ public class PublisherImpl implements Publisher{
 //			for(Species s: object.getSelectedSpecies())
 //				logger.trace(AquaMapsXStream.getXMLInstance().toXML(s));
 //		
-		return getWrapper().getJobById(getWrapper().storeJob(toPublish));}
+		logger.trace("Submitted Job Object Types :");
+		for(AquaMapsObject obj : toPublish.getAquaMapsObjectList())
+			logger.trace(obj.getName()+"\t"+obj.getId()+"\t"+obj.getType());
+
+//		Job toReturn=getWrapper().getJobById(getWrapper().storeJob(toPublish));
+		
+		getWrapper().storeJobAsync(toPublish);
+		while(!getWrapper().isJobReady(toPublish.getId())){
+			logger.debug("Waiting for publisher to store job "+toPublish.getName()+" ("+toPublish.getId()+")");
+			try{Thread.sleep(1000);}catch(InterruptedException e){}			
+		}
+		
+		Job toReturn=getWrapper().getJobById(toPublish.getId());
+		
+		
+		
+		logger.trace("Returned Job  Object Types : " );
+		for(AquaMapsObject obj : toReturn.getAquaMapsObjectList())
+			logger.trace(obj.getName()+"\t"+obj.getId()+"\t"+obj.getType());
+			
+		return toReturn;}
 	
 	public boolean publishAquaMapsObject(AquaMapsObject toPublish) throws Exception {return getWrapper().updateAquaMapObject(toPublish);}
 
@@ -547,6 +565,8 @@ public class PublisherImpl implements Publisher{
 			layer=getWrapper().getLayerTemplate(TemplateLayerType.PointMap);
 			break;}
 		default : layer=getWrapper().getLayerTemplate(TemplateLayerType.SpeciesDistribution);
+					layer.setType(type);
+		break;
 		}
 		
 		

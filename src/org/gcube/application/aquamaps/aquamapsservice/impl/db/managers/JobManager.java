@@ -4,7 +4,6 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -395,9 +394,6 @@ public class JobManager extends SubmittedManager{
 		logger.trace("Creating new pending Job");
 		String myData = ServiceUtils.getDate();
 		DBSession session=null;
-//		String submittedInsertion="INSERT INTO "+submittedTable+" ("+SubmittedFields.title+","+SubmittedFields.author+","+SubmittedFields.date+","+SubmittedFields.status+","+
-//		SubmittedFields.isAquaMap+","+SubmittedFields.type+","+SubmittedFields.sourceHCAF+","+SubmittedFields.sourceHSPEC+","+
-//		SubmittedFields.sourceHSPEN+","+SubmittedFields.jobid+") values (?,?,?,?,?,?,?,?,?,?)";
 		
 		////*************** Send to publisher
 		try{
@@ -407,14 +403,39 @@ public class JobManager extends SubmittedManager{
 		
 		////*************** Insert references into local DB
 		logger.trace("Inserting references into internal DB...");
-		toPerform.setId(insertInTable(toPerform.getName(), false, 0));
-		for(AquaMapsObject obj : toPerform.getAquaMapsObjectList())
-			obj.setId(insertInTable(obj.getName(), true, toPerform.getId()));
+		
+		List<Field> row=new ArrayList<Field>();
+		row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
+		row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
+		row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
+		PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
+		session.fillParameters(row, ps).executeUpdate();
+		ResultSet rs=ps.getGeneratedKeys();
+		rs.next();
+		toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
+		
+		for(AquaMapsObject obj : toPerform.getAquaMapsObjectList()){
+			row=new ArrayList<Field>();
+			row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+			row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
+			row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
+			ps=session.getPreparedStatementForInsert(row, submittedTable);
+			session.fillParameters(row, ps).executeUpdate();
+			rs=ps.getGeneratedKeys();
+			rs.next();
+			obj.setId(rs.getInt(SubmittedFields.searchid+""));
+		}
 		
 		logger.trace("Preparing taxonomy for species selections");
 		for(Species s:toPerform.getSelectedSpecies()){
 			Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEC().getSearchId());
-			s.attributesList=updated.getAttributesList();
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.kingdom+""));
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.order+""));
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.phylum+""));
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.classcolumn+""));
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.family+""));
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.species+""));
+			s.addField(updated.getFieldbyName(SpeciesOccursumFields.genus+""));
 			for(AquaMapsObject obj:toPerform.getAquaMapsObjectList())
 				if(obj.getSelectedSpecies().contains(s)){ 
 					obj.getSelectedSpecies().remove(s);
