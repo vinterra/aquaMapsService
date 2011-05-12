@@ -317,12 +317,14 @@ public class JobManager extends SubmittedManager{
 		Map<String,ObjectType> layers=new HashMap<String, ObjectType>(); 
 		for(Submitted obj:getObjects(jobId)){
 			if(obj.getGisEnabled())
-				layers.put(obj.getGisReferences().get(0), obj.getType());
+				for(String id:obj.getGisPublishedId())
+				layers.put(id, obj.getType());
 		}
 		GroupGenerationRequest request=new GroupGenerationRequest();
 		request.setToGenerateGroupName(ServiceUtils.generateId("WMS_"+job.getTitle(), ""));
 		request.setLayers(layers);
 		
+		logger.trace("Sending request to generator, "+request.getLayers().size()+" layers to add to group "+request.getToGenerateGroupName());
 		if(GeneratorManager.requestGeneration(request))
 			updateField(jobId, SubmittedFields.geoserverreference, FieldType.STRING, request.getToGenerateGroupName());
 		else throw new Exception ("Group Generation Failed "+request.getToGenerateGroupName());

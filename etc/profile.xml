@@ -24,10 +24,10 @@
 						<Service>
 							<Class>Application</Class>
 							<Name>AquaMapsService</Name>
-							<Version>2.5.0</Version>
+							<Version>1.0.0</Version>
 						</Service>
 						<Package>AquaMapsService-stubs</Package>
-						<Version>2.5.0</Version>
+						<Version>1.0.0</Version>
 						<Scope level="GHN" />
 						<Optional>false</Optional>
 					</Dependency>
@@ -35,7 +35,7 @@
 						<Service>
 							<Class>Application</Class>
 							<Name>AquaMapsPublisher</Name>
-							<Version>2.5.0</Version>
+							<Version>1.0.0</Version>
 						</Service>
 						<Package>AquaMapsPublisher-stubs</Package>
 						<Version>1.0.0</Version>

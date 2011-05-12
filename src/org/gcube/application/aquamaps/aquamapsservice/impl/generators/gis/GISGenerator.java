@@ -169,18 +169,20 @@ public class GISGenerator implements Generator{
 		for(Entry<String, ObjectType> layer:request.getLayers().entrySet()){
 			LayerInfo found=null;
 			switch(layer.getValue()){
-			case Biodiversity :	found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.PointMap);
+			case Biodiversity :	found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.Biodiversity);
 								break;
-			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.PointMap);
+			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.NativeRange);
 			}
-			if(layer!=null){
-				layersAndStyles.put(found.getId(),found.getDefaultStyle());
+			if(found!=null){
+				layersAndStyles.put(found.getUrl(),found.getDefaultStyle());
 				layers.add(found);
-			}
+			}logger.warn("Layer "+layer.getKey()+" , "+layer.getValue()+" not found");
 		}
 		logger.trace("loaded "+layers.size()+" layers");
+		if(layers.size()>0)
 //		request.setWMSContextInfoType(publisher.publishWMSContext(request.getToGenerateGroupName(), layers);
 		return createGroupOnGeoServer(layersAndStyles.keySet(), layersAndStyles, request.getToGenerateGroupName());
+		else return false;
 	}
 
 
