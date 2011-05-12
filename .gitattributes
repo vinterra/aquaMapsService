@@ -19,6 +19,7 @@ etc/publisher/build.properties -text
 etc/publisher/deploy-jndi-config.xml -text
 etc/publisher/deploy-server.wsdd -text
 etc/publisher/hibernate.cfg.xml -text
+etc/publisher/hibernate.cfg.xml.backup -text
 etc/publisher/pool.properties -text
 etc/publisher/profile.xml -text
 etc/publisher/registration.xml -text
@@ -26,6 +27,7 @@ etc/publisher/security_descriptor.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
 /install.sh -text
+lib/javassist.jar -text
 schema/AquaMapsService.wsdl -text
 schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
