@@ -24,6 +24,11 @@ etc/publisher/pool.properties -text
 etc/publisher/profile.xml -text
 etc/publisher/registration.xml -text
 etc/publisher/security_descriptor.xml -text
+etc/publisher/template/BiodiversityTemplate.xml -text
+etc/publisher/template/EnvironmentTemplate.xml -text
+etc/publisher/template/PointMapTemplate.xml -text
+etc/publisher/template/SpeciesDistributionTemplate.xml -text
+etc/publisher/template/WMSContext.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
 /install.sh -text
