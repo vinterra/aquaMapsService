@@ -175,7 +175,7 @@ public class PerlImageGenerator implements Generator{
 		logger.trace("Checking generated images...");
 		logger.trace("base path : "+basePath);
 		logger.trace("header is "+header);
-		File f1 = new File(GENERATED_IMAGES+"csq_map127.0.0.1_"+header+"_pic.jpg");
+		File f1 = new File(GENERATED_IMAGES+"csq_map127.0.0.1_"+header+"_map_pic.jpg");
 		logger.trace("Checking file "+f1.getAbsolutePath());
 		if (f1.exists())
 			toReturn.put("Earth",f1.getAbsolutePath());			

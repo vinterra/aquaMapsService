@@ -1,15 +1,19 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -18,6 +22,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SubmittedManager {
@@ -160,7 +165,7 @@ public class SubmittedManager {
 		updateField(jobId,SubmittedFields.status,FieldType.STRING,statusValue.toString());
 		if(statusValue.equals(SubmittedStatus.Error)||statusValue.equals(SubmittedStatus.Completed)){
 			logger.trace("Found status "+statusValue+", updateing Publisher..");
-			Publisher pub=PublisherImpl.getPublisher();
+			Publisher pub=ServiceContext.getContext().getPublisher();
 			if(isAquaMap(jobId)){
 				AquaMapsObject obj = pub.getAquaMapsObjectById(jobId);
 				obj.setStatus(statusValue);
@@ -222,4 +227,51 @@ public class SubmittedManager {
 		return found.get(0);
 	}
 
+	//*************** QUEUE MANAGEMENT
+	
+	
+	private static String queueTable="submitted_queue";
+	private static String path="path";
+	private static String idField="id";
+	
+	private static String queueDir="QUEUE";
+	
+	public static String addInQueue(Job toPerform) throws Exception {
+		DBSession session=null;
+		try{
+			String id=ServiceUtils.generateId("job", "xml");
+			
+			File f= new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+queueDir+File.separator+id);
+			f.mkdirs();
+			BufferedWriter out = new BufferedWriter(new FileWriter(f));
+			out.write(AquaMapsXStream.getXMLInstance().toXML(toPerform));
+			out.close();
+			List<List<Field>> toInsert=new ArrayList<List<Field>>();
+			List<Field> row= new ArrayList<Field>();
+			row.add(new Field(path,f.getAbsolutePath(),FieldType.STRING));
+			row.add(new Field(idField,id,FieldType.STRING));
+			toInsert.add(row);
+			session=DBSession.getInternalDBSession();
+			session.insertOperation(queueTable, toInsert);
+			return id;
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+
+	public static Job loadFromQueue(String id)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			List<Field> filter= new ArrayList<Field>();
+			filter.add(new Field(idField,id,FieldType.STRING));
+			ResultSet rs= session.executeFilteredQuery(filter, queueTable, null, null);
+			if (rs.next()){
+				String filePath=rs.getString(path);
+				String data=ServiceUtils.fileToString(filePath);
+				return (Job) AquaMapsXStream.getXMLInstance().fromXML(data);
+			}else throw new Exception("ID "+id+" not found in table..");
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
 }

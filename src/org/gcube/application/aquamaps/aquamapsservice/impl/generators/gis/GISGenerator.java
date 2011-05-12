@@ -12,8 +12,10 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.csv4j.CSVLineProcessor;
@@ -25,9 +27,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequest
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -41,7 +43,7 @@ public class GISGenerator implements Generator{
 	public static char delimiter=',';
 	public static boolean hasHeader=false;
 
-	private static Publisher publisher=PublisherImpl.getPublisher();
+	private static Publisher publisher=ServiceContext.getContext().getPublisher();
 	
 	private static Integer insertedLineFromCSV=0;
 	
@@ -159,8 +161,26 @@ public class GISGenerator implements Generator{
 
 
 	private static synchronized boolean generateGroup(GroupGenerationRequest request)throws Exception{
-		//TODO IMPLEMENT
-		throw new Exception("Not yet Implemented");
+		logger.trace("Generating group "+request.getToGenerateGroupName());
+		Publisher publisher=ServiceContext.getContext().getPublisher();
+		List<LayerInfo> layers=new ArrayList<LayerInfo>();
+		Map<String,String> layersAndStyles=new HashMap<String, String>();
+		logger.trace("loading layer infos..");
+		for(Entry<String, ObjectType> layer:request.getLayers().entrySet()){
+			LayerInfo found=null;
+			switch(layer.getValue()){
+			case Biodiversity :	found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.PointMap);
+								break;
+			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.PointMap);
+			}
+			if(layer!=null){
+				layersAndStyles.put(found.getId(),found.getDefaultStyle());
+				layers.add(found);
+			}
+		}
+		logger.trace("loaded "+layers.size()+" layers");
+//		request.setWMSContextInfoType(publisher.publishWMSContext(request.getToGenerateGroupName(), layers);
+		return createGroupOnGeoServer(layersAndStyles.keySet(), layersAndStyles, request.getToGenerateGroupName());
 	}
 
 
@@ -355,6 +375,7 @@ public class GISGenerator implements Generator{
 
 
 	private static boolean createGroupOnGeoServer(Set<String> layers,Map<String,String> styles, String groupName)throws Exception{	 
+		logger.trace("Creating group on geo server...");
 		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());		
 		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getTemplateGroup());
 		//		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
@@ -364,7 +385,7 @@ public class GISGenerator implements Generator{
 		for(String l:layers){
 			g.addLayer(l);
 			g.addStyle(l, styles.get(l));
-		}		
+		}
 		g.setName(groupName);
 		return caller.addLayersGroup(g);
 	}

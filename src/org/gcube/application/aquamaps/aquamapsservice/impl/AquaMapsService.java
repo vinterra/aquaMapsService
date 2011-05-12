@@ -10,8 +10,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.envelope.SpEnvelope;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SubmittedMonitorThread;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
@@ -26,6 +26,7 @@ import org.gcube.application.aquamaps.dataModel.FieldArray;
 import org.gcube.application.aquamaps.dataModel.Types.AreaType;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
@@ -145,10 +146,28 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	public String submitJob(org.gcube.application.aquamaps.dataModel.Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
-		JobSubmissionThread thread=new JobSubmissionThread(new Job(req));
-		ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
-		ThreadManager.getExecutor().execute(thread);
-		return String.valueOf(thread.getId());
+			logger.trace("Forcing group enabling if layers requested");
+			Job job= new Job(req);
+			boolean enableGis=false;
+			for(AquaMapsObject obj : job.getAquaMapsObjectList())
+				if(obj.getGis()) {
+					enableGis=true;
+					break;
+				}
+			
+			job.setIsGis(enableGis);
+			if(ServiceContext.getContext().isPostponeSubmission()){
+			
+			String file=SubmittedMonitorThread.getInstance().putInQueue(job);
+			logger.trace("Queued with "+file);
+			return file;}
+			else{
+				
+				JobSubmissionThread thread=new JobSubmissionThread(job);
+				ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
+				ThreadManager.getExecutor().execute(thread);
+				return "";
+			}
 		}catch(Exception e){
 			logger.error("Unable to execute Job "+req.getName(), e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -288,7 +307,12 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 	public AquaMap getObject(int arg0) throws RemoteException, GCUBEFault {
 		try{
-			return PublisherImpl.getPublisher().getAquaMapsObjectById(arg0).toStubsVersion();
+			AquaMapsObject toReturn=ServiceContext.getContext().getPublisher().getAquaMapsObjectById(arg0);
+			if(toReturn==null){
+				logger.trace("Object with id "+arg0+" not found");
+				return null;
+			}
+			else return toReturn.toStubsVersion();
 			
 		}catch(Exception e){
 			logger.error("",e);

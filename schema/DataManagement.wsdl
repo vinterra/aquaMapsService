@@ -9,7 +9,8 @@
 	xmlns:coretypes="http://gcube-system.org/namespaces/common/core/types"
 	xmlns:corefaults="http://gcube-system.org/namespaces/common/core/faults"
 	xmlns:wsntw="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.wsdl"
-	xmlns:provider="http://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider">
+	xmlns:provider="http://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider"
+	xmlns:aqtypes="http://gcube-system.org/namespaces/application/aquamaps/types">
 
 	<import namespace="http://gcube-system.org/namespaces/common/core/faults"
 		location="../gcube/common/core/faults/GCUBEFaults.wsdl" />
@@ -19,6 +20,10 @@
 			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement">
 			<xsd:import namespace="http://gcube-system.org/namespaces/common/core/types"
 				schemaLocation="../gcube/common/core/types/GCUBETypes.xsd" />
+				<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/types"
+		 schemaLocation="AquaMapsTypes.xsd"/>
+		 <xsd:import namespace="http://gcube-system.org/namespaces/common/gis/types"
+		 schemaLocation="GISTypes.xsd" />
 
 			<!--  DataManagement portType request types -->
 			<xsd:complexType name="generateHCAFRequestType">
@@ -63,6 +68,15 @@
 			</xsd:complexType>
 			
 			
+			<xsd:complexType name="generateMapsRequestType">
+				<xsd:sequence>
+					<xsd:element name="author" type="xsd:string"/>
+					<xsd:element name="HSPECId" type="xsd:int"/>
+					<xsd:element name="generateLayers" type="xsd:boolean"/>
+					<xsd:element name="speciesFilter" type="aqtypes:fieldArray"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
 			<!-- Data management request elements -->
 
 			<xsd:element name="generateHCAFRequest" type="tns:generateHCAFRequestType" />
@@ -78,7 +92,10 @@
 			<xsd:element name="getGenerationReportByTypeRequest"
 				type="tns:getGenerationReportByTypeRequestType" />
 			<xsd:element name="getGenerationReportByTypeResponse" type="xsd:string" />
-
+			
+			
+			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType"/>
+			<xsd:element name="generateMapsResponse" type ="xsd:int"/>
 
 		</xsd:schema>
 	</types>
@@ -112,6 +129,15 @@
 		<part name="response" element="tns:getGenerationReportByTypeResponse" />
 	</message>
 	
+	<message name="GenerateMapsRequest">
+		<part name="request" element="tns:generateMapsRequest" />
+	</message>
+	<message name="GenerateMapsResponse">
+		<part name="response" element="tns:generateMapsResponse" />
+	</message>
+	
+	
+	
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
 			<wsdl:input message="tns:GenerateHCAFRequest" />
@@ -132,6 +158,11 @@
 		<wsdl:operation name="getGenerationReportByType">
 			<wsdl:input message="tns:GetGenerationReportByTypeRequest" />
 			<wsdl:output message="tns:GetGenerationReportByTypeResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="generateMaps">
+			<wsdl:input message="tns:GenerateMapsRequest" />
+			<wsdl:output message="tns:GenerateMapsResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

@@ -1,52 +1,36 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.gcube.common.gis.dataModel.LayerInfoType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.common.gis.dataModel.WMSContextInfoType;
 
 public class GroupGenerationRequest implements GISRequest {
 
-	
-	private Map<String,String> geoServerLayers=new HashMap<String, String>();
-	private String toCreateGroupName;
-	
-	private List<LayerInfoType> publishedLayer=new ArrayList<LayerInfoType>();
-	
-	private WMSContextInfoType associatedContext;
+	private Map<String,ObjectType> layers=new HashMap<String, ObjectType>();
+	private String toGenerateGroupName;
+	private WMSContextInfoType createdContextInfoType;
 	
 	
-	public Set<String> getGeoServerLayers(){return getGeoServerLayersMap().keySet();}
-	public Map<String,String> getStyles(){return getGeoServerLayersMap();}
 	
 	
-	public Map<String,String> getGeoServerLayersMap() {
-		return geoServerLayers;
+	public String getToGenerateGroupName() {
+		return toGenerateGroupName;
 	}
-	public void setGeoServerLayers(Map<String,String> geoServerLayers) {
-		this.geoServerLayers = geoServerLayers;
+	public void setToGenerateGroupName(String toGenerateGroupName) {
+		this.toGenerateGroupName = toGenerateGroupName;
 	}
-	public void setToCreateGroupName(String toCreateGroupName) {
-		this.toCreateGroupName = toCreateGroupName;
+	public WMSContextInfoType getCreatedContextInfoType() {
+		return createdContextInfoType;
 	}
-	public String getToCreateGroupName() {
-		return toCreateGroupName;
+	public void setCreatedContextInfoType(WMSContextInfoType createdContextInfoType) {
+		this.createdContextInfoType = createdContextInfoType;
 	}
-	public void setPublishedLayer(List<LayerInfoType> publishedLayer) {
-		this.publishedLayer = publishedLayer;
+	public void setLayers(Map<String,ObjectType> layers) {
+		this.layers = layers;
 	}
-	public List<LayerInfoType> getPublishedLayer() {
-		return publishedLayer;
+	public Map<String,ObjectType> getLayers() {
+		return layers;
 	}
-	public void setAssociatedContext(WMSContextInfoType associatedContext) {
-		this.associatedContext = associatedContext;
-	}
-	public WMSContextInfoType getAssociatedContext() {
-		return associatedContext;
-	}
-	
 }

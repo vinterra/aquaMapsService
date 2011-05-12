@@ -4,15 +4,20 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -307,48 +312,22 @@ public class JobManager extends SubmittedManager{
 
 	@Deprecated
 	public static void createGroup (int jobId)throws Exception{
-		throw new Exception("NOT YET IMPLEMENTED");
+		logger.trace("Creating group for "+jobId);
+		Submitted job= SubmittedManager.getSubmittedById(jobId);
+		Map<String,ObjectType> layers=new HashMap<String, ObjectType>(); 
+		for(Submitted obj:getObjects(jobId)){
+			if(obj.getGisEnabled())
+				layers.put(obj.getGisReferences().get(0), obj.getType());
+		}
+		GroupGenerationRequest request=new GroupGenerationRequest();
+		request.setToGenerateGroupName(ServiceUtils.generateId("WMS_"+job.getTitle(), ""));
+		request.setLayers(layers);
 		
-		/* Gather information for required group
-			GeoServer layer references are in DB as submitted.gis
-				needed layer-style map
-			LayersInfoType information may be available at generation time
+		if(GeneratorManager.requestGeneration(request))
+			updateField(jobId, SubmittedFields.geoserverreference, FieldType.STRING, request.getToGenerateGroupName());
+		else throw new Exception ("Group Generation Failed "+request.getToGenerateGroupName());
 			
-		*/
-		
-		
-		
-		
-		
-		
-//		try{
-//			logger.trace("Starting job Id : "+jobId+" layers group creation ..");
-//			logger.trace("Looking for generated layers");
-//			ArrayList<String> layers=new ArrayList<String>();
-//			for(Submitted obj:getObjects(jobId)){				
-//				if((obj.getGis()!=null)&&(!obj.getGis().equalsIgnoreCase("null")))
-//					layers.add(obj.getGis());
-//			}
-//			if(layers.size()>0){
-//				logger.trace("found "+layers.size()+" generated layer(s), looking for related style(s)");
-//				GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
-//				GroupGenerationRequest req=new GroupGenerationRequest();
-//				req.setLayers(layers);
-//				for(String layerId:layers){
-//					LayerRest lRest=caller.getLayer(layerId);
-//					req.getStyles().put(layerId, lRest.getDefaultStyle());
-//				}								
-//				req.setName(String.valueOf(jobId));				
-//				req.setSubmittedId(jobId);
-//				if(GeneratorManager.requestGeneration(req))logger.trace("Generation of jobId "+jobId+" layers group complete");
-//				else throw new Exception("Unable to generate Group");
-//			}else logger.trace("No generated layers found for job Id "+jobId);
-//		}catch(Exception e){
-//			logger.error("Unable to complete group "+jobId+" generation",e);
-//			throw e;
-//		}
-		
-		
+	
 	}
 
 
@@ -399,7 +378,7 @@ public class JobManager extends SubmittedManager{
 		try{
 		
 			session=DBSession.getInternalDBSession();
-		Publisher publisher= PublisherImpl.getPublisher();
+		Publisher publisher= ServiceContext.getContext().getPublisher();
 		
 		////*************** Insert references into local DB
 		logger.trace("Inserting references into internal DB...");
@@ -581,7 +560,7 @@ public class JobManager extends SubmittedManager{
 			}
 		}
 		
-		Publisher pub=PublisherImpl.getPublisher();
+		Publisher pub=ServiceContext.getContext().getPublisher();
 		pub.removeJob(submittedId);		
 		count+=deleteFromTables(submittedId);
 		return count;

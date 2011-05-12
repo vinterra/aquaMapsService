@@ -15,6 +15,14 @@ etc/deploy-server.wsdd -text
 etc/generator/ALog.properties -text
 etc/generator/DestinationDBHibernate.cfg.xml -text
 etc/profile.xml -text
+etc/publisher/build.properties -text
+etc/publisher/deploy-jndi-config.xml -text
+etc/publisher/deploy-server.wsdd -text
+etc/publisher/hibernate.cfg.xml -text
+etc/publisher/pool.properties -text
+etc/publisher/profile.xml -text
+etc/publisher/registration.xml -text
+etc/publisher/security_descriptor.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
 /install.sh -text
@@ -81,9 +89,10 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/u
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/StatusMonitorThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/ConnectedPublisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/DummyPublisher.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/EmbeddedPublisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/PublisherImpl.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobSubmissionThread.java -text
@@ -91,6 +100,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobUtils.java -t
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SimulationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SourceGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SpeciesPerturbationThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SubmittedMonitorThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsCall.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsServiceCall.java -text

@@ -2,18 +2,16 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Properties;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.PoolManager.DBType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.ConnectedPublisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.DummyPublisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.EmbeddedPublisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SubmittedMonitorThread;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
-import org.gcube.common.core.contexts.GHNContext;
-import org.gcube.common.core.scope.GCUBEScope;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ResourceHandler;
-import org.mortbay.jetty.nio.SelectChannelConnector;
 
 
 
@@ -75,9 +73,14 @@ public class ServiceContext extends GCUBEServiceContext {
 	private boolean useDummyPublisher;
 	private boolean useEnvironmentModelingLib;
 	private boolean enableScriptLogging;
-	
+	private boolean postponeSubmission;
 	
 	private String defaultPublisherUrl;
+	
+	
+	//********PUBLISHER
+	private Publisher publisher;
+	
 	
 	
 	private long monitorInterval;
@@ -148,34 +151,38 @@ public class ServiceContext extends GCUBEServiceContext {
 	protected void onReady() throws Exception{
 		
 		
-		File serverPathDir= new File(this.getPersistenceRoot()+File.separator+httpServerBasePath);
-		if(!serverPathDir.exists())
-			serverPathDir.mkdirs();
-				
-		webServerUrl="http://"+GHNContext.getContext().getHostname()+":"+httpServerPort+"/";
-		logger.debug("WEBSERVER URL: "+this.webServerUrl);
-
-		//initializing jetty
-		Connector connector = new SelectChannelConnector();
-		connector.setPort(httpServerPort);
-		Server server = new Server(httpServerPort);
-		server.setConnectors(new Connector[]{connector});
-		ResourceHandler resourceHandler = new ResourceHandler();
-		resourceHandler.setResourceBase(serverPathDir.getAbsolutePath());
-		try {
-			logger.debug("HTTP Server Base Path : " + resourceHandler.getBaseResource().getFile().getAbsolutePath());
-		} catch (IOException e) {
-			logger.error(e);
-		}
-		server.setHandler(resourceHandler);
-		//starting the web server
-		server.start();
-	
+//		File serverPathDir= new File(this.getPersistenceRoot()+File.separator+httpServerBasePath);
+//		if(!serverPathDir.exists())
+//			serverPathDir.mkdirs();
+//				
+//		webServerUrl="http://"+GHNContext.getContext().getHostname()+":"+httpServerPort+"/";
+//		logger.debug("WEBSERVER URL: "+this.webServerUrl);
+//
+//		//initializing jetty
+//		Connector connector = new SelectChannelConnector();
+//		connector.setPort(httpServerPort);
+//		Server server = new Server(httpServerPort);
+//		server.setConnectors(new Connector[]{connector});
+//		ResourceHandler resourceHandler = new ResourceHandler();
+//		resourceHandler.setResourceBase(serverPathDir.getAbsolutePath());
+//		try {
+//			logger.debug("HTTP Server Base Path : " + resourceHandler.getBaseResource().getFile().getAbsolutePath());
+//		} catch (IOException e) {
+//			logger.error(e);
+//		}
+//		server.setHandler(resourceHandler);
+//		//starting the web server
+//		server.start();
+//	
 		
 //		//Monitoring
 		StatusMonitorThread t=new StatusMonitorThread(monitorInterval,monitorThreshold);
 		logger.debug("Staring monitor thread: interval = "+monitorInterval+"; freespaceThreshold="+monitorThreshold);
 		t.start();
+		
+		
+		SubmittedMonitorThread t2=new SubmittedMonitorThread(getPersistenceRoot()+File.separator+"JOBS", 1000);
+		t2.start();
 		
 	}
 	
@@ -245,13 +252,33 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.setUseDummyPublisher(Boolean.parseBoolean(prop.getProperty("useDummyPublisher").trim()));
 			this.setUseEnvironmentModelingLib(Boolean.parseBoolean(prop.getProperty("useEnvironmentModelingLib").trim()));
 			this.setEnableScriptLogging(Boolean.parseBoolean(prop.getProperty("enableScriptLogging").trim()));
-			
-		
+			this.setPostponeSubmission(Boolean.parseBoolean(prop.getProperty("postponeSubmission").trim()));
 			
 		}catch(Exception e){
 			logger.fatal("Unable to load properties ",e);
 		}
 			
+		try{
+			if(isUseDummyPublisher()){
+				logger.trace("Publisher is DummyPublisher");			
+				setPublisher(new DummyPublisher());
+			}else if(isStandAloneMode()){
+				logger.trace("Publisher is Embedded");
+				setPublisher(new EmbeddedPublisher(
+						getPersistenceRoot().getAbsolutePath(),
+						ServiceContext.getContext().getFile("publisher", false).getAbsolutePath()+File.separator,						
+						(String) this.getProperty("httpServerBasePath", true),
+						Integer.parseInt((String)this.getProperty("httpServerPort",true))));
+				}else {
+					logger.trace("Pubilsher is connected");
+					setPublisher(ConnectedPublisher.getPublisher());
+				}
+			
+		}catch(Exception e){
+			logger.fatal("Unable to initiate Publisher library ",e);
+		}
+		
+		
 			
 	}
 	
@@ -591,5 +618,38 @@ public class ServiceContext extends GCUBEServiceContext {
 	public boolean isEnableScriptLogging() {
 		return enableScriptLogging;
 	}
+
+	public void setPostponeSubmission(boolean postponeSubmission) {
+		this.postponeSubmission = postponeSubmission;
+	}
+
+	public boolean isPostponeSubmission() {
+		return postponeSubmission;
+	}
+
+	public void setPublisher(Publisher publisher) {
+		this.publisher = publisher;
+	}
+
+	public Publisher getPublisher() {
+		return publisher;
+	}
 		
+	
+	@Override
+    protected void onShutdown() throws Exception {
+        // TODO Auto-generated method stub
+        super.onShutdown();
+        if(!isUseDummyPublisher()&&isStandAloneMode())
+        	EmbeddedPublisher.stop();
+    }
+    @Override
+    protected void onFailure() throws Exception {
+        // TODO Auto-generated method stub
+        super.onFailure();
+        if(!isUseDummyPublisher()&&isStandAloneMode())
+        	EmbeddedPublisher.stop();
+    }
+	
+	
 }
