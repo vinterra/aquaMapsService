@@ -32,6 +32,7 @@ etc/publisher/template/WMSContext.xml -text
 etc/registration.xml -text
 etc/security_descriptor.xml -text
 /install.sh -text
+lib/backport-util-concurrent-3.0.jar -text
 lib/javassist.jar -text
 schema/AquaMapsService.wsdl -text
 schema/AquaMapsTypes.xsd -text
