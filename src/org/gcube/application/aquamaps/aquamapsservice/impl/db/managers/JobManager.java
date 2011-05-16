@@ -371,7 +371,7 @@ public class JobManager extends SubmittedManager{
 	 * 
 	 * @return new job id
 	 */
-	public static int insertNewJob(Job toPerform) throws Exception{
+	public static Job insertNewJob(Job toPerform) throws Exception{
 		logger.trace("Creating new pending Job");
 		String myData = ServiceUtils.getDate();
 		DBSession session=null;
@@ -463,7 +463,7 @@ public class JobManager extends SubmittedManager{
 			ArrayList<String> layersUri=new ArrayList<String>();
 			for(LayerInfo info: obj.getLayers()){
 				layersId.add(info.getId());
-				layersUri.add(info.getUrl());
+				layersUri.add(info.getUrl()+"/"+info.getName());
 			}
 			objRow.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
 			objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
@@ -540,7 +540,7 @@ public class JobManager extends SubmittedManager{
 			
 			
 		}
-		return toPerform.getId();
+		return toPerform;
 		}catch (Exception e){
 			throw e;
 		}finally {

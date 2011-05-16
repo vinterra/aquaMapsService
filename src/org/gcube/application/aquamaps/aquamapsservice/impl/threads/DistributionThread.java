@@ -40,7 +40,7 @@ public class DistributionThread extends Thread {
 	private int aquamapsId;
 	private String aquamapsName;	
 
-	private Set<String> speciesId=new HashSet<String>();
+	private Set<Species> selectedSpecies=new HashSet<Species>();
 	private DBSession session;
 	private int jobId;	
 	private boolean gisEnabled=false;
@@ -63,7 +63,7 @@ public class DistributionThread extends Thread {
 	}
 
 	public void setRelatedSpeciesId(Species species, Map<String,Map<String,Perturbation>> envelopeCustomization, Map<String,Map<EnvelopeFields,Field>> envelopeWeights){
-		speciesId.add(species.getId());
+		selectedSpecies.add(species);
 		this.envelopeCustomization=envelopeCustomization.get(species.getId());
 		this.envelopeWeights=envelopeWeights.get(species.getId());
 	}
@@ -74,7 +74,9 @@ public class DistributionThread extends Thread {
 
 	public void run() {
 		logger.trace(this.getName()+" started");
+		
 		try {
+			Set<String> speciesId=new HashSet<String>();
 			while(!JobManager.isSpeciesListReady(jobId, speciesId)){
 				try{
 					Thread.sleep(waitTime);
@@ -124,13 +126,13 @@ public class DistributionThread extends Thread {
 					ArrayList<String> layersUri=new ArrayList<String>();
 					
 					//TODO check algorithm
-					PredictionLayerGenerationRequest request= new PredictionLayerGenerationRequest(aquamapsId, new Species(speciesId.iterator().next()), hcaf, hspen, 
+					PredictionLayerGenerationRequest request= new PredictionLayerGenerationRequest(aquamapsId,aquamapsName, selectedSpecies.iterator().next(), hcaf, hspen, 
 							envelopeCustomization, envelopeWeights, selectedAreas, bb, csvFile, true);
 					
 
 					if(GeneratorManager.requestGeneration(request)){
 						layersId.add(request.getGeneratedLayer());
-						layersId.add(request.getGeServerLayerId());
+						layersUri.add(request.getGeServerLayerId());
 					}else {
 						throw new Exception("Gis Generation returned false, request was "+request);
 					}
@@ -175,7 +177,7 @@ public class DistributionThread extends Thread {
 		String clusteringQuery=clusteringDistributionQuery(HSPECName);
 		logger.trace("Gonna use query "+clusteringQuery);
 		PreparedStatement ps= session.preparedStatement(clusteringQuery);
-		ps.setString(1,speciesId.iterator().next());
+		ps.setString(1,selectedSpecies.iterator().next().getId());
 
 
 		return ps.executeQuery();

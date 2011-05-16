@@ -174,7 +174,7 @@ public class GISGenerator implements Generator{
 			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.NativeRange);
 			}
 			if(found!=null){
-				layersAndStyles.put(found.getUrl(),found.getDefaultStyle());
+				layersAndStyles.put(found.getName(),found.getDefaultStyle());
 				layers.add(found);
 			}else logger.warn("Layer "+layer.getKey()+" , "+layer.getValue()+" not found");
 		}
@@ -302,7 +302,7 @@ public class GISGenerator implements Generator{
 
 	private static String createLayerTable(String appTableName,String layerName,String featureLabel,DBSession session)throws Exception{
 
-		String featureTable=ServiceUtils.generateId("layerName", "");
+		String featureTable=ServiceUtils.generateId(layerName, "").replaceAll(" ", "_");
 
 		logger.trace("Creating table "+featureTable);
 		session.executeUpdate("Create table "+featureTable+" AS (Select "+

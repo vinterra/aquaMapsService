@@ -89,7 +89,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(35904)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(35961)));
 		
 		
 		
