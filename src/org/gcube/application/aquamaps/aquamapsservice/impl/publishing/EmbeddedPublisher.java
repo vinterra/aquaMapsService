@@ -1,7 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.publishing;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,13 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+import org.gcube.application.aquamaps.aquamapspublisher.impl.AquaMapsPublisherWrapperL;
 import org.gcube.application.aquamaps.aquamapspublisher.impl.PublisherContext;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.TemplateLayerType;
-import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.RSWrapper;
-import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.ZipUtils;
-import org.gcube.application.aquamaps.aquamapspublisher.stubs.wrapper.AquaMapsPublisherWrapperL;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
@@ -24,16 +19,11 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 import org.gcube.common.gis.dataModel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.dataModel.types.LayersType;
-
-import com.Ostermiller.util.Base64;
 
 public class EmbeddedPublisher implements Publisher{
 

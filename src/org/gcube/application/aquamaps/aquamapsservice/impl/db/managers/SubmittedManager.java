@@ -148,10 +148,14 @@ public class SubmittedManager {
 	}
 
 	public static int setGisPublishedId(int submittedId,List<String> gisId)throws Exception{
-		return updateField(submittedId,SubmittedFields.gispublishedid,FieldType.STRING,CSVUtils.listToCSV(gisId));
+		String value=CSVUtils.listToCSV(gisId);
+		logger.debug("Setting gis publishd id : "+value+" for Submitted id : "+submittedId);
+		return updateField(submittedId,SubmittedFields.gispublishedid,FieldType.STRING,value);
 	}
 	public static int setGisReference(int submittedId,List<String> gisreference)throws Exception{
-		return updateField(submittedId,SubmittedFields.geoserverreference,FieldType.STRING,CSVUtils.listToCSV(gisreference));
+		String value=CSVUtils.listToCSV(gisreference);
+		logger.debug("Setting geo server references id : "+value+" for Submitted id : "+submittedId);
+		return updateField(submittedId,SubmittedFields.geoserverreference,FieldType.STRING,value);
 	}
 	
 	

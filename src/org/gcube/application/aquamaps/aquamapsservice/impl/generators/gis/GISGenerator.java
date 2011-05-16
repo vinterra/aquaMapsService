@@ -176,7 +176,7 @@ public class GISGenerator implements Generator{
 			if(found!=null){
 				layersAndStyles.put(found.getUrl(),found.getDefaultStyle());
 				layers.add(found);
-			}logger.warn("Layer "+layer.getKey()+" , "+layer.getValue()+" not found");
+			}else logger.warn("Layer "+layer.getKey()+" , "+layer.getValue()+" not found");
 		}
 		logger.trace("loaded "+layers.size()+" layers");
 		if(layers.size()>0)
@@ -378,18 +378,23 @@ public class GISGenerator implements Generator{
 
 	private static boolean createGroupOnGeoServer(Set<String> layers,Map<String,String> styles, String groupName)throws Exception{	 
 		logger.trace("Creating group on geo server...");
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());		
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
+		logger.trace("Getting template group : "+ServiceContext.getContext().getTemplateGroup());
 		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getTemplateGroup());
 		//		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
 		//        g.setLayers(list);
 		//        g.setStyles(styles);
-
+		logger.trace("Adding layers to template copy...");
 		for(String l:layers){
+			logger.trace("Added layer "+l);
 			g.addLayer(l);
 			g.addStyle(l, styles.get(l));
 		}
 		g.setName(groupName);
-		return caller.addLayersGroup(g);
+		logger.trace("Setted group name "+groupName);
+		boolean toReturn=caller.addLayersGroup(g);
+		logger.trace("(Caller) Add layersGroup returned : "+toReturn);
+		return toReturn;
 	}
 
 }
