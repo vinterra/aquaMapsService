@@ -62,7 +62,7 @@ public class ServiceContext extends GCUBEServiceContext {
 	private String geoServerUrl;
 	private String geoServerUser;
 	private String geoServerPwd;
-	
+	private String geoServerWorkspace;
 
 	private String templateGroup;
 	
@@ -219,6 +219,7 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.geoServerUser=prop.getProperty("geoServerUser", "").trim();
 			this.geoServerPwd=prop.getProperty("geoServerPwd", "").trim();
 			this.worldTable=prop.getProperty("worldTable", "").trim();
+			this.setGeoServerWorkspace(prop.getProperty("geoServerWorkspace").trim());
 			this.templateGroup=prop.getProperty("templateGroup", "").trim();
 			this.distributionDefaultStyle=prop.getProperty("distributionDefaultStyle","").trim();
 			this.setGISMode(Boolean.parseBoolean(prop.getProperty("GISMode", "false").trim()));
@@ -650,6 +651,14 @@ public class ServiceContext extends GCUBEServiceContext {
         if(!isUseDummyPublisher()&&isStandAloneMode())
         	EmbeddedPublisher.stop();
     }
+
+	public void setGeoServerWorkspace(String geoServerWorkspace) {
+		this.geoServerWorkspace = geoServerWorkspace;
+	}
+
+	public String getGeoServerWorkspace() {
+		return geoServerWorkspace;
+	}
 	
 	
 }

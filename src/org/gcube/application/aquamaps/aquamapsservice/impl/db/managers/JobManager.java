@@ -35,11 +35,11 @@ public class JobManager extends SubmittedManager{
 	public static final String toDropTables="temptables";
 	public static final String toDropTablesJobId=SubmittedFields.jobid+"";
 	public static final String toDropTablesTableName="tablename";
-	
+
 	public static final String tempFolders="tempfolders";
 	public static final String tempFoldersJobId=SubmittedFields.jobid+"";
 	public static final String tempFoldersFolderName="foldername";
-	
+
 	public static final String selectedSpecies="selectedspecies";
 	public static final String selectedSpeciesStatus=SubmittedFields.status+"";
 	public static final String selectedSpeciesJobId=SubmittedFields.jobid+"";
@@ -50,9 +50,9 @@ public class JobManager extends SubmittedManager{
 	protected static final String workingTables="workingtables";
 	protected static final String tableField="tablename";
 	protected static final String tableTypeField="tabletype";
-	
-	
-	
+
+
+
 	protected static void setWorkingTable(int submittedId,String tableType,String tableName)throws Exception{
 		DBSession session=null;
 		try{
@@ -95,7 +95,7 @@ public class JobManager extends SubmittedManager{
 			filter.add(new Field(tableTypeField,tableType,FieldType.STRING));
 			ResultSet rs= session.executeFilteredQuery(filter, workingTables, tableField, "ASC");
 			if(rs.next())
-			return rs.getString(tableField);
+				return rs.getString(tableField);
 			else return null;
 		}catch (Exception e){
 			throw e;
@@ -103,7 +103,7 @@ public class JobManager extends SubmittedManager{
 			session.close();
 		}
 	}
-	
+
 	public static void setWorkingHCAF(int submittedId,String tableName)throws Exception{
 		setWorkingTable(submittedId,ResourceType.HCAF.toString(),tableName);
 	}
@@ -127,7 +127,7 @@ public class JobManager extends SubmittedManager{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			
+
 			List<List<Field>> rows= new ArrayList<List<Field>>();
 			List<Field> row=new ArrayList<Field>();
 			row.add(new Field(toDropTablesJobId,jobId+"",FieldType.INTEGER));
@@ -144,14 +144,14 @@ public class JobManager extends SubmittedManager{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			
+
 			List<List<Field>> rows= new ArrayList<List<Field>>();
 			List<Field> row=new ArrayList<Field>();
 			row.add(new Field(tempFoldersJobId,jobId+"",FieldType.INTEGER));
 			row.add(new Field(tempFoldersFolderName,folderName,FieldType.STRING));
 			rows.add(row);			
 			try{
-			session.insertOperation(tempFolders, rows);
+				session.insertOperation(tempFolders, rows);
 			}catch(Exception e ){
 				logger.error("checking already inserted temp folders..");
 				List<Field> filter=new ArrayList<Field>();
@@ -160,7 +160,7 @@ public class JobManager extends SubmittedManager{
 				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(filter, tempFolders, tempFoldersJobId, "ASC"))){
 					for(Field g:f)
 						if(g.getName().equals(tempFoldersFolderName)&&g.getValue().equals(folderName));
-							found=true;
+					found=true;
 				}
 				if(!found)logger.warn("Unable to register temp folder "+folderName);
 			}
@@ -188,7 +188,7 @@ public class JobManager extends SubmittedManager{
 				keys.add(key);
 			}
 			if(values.size()>0)
-			session.updateOperation(selectedSpecies, keys, values);
+				session.updateOperation(selectedSpecies, keys, values);
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -199,10 +199,10 @@ public class JobManager extends SubmittedManager{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			
+
 			List<Field> filters= new ArrayList<Field>();
 			filters.add(new Field(selectedSpeciesJobId,jobId+"",FieldType.INTEGER));
-				if(status!=null) filters.add(new Field(selectedSpeciesStatus,status+"",FieldType.STRING));
+			if(status!=null) filters.add(new Field(selectedSpeciesStatus,status+"",FieldType.STRING));
 			ResultSet rs = session.executeFilteredQuery(filters, selectedSpecies, selectedSpeciesStatus, "ASC");
 			ArrayList<String> toReturn=new ArrayList<String>(); 
 			while(rs.next()){
@@ -232,7 +232,7 @@ public class JobManager extends SubmittedManager{
 			long completedCount=session.getCount(submittedTable, filter);
 			logger.debug("Found "+completedCount+" COMPLETED aquamaps object for jobId ");
 			return (completedCount+errorCount-count==0);
-			
+
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -255,7 +255,7 @@ public class JobManager extends SubmittedManager{
 
 			logger.debug("cleaning folders for : "+jobId);
 			rs=session.executeFilteredQuery(filter, tempFolders, tempFoldersFolderName, "ASC");
-			
+
 			while(rs.next()){
 				String folder=rs.getString(tempFoldersFolderName);
 				try{					
@@ -274,7 +274,7 @@ public class JobManager extends SubmittedManager{
 			logger.debug("cleaning speceisSelection for : "+jobId);
 			session.deleteOperation(selectedSpecies, filter);
 			logger.debug("cleaning references to working tables for : "+jobId);
-			
+
 			filter=new ArrayList<Field>();
 			filter.add(new Field(SubmittedFields.searchid+"",jobId+"",FieldType.INTEGER));
 			session.deleteOperation(workingTables, filter);
@@ -297,7 +297,7 @@ public class JobManager extends SubmittedManager{
 				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, "ASC");
 				if(rs.next()){
 					if(!rs.getString(selectedSpeciesStatus).equalsIgnoreCase(SpeciesStatus.Ready+""))
-							return false;
+						return false;
 				}else throw new Exception("SpeciesID "+id+" not found in jobId "+jobId+" selection");
 			}
 			return true;
@@ -316,20 +316,23 @@ public class JobManager extends SubmittedManager{
 		Submitted job= SubmittedManager.getSubmittedById(jobId);
 		Map<String,ObjectType> layers=new HashMap<String, ObjectType>(); 
 		for(Submitted obj:getObjects(jobId)){
-			if(obj.getGisEnabled())
+			if(obj.getGisEnabled()&&obj.getStatus().equals(SubmittedStatus.Completed))
 				for(String id:obj.getGisPublishedId())
-				layers.put(id, obj.getType());
+					layers.put(id, obj.getType());
 		}
-		GroupGenerationRequest request=new GroupGenerationRequest();
-		request.setToGenerateGroupName(ServiceUtils.generateId("WMS_"+job.getTitle(), ""));
-		request.setLayers(layers);
-		
-		logger.trace("Sending request to generator, "+request.getLayers().size()+" layers to add to group "+request.getToGenerateGroupName());
-		if(GeneratorManager.requestGeneration(request))
-			updateField(jobId, SubmittedFields.geoserverreference, FieldType.STRING, request.getToGenerateGroupName());
-		else throw new Exception ("Group Generation Failed "+request.getToGenerateGroupName());
-			
-	
+		if(layers.isEmpty()){
+			logger.trace("No layer found, skipping group generation for job id : "+jobId);
+		}else{
+			GroupGenerationRequest request=new GroupGenerationRequest();
+			request.setToGenerateGroupName(ServiceUtils.generateId("WMS_"+job.getTitle(), ""));
+			request.setLayers(layers);
+
+			logger.trace("Sending request to generator, "+request.getLayers().size()+" layers to add to group "+request.getToGenerateGroupName());
+			if(GeneratorManager.requestGeneration(request))
+				updateField(jobId, SubmittedFields.geoserverreference, FieldType.STRING, request.getToGenerateGroupName());
+			else throw new Exception ("Group Generation Failed "+request.getToGenerateGroupName());
+		}
+
 	}
 
 
@@ -340,7 +343,7 @@ public class JobManager extends SubmittedManager{
 		try{
 			logger.trace("Checking species customizations flag..");
 			session=DBSession.getInternalDBSession();
-			
+
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(selectedSpeciesJobId,submittedId+"",FieldType.INTEGER));
 			Field idField=new Field(selectedSpeciesSpeciesID,"",FieldType.STRING);
@@ -350,10 +353,10 @@ public class JobManager extends SubmittedManager{
 				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, "ASC");
 				if(rs.next()){
 					if(rs.getInt(selectedSpeciesIsCustomized)==0)
-							return false;
+						return false;
 				}else throw new Exception("SpeciesID "+id+" not found in jobId "+submittedId+" selection");
 			}
-			
+
 			return true;
 		}catch(Exception e){
 			logger.error("unable to check species customization flag",e);
@@ -375,172 +378,172 @@ public class JobManager extends SubmittedManager{
 		logger.trace("Creating new pending Job");
 		String myData = ServiceUtils.getDate();
 		DBSession session=null;
-		
+
 		////*************** Send to publisher
 		try{
-		
+
 			session=DBSession.getInternalDBSession();
-		Publisher publisher= ServiceContext.getContext().getPublisher();
-		
-		////*************** Insert references into local DB
-		logger.trace("Inserting references into internal DB...");
-		
-		List<Field> row=new ArrayList<Field>();
-		row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
-		row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
-		row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
-		PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
-		session.fillParameters(row, ps).executeUpdate();
-		ResultSet rs=ps.getGeneratedKeys();
-		rs.next();
-		toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
-		
-		for(AquaMapsObject obj : toPerform.getAquaMapsObjectList()){
-			row=new ArrayList<Field>();
-			row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
-			row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
-			row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
-			ps=session.getPreparedStatementForInsert(row, submittedTable);
+			Publisher publisher= ServiceContext.getContext().getPublisher();
+
+			////*************** Insert references into local DB
+			logger.trace("Inserting references into internal DB...");
+
+			List<Field> row=new ArrayList<Field>();
+			row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
+			row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
+			row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
+			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
 			session.fillParameters(row, ps).executeUpdate();
-			rs=ps.getGeneratedKeys();
+			ResultSet rs=ps.getGeneratedKeys();
 			rs.next();
-			obj.setId(rs.getInt(SubmittedFields.searchid+""));
-		}
-		
-		logger.trace("Preparing taxonomy for species selections");
-		for(Species s:toPerform.getSelectedSpecies()){
-			Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEC().getSearchId());
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.kingdom+""));
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.order+""));
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.phylum+""));
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.classcolumn+""));
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.family+""));
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.species+""));
-			s.addField(updated.getFieldbyName(SpeciesOccursumFields.genus+""));
-			for(AquaMapsObject obj:toPerform.getAquaMapsObjectList())
-				if(obj.getSelectedSpecies().contains(s)){ 
-					obj.getSelectedSpecies().remove(s);
-					obj.getSelectedSpecies().add(updated);
-				}
-		}
-		
-		logger.trace("Sending job to publisher..");
-		////*************** Send to publisher
-		toPerform=publisher.publishJob(toPerform);		
-		
-		////*************** update references in local DB
-		
-				
-		
-		
-		Field author=new Field(SubmittedFields.author+"",toPerform.getAuthor(),FieldType.STRING);
-		Field date= new Field (SubmittedFields.date+"",myData,FieldType.STRING);
-		Field isAquaMaps= new Field(SubmittedFields.isaquamap+"","true",FieldType.BOOLEAN);
-		Field sourceHCAF=new Field(SubmittedFields.sourcehcaf+"",toPerform.getSourceHCAF().getSearchId()+"",FieldType.INTEGER);
-		Field sourceHSPEN=new Field(SubmittedFields.sourcehspen+"",toPerform.getSourceHSPEN().getSearchId()+"",FieldType.INTEGER);
-		Field sourceHSPEC=new Field(SubmittedFields.sourcehspec+"",toPerform.getSourceHSPEC().getSearchId()+"",FieldType.INTEGER);
-		Field jobIdField=new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER);
-		
-		
-		List<List<Field>> aquamapsList=new ArrayList<List<Field>>();
-		List<List<Field>> aquamapsKeys=new ArrayList<List<Field>>();
-		for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
-			List<Field> objRow= new ArrayList<Field>();
-			List<Field> objKey= new ArrayList<Field>();
-			objRow.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
-			objRow.add(author);
-			objRow.add(date);
-			
-			objRow.add(new Field(SubmittedFields.status+"",obj.getStatus()+"",FieldType.STRING));
-			
-			objRow.add(isAquaMaps);
-			objRow.add(sourceHCAF);
-			objRow.add(sourceHSPEN);
-			objRow.add(sourceHSPEC);
-			objRow.add(jobIdField);
-			objRow.add(new Field(SubmittedFields.gisenabled+"",obj.getGis()+"",FieldType.BOOLEAN));
-			ArrayList<String> layersId=new ArrayList<String>();
-			ArrayList<String> layersUri=new ArrayList<String>();
-			for(LayerInfo info: obj.getLayers()){
-				layersId.add(info.getId());
-				layersUri.add(info.getUrl()+"/"+info.getName());
+			toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
+
+			for(AquaMapsObject obj : toPerform.getAquaMapsObjectList()){
+				row=new ArrayList<Field>();
+				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+				row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
+				row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
+				ps=session.getPreparedStatementForInsert(row, submittedTable);
+				session.fillParameters(row, ps).executeUpdate();
+				rs=ps.getGeneratedKeys();
+				rs.next();
+				obj.setId(rs.getInt(SubmittedFields.searchid+""));
 			}
-			objRow.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
-			objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
-			objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
-			aquamapsList.add(objRow);
-			objKey.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.INTEGER));
-			aquamapsKeys.add(objKey);
-			
-		}
-		session.updateOperation(submittedTable, aquamapsKeys,aquamapsList);
-		
-		
-		List<List<Field>> jobList=new ArrayList<List<Field>>();
-		List<List<Field>> jobKeys=new ArrayList<List<Field>>();
-		List<Field> jobRow= new ArrayList<Field>();
-		List<Field> jobKey=new ArrayList<Field>();
-		jobRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
-		jobRow.add(author);
-		jobRow.add(date);
-		
-		jobRow.add(new Field(SubmittedFields.status+"",toPerform.getStatus()+"",FieldType.STRING));
-		
-		jobRow.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
-		jobRow.add(sourceHCAF);
-		jobRow.add(sourceHSPEN);
-		jobRow.add(sourceHSPEC);
 
-		jobRow.add(new Field(SubmittedFields.gisenabled+"",toPerform.getIsGis()+"",FieldType.BOOLEAN));
-		jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
-		jobList.add(jobRow);
-		
-		jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
-		jobKeys.add(jobKey);
-		session.updateOperation(submittedTable,jobKeys, jobList);
+			logger.trace("Preparing taxonomy for species selections");
+			for(Species s:toPerform.getSelectedSpecies()){
+				Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEC().getSearchId());
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.kingdom+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.order+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.phylum+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.classcolumn+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.family+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.species+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.genus+""));
+				for(AquaMapsObject obj:toPerform.getAquaMapsObjectList())
+					if(obj.getSelectedSpecies().contains(s)){ 
+						obj.getSelectedSpecies().remove(s);
+						obj.getSelectedSpecies().add(updated);
+					}
+			}
 
-		
-		if(!toPerform.getStatus().equals(SubmittedStatus.Completed)){
-			//Initialize working variables 
-			if((toPerform.getSelectedSpecies().size()>0)){
-			
-							boolean hasPerturbation=false;
-							if((toPerform.getEnvelopeCustomization().size()>0)) hasPerturbation=true;
-			
-							boolean hasWeight=false;
-							if((toPerform.getEnvelopeWeights().size()>0)) hasWeight=true;
-			
-							
-							List<Field> fields=new ArrayList<Field>();
-							fields.add(new Field(selectedSpeciesJobId,"",FieldType.INTEGER));
-							fields.add(new Field(selectedSpeciesSpeciesID,"",FieldType.STRING));
-							fields.add(new Field(selectedSpeciesStatus,"",FieldType.STRING));
-							fields.add(new Field(selectedSpeciesIsCustomized,"",FieldType.BOOLEAN));
-							
-							PreparedStatement psSpecies=session.getPreparedStatementForInsert(fields, selectedSpecies);
-							fields.get(0).setValue(toPerform.getId()+"");
-							for(Species s:toPerform.getSelectedSpecies()){
-								String status=SpeciesStatus.Ready.toString();
-								if((hasWeight)&&(toPerform.getEnvelopeWeights().containsKey(s.getId())))status=SpeciesStatus.toGenerate.toString();
-								if((hasPerturbation)&&(toPerform.getEnvelopeCustomization().containsKey(s.getId())))status=SpeciesStatus.toCustomize.toString();
-								fields.get(1).setValue(s.getId());
-								fields.get(2).setValue(status);
-								fields.get(3).setValue((hasWeight||hasPerturbation)+"");
-								psSpecies=session.fillParameters(fields, psSpecies);
-								psSpecies.executeUpdate();
-							}
-						}else throw new Exception("Invalid job, no species found");
-						
-						
-						//Setting selected sources as working tables
-						
-						setWorkingHCAF(toPerform.getId(), SourceManager.getSourceName(ResourceType.HCAF, toPerform.getSourceHCAF().getSearchId()));
-						setWorkingHSPEC(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEC, toPerform.getSourceHSPEC().getSearchId()));
-						setWorkingHSPEN(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEN, toPerform.getSourceHSPEN().getSearchId()));
-			
-			
-		}
-		return toPerform;
+			logger.trace("Sending job to publisher..");
+			////*************** Send to publisher
+			toPerform=publisher.publishJob(toPerform);		
+
+			////*************** update references in local DB
+
+
+
+
+			Field author=new Field(SubmittedFields.author+"",toPerform.getAuthor(),FieldType.STRING);
+			Field date= new Field (SubmittedFields.date+"",myData,FieldType.STRING);
+			Field isAquaMaps= new Field(SubmittedFields.isaquamap+"","true",FieldType.BOOLEAN);
+			Field sourceHCAF=new Field(SubmittedFields.sourcehcaf+"",toPerform.getSourceHCAF().getSearchId()+"",FieldType.INTEGER);
+			Field sourceHSPEN=new Field(SubmittedFields.sourcehspen+"",toPerform.getSourceHSPEN().getSearchId()+"",FieldType.INTEGER);
+			Field sourceHSPEC=new Field(SubmittedFields.sourcehspec+"",toPerform.getSourceHSPEC().getSearchId()+"",FieldType.INTEGER);
+			Field jobIdField=new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER);
+
+
+			List<List<Field>> aquamapsList=new ArrayList<List<Field>>();
+			List<List<Field>> aquamapsKeys=new ArrayList<List<Field>>();
+			for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
+				List<Field> objRow= new ArrayList<Field>();
+				List<Field> objKey= new ArrayList<Field>();
+				objRow.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+				objRow.add(author);
+				objRow.add(date);
+
+				objRow.add(new Field(SubmittedFields.status+"",obj.getStatus()+"",FieldType.STRING));
+
+				objRow.add(isAquaMaps);
+				objRow.add(sourceHCAF);
+				objRow.add(sourceHSPEN);
+				objRow.add(sourceHSPEC);
+				objRow.add(jobIdField);
+				objRow.add(new Field(SubmittedFields.gisenabled+"",obj.getGis()+"",FieldType.BOOLEAN));
+				ArrayList<String> layersId=new ArrayList<String>();
+				ArrayList<String> layersUri=new ArrayList<String>();
+				for(LayerInfo info: obj.getLayers()){
+					layersId.add(info.getId());
+					layersUri.add(info.getUrl()+"/"+info.getName());
+				}
+				objRow.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
+				objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
+				objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
+				aquamapsList.add(objRow);
+				objKey.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.INTEGER));
+				aquamapsKeys.add(objKey);
+
+			}
+			session.updateOperation(submittedTable, aquamapsKeys,aquamapsList);
+
+
+			List<List<Field>> jobList=new ArrayList<List<Field>>();
+			List<List<Field>> jobKeys=new ArrayList<List<Field>>();
+			List<Field> jobRow= new ArrayList<Field>();
+			List<Field> jobKey=new ArrayList<Field>();
+			jobRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
+			jobRow.add(author);
+			jobRow.add(date);
+
+			jobRow.add(new Field(SubmittedFields.status+"",toPerform.getStatus()+"",FieldType.STRING));
+
+			jobRow.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
+			jobRow.add(sourceHCAF);
+			jobRow.add(sourceHSPEN);
+			jobRow.add(sourceHSPEC);
+
+			jobRow.add(new Field(SubmittedFields.gisenabled+"",toPerform.getIsGis()+"",FieldType.BOOLEAN));
+			jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
+			jobList.add(jobRow);
+
+			jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
+			jobKeys.add(jobKey);
+			session.updateOperation(submittedTable,jobKeys, jobList);
+
+
+			if(!toPerform.getStatus().equals(SubmittedStatus.Completed)){
+				//Initialize working variables 
+				if((toPerform.getSelectedSpecies().size()>0)){
+
+					boolean hasPerturbation=false;
+					if((toPerform.getEnvelopeCustomization().size()>0)) hasPerturbation=true;
+
+					boolean hasWeight=false;
+					if((toPerform.getEnvelopeWeights().size()>0)) hasWeight=true;
+
+
+					List<Field> fields=new ArrayList<Field>();
+					fields.add(new Field(selectedSpeciesJobId,"",FieldType.INTEGER));
+					fields.add(new Field(selectedSpeciesSpeciesID,"",FieldType.STRING));
+					fields.add(new Field(selectedSpeciesStatus,"",FieldType.STRING));
+					fields.add(new Field(selectedSpeciesIsCustomized,"",FieldType.BOOLEAN));
+
+					PreparedStatement psSpecies=session.getPreparedStatementForInsert(fields, selectedSpecies);
+					fields.get(0).setValue(toPerform.getId()+"");
+					for(Species s:toPerform.getSelectedSpecies()){
+						String status=SpeciesStatus.Ready.toString();
+						if((hasWeight)&&(toPerform.getEnvelopeWeights().containsKey(s.getId())))status=SpeciesStatus.toGenerate.toString();
+						if((hasPerturbation)&&(toPerform.getEnvelopeCustomization().containsKey(s.getId())))status=SpeciesStatus.toCustomize.toString();
+						fields.get(1).setValue(s.getId());
+						fields.get(2).setValue(status);
+						fields.get(3).setValue((hasWeight||hasPerturbation)+"");
+						psSpecies=session.fillParameters(fields, psSpecies);
+						psSpecies.executeUpdate();
+					}
+				}else throw new Exception("Invalid job, no species found");
+
+
+				//Setting selected sources as working tables
+
+				setWorkingHCAF(toPerform.getId(), SourceManager.getSourceName(ResourceType.HCAF, toPerform.getSourceHCAF().getSearchId()));
+				setWorkingHSPEC(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEC, toPerform.getSourceHSPEC().getSearchId()));
+				setWorkingHSPEN(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEN, toPerform.getSourceHSPEN().getSearchId()));
+
+
+			}
+			return toPerform;
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -552,7 +555,7 @@ public class JobManager extends SubmittedManager{
 		logger.trace("Deleting job "+submittedId);
 		List<Submitted> objects=getObjects(submittedId);
 		logger.trace("Found "+objects.size()+" object(s) to delete..");
-		
+
 		int count=0;
 		for(Submitted obj:objects) {
 			try{
@@ -561,7 +564,7 @@ public class JobManager extends SubmittedManager{
 				logger.error("Unable to delete object "+obj);
 			}
 		}
-		
+
 		Publisher pub=ServiceContext.getContext().getPublisher();
 		pub.removeJob(submittedId);		
 		count+=deleteFromTables(submittedId);
