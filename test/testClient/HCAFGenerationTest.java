@@ -37,7 +37,7 @@ public class HCAFGenerationTest {
 
 		//Maps Generation
 		List<Field> filter=new ArrayList<Field>();
-		filter.add(new Field(SpeciesOccursumFields.family+"","Gadilidae",FieldType.STRING));
+		filter.add(new Field(SpeciesOccursumFields.family+"","Gadidae",FieldType.STRING));
 		GenerateMapsRequestType req=new GenerateMapsRequestType(2, "Fabio.Sinibaldi", true,Field.toStubsVersion(filter));
 		
 		pt.generateMaps(req);
