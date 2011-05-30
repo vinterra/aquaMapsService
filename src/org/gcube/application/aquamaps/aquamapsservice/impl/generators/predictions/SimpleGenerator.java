@@ -37,7 +37,7 @@ public class SimpleGenerator implements SimpleGeneratorI {
 		
 		Hcaf hcaf=ModelTranslation.Cell2Hcaf(cell);
 		Hspen hspen=ModelTranslation.species2HSPEN(species);
-		BoundingBoxInformation bb=generator.getBoudingBox(hcaf, hspen);
+		BoundingBoxInformation bb=generator.getBoudingBox(hcaf, hspen, false);
 		List<Field> row=null;
 		if((useBoundingBox==bb.isInBoundingBox())&&(useFao==bb.isInFaoArea())){
 			row=new ArrayList<Field>();
