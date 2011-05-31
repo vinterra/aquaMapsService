@@ -45,10 +45,10 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 	 * @param csvFile
 	 * @param isNative
 	 */
-	public PredictionLayerGenerationRequest(int objectId,Species species, Resource hcaf,Resource hspen,
+	public PredictionLayerGenerationRequest(int objectId,String objectName,Species species, Resource hcaf,Resource hspen,
 			Map<String,Perturbation> envelopeCustomization, Map<EnvelopeFields,Field> envelopeWeights,
 			Set<Area> areaSelection, BoundingBox bb, String csvFile, boolean isNative) {
-		super(csvFile,HSPECFields.probability+"","real",species.getFieldbyName(SpeciesOccursumFields.english_name+"").getValue());
+		super(csvFile,HSPECFields.probability+"","real",objectName);
 		this.setMapType(isNative?LayersType.NativeRange:LayersType.SuitableRange);
 		this.getSpeciesCoverage().add(species.getId());
 		if(envelopeCustomization!=null)

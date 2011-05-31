@@ -24,7 +24,6 @@ public class JobSubmissionThread extends Thread {
 	private static final int waitTime=10*1000;
 
 	private Job toPerform;
-	private int jobId;
 
 
 	Map<String,File> toPublishPaths=new HashMap<String, File>();
@@ -32,26 +31,26 @@ public class JobSubmissionThread extends Thread {
 
 	public JobSubmissionThread(Job toPerform) throws Exception{
 		super(toPerform.getName()+"_thread");
-		this.setPriority(MIN_PRIORITY+1);
-		this.toPerform=toPerform;
+		this.setPriority(MIN_PRIORITY+1);		
 		logger.trace("JobSubmissionThread created for job: "+toPerform.getName());
 		waitingGroup=new ThreadGroup(toPerform.getName());
-		this.jobId=JobManager.insertNewJob(toPerform);
+		this.toPerform=JobManager.insertNewJob(toPerform);
+		
 	}
 
-	public int getJobId(){return jobId;}
+	public int getJobId(){return (toPerform!=null)?toPerform.getId():0;}
 
 	public void run() {
 		try{
-			if(SubmittedManager.getStatus(jobId).equals(SubmittedStatus.Completed))
-				logger.trace("Job "+jobId+" doesn't need any processing..");
+			if(SubmittedManager.getStatus(toPerform.getId()).equals(SubmittedStatus.Completed))
+				logger.trace("Job "+toPerform.getId()+" doesn't need any processing..");
 			else{
 				try{
-					logger.trace("Starting Job "+jobId+" processing ");
+					logger.trace("Starting Job "+toPerform.getId()+" processing ");
 
-					if(JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize).length>0){
+					if(JobManager.getSpeciesByStatus(toPerform.getId(), SpeciesStatus.toCustomize).length>0){
 						logger.trace("Found customizations, going to filter and schedule working HSPEN creation");
-						SpeciesPerturbationThread specThread=new SpeciesPerturbationThread(waitingGroup,toPerform.getName(),jobId,toPerform.getEnvelopeCustomization());
+						SpeciesPerturbationThread specThread=new SpeciesPerturbationThread(waitingGroup,toPerform.getName(),toPerform.getId(),toPerform.getEnvelopeCustomization());
 						specThread.setPriority(MIN_PRIORITY);
 						ThreadManager.getExecutor().execute(specThread);	
 						ServiceContext.getContext().setScope(specThread, ServiceContext.getContext().getScope());
@@ -62,7 +61,7 @@ public class JobSubmissionThread extends Thread {
 
 					//Create and run Simulation Thread
 
-					while((JobManager.getSpeciesByStatus(jobId, SpeciesStatus.toCustomize).length>0)&&(JobManager.getStatus(jobId)!=SubmittedStatus.Error))
+					while((JobManager.getSpeciesByStatus(toPerform.getId(), SpeciesStatus.toCustomize).length>0)&&(JobManager.getStatus(toPerform.getId())!=SubmittedStatus.Error))
 					{
 						try {
 							Thread.sleep(waitTime);
@@ -71,26 +70,26 @@ public class JobSubmissionThread extends Thread {
 						logger.trace(waitingGroup.toString());
 					}
 
-					if((JobManager.getStatus(jobId)==SubmittedStatus.Error))
-						throw new Exception("Job "+jobId+" failed perturbation phase");
+					if((JobManager.getStatus(toPerform.getId())==SubmittedStatus.Error))
+						throw new Exception("Job "+toPerform.getId()+" failed perturbation phase");
 
-					SubmittedManager.updateStatus(jobId, SubmittedStatus.Simulating);
+					SubmittedManager.updateStatus(toPerform.getId(), SubmittedStatus.Simulating);
 					SimulationThread simT=new SimulationThread(waitingGroup,toPerform);
 					simT.setPriority(MIN_PRIORITY);
 					ServiceContext.getContext().setScope(simT,ServiceContext.getContext().getScope());
 					ThreadManager.getExecutor().execute(simT);
 
-					while(JobManager.getStatus(jobId).equals(SubmittedStatus.Simulating)&&(JobManager.getStatus(jobId)!=SubmittedStatus.Error)){
+					while(JobManager.getStatus(toPerform.getId()).equals(SubmittedStatus.Simulating)&&(JobManager.getStatus(toPerform.getId())!=SubmittedStatus.Error)){
 						try {
 							Thread.sleep(waitTime);
 						} catch (InterruptedException e) {}
 						logger.trace(this.getName()+" waiting for simulation process ");			
 						logger.trace(waitingGroup.toString());
 					}
-					if(JobManager.getStatus(jobId).equals(SubmittedStatus.Error)){
+					if(JobManager.getStatus(toPerform.getId()).equals(SubmittedStatus.Error)){
 						for(AquaMapsObject aquaMapObj:toPerform.getAquaMapsObjectList())
 							SubmittedManager.updateStatus(aquaMapObj.getId(), SubmittedStatus.Error);				
-						throw new Exception("Job "+jobId+" failed simulation phase");
+						throw new Exception("Job "+toPerform.getId()+" failed simulation phase");
 						
 					}else {
 						logger.trace(this.getName()+" Launching maps generation");
@@ -106,12 +105,12 @@ public class JobSubmissionThread extends Thread {
 								Thread t;
 
 								if(aquaMapObj.getType().equals(ObjectType.Biodiversity)){
-									t=new BiodiversityThread(waitingGroup,jobId,aquaMapObj.getId(),aquaMapObj.getName(),aquaMapObj.getThreshold(),
+									t=new BiodiversityThread(waitingGroup,toPerform.getId(),aquaMapObj.getId(),aquaMapObj.getName(),aquaMapObj.getThreshold(),
 											toPerform.getSelectedAreas(),aquaMapObj.getBoundingBox());						
 									((BiodiversityThread)t).setRelatedSpeciesList(aquaMapObj.getSelectedSpecies(),toPerform.getEnvelopeCustomization(),toPerform.getEnvelopeWeights());
 									((BiodiversityThread)t).setGis(aquaMapObj.getGis());
 								}else{
-									t=new DistributionThread(waitingGroup,jobId,aquaMapObj.getId(),aquaMapObj.getName(),
+									t=new DistributionThread(waitingGroup,toPerform.getId(),aquaMapObj.getId(),aquaMapObj.getName(),
 											toPerform.getSelectedAreas(),aquaMapObj.getBoundingBox());
 									((DistributionThread)t).setRelatedSpeciesId(aquaMapObj.getSelectedSpecies().iterator().next(),toPerform.getEnvelopeCustomization(),toPerform.getEnvelopeWeights());
 									((DistributionThread)t).setGis(aquaMapObj.getGis());
@@ -124,7 +123,7 @@ public class JobSubmissionThread extends Thread {
 								logger.trace("Skipping obj "+aquaMapObj.getName()+", no species found");
 							}
 					}
-					while(!JobManager.isJobComplete(jobId)){
+					while(!JobManager.isJobComplete(toPerform.getId())){
 						try {
 							Thread.sleep(waitTime);
 						} catch (InterruptedException e) {}
@@ -135,19 +134,19 @@ public class JobSubmissionThread extends Thread {
 
 					if(ServiceContext.getContext().isGISMode())
 						if(toPerform.getIsGis())
-							JobManager.createGroup(jobId);
+							JobManager.createGroup(toPerform.getId());
 
 
 
 					logger.warn("Job should be complete here");
-					SubmittedManager.updateStatus(jobId, SubmittedStatus.Completed);
+					SubmittedManager.updateStatus(toPerform.getId(), SubmittedStatus.Completed);
 
 
 					//			session.commit();
 					logger.trace(this.getName()+" job "+toPerform.getName()+" completed");
 				}catch (SQLException e) {
 					try {
-						SubmittedManager.updateStatus(jobId, SubmittedStatus.Error);	
+						SubmittedManager.updateStatus(toPerform.getId(), SubmittedStatus.Error);	
 					} catch (Exception e1) {logger.error("Unaxpected Error",e);}
 					logger.error("SQLException Occurred while performing Job "+toPerform.getName(), e);
 					//				rollback();
@@ -160,7 +159,7 @@ public class JobSubmissionThread extends Thread {
 				} catch (Exception e) {
 					logger.error("unable to Publish maps",e);
 					try {
-						SubmittedManager.updateStatus(jobId, SubmittedStatus.Error);				
+						SubmittedManager.updateStatus(toPerform.getId(), SubmittedStatus.Error);				
 					} catch (Exception e1) {logger.error("Unaxpected Error",e);}
 				}
 
@@ -169,7 +168,7 @@ public class JobSubmissionThread extends Thread {
 				}
 			}
 		}catch(Exception e){
-			logger.fatal("Cannot read job ("+jobId+") status ",e);
+			logger.fatal("Cannot read job ("+toPerform.getId()+") status ",e);
 		}
 
 	}
@@ -177,9 +176,9 @@ public class JobSubmissionThread extends Thread {
 
 	public void cleanTmp(){
 		try{
-			JobManager.cleanTemp(jobId);
+			JobManager.cleanTemp(toPerform.getId());
 		}catch(Exception e){
-			logger.error("Unable to clean temp tables for jobId "+jobId, e);
+			logger.error("Unable to clean temp tables for toPerform.getId() "+toPerform.getId(), e);
 		}
 	}
 

@@ -13,7 +13,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -193,7 +192,7 @@ public class JobUtils {
 			Map<String,String> app=request.getGeneratedImagesNameAndPath();
 			logger.trace(" found "+app.size()+" files to publish");
 			if(app.size()>0){
-				result=PublisherImpl.getPublisher().publishImages(objId,app);
+				result=ServiceContext.getContext().getPublisher().publishImages(objId,app);
 				if(!result) throw new Exception("Couldn't publish images for objId "+objId+", publisher returned false");
 				else logger.trace("Published Images for object "+objId);
 			}else logger.warn("Generator returned true but no files where found for objId "+objId);

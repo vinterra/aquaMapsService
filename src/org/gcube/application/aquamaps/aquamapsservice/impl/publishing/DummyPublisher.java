@@ -20,7 +20,7 @@ import org.gcube.common.gis.dataModel.types.LayersType;
 
 public class DummyPublisher implements Publisher {
 
-	private static GCUBELog logger= new GCUBELog(PublisherImpl.class);
+	private static GCUBELog logger= new GCUBELog(ConnectedPublisher.class);
 	
 	
 	@Override

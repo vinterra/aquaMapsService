@@ -12,8 +12,10 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.csv4j.CSVLineProcessor;
@@ -25,9 +27,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequest
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -41,7 +43,7 @@ public class GISGenerator implements Generator{
 	public static char delimiter=',';
 	public static boolean hasHeader=false;
 
-	private static Publisher publisher=PublisherImpl.getPublisher();
+	private static Publisher publisher=ServiceContext.getContext().getPublisher();
 	
 	private static Integer insertedLineFromCSV=0;
 	
@@ -92,6 +94,8 @@ public class GISGenerator implements Generator{
 		if(published==null){
 			logger.trace("Layer not found for request : "+request);
 			DBSession session=null;
+			String layerTable=null;
+			boolean layerTableCreated=false;
 			try{
 				//***** Create Layer table in postGIS
 				long start=System.currentTimeMillis();
@@ -101,10 +105,12 @@ public class GISGenerator implements Generator{
 				logger.debug("Importing data..");
 				String appTableName=importLayerData(request.getCsvFile(), request.getFeatureLabel(),request.getFeatureDefinition(),session);
 				logger.debug("Created "+appTableName+" in "+(System.currentTimeMillis()-start));
-				String layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
+				layerTable=createLayerTable(appTableName, request.getMapName(), request.getFeatureLabel(), session);
 				logger.debug("Created "+layerTable+" in "+(System.currentTimeMillis()-start));
 				session.dropTable(appTableName);
-
+				session.commit();
+				logger.debug("Committed session");
+				layerTableCreated=true;
 				//**** Needed wait for data synch 
 				//**** POSTGIS - GEOServer limitation
 				try {
@@ -131,7 +137,7 @@ public class GISGenerator implements Generator{
 					throw new Exception("Unable to generate Layer "+request.getMapName());
 
 				String url = ServiceContext.getContext().getGeoServerUrl()+"/wms/"+layerTable;
-				logger.trace("Layer url : "+layerTable);
+				logger.trace("Layer url : "+url);
 				
 				request.setGeServerLayerId(layerTable);
 
@@ -139,11 +145,14 @@ public class GISGenerator implements Generator{
 				//***** create reference in Publisher
 				logger.trace("invoking publisher");
 				request.setGeneratedLayer(publishLayer(request));
-				session.commit();
 				logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start));
 				return true;
 			}catch (Exception e ){
 				logger.error("Unable to create Layer ", e);
+//				if(session!=null && layerTableCreated){
+//						logger.trace("Dropping generated layer table : "+layerTable);
+//						session.dropTable(layerTable);
+//					}
 				throw e;
 			}finally {
 				session.close();
@@ -159,8 +168,28 @@ public class GISGenerator implements Generator{
 
 
 	private static synchronized boolean generateGroup(GroupGenerationRequest request)throws Exception{
-		//TODO IMPLEMENT
-		throw new Exception("Not yet Implemented");
+		logger.trace("Generating group "+request.getToGenerateGroupName());
+		Publisher publisher=ServiceContext.getContext().getPublisher();
+		List<LayerInfo> layers=new ArrayList<LayerInfo>();
+		Map<String,String> layersAndStyles=new HashMap<String, String>();
+		logger.trace("loading layer infos..");
+		for(Entry<String, ObjectType> layer:request.getLayers().entrySet()){
+			LayerInfo found=null;
+			switch(layer.getValue()){
+			case Biodiversity :	found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.Biodiversity);
+								break;
+			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.NativeRange);
+			}
+			if(found!=null){
+				layersAndStyles.put(found.getName(),found.getDefaultStyle());
+				layers.add(found);
+			}else logger.warn("Layer "+layer.getKey()+" , "+layer.getValue()+" not found");
+		}
+		logger.trace("loaded "+layers.size()+" layers");
+		if(layers.size()>0)
+//		request.setWMSContextInfoType(publisher.publishWMSContext(request.getToGenerateGroupName(), layers);
+		return createGroupOnGeoServer(layersAndStyles.keySet(), layersAndStyles, request.getToGenerateGroupName());
+		else return false;
 	}
 
 
@@ -280,7 +309,7 @@ public class GISGenerator implements Generator{
 
 	private static String createLayerTable(String appTableName,String layerName,String featureLabel,DBSession session)throws Exception{
 
-		String featureTable=ServiceUtils.generateId("layerName", "");
+		String featureTable=ServiceUtils.generateId(layerName, "").replaceAll(" ", "").replaceAll("_","").toLowerCase();
 
 		logger.trace("Creating table "+featureTable);
 		session.executeUpdate("Create table "+featureTable+" AS (Select "+
@@ -331,10 +360,10 @@ public class GISGenerator implements Generator{
 	}
 
 
-	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex) throws JSONException{		
+	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex) throws Exception{		
 		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();
-		featureTypeRest.setDatastore("aquamapsdb");
+		featureTypeRest.setDatastore(ServiceContext.getContext().getPostGis_database());
 		featureTypeRest.setEnabled(true);
 		featureTypeRest.setLatLonBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
 		featureTypeRest.setNativeBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
@@ -343,30 +372,42 @@ public class GISGenerator implements Generator{
 		featureTypeRest.setProjectionPolicy("FORCE_DECLARED");
 		featureTypeRest.setSrs("EPSG:4326");
 		featureTypeRest.setNativeCRS(crs);
-		featureTypeRest.setTitle(layerName);
-		featureTypeRest.setWorkspace("aquamaps");   	
+		featureTypeRest.setTitle(featureTable);
+		featureTypeRest.setWorkspace(ServiceContext.getContext().getGeoServerWorkspace()); 
+		logger.debug("Invoking Caller for registering layer : ");
+		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
+		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());
 		if (caller.addFeatureType(featureTypeRest)){
+			logger.debug("Add feature type returned true .. waiting 6 secs..");
 			try {
 				Thread.sleep(6*1000);
-			} catch (InterruptedException e) {}			
-			return caller.setLayer(featureTypeRest, styles.get(defaultStyleIndex), styles);			
+			} catch (InterruptedException e) {}	
+			boolean setLayerValue= caller.setLayer(featureTypeRest, styles.get(defaultStyleIndex), styles);
+			logger.debug("Set layer returned "+setLayerValue);
+			return setLayerValue;
 		}else return false;
 	}
 
 
 	private static boolean createGroupOnGeoServer(Set<String> layers,Map<String,String> styles, String groupName)throws Exception{	 
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());		
+		logger.trace("Creating group on geo server...");
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
+		logger.trace("Getting template group : "+ServiceContext.getContext().getTemplateGroup());
 		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getTemplateGroup());
 		//		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
 		//        g.setLayers(list);
 		//        g.setStyles(styles);
-
+		logger.trace("Adding layers to template copy...");
 		for(String l:layers){
+			logger.trace("Added layer "+l);
 			g.addLayer(l);
 			g.addStyle(l, styles.get(l));
-		}		
+		}
 		g.setName(groupName);
-		return caller.addLayersGroup(g);
+		logger.trace("Setted group name "+groupName);
+		boolean toReturn=caller.addLayersGroup(g);
+		logger.trace("(Caller) Add layersGroup returned : "+toReturn);
+		return toReturn;
 	}
 
 }

@@ -44,7 +44,7 @@ public class BiodiversityThread extends Thread {
 	private String aquamapsName;
 	private float threshold;
 	private String HSPECName;	
-	private Set<String> species=new HashSet<String>();
+	private Set<Species> selectedSpecies=new HashSet<Species>();
 	private DBSession session;
 	private boolean gisEnabled=false;
 
@@ -68,7 +68,7 @@ public class BiodiversityThread extends Thread {
 	public void setRelatedSpeciesList(Set<Species> ids,Map<String,Map<String,Perturbation>> envelopeCustomization,
 	Map<String,Map<EnvelopeFields,Field>> envelopeWeights){		
 		for(Species s:ids){
-			species.add(s.getId());
+			selectedSpecies.add(s);
 			this.envelopeCustomization.put(s.getId(), envelopeCustomization.get(s.getId()));
 			this.envelopeWeights.put(s.getId(), envelopeWeights.get(s.getId()));
 		}
@@ -81,6 +81,11 @@ public class BiodiversityThread extends Thread {
 		logger.trace(this.getName()+" started");
 		try {
 			//Waiting for needed simulation data
+			Set<String> species=new HashSet<String>();
+			for(Species s:selectedSpecies){
+				species.add(s.getId());
+			}
+			
 			while(!JobManager.isSpeciesListReady(jobId,species)){
 				try {
 					Thread.sleep(waitTime);
@@ -165,7 +170,7 @@ public class BiodiversityThread extends Thread {
 									envelopeWeights,selectedAreas,bb,threshold,csvFile,aquamapsName,minValue,maxValue);
 							if(GeneratorManager.requestGeneration(request)){
 								layersId.add(request.getGeneratedLayer());
-								layersId.add(request.getGeServerLayerId());
+								layersUri.add(request.getGeServerLayerId());
 							}else {
 								throw new Exception("Gis Generation returned false, request was "+request);
 							}

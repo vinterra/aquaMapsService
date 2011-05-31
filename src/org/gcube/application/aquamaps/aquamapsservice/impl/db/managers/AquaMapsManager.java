@@ -2,7 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.PublisherImpl;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 
 public class AquaMapsManager extends SubmittedManager{
 
@@ -10,7 +10,7 @@ public class AquaMapsManager extends SubmittedManager{
 	public static int deleteObject(int objectId)throws Exception{
 		logger.trace("Deleting obj "+objectId);
 		try{
-		PublisherImpl.getPublisher().removeAquaMapsObject(objectId);
+		ServiceContext.getContext().getPublisher().removeAquaMapsObject(objectId);
 		//TODO get from publisher layers and styles to delete
 		}catch(Exception e){
 			logger.warn("Unable to delete from publisher object Id "+objectId, e);

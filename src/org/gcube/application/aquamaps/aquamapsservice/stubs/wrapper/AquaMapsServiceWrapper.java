@@ -264,7 +264,7 @@ public class AquaMapsServiceWrapper {
 		try{
 			List<String> ids=new ArrayList<String>();
 			for(Integer id:submittedIds)ids.add(String.valueOf(id));
-			pt.markSaved(new StringArray(new String[ids.size()]));
+			pt.markSaved(new StringArray(ids.toArray(new String[ids.size()])));
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

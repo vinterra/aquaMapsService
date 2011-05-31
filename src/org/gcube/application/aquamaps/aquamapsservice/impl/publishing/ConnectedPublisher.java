@@ -36,27 +36,27 @@ import org.gcube.common.gis.dataModel.types.LayersType;
 
 import com.Ostermiller.util.Base64;
 
-public class PublisherImpl implements Publisher{
+public class ConnectedPublisher implements Publisher{
 
-	private static String[] taxonomyInDB=new String[]{
-		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.kingdom,
-		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.phylum,
-		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.classcolumn,
-		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.order,
-		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.family,		
-	};
+//	private static String[] taxonomyInDB=new String[]{
+//		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.kingdom,
+//		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.phylum,
+//		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.classcolumn,
+//		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.order,
+//		SpeciesManager.speciesOccurSum+"."+SpeciesOccursumFields.family,		
+//	};
 	
 	
 	
-	private static PublisherImpl instance=new PublisherImpl();
+	private static ConnectedPublisher instance=new ConnectedPublisher();
 	
-	private PublisherImpl(){};
+	private ConnectedPublisher(){};
 	
 	public static Publisher getPublisher(){
 		if(ServiceContext.getContext().isUseDummyPublisher())return new DummyPublisher();
 		else return instance;}
 	
-	private static GCUBELog logger= new GCUBELog(PublisherImpl.class);
+	private static GCUBELog logger= new GCUBELog(ConnectedPublisher.class);
 	
 	protected static ISClient isClient;
 	
@@ -433,7 +433,7 @@ public class PublisherImpl implements Publisher{
 
 //		Job toReturn=getWrapper().getJobById(getWrapper().storeJob(toPublish));
 		
-		getWrapper().storeJobAsync(toPublish);
+		getWrapper().storeJobAsync(toPublish,getScope());
 		while(!getWrapper().isJobReady(toPublish.getId())){
 			logger.debug("Waiting for publisher to store job "+toPublish.getName()+" ("+toPublish.getId()+")");
 			try{Thread.sleep(1000);}catch(InterruptedException e){}			

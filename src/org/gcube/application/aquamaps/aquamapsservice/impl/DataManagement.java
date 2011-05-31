@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,15 +10,23 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGen
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SourceGenerationThread;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportByTypeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -121,10 +130,48 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		return null;
 	}
 
-	private String generateMaps(Resource selectedHSPEC) throws RemoteException,GCUBEFault{
+	
+	@Override
+	public int generateMaps(GenerateMapsRequestType arg0) throws RemoteException,GCUBEFault{
 		
-		return null;
+		try{
+			logger.trace("Gnerating job for maps generation :");
+			logger.trace("HSPEC id :" +arg0.getHSPECId());
+			
+			Job job=new Job();
+			job.addSpecies(SpeciesManager.getList(Field.load(arg0.getSpeciesFilter())));
+			logger.trace("loaded "+job.getSelectedSpecies().size()+" species..");
+			job.setAuthor(arg0.getAuthor());
+			Resource hspec=SourceManager.getById(ResourceType.HSPEC, arg0.getHSPECId());
+			logger.trace("HSPEC is "+AquaMapsXStream.getXMLInstance().toXML(hspec));
+			job.setIsGis(false);
+			job.setName(hspec.getTitle()+"_All Maps");
+			job.setSourceHSPEC(hspec);
+			job.setSourceHCAF(SourceManager.getById(ResourceType.HCAF, hspec.getSourceHCAFId()));
+			job.setSourceHSPEN(SourceManager.getById(ResourceType.HSPEN, hspec.getSourceHSPENId()));
+			for(Species s: job.getSelectedSpecies()){
+				AquaMapsObject object=new AquaMapsObject(s.getFieldbyName(SpeciesOccursumFields.scientific_name+"").getValue(), 0, ObjectType.SpeciesDistribution);
+				if(object.getName()==null||object.getName().equals(Field.VOID))
+					object.setName(s.getFieldbyName(SpeciesOccursumFields.genus+"").getValue()+"_"+s.getFieldbyName(SpeciesOccursumFields.species+"").getValue());
+				
+				object.setAuthor(job.getAuthor());
+				object.getSelectedSpecies().add(s);
+				object.setGis(arg0.isGenerateLayers());
+				job.getAquaMapsObjectList().add(object);
+			}
+			
+			
+			logger.trace("Submiting job "+job.getName());
+			JobSubmissionThread thread=new JobSubmissionThread(job);
+			ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
+			ThreadManager.getExecutor().execute(thread);
+			return (int) thread.getId();
+			}catch(Exception e){
+				logger.error("Unable to execute request ", e);
+				throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+			}
 	}
+
 
 
 }
