@@ -17,7 +17,46 @@ public class BatchGenerator implements BatchGeneratorI {
 	private static final int NUM_OF_THREADS=2;
 	
 	
+	private Integer internalId;
+	
+	
 	public BatchGenerator(String path,DBCredentialDescriptor credentials) {
+		setConfiguration(path, credentials);
+	}
+	
+	
+	@Override
+	public String generateHSPECTable(String hcaf, String hspen,
+			AlgorithmType type,boolean iscloud) throws Exception {
+		
+		String toGenerate=ServiceUtils.generateId("HSPEC", "");
+		
+		//hspen reference table
+		e.setHspenTable(hspen);
+		//hcaf reference table
+		e.setHcafTable(hcaf);
+		//output table - created if the CreateTable flag is true
+		e.setDistributionTable(toGenerate);
+		//native generation flag set to false - default value
+		e.setNativeGeneration(type.equals(AlgorithmType.NativeRange)||type.equals(AlgorithmType.NativeRange2050));
+		//2050 generation flag set to false - default value
+		e.setType2050(type.equals(AlgorithmType.NativeRange2050)||type.equals(AlgorithmType.SuitableRange2050));
+		
+		logger.trace("generating hspec : "+toGenerate);
+		logger.trace("hspen : "+hspen);
+		logger.trace("hcaf : "+hcaf);
+		logger.trace("algorithm : "+type);
+		logger.trace("cloud : "+iscloud);
+		
+		
+		DistributionGenerator dg = new DistributionGenerator(e);
+		//calculation
+		dg.generateHSPEC();
+		
+		return toGenerate;
+	}
+	@Override
+	public void setConfiguration(String path, DBCredentialDescriptor credentials) {
 		logger.trace("Creating Batch generator, path "+path);
 		//path to the configuration directory
 		e.setConfigPath(path);
@@ -44,42 +83,22 @@ public class BatchGenerator implements BatchGeneratorI {
 		logger.trace("passed argument : url "+e.getDatabaseURL());
 		logger.trace("passed argument : threads num "+e.getNumberOfThreads());
 	}
-	
-	
-	@Override
-	public String generateHSPECTable(String hcaf, String hspen,
-			AlgorithmType type, boolean is2050) throws Exception {
-		
-		String toGenerate=ServiceUtils.generateId("HSPEC", "");
-		
-		//hspen reference table
-		e.setHspenTable(hspen);
-		//hcaf reference table
-		e.setHcafTable(hcaf);
-		//output table - created if the CreateTable flag is true
-		e.setDistributionTable(toGenerate);
-		//native generation flag set to false - default value
-		e.setNativeGeneration(type.equals(AlgorithmType.NativeRange));
-		//2050 generation flag set to false - default value
-		e.setType2050(is2050);
-		
-		logger.trace("generating hspec : "+toGenerate);
-		logger.trace("hspen : "+hspen);
-		logger.trace("hcaf : "+hcaf);
-		logger.trace("algorithm : "+type);
-		logger.trace("2050 : "+is2050);
-		
-		
-		DistributionGenerator dg = new DistributionGenerator(e);
-		//calculation
-		dg.generateHSPEC();
-		
-		return toGenerate;
+	public BatchGenerator(Integer internalId) {
+		this.internalId=internalId;
 	}
 
-	
-	
-	
+
+	@Override
+	public Report getReport() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public int getReportId() {
+		return internalId;
+	}
 	
 	
 }

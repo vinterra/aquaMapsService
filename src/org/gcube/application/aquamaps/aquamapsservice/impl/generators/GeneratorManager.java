@@ -11,6 +11,8 @@ public class GeneratorManager {
 	private static GenericObjectPool perlPool=new GenericObjectPool(new PerlCallsFactory());
 	private static GenericObjectPool gisPool=new GenericObjectPool(new GISGeneratorFactory());
 	private static GenericObjectPool sourceGeneratorPool=new GenericObjectPool(new SourceGeneratorFactory());
+	
+	
 	static{
 		logger.debug("Initializing pools...");
 		perlPool.setLifo(false);
@@ -50,6 +52,10 @@ public class GeneratorManager {
 			logger.error("Unable to init source generator pool",e);
 		}
 
+		
+	
+		
+		
 	}
 
 
@@ -75,8 +81,6 @@ public class GeneratorManager {
 		}finally{
 			thePool.returnObject(obj);
 		}
-		
-		
 	}
 
 }

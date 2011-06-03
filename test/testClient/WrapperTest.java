@@ -1,27 +1,19 @@
 package testClient;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.scope.GCUBEScope;
 
@@ -33,8 +25,8 @@ public class WrapperTest {
 	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
-		
+//		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.SERVICE_URI);
 		
 		
 		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", "ASC")));

@@ -77,6 +77,36 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
+			
+			<xsd:complexType name="hspecGroupGenerationRequestType">
+			<xsd:sequence>
+				<xsd:element name="author" type="xsd:string"/>
+				<xsd:element name="generationName" type="xsd:string"/>
+				<xsd:element name="algorithms" type="xsd:string"/>
+				<xsd:element name="enableLayerGeneration" type="xsd:boolean"/>
+				<xsd:element name="enableImageGeneration" type="xsd:boolean"/>
+				<xsd:element name="description" type="xsd:string"/>
+				<xsd:element name="isUploadHcaf" type="xsd:boolean"/>
+				<xsd:element name="isUploadHspen" type="xsd:boolean"/>
+				<xsd:element name="toUploadHcafRSLocator" type="xsd:string"/>
+				<xsd:element name="toUploadHspenRSLocator" type="xsd:string"/>
+				<xsd:element name="description" type="xsd:string"/>
+				<xsd:element name="hcafSearchId" type="xsd:int"/>
+				<xsd:element name="hspenSearchId" type="xsd:int"/>
+				<xsd:element name="cloud" type="xsd:boolean"/>
+			</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
+				<xsd:sequence>
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			
 			<!-- Data management request elements -->
 
 			<xsd:element name="generateHCAFRequest" type="tns:generateHCAFRequestType" />
@@ -96,6 +126,16 @@
 			
 			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType"/>
 			<xsd:element name="generateMapsResponse" type ="xsd:int"/>
+
+
+			<xsd:element name="hspecGroupGenerationRequest" type="tns:hspecGroupGenerationRequestType"/>
+			<xsd:element name="hspecGroupGenerationResponse" type="xsd:string"/>
+
+			<xsd:element name="getJSONSubmittedHSPECRequest" type="tns:getJSONSubmittedHSPECRequestType"/>
+			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string"/>
+
+			<xsd:element name="getGenerationLiveReportRequest" type="xsd:string"/>
+			<xsd:element name="getGenerationLiveReportResponse" type="xsd:string"/>
 
 		</xsd:schema>
 	</types>
@@ -137,6 +177,29 @@
 	</message>
 	
 	
+	<message name="HSPECGroupGenerationRequest">
+		<part name="request" element="tns:hspecGroupGenerationRequest"/>
+	</message>
+	<message name="HSPECGroupGenerationResponse">
+		<part name="response" element="tns:hspecGroupGenerationResponse"/>
+	</message>
+	
+	
+	<message name="GetJSONSubmittedHSPECRequest">
+		<part name="request" element="tns:getJSONSubmittedHSPECRequest"/>
+	</message>
+	<message name="GetJSONSubmittedHSPECResponse">
+		<part name="response" element="tns:getJSONSubmittedHSPECResponse"/>
+	</message>
+	
+	<message name="GetGenerationLiveReportRequest">
+		<part name="request" element="tns:getGenerationLiveReportRequest"/>
+	</message>
+	<message name="GetGenerationLiveReportResponse">
+		<part name="response" element="tns:getGenerationLiveReportResponse"/>
+	</message>
+	
+	
 	
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
@@ -163,6 +226,21 @@
 		<wsdl:operation name="generateMaps">
 			<wsdl:input message="tns:GenerateMapsRequest" />
 			<wsdl:output message="tns:GenerateMapsResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GenerateHSPECGroup">
+			<wsdl:input message="tns:HSPECGroupGenerationRequest" />
+			<wsdl:output message="tns:HSPECGroupGenerationResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetJSONSubmittedHSPECGroup">
+			<wsdl:input message="tns:GetJSONSubmittedHSPECRequest" />
+			<wsdl:output message="tns:GetJSONSubmittedHSPECResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetGenerationLiveReportGroup">
+			<wsdl:input message="tns:GetGenerationLiveReportRequest" />
+			<wsdl:output message="tns:GetGenerationLiveReportResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

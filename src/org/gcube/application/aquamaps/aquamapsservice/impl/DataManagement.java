@@ -1,23 +1,26 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGroupGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SourceGenerationThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportByTypeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -170,6 +173,40 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				logger.error("Unable to execute request ", e);
 				throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 			}
+	}
+
+	@Override
+	public String generateHSPECGroup(HspecGroupGenerationRequestType arg0)
+			throws RemoteException, GCUBEFault {
+		logger.trace("Received hspec group generation request, title : "+arg0.getGenerationName());
+		String id=ServiceUtils.generateId("HGGR", "");
+		logger.trace("Id will be "+id);
+		try{//Inserting request into db
+			logger.trace("Checking settings..");
+			Resource hcaf= SourceManager.getById(ResourceType.HCAF, arg0.getHcafSearchId());
+			Resource hspen= SourceManager.getById(ResourceType.HSPEN, arg0.getHspenSearchId());
+			return HSPECGroupGenerationRequestsManager.insertRequest(arg0.getAuthor(), 
+					arg0.getGenerationName(), arg0.getAlgorithms(), arg0.isEnableLayerGeneration(), arg0.isEnableImageGeneration(), 
+					arg0.getDescription(), hcaf,hspen,arg0.isCloud());
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+
+	@Override
+	public String getGenerationLiveReportGroup(String arg0)
+			throws RemoteException, GCUBEFault {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getJSONSubmittedHSPECGroup(
+			GetJSONSubmittedHSPECRequestType arg0) throws RemoteException,
+			GCUBEFault {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -10,6 +10,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.ConnectedP
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.DummyPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.EmbeddedPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.HSPECGroupGenerationManagerThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SubmittedMonitorThread;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 
@@ -108,6 +109,12 @@ public class ServiceContext extends GCUBEServiceContext {
 	private Integer defaultHSPECID=null;
 	private Integer defaultHCAFID=null;
 	
+	
+	//************ Environmental library config
+	
+	private Integer BATCH_POOL_SIZE=null;
+	
+	
 	public Integer getDefaultHSPENID() {
 		return defaultHSPENID;
 	}
@@ -180,9 +187,12 @@ public class ServiceContext extends GCUBEServiceContext {
 		logger.debug("Staring monitor thread: interval = "+monitorInterval+"; freespaceThreshold="+monitorThreshold);
 		t.start();
 		
-		
-		SubmittedMonitorThread t2=new SubmittedMonitorThread(getPersistenceRoot()+File.separator+"JOBS", 1000);
+		logger.trace("Starting submitted monitor..");
+		SubmittedMonitorThread t2=new SubmittedMonitorThread(getPersistenceRoot()+File.separator+"JOBS", 4*1000);
 		t2.start();
+		logger.trace("Starting hspec group request monitor..");
+		HSPECGroupGenerationManagerThread t3=new HSPECGroupGenerationManagerThread(4*1000);
+		t3.start();
 		
 	}
 	
@@ -254,7 +264,7 @@ public class ServiceContext extends GCUBEServiceContext {
 			this.setUseEnvironmentModelingLib(Boolean.parseBoolean(prop.getProperty("useEnvironmentModelingLib").trim()));
 			this.setEnableScriptLogging(Boolean.parseBoolean(prop.getProperty("enableScriptLogging").trim()));
 			this.setPostponeSubmission(Boolean.parseBoolean(prop.getProperty("postponeSubmission").trim()));
-			
+			this.setBATCH_POOL_SIZE(Integer.parseInt(prop.getProperty("BATCH_POOL_SIZE").trim()));
 		}catch(Exception e){
 			logger.fatal("Unable to load properties ",e);
 		}
@@ -658,6 +668,14 @@ public class ServiceContext extends GCUBEServiceContext {
 
 	public String getGeoServerWorkspace() {
 		return geoServerWorkspace;
+	}
+
+	public void setBATCH_POOL_SIZE(Integer bATCH_POOL_SIZE) {
+		BATCH_POOL_SIZE = bATCH_POOL_SIZE;
+	}
+
+	public Integer getBATCH_POOL_SIZE() {
+		return BATCH_POOL_SIZE;
 	}
 	
 	

@@ -222,7 +222,7 @@ public abstract class DBSession {
 	public PreparedStatement getPreparedStatementForInsertFromSelect(List<Field> fields, String destTable,String srcTable) throws Exception{
 
 		String query="INSERT INTO "+destTable+" ( "+formSelectQueryStringFromFields(fields, srcTable,null,null)+" )";
-		logger.trace("the prepared statement is :"+ query);
+//		logger.trace("the prepared statement is :"+ query);
 		PreparedStatement ps= preparedStatement(query);
 		return ps;
 	}
@@ -316,7 +316,7 @@ public abstract class DBSession {
 		String toReturn="SELECT * FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
 		((sortColumn!=null)?" ORDER BY "+sortColumn+" "+sortDirection:"");
-		logger.debug("QUERY STRING IS : "+toReturn);
+//		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 
@@ -331,7 +331,7 @@ public abstract class DBSession {
 	protected static String formUpdateQuery(List<Field> toSet, List<Field> keys,String tableName){
 		String toReturn="UPDATE "+tableName+" SET "+getCondition(toSet,",")+
 		(((keys!=null)&&keys.size()>0)?" WHERE "+getCondition(keys,"AND"):"");
-		logger.debug("QUERY STRING IS : "+toReturn);
+//		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 	

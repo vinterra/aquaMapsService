@@ -2,7 +2,8 @@ package testClient;
 
 import java.util.Map.Entry;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
@@ -19,8 +20,8 @@ public class AquaMapsServiceTester {
 	
 	public static void main(String[] args){
 		try{
-		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), SERVICE_URI);
-		
+//		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),SERVICE_URI);
 		Species spec=new Species("Fis-29501");
 //		System.out.println("Occurrence cells for ");
 //		System.out.println(wrapper.getJSONOccurrenceCells(spec.getId(), new PagedRequestSettings(10, 0, Cell.ID, "ASC")));

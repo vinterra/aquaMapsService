@@ -10,7 +10,8 @@ import java.util.Properties;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.WrapperUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
@@ -42,7 +43,7 @@ public class HSPECGeneratorTest {
 	
 	private static void fromSpeciesAndCell()throws Exception{
 		
-		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.SERVICE_URI);
 		
 		Species s=wrapper.loadEnvelope("Fis-22836",1);
 //		Envelope env=wrapper.loadEnvelope(s.getId(), 1);
