@@ -393,18 +393,20 @@ public class JobManager extends SubmittedManager{
 			row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
 			row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
 			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
-			session.fillParameters(row, ps).executeUpdate();
+			session.fillParameters(row,0, ps).executeUpdate();
 			ResultSet rs=ps.getGeneratedKeys();
 			rs.next();
 			toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
 
+			ps=null;
+			
 			for(AquaMapsObject obj : toPerform.getAquaMapsObjectList()){
 				row=new ArrayList<Field>();
 				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
 				row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
 				row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
-				ps=session.getPreparedStatementForInsert(row, submittedTable);
-				session.fillParameters(row, ps).executeUpdate();
+				if(ps==null)ps=session.getPreparedStatementForInsert(row, submittedTable);
+				session.fillParameters(row,0, ps).executeUpdate();
 				rs=ps.getGeneratedKeys();
 				rs.next();
 				obj.setId(rs.getInt(SubmittedFields.searchid+""));
@@ -445,11 +447,13 @@ public class JobManager extends SubmittedManager{
 			Field jobIdField=new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER);
 
 
-			List<List<Field>> aquamapsList=new ArrayList<List<Field>>();
-			List<List<Field>> aquamapsKeys=new ArrayList<List<Field>>();
+			PreparedStatement psUpdateObjects=null;
+			ArrayList<Field> objRow=null;
+			ArrayList<Field> objKey=null;
+			
 			for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
-				List<Field> objRow= new ArrayList<Field>();
-				List<Field> objKey= new ArrayList<Field>();
+				objRow= new ArrayList<Field>();
+				objKey= new ArrayList<Field>();
 				objRow.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
 				objRow.add(author);
 				objRow.add(date);
@@ -471,18 +475,22 @@ public class JobManager extends SubmittedManager{
 				objRow.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
 				objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
 				objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
-				aquamapsList.add(objRow);
+				
 				objKey.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.INTEGER));
-				aquamapsKeys.add(objKey);
-
+				
+				if(psUpdateObjects==null) psUpdateObjects=session.getPreparedStatementForUpdate(objRow, objKey, submittedTable);
+				
+				//fill values
+				psUpdateObjects=session.fillParameters(objRow, 0, psUpdateObjects);
+				//fill keys
+				psUpdateObjects=session.fillParameters(objKey,objRow.size(),psUpdateObjects);
+				
+				psUpdateObjects.executeUpdate();
 			}
-			session.updateOperation(submittedTable, aquamapsKeys,aquamapsList);
 
 
-			List<List<Field>> jobList=new ArrayList<List<Field>>();
-			List<List<Field>> jobKeys=new ArrayList<List<Field>>();
-			List<Field> jobRow= new ArrayList<Field>();
-			List<Field> jobKey=new ArrayList<Field>();
+			ArrayList<Field> jobRow= new ArrayList<Field>();
+			ArrayList<Field> jobKey=new ArrayList<Field>();
 			jobRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
 			jobRow.add(author);
 			jobRow.add(date);
@@ -496,11 +504,15 @@ public class JobManager extends SubmittedManager{
 
 			jobRow.add(new Field(SubmittedFields.gisenabled+"",toPerform.getIsGis()+"",FieldType.BOOLEAN));
 			jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
-			jobList.add(jobRow);
 
 			jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
-			jobKeys.add(jobKey);
-			session.updateOperation(submittedTable,jobKeys, jobList);
+			
+			
+			PreparedStatement psJobUpdate=session.getPreparedStatementForUpdate(jobRow, jobKey, submittedTable);
+			
+			psJobUpdate=session.fillParameters(jobRow, 0, psJobUpdate);
+			psJobUpdate=session.fillParameters(jobKey, jobRow.size(), psJobUpdate);
+			psJobUpdate.executeUpdate();
 
 
 			if(!toPerform.getStatus().equals(SubmittedStatus.Completed)){
@@ -529,7 +541,7 @@ public class JobManager extends SubmittedManager{
 						fields.get(1).setValue(s.getId());
 						fields.get(2).setValue(status);
 						fields.get(3).setValue((hasWeight||hasPerturbation)+"");
-						psSpecies=session.fillParameters(fields, psSpecies);
+						psSpecies=session.fillParameters(fields,0, psSpecies);
 						psSpecies.executeUpdate();
 					}
 				}else throw new Exception("Invalid job, no species found");

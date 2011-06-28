@@ -21,6 +21,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetPhylogenyRequestT
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.dataModel.AquaMap;
 import org.gcube.application.aquamaps.dataModel.FieldArray;
 import org.gcube.application.aquamaps.dataModel.Types.AreaType;
@@ -56,8 +57,14 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	}
 
 	public String getPhylogeny(GetPhylogenyRequestType req) throws GCUBEFault{
-		//FIXME implement getPhilogenyMethod
-		throw new GCUBEFault("Method not yet implemented");
+		try{
+			Field toSelect= new Field(req.getToSelect());
+			PagedRequestSettings settings= new PagedRequestSettings(req.getLimit(), req.getOffset(), req.getSortColumn(), req.getSortDirection());
+			return SpeciesManager.getJSONTaxonomy(toSelect, Field.load(req.getFieldList()), settings);
+		}catch(Exception e){
+			logger.error("Unable to get Taxonomy ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
 	}
 
 	public int deleteSubmitted(StringArray submittedIds)throws GCUBEFault{

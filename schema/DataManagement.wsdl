@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions name="DataManagement"
 	targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
-	xmlns="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:wsdlpp="http://www.globus.org/namespaces/2004/10/WSDLPreprocessor"
@@ -16,16 +16,18 @@
 		location="../gcube/common/core/faults/GCUBEFaults.wsdl" />
 
 	<types>
-		<xsd:schema targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
+		<xsd:schema
+			targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement"
 			xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/datamanagement">
 			<xsd:import namespace="http://gcube-system.org/namespaces/common/core/types"
 				schemaLocation="../gcube/common/core/types/GCUBETypes.xsd" />
-				<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/types"
-		 schemaLocation="AquaMapsTypes.xsd"/>
-		 <xsd:import namespace="http://gcube-system.org/namespaces/common/gis/types"
-		 schemaLocation="GISTypes.xsd" />
+			<xsd:import
+				namespace="http://gcube-system.org/namespaces/application/aquamaps/types"
+				schemaLocation="AquaMapsTypes.xsd" />
+			<xsd:import namespace="http://gcube-system.org/namespaces/common/gis/types"
+				schemaLocation="GISTypes.xsd" />
 
-			<!--  DataManagement portType request types -->
+			<!-- DataManagement portType request types -->
 			<xsd:complexType name="generateHCAFRequestType">
 				<xsd:sequence>
 					<xsd:element name="userId" type="xsd:string" />
@@ -42,61 +44,64 @@
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
-			
-			
+
+
 			<xsd:complexType name="generateHSPECRequestType">
 				<xsd:sequence>
-					<xsd:element name="userId" 				type="xsd:string" />
-					<xsd:element name="generateNative" 		type="xsd:boolean" />
-					<xsd:element name="generateSuitable"    type="xsd:boolean"/>
-					<xsd:element name="toGeneratePrefix" 	type="xsd:string" />
-					<xsd:element name="sourceHCAFId" 		type="xsd:int" />
-					<xsd:element name="sourceHSPENId" 		type="xsd:int" />
-					<xsd:element name="speciesSelection"    type="coretypes:stringArray"/>
-					<xsd:element name="enableLog" 		type="xsd:boolean"/>
+					<xsd:element name="userId" type="xsd:string" />
+					<xsd:element name="generateNative" type="xsd:boolean" />
+					<xsd:element name="generateSuitable" type="xsd:boolean" />
+					<xsd:element name="toGeneratePrefix" type="xsd:string" />
+					<xsd:element name="sourceHCAFId" type="xsd:int" />
+					<xsd:element name="sourceHSPENId" type="xsd:int" />
+					<xsd:element name="speciesSelection" type="coretypes:stringArray" />
+					<xsd:element name="enableLog" type="xsd:boolean" />
 				</xsd:sequence>
 			</xsd:complexType>
-			
+
 			<xsd:complexType name="getGenerationReportByTypeRequestType">
 				<xsd:sequence>
 					<xsd:element name="sortColumn" type="xsd:string" />
 					<xsd:element name="sortDirection" type="xsd:string" />
 					<xsd:element name="limit" type="xsd:int" />
 					<xsd:element name="offset" type="xsd:int" />
-					<xsd:element name="resourceType" type="xsd:string"/>
+					<xsd:element name="resourceType" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
-			
-			
+
+
 			<xsd:complexType name="generateMapsRequestType">
 				<xsd:sequence>
-					<xsd:element name="author" type="xsd:string"/>
-					<xsd:element name="HSPECId" type="xsd:int"/>
-					<xsd:element name="generateLayers" type="xsd:boolean"/>
-					<xsd:element name="speciesFilter" type="aqtypes:fieldArray"/>
+					<xsd:element name="author" type="xsd:string" />
+					<xsd:element name="HSPECId" type="xsd:int" />
+					<xsd:element name="generateLayers" type="xsd:boolean" />
+					<xsd:element name="speciesFilter" type="aqtypes:fieldArray" />
 				</xsd:sequence>
 			</xsd:complexType>
-			
-			
+
+
 			<xsd:complexType name="hspecGroupGenerationRequestType">
-			<xsd:sequence>
-				<xsd:element name="author" type="xsd:string"/>
-				<xsd:element name="generationName" type="xsd:string"/>
-				<xsd:element name="algorithms" type="xsd:string"/>
-				<xsd:element name="enableLayerGeneration" type="xsd:boolean"/>
-				<xsd:element name="enableImageGeneration" type="xsd:boolean"/>
-				<xsd:element name="description" type="xsd:string"/>
-				<xsd:element name="isUploadHcaf" type="xsd:boolean"/>
-				<xsd:element name="isUploadHspen" type="xsd:boolean"/>
-				<xsd:element name="toUploadHcafRSLocator" type="xsd:string"/>
-				<xsd:element name="toUploadHspenRSLocator" type="xsd:string"/>
-				<xsd:element name="description" type="xsd:string"/>
-				<xsd:element name="hcafSearchId" type="xsd:int"/>
-				<xsd:element name="hspenSearchId" type="xsd:int"/>
-				<xsd:element name="cloud" type="xsd:boolean"/>
-			</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="author" type="xsd:string" />
+					<xsd:element name="generationName" type="xsd:string" />
+					<xsd:element name="algorithms" type="xsd:string" />
+					<xsd:element name="enableLayerGeneration" type="xsd:boolean" />
+					<xsd:element name="enableImageGeneration" type="xsd:boolean" />
+					<xsd:element name="description" type="xsd:string" />
+					<xsd:element name="isUploadHcaf" type="xsd:boolean" />
+					<xsd:element name="isUploadHspen" type="xsd:boolean" />
+					<xsd:element name="toUploadHcafRSLocator" type="xsd:string" />
+					<xsd:element name="toUploadHspenRSLocator" type="xsd:string" />
+					<xsd:element name="description" type="xsd:string" />
+					<xsd:element name="hcafSearchId" type="xsd:int" />
+					<xsd:element name="hspenSearchId" type="xsd:int" />
+					<xsd:element name="cloud" type="xsd:boolean" />
+					<xsd:element name="backend" type="xsd:string" />
+					<xsd:element name="endpointUrl" type="xsd:string"/>
+					<xsd:element name="resourceNumber" type="xsd:int"/>
+				</xsd:sequence>
 			</xsd:complexType>
-			
+
 			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
 				<xsd:sequence>
 					<xsd:element name="sortColumn" type="xsd:string" />
@@ -105,8 +110,28 @@
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
+
+
+			<xsd:complexType name="getGenerationLiveReportResponseType">
+				<xsd:sequence>
+					<xsd:element name="percent" type="xsd:double" />
+					<xsd:element name="resourceMap" type="xsd:string" />
+					<xsd:element name="resourceLoad" type="xsd:string" />
+					<xsd:element name="elaboratedSpecies" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="removeHSPECGroupGenerationRequestResponseType">
+				<xsd:sequence>
+					<xsd:element name="requestId" type="xsd:string" />
+					<xsd:element name="removeTables" type="xsd:boolean" />
+					<xsd:element name="removeJobs" type="xsd:boolean" />
+				</xsd:sequence>
+			</xsd:complexType>
 			
 			
+			
+
 			<!-- Data management request elements -->
 
 			<xsd:element name="generateHCAFRequest" type="tns:generateHCAFRequestType" />
@@ -121,21 +146,28 @@
 
 			<xsd:element name="getGenerationReportByTypeRequest"
 				type="tns:getGenerationReportByTypeRequestType" />
-			<xsd:element name="getGenerationReportByTypeResponse" type="xsd:string" />
+			<xsd:element name="getGenerationReportByTypeResponse"
+				type="xsd:string" />
+
+
+			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType" />
+			<xsd:element name="generateMapsResponse" type="xsd:int" />
+
+
+			<xsd:element name="hspecGroupGenerationRequest" type="tns:hspecGroupGenerationRequestType" />
+			<xsd:element name="hspecGroupGenerationResponse" type="xsd:string" />
+
+			<xsd:element name="getJSONSubmittedHSPECRequest" type="tns:getJSONSubmittedHSPECRequestType" />
+			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string" />
+
+			<xsd:element name="getGenerationLiveReportRequest" type="xsd:int" />
+			<xsd:element name="getGenerationLiveReportResponse" type="tns:getGenerationLiveReportResponseType" />
+
+			<xsd:element name="removeHSPECGroupRequest" type="tns:removeHSPECGroupGenerationRequestResponseType" />
+			<xsd:element name="removeHSPECGroupResponse" type="tns:removeHSPECGroupGenerationRequestResponseType" />
 			
-			
-			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType"/>
-			<xsd:element name="generateMapsResponse" type ="xsd:int"/>
-
-
-			<xsd:element name="hspecGroupGenerationRequest" type="tns:hspecGroupGenerationRequestType"/>
-			<xsd:element name="hspecGroupGenerationResponse" type="xsd:string"/>
-
-			<xsd:element name="getJSONSubmittedHSPECRequest" type="tns:getJSONSubmittedHSPECRequestType"/>
-			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string"/>
-
-			<xsd:element name="getGenerationLiveReportRequest" type="xsd:string"/>
-			<xsd:element name="getGenerationLiveReportResponse" type="xsd:string"/>
+			<xsd:element name="editHSPECGroupDetailsRequest" type="tns:hspecGroupGenerationRequestType" />
+			<xsd:element name="editHSPECGroupDetailsResponse" type="coretypes:VOID"/>
 
 		</xsd:schema>
 	</types>
@@ -154,9 +186,10 @@
 	</message>
 	<message name="GetHCAFGenerationReportResponse">
 		<part name="response" element="tns:getHCAFGenerationReportResponse" />
-		
-		
-	</message><message name="GenerateHSPECRequest">
+
+
+	</message>
+	<message name="GenerateHSPECRequest">
 		<part name="request" element="tns:generateHSPECRequest" />
 	</message>
 	<message name="GenerateHSPECResponse">
@@ -168,39 +201,54 @@
 	<message name="GetGenerationReportByTypeResponse">
 		<part name="response" element="tns:getGenerationReportByTypeResponse" />
 	</message>
-	
+
 	<message name="GenerateMapsRequest">
 		<part name="request" element="tns:generateMapsRequest" />
 	</message>
 	<message name="GenerateMapsResponse">
 		<part name="response" element="tns:generateMapsResponse" />
 	</message>
-	
-	
+
+
 	<message name="HSPECGroupGenerationRequest">
-		<part name="request" element="tns:hspecGroupGenerationRequest"/>
+		<part name="request" element="tns:hspecGroupGenerationRequest" />
 	</message>
 	<message name="HSPECGroupGenerationResponse">
-		<part name="response" element="tns:hspecGroupGenerationResponse"/>
+		<part name="response" element="tns:hspecGroupGenerationResponse" />
 	</message>
-	
-	
+
+
 	<message name="GetJSONSubmittedHSPECRequest">
-		<part name="request" element="tns:getJSONSubmittedHSPECRequest"/>
+		<part name="request" element="tns:getJSONSubmittedHSPECRequest" />
 	</message>
 	<message name="GetJSONSubmittedHSPECResponse">
-		<part name="response" element="tns:getJSONSubmittedHSPECResponse"/>
+		<part name="response" element="tns:getJSONSubmittedHSPECResponse" />
 	</message>
-	
+
 	<message name="GetGenerationLiveReportRequest">
-		<part name="request" element="tns:getGenerationLiveReportRequest"/>
+		<part name="request" element="tns:getGenerationLiveReportRequest" />
 	</message>
 	<message name="GetGenerationLiveReportResponse">
-		<part name="response" element="tns:getGenerationLiveReportResponse"/>
+		<part name="response" element="tns:getGenerationLiveReportResponse" />
 	</message>
-	
-	
-	
+
+	<message name="RemoveHSPECGroupRequest">
+		<part name="request" element="tns:removeHSPECGroupRequest" />
+	</message>
+	<message name="RemoveHSPECGroupResponse">
+		<part name="response" element="tns:removeHSPECGroupResponse" />
+	</message>
+
+	<message name="EditHSPECGroupDetailsRequest">
+		<part name="request" element="tns:editHSPECGroupDetailsRequest" />
+	</message>
+	<message name="EditHSPECGroupDetailsResponse">
+		<part name="response" element="tns:editHSPECGroupDetailsResponse" />
+	</message>
+
+
+
+
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
 			<wsdl:input message="tns:GenerateHCAFRequest" />
@@ -212,7 +260,7 @@
 			<wsdl:output message="tns:GetHCAFGenerationReportResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		
+
 		<wsdl:operation name="generateHSPEC">
 			<wsdl:input message="tns:GenerateHSPECRequest" />
 			<wsdl:output message="tns:GenerateHSPECResponse" />
@@ -241,6 +289,16 @@
 		<wsdl:operation name="GetGenerationLiveReportGroup">
 			<wsdl:input message="tns:GetGenerationLiveReportRequest" />
 			<wsdl:output message="tns:GetGenerationLiveReportResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="RemoveHSPECGroup">
+			<wsdl:input message="tns:RemoveHSPECGroupRequest" />
+			<wsdl:output message="tns:RemoveHSPECGroupResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="EditHSPECGroupDetails">
+			<wsdl:input message="tns:EditHSPECGroupDetailsRequest" />
+			<wsdl:output message="tns:EditHSPECGroupDetailsResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

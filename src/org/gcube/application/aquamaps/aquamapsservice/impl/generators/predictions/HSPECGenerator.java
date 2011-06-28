@@ -594,7 +594,7 @@ public class HSPECGenerator {
 						probability=getOverallProbability();
 						probabilityRow.get(2).setValue(formatter.format(probability));
 						if ((probability>=probabilityThresholdForInsert)){
-							insertedSuitableCellCount+=session.fillParameters(probabilityRow, psInsertSuitable).executeUpdate();
+							insertedSuitableCellCount+=session.fillParameters(probabilityRow,0, psInsertSuitable).executeUpdate();
 						}
 					}
 
@@ -608,7 +608,7 @@ public class HSPECGenerator {
 
 
 						if ((probability>=probabilityThresholdForInsert)){
-							insertedNativeCellCount+=session.fillParameters(probabilityRow, psInsertNative).executeUpdate();
+							insertedNativeCellCount+=session.fillParameters(probabilityRow,0, psInsertNative).executeUpdate();
 						}
 					}
 
@@ -685,7 +685,7 @@ public class HSPECGenerator {
 				probabilityLogRow.get(5).setValue(primaryProductsValue+"");
 				probabilityLogRow.get(6).setValue(sstValue+"");
 				probabilityLogRow.get(7).setValue(probability+"");
-				session.fillParameters(probabilityLogRow, probabilitiesLogInsert).executeUpdate();
+				session.fillParameters(probabilityLogRow,0, probabilitiesLogInsert).executeUpdate();
 			}catch(Exception e){
 				// duplicate key on second run per species
 			}

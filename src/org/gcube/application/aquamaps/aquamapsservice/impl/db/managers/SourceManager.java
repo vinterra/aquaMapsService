@@ -55,10 +55,28 @@ public class SourceManager {
 			String metaTable=getMetaTable(toRegister.getType());
 			session=DBSession.getInternalDBSession();
 			List<List<Field>> rows= new ArrayList<List<Field>>();
-			
-			rows.add(toRegister.toRow());
+			ArrayList<Field> row= new ArrayList<Field>();
+			row.add(toRegister.getField(MetaSourceFields.algorithm));
+			row.add(toRegister.getField(MetaSourceFields.author));
+			row.add(toRegister.getField(MetaSourceFields.date));
+			row.add(toRegister.getField(MetaSourceFields.description));
+			row.add(toRegister.getField(MetaSourceFields.disclaimer));
+			row.add(toRegister.getField(MetaSourceFields.parameters));
+			row.add(toRegister.getField(MetaSourceFields.provenience));
+			row.add(toRegister.getField(MetaSourceFields.sourcehcaf));
+			row.add(toRegister.getField(MetaSourceFields.sourcehcaftable));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspec));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspectable));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspen));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspentable));
+			row.add(toRegister.getField(MetaSourceFields.status));
+			row.add(toRegister.getField(MetaSourceFields.tablename));
+			row.add(toRegister.getField(MetaSourceFields.title));
+			row.add(toRegister.getField(MetaSourceFields.type));
+			rows.add(row);
 			List<List<Field>> ids = session.insertOperation(metaTable, rows);
-			toRegister.setSearchId(Integer.parseInt(ids.get(0).get(0).getValue()));
+			for(Field f: ids.get(0)) 
+				if(f.getName().equals(MetaSourceFields.searchid+"")) toRegister.setSearchId(f.getValueAsInteger());
 			logger.trace("registered source with id : "+toRegister.getSearchId());
 			return toRegister;
 		}catch(Exception e){

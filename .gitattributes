@@ -40,6 +40,7 @@ schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
 schema/GISTypes.xsd -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/CommonServiceLogic.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
@@ -107,6 +108,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/EmbeddedPubli
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/EnvironmentalStatusUpdateThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/HSPECGroupGenerationManagerThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/HSPECGroupGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/JobSubmissionThread.java -text
@@ -129,6 +131,7 @@ test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text
 test/testClient/DBConnectionTest.java -text
+test/testClient/DMTest.java -text
 test/testClient/DataModelTest.java -text
 test/testClient/DummyObjects.java -text
 test/testClient/HCAFGenerationTest.java -text

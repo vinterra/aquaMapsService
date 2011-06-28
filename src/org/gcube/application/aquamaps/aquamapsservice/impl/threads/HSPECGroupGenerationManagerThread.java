@@ -26,12 +26,13 @@ public class HSPECGroupGenerationManagerThread extends Thread {
 //			logger.trace("Looking for submitted");
 			HSPECGroupGenerationRequest request=null;
 			try{
-				do{
+				do{	
 					request=HSPECGroupGenerationRequestsManager.getFirst();
 					if(request!=null){
 						logger.debug("Found request with id "+request.getId());
 						HSPECGroupGenerationThread thread=new HSPECGroupGenerationThread(request);
 						ThreadManager.getExecutor().execute(thread);
+						HSPECGroupGenerationRequestsManager.setPhase(HSPECGroupGenerationPhase.datageneration, request.getId());
 					} 
 				}while(request!=null);
 			}catch(Exception e){
@@ -39,7 +40,7 @@ public class HSPECGroupGenerationManagerThread extends Thread {
 				else{
 					logger.error("Unexpeceted error while generating HSPEC group : request id = "+request.getId(),e);
 					try{
-						HSPECGroupGenerationRequestsManager.setPhase(HSPECGroupGenerationPhase.Error, request.getId());
+						HSPECGroupGenerationRequestsManager.setPhase(HSPECGroupGenerationPhase.error, request.getId());
 					}catch(Exception e1){
 						logger.error("Unable to update phase for request id "+request.getId(),e1);
 					}

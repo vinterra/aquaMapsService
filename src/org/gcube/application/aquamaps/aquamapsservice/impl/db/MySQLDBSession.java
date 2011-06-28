@@ -13,35 +13,35 @@ import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 
 public class MySQLDBSession extends DBSession {
 
-	
-	
-	
+
+
+
 
 	public MySQLDBSession(Connection conn) {
 		super (conn);
 	}
 
-	
+
 	@Override
 	public ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, String orderMode)throws Exception{
 		PreparedStatement ps=getPreparedStatementForQuery(filters, table, orderColumn, orderMode);
-		return fillParameters(filters, ps).executeQuery();
+		return fillParameters(filters,0, ps).executeQuery();
 	}
-	
+
 	@Override
-	public PreparedStatement fillParameters(List<Field> fields, PreparedStatement ps) throws SQLException{
+	public PreparedStatement fillParameters(List<Field> fields,int parameterOffset, PreparedStatement ps) throws SQLException{
 		for(int i=0;i<fields.size();i++){
 			Field f=fields.get(i);
 			switch(f.getType()){
 			case BOOLEAN: ps.setBoolean(i+1, Boolean.parseBoolean(f.getValue()));
-							break;
+			break;
 			case DOUBLE: ps.setDouble(i+1, Double.parseDouble(f.getValue()));
-							break;
+			break;
 			case INTEGER: ps.setInt(i+1, Integer.parseInt(f.getValue()));
 			break;				
 			case STRING: ps.setString(i+1,f.getValue());
 			break;
-			
+
 			}			
 		}
 		return ps;
@@ -49,25 +49,25 @@ public class MySQLDBSession extends DBSession {
 
 	@Override
 	public boolean checkExist(String tableName, List<Field> keys)
-			throws Exception {
+	throws Exception {
 		PreparedStatement ps=getPreparedStatementForQuery(keys, tableName, null, null);
-		ResultSet rs=fillParameters(keys, ps).executeQuery();
+		ResultSet rs=fillParameters(keys,0, ps).executeQuery();
 		return rs.first();
 	}
 
 
 	@Override
 	public int deleteOperation(String tableName, List<Field> filters)
-			throws Exception {
+	throws Exception {
 		PreparedStatement ps=getPreparedStatementForDelete(filters, tableName);
-		return fillParameters(filters, ps).executeUpdate();
+		return fillParameters(filters,0, ps).executeUpdate();
 	}
 
 
 	@Override
 	public int getCount(String tableName, List<Field> filters) throws Exception {
 		PreparedStatement ps=getPreparedStatementForCount(filters, tableName);
-		ResultSet rs=fillParameters(filters, ps).executeQuery();
+		ResultSet rs=fillParameters(filters,0, ps).executeQuery();
 		if(rs.next()) return rs.getInt(1);
 		else return 0;
 	}
@@ -78,11 +78,11 @@ public class MySQLDBSession extends DBSession {
 			String sourceTableName, String destinationTableName) throws Exception {
 		switch(filterByCodeType){
 		case faoaream : return preparedStatement("INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-						" where "+sourceTableName+"."+HSPECFields.faoaream+" = ? ) ");
+				" where "+sourceTableName+"."+HSPECFields.faoaream+" = ? ) ");
 		case eezall : return preparedStatement("INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-						" where find_in_set( ? , "+sourceTableName+"."+HSPECFields.eezall+")) ");
+				" where find_in_set( ? , "+sourceTableName+"."+HSPECFields.eezall+")) ");
 		case lme : return preparedStatement("INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-						" where "+sourceTableName+"."+HSPECFields.lme+" = ? ) ");
+				" where "+sourceTableName+"."+HSPECFields.lme+" = ? ) ");
 		default : throw new SQLException("Invalid Field "+filterByCodeType);
 		}
 	}
@@ -96,9 +96,9 @@ public class MySQLDBSession extends DBSession {
 		if(rows.size()==0) throw new Exception("Empty rows to insert");
 
 		PreparedStatement ps=getPreparedStatementForInsert(rows.get(0), tableName);
-		
+
 		for(List<Field> row:rows){
-			ps=fillParameters(row, ps);
+			ps=fillParameters(row,0, ps);
 			if(ps.executeUpdate()>0)
 				toReturn.addAll(getGeneratedKeys(ps));
 		}
@@ -111,60 +111,38 @@ public class MySQLDBSession extends DBSession {
 			List<List<Field>> rows) throws Exception {
 		int count=0;
 		//**** Create Query
-		
+
 		if(rows.size()==0) throw new Exception("Empty rows to insert");
 		if(keys.size()==0) throw new Exception("Empty keys");
 		if(rows.size()!=keys.size()) throw new Exception("Un matching rows/keys sizes "+rows.size()+"/"+keys.size());
 		PreparedStatement ps=getPreparedStatementForUpdate(rows.get(0), keys.get(0), tableName);
-		
+
 		for(int i=0;i<rows.size();i++){
-			//Setting 
-			for(int j=0;j<rows.get(i).size();j++){
-				Field f=rows.get(i).get(j);			
-				switch(f.getType()){
-				case BOOLEAN: ps.setBoolean(j+1, Boolean.parseBoolean(f.getValue()));
-				break;
-				case DOUBLE: ps.setDouble(j+1, Double.parseDouble(f.getValue()));
-				break;
-				case INTEGER: ps.setInt(j+1, Integer.parseInt(f.getValue()));
-				break;				
-				case STRING: ps.setString(j+1,f.getValue());
-				break;
-				}
-			}
-			for(int j=0;j<keys.get(i).size();j++){
-				Field f=keys.get(i).get(j);
-				switch(f.getType()){
-				case BOOLEAN: ps.setBoolean(j+1+rows.get(i).size(), Boolean.parseBoolean(f.getValue()));
-				break;
-				case DOUBLE: ps.setDouble(j+1+rows.get(i).size(), Double.parseDouble(f.getValue()));
-				break;
-				case INTEGER: ps.setInt(j+1+rows.get(i).size(), Integer.parseInt(f.getValue()));
-				break;				
-				case STRING: ps.setString(j+1+rows.get(i).size(),f.getValue());
-				break;
-				}
-			}
+
+			//fill values
+			ps=fillParameters(rows.get(i), 0, ps);
+			//fill keys
+			ps=fillParameters(keys.get(i),rows.get(i).size(),ps);
 			count+=ps.executeUpdate();
 		}
 		return count;
 	}
-	
-	
-	
-	
+
+
+
+
 	public void createTable(String tableName, String[] columnsAndConstraintDefinition, int numParitions, String partitioningKey, ENGINE ... engines ) throws Exception{
 		Statement statement = connection.createStatement();
-		
+
 		String engine=engines.length==0?"":"ENGINE="+engines[0].toString();
 		StringBuilder createQuery= new StringBuilder("CREATE TABLE IF NOT EXISTS "+tableName+" (");
 		for (String singleColumnDef:columnsAndConstraintDefinition)			
 			createQuery.append(singleColumnDef+",");
-		
-		
+
+
 		createQuery.deleteCharAt(createQuery.length()-1);
 		createQuery.append(") "+engine+" CHARACTER SET utf8 COLLATE utf8_general_ci  PARTITION BY KEY("+partitioningKey+") PARTITIONS "+numParitions+" ;");
-		
+
 		logger.debug("the query is: " + createQuery.toString());
 		statement.executeUpdate(createQuery.toString());
 		statement.close();
@@ -173,7 +151,7 @@ public class MySQLDBSession extends DBSession {
 
 	@Override
 	public void createLikeTable(String newTableName, String oldTable)
-			throws Exception {
+	throws Exception {
 		Statement statement = connection.createStatement();
 		statement.executeUpdate("CREATE TABLE IF NOT EXISTS "+newTableName+" LIKE "+oldTable);
 		logger.debug("the like creation is : CREATE TABLE IF NOT EXISTS "+newTableName+" LIKE "+oldTable);
@@ -184,53 +162,61 @@ public class MySQLDBSession extends DBSession {
 	@Override
 	public void createTable(String tableName,
 			String[] columnsAndConstraintDefinition)
-			throws Exception {
-				Statement statement = connection.createStatement();
-				
-				StringBuilder createQuery= new StringBuilder("CREATE TABLE IF NOT EXISTS "+tableName+" (");
-				for (String singleColumnDef:columnsAndConstraintDefinition)			
-					createQuery.append(singleColumnDef+",");
-				
-				createQuery.deleteCharAt(createQuery.length()-1);
-				createQuery.append(") CHARACTER SET utf8 COLLATE utf8_general_ci ;");
-				
-				logger.debug("the query is: " + createQuery.toString());
-				statement.executeUpdate(createQuery.toString());
-				statement.close();
-			}
+	throws Exception {
+		Statement statement = connection.createStatement();
+
+		StringBuilder createQuery= new StringBuilder("CREATE TABLE IF NOT EXISTS "+tableName+" (");
+		for (String singleColumnDef:columnsAndConstraintDefinition)			
+			createQuery.append(singleColumnDef+",");
+
+		createQuery.deleteCharAt(createQuery.length()-1);
+		createQuery.append(") CHARACTER SET utf8 COLLATE utf8_general_ci ;");
+
+		logger.debug("the query is: " + createQuery.toString());
+		statement.executeUpdate(createQuery.toString());
+		statement.close();
+	}
 
 
 	@Override
 	public PreparedStatement getPreparedStatementForInsertOnDuplicate(
 			List<Field> fields, String table, Integer[] keyIndexes)
-			throws Exception {
+	throws Exception {
 		// TODO Auto-generated method stub
 		throw new Exception ("YET TO IMPLEMENT");
 	}
 
 
-//	@Override
-//	public PreparedStatement getPreparedStatementForInsert(List<Field> fields,
-//			String table, Integer[] keysIndexes) throws Exception {
-//				StringBuilder fieldsName=new StringBuilder("(");
-//				StringBuilder fieldsValues=new StringBuilder("(");
-//				for (Field f: fields){
-//					fieldsValues.append("?,");
-//					fieldsName.append(f.getName()+",");
-//				}
-//
-//				logger.debug(" the values are "+ fields.size());
-//
-//				fieldsValues.deleteCharAt(fieldsValues.length()-1);
-//				fieldsValues.append(")");
-//				fieldsName.deleteCharAt(fieldsName.length()-1);
-//				fieldsName.append(")");
-//
-//				String query="INSERT INTO "+table+" "+fieldsName+" VALUES "+fieldsValues+ 
-//				"ON ";
-//				logger.trace("the prepared statement is :"+ query);
-//				PreparedStatement ps= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
-//				return ps;
-//			}
-//	
+	@Override
+	public ResultSet getDistinct(Field toSelect,List<Field> filters, String table,
+			String orderColumn, String orderMode) throws Exception {
+		PreparedStatement ps=getPreparedStatementForDISTINCT(filters, toSelect, table, orderColumn, orderMode);
+		return fillParameters(filters,0, ps).executeQuery();
+	}
+
+
+	//	@Override
+	//	public PreparedStatement getPreparedStatementForInsert(List<Field> fields,
+	//			String table, Integer[] keysIndexes) throws Exception {
+	//				StringBuilder fieldsName=new StringBuilder("(");
+	//				StringBuilder fieldsValues=new StringBuilder("(");
+	//				for (Field f: fields){
+	//					fieldsValues.append("?,");
+	//					fieldsName.append(f.getName()+",");
+	//				}
+	//
+	//				logger.debug(" the values are "+ fields.size());
+	//
+	//				fieldsValues.deleteCharAt(fieldsValues.length()-1);
+	//				fieldsValues.append(")");
+	//				fieldsName.deleteCharAt(fieldsName.length()-1);
+	//				fieldsName.append(")");
+	//
+	//				String query="INSERT INTO "+table+" "+fieldsName+" VALUES "+fieldsValues+ 
+	//				"ON ";
+	//				logger.trace("the prepared statement is :"+ query);
+	//				PreparedStatement ps= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
+	//				return ps;
+	//			}
+	//	
 }

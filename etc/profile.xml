@@ -103,6 +103,10 @@
 					<Name>gcube/application/aquamaps/aquamapsservice/AquaMapsService</Name>
 					<WSDL></WSDL>
 				</PortType>
+				<PortType>
+					<Name>gcube/application/aquamaps/aquamapsservice/DataManagement</Name>
+					<WSDL></WSDL>
+				</PortType>
 			</Main>
 			<Software>
 				<Description>AquaMapsService stubs</Description>

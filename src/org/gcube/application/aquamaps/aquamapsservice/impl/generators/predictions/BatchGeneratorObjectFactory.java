@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictio
 import java.util.ArrayList;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
+import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
@@ -10,14 +11,14 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 	static GCUBELog logger= new GCUBELog(BatchGeneratorObjectFactory.class);	
 	
 	
-	private ArrayList<BatchGenerator> batchGenerators=new ArrayList<BatchGenerator>();
+	private static ArrayList<BatchGenerator> batchGenerators=new ArrayList<BatchGenerator>();
 	
 	
 	@Override
 	public Object makeObject() throws Exception {
-		int id = batchGenerators.size()+1;
+		int id = batchGenerators.size();
 		BatchGenerator batch=new BatchGenerator(id);
-		batchGenerators.add(id, batch);
+		batchGenerators.add(batch);
 		return batch;
 	}
 	@Override
@@ -38,11 +39,11 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 	}
 	
 	
-	public Report getReport(int batchId)throws Exception{
+	public static EnvironmentalExecutionReportItem getReport(int batchId)throws Exception{
 		try{
 			return batchGenerators.get(batchId).getReport();
 		}catch (IndexOutOfBoundsException e){
-			throw new Exception("Requested wrong batch Id "+batchId);
+			return null;
 		}
 	}
 	

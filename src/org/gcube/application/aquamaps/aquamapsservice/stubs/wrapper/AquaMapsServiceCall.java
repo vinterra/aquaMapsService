@@ -8,10 +8,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeReq
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetAquaMapsPerUserRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetOccurrenceCellsRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetPhylogenyRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.AquaMapsServiceAddressingLocator;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
@@ -25,6 +27,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -34,11 +37,11 @@ import org.gcube.common.core.types.StringArray;
 
 public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsServiceInterface{
 
-	
+
 	public static AquaMapsServiceInterface getCall(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI)throws Exception{
 		return new AquaMapsServiceCall(scope, securityManager,defaultURI);
 	}
-	
+
 	/**
 	 * Creates a call with a disabled security manager  
 	 * 
@@ -54,28 +57,28 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			public boolean isSecurityEnabled() {
 				return false;
 			}
-			
+
 		};
 		return new AquaMapsServiceCall(scope, new GCUBESecurityManager[]{secMan},defaultURI);
 	}
-	
+
 	private AquaMapsServiceCall(GCUBEScope scope,
 			GCUBESecurityManager[] securityManager,String defaultURI) throws Exception {
 		super(scope, securityManager,defaultURI);
 		pt=GCUBERemotePortTypeContext.getProxy(new AquaMapsServiceAddressingLocator().getAquaMapsServicePortTypePort(epr), scope, 120000, securityManager);
 	}
 
-	
+
 	@Override
 	public String getPortTypeName() {
 		return Constant.AQUAMAPSSERVICE_PT_NAME;
 	}
 
 	private AquaMapsServicePortType pt;
-	
-	
-	
-	
+
+
+
+
 	@Override
 	public Envelope calculateEnvelope(BoundingBox bb,List<Area> areas,String speciesId,boolean useBottom, boolean useBounding, boolean useFAO) throws Exception{
 		try{
@@ -174,18 +177,9 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		}	
 	}
 
-	@Override
-	public String getJSONPhilogeny()throws Exception{
-		try{
-			throw new GCUBEFault("Not Implemented");
-		}catch(GCUBEFault f){
-			logger.error("Service thrown Fault ",f);
-			throw new ServiceException(f.getFaultMessage());
-		}	
-	}
 
-	
-	
+
+
 	/**wraps getProfile
 	 * 
 	 * @return
@@ -200,7 +194,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
-	
+
 	@Override
 	public Resource loadResource(int resId,ResourceType type)throws Exception{
 		try{
@@ -256,7 +250,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			//			System.out.println("Loaded Fields : ");
 			//			for(Field f:spec.attributesList)
 			//				System.out.println(f.getName()+" : "+f.getValue());
-//			return spec.extractEnvelope();
+			//			return spec.extractEnvelope();
 			return spec;
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -285,7 +279,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}
-	
+
 	@Override
 	public Submitted loadSubmittedById(int id)throws Exception{
 		try{
@@ -295,5 +289,24 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			throw new ServiceException(f.getFaultMessage());
 		}	
 	}
-	
+
+	@Override
+	public String getJSONPhilogeny(SpeciesOccursumFields level,
+			ArrayList<Field> filters, PagedRequestSettings settings)
+	throws Exception {
+		try{
+			GetPhylogenyRequestType request=new GetPhylogenyRequestType();
+			request.setFieldList(Field.toStubsVersion(filters));
+			request.setLimit(settings.getLimit());
+			request.setOffset(settings.getOffset());
+			request.setSortColumn(settings.getOrderColumn());
+			request.setSortDirection(settings.getOrderDirection());
+			request.setToSelect(new Field(level+"","",FieldType.STRING).toStubsVersion());
+			return pt.getPhylogeny(request);
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}	
+	}
+
 }

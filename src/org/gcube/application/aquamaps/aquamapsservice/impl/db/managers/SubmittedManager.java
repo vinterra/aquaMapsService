@@ -278,4 +278,14 @@ public class SubmittedManager {
 		finally{session.close();}
 	}
 	
+	
+	public static long getCount(ArrayList<Field> filter)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			return session.getCount(submittedTable, filter);
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
 }

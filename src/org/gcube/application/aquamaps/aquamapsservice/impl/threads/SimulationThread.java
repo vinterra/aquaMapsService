@@ -171,7 +171,7 @@ public class SimulationThread extends Thread {
 //			
 			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator,
 					DBSession.getInternalCredentials());
-			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), AlgorithmType.NativeRange, false);
+			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), AlgorithmType.NativeRange, false, null, 1);
 		}else{
 			logger.trace("Embedded HSPEC Generation");
 			String HCAF_DName=JobManager.getWorkingHCAF(jobId);		

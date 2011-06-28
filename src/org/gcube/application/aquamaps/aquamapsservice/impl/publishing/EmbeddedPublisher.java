@@ -180,9 +180,9 @@ public class EmbeddedPublisher implements Publisher{
 //			for(Species s: object.getSelectedSpecies())
 //				logger.trace(AquaMapsXStream.getXMLInstance().toXML(s));
 		
-		logger.debug("Submitted Job Object Types :");
-		for(AquaMapsObject obj : toPublish.getAquaMapsObjectList())
-			logger.debug(obj.getName()+"\t"+obj.getId()+"\t"+obj.getType());
+//		logger.debug("Submitted Job Object Types :");
+//		for(AquaMapsObject obj : toPublish.getAquaMapsObjectList())
+//			logger.debug(obj.getName()+"\t"+obj.getId()+"\t"+obj.getType());
 
 		Job toReturn=getWrapper().getJobById(getWrapper().storeJob(toPublish));
 		
@@ -196,12 +196,12 @@ public class EmbeddedPublisher implements Publisher{
 //		
 		
 		
-		logger.debug("Returned Job  Object Types : " );
+//		logger.debug("Returned Job  Object Types : " );
 		if(toReturn==null) throw new Exception("Returned Null job after storing, job id was "+toPublish.getId());
 		if(toReturn.getAquaMapsObjectList()==null) throw new Exception ("Null object list in returned Job Id "+toReturn.getId());
-		for(AquaMapsObject obj : toReturn.getAquaMapsObjectList()){
-			logger.debug(obj.getName()+"\t"+obj.getId()+"\t"+obj.getType());
-		}
+//		for(AquaMapsObject obj : toReturn.getAquaMapsObjectList()){
+//			logger.debug(obj.getName()+"\t"+obj.getId()+"\t"+obj.getType());
+//		}
 			
 		return toReturn;}
 	

@@ -10,6 +10,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.ConnectedP
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.DummyPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.EmbeddedPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.threads.EnvironmentalStatusUpdateThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.HSPECGroupGenerationManagerThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SubmittedMonitorThread;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
@@ -193,6 +194,10 @@ public class ServiceContext extends GCUBEServiceContext {
 		logger.trace("Starting hspec group request monitor..");
 		HSPECGroupGenerationManagerThread t3=new HSPECGroupGenerationManagerThread(4*1000);
 		t3.start();
+		
+		logger.trace("Starting hspec group request status updater..");
+		EnvironmentalStatusUpdateThread t4=new EnvironmentalStatusUpdateThread(2*1000);
+		t4.start();
 		
 	}
 	

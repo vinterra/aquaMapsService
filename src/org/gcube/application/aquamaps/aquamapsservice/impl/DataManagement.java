@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,27 +10,29 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGrou
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGeneratorObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SourceGenerationThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportByTypeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -138,37 +141,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public int generateMaps(GenerateMapsRequestType arg0) throws RemoteException,GCUBEFault{
 		
 		try{
-			logger.trace("Gnerating job for maps generation :");
-			logger.trace("HSPEC id :" +arg0.getHSPECId());
-			
-			Job job=new Job();
-			job.addSpecies(SpeciesManager.getList(Field.load(arg0.getSpeciesFilter())));
-			logger.trace("loaded "+job.getSelectedSpecies().size()+" species..");
-			job.setAuthor(arg0.getAuthor());
-			Resource hspec=SourceManager.getById(ResourceType.HSPEC, arg0.getHSPECId());
-			logger.trace("HSPEC is "+AquaMapsXStream.getXMLInstance().toXML(hspec));
-			job.setIsGis(false);
-			job.setName(hspec.getTitle()+"_All Maps");
-			job.setSourceHSPEC(hspec);
-			job.setSourceHCAF(SourceManager.getById(ResourceType.HCAF, hspec.getSourceHCAFId()));
-			job.setSourceHSPEN(SourceManager.getById(ResourceType.HSPEN, hspec.getSourceHSPENId()));
-			for(Species s: job.getSelectedSpecies()){
-				AquaMapsObject object=new AquaMapsObject(s.getFieldbyName(SpeciesOccursumFields.scientific_name+"").getValue(), 0, ObjectType.SpeciesDistribution);
-				if(object.getName()==null||object.getName().equals(Field.VOID))
-					object.setName(s.getFieldbyName(SpeciesOccursumFields.genus+"").getValue()+"_"+s.getFieldbyName(SpeciesOccursumFields.species+"").getValue());
-				
-				object.setAuthor(job.getAuthor());
-				object.getSelectedSpecies().add(s);
-				object.setGis(arg0.isGenerateLayers());
-				job.getAquaMapsObjectList().add(object);
-			}
-			
-			
-			logger.trace("Submiting job "+job.getName());
-			JobSubmissionThread thread=new JobSubmissionThread(job);
-			ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
-			ThreadManager.getExecutor().execute(thread);
-			return (int) thread.getId();
+			return CommonServiceLogic.generateMaps_Logic(arg0.getHSPECId(),Field.load(arg0.getSpeciesFilter()),arg0.getAuthor(),arg0.isGenerateLayers());
 			}catch(Exception e){
 				logger.error("Unable to execute request ", e);
 				throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -187,7 +160,22 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			Resource hspen= SourceManager.getById(ResourceType.HSPEN, arg0.getHspenSearchId());
 			return HSPECGroupGenerationRequestsManager.insertRequest(arg0.getAuthor(), 
 					arg0.getGenerationName(), arg0.getAlgorithms(), arg0.isEnableLayerGeneration(), arg0.isEnableImageGeneration(), 
-					arg0.getDescription(), hcaf,hspen,arg0.isCloud());
+					arg0.getDescription(), hcaf,hspen,arg0.isCloud(),arg0.getBackend(),arg0.getEndpointUrl(),arg0.getResourceNumber());
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+
+
+	@Override
+	public String getJSONSubmittedHSPECGroup(
+			GetJSONSubmittedHSPECRequestType arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), arg0.getSortDirection());
+			return HSPECGroupGenerationRequestsManager.getJSONList(new ArrayList<Field>(), settings);
+			
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -195,20 +183,50 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	}
 
 	@Override
-	public String getGenerationLiveReportGroup(String arg0)
-			throws RemoteException, GCUBEFault {
-		// TODO Auto-generated method stub
-		return null;
+	public GetGenerationLiveReportResponseType getGenerationLiveReportGroup(
+			int arg0) throws RemoteException, GCUBEFault {
+		try{
+			logger.trace("Serving get generation Live Report, generator ID is "+arg0);
+			EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(arg0);
+			if(report==null) throw new Exception("Execution finished or not yet started");
+			return new GetGenerationLiveReportResponseType(
+					report.getElaboratedSpecies(), report.getPercent(), report.getResourceLoad(), report.getResourcesMap());
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
 	}
 
 	@Override
-	public String getJSONSubmittedHSPECGroup(
-			GetJSONSubmittedHSPECRequestType arg0) throws RemoteException,
-			GCUBEFault {
-		// TODO Auto-generated method stub
-		return null;
+	public VOID editHSPECGroupDetails(HspecGroupGenerationRequestType arg0)
+			throws RemoteException, GCUBEFault {
+		try{
+			//TODO implment
+			throw new Exception("NOT YET IMPLEMENTED");
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
 	}
 
-
+	@Override
+	public RemoveHSPECGroupGenerationRequestResponseType removeHSPECGroup(
+			RemoveHSPECGroupGenerationRequestResponseType arg0)
+			throws RemoteException, GCUBEFault {
+		try{
+			ArrayList<Field> filter=new ArrayList<Field>();
+			filter.add(new Field(GroupGenerationRequestFields.id+"",arg0.getRequestId(),FieldType.STRING));
+			HSPECGroupGenerationRequest request= HSPECGroupGenerationRequestsManager.getList(filter).get(0);
+			//TODO complete method
+			if(arg0.isRemoveTables()) throw new Exception("REMOVE TABLES NOT YET IMPLEMENTED");
+			if(arg0.isRemoveJobs()) throw new Exception("REMOVE JOBS NOT YET IMPLEMENTED");
+			HSPECGroupGenerationRequestsManager.delete(filter);
+			return new RemoveHSPECGroupGenerationRequestResponseType(false,false,request.getId());
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	
 
 }

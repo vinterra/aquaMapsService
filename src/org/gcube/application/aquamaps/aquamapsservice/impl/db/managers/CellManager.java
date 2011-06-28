@@ -64,7 +64,7 @@ public class CellManager {
 			String HCAF=SourceManager.getSourceName(ResourceType.HCAF, SourceManager.getDefaultId(ResourceType.HCAF));
 			PreparedStatement ps= session.preparedStatement("SELECT * FROM "+occurrenceCells+" as o INNER JOIN "+HCAF+" as h ON " +
 					"o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+" WHERE o."+SpeciesOccursumFields.speciesid+" = ?");
-			return DBUtils.toJSon(session.fillParameters(filter, ps).executeQuery(), offset, offset+limit);
+			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), offset, offset+limit);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
@@ -80,7 +80,7 @@ public class CellManager {
 				List<Field> field= new ArrayList<Field>();
 				field.add(new Field(HCAF_SFields.csquarecode+"",code,FieldType.STRING));
 				if(ps==null) ps=session.getPreparedStatementForQuery(field, HCAF_S, HCAF_SFields.csquarecode+"", "ASC");
-				ResultSet rs=session.fillParameters(field, ps).executeQuery();
+				ResultSet rs=session.fillParameters(field,0, ps).executeQuery();
 				if(rs.next())				
 					toReturn.add(new Cell(Field.loadRow(rs)));
 				else logger.warn("Row not found for cell "+code);
@@ -109,7 +109,7 @@ public class CellManager {
 				List<Field> filter=new ArrayList<Field>();
 				filter.add(new Field(HCAF_SFields.csquarecode+"",c.getCode(),FieldType.STRING));
 				if(ps==null)ps=session.getPreparedStatementForQuery(filter, HCAFName,HCAF_SFields.csquarecode+"","ASC");
-				ResultSet rs=session.fillParameters(filter, ps).executeQuery();
+				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
 					c.attributesList.addAll(Field.loadRow(rs));
 				else logger.warn("Row not found for cell "+c.getCode());
@@ -131,7 +131,7 @@ public class CellManager {
 				filter.add(new Field(HCAF_SFields.csquarecode+"",c.getCode(),FieldType.STRING));
 				filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
 				if(ps==null)ps=session.getPreparedStatementForQuery(filter, occurrenceCells,HCAF_SFields.csquarecode+"","ASC");
-				ResultSet rs=session.fillParameters(filter, ps).executeQuery();
+				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
 					c.attributesList.addAll(Field.loadRow(rs));
 				else logger.warn("Row not found for cell "+c.getCode());

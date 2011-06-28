@@ -84,6 +84,11 @@
 			<xsd:complexType name="getPhylogenyRequestType">
 				<xsd:sequence>
 					<xsd:element name="fieldList" type="aqtypes:fieldArray" />
+					<xsd:element name="toSelect" type="aqtypes:field"/>
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
 

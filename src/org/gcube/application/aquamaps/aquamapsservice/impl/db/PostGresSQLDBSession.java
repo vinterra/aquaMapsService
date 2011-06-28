@@ -25,12 +25,12 @@ public class PostGresSQLDBSession extends DBSession {
 	@Override
 	public ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, String orderMode)throws Exception{
 		PreparedStatement ps=getPreparedStatementForQuery(filters, table, orderColumn, orderMode);
-		return fillParameters(filters, ps).executeQuery();
+		return fillParameters(filters,0, ps).executeQuery();
 	}
 	
 	
 	@Override
-	public PreparedStatement fillParameters(List<Field> fields, PreparedStatement ps) throws SQLException{
+	public PreparedStatement fillParameters(List<Field> fields,int parameterOffset, PreparedStatement ps) throws SQLException{
 //		logger.debug("Fillin prepared statement : ");
 		for(int i=0;i<fields.size();i++){
 			Field f=fields.get(i);
@@ -38,14 +38,19 @@ public class PostGresSQLDBSession extends DBSession {
 			switch(f.getType()){
 			case BOOLEAN:{ 
 							Integer value=Boolean.parseBoolean(f.getValue())?1:0;
-							ps.setInt(i+1, value);
+							ps.setInt(i+1+parameterOffset, value);
 							break;
 							}
-			case DOUBLE: ps.setDouble(i+1, Double.parseDouble(f.getValue()));
+			case DOUBLE: ps.setDouble(i+1+parameterOffset, Double.parseDouble(f.getValue()));
 							break;
-			case INTEGER: ps.setInt(i+1, Integer.parseInt(f.getValue()));
+			case INTEGER: try{
+				ps.setInt(i+1+parameterOffset, Integer.parseInt(f.getValue()));
+			}catch(NumberFormatException e){
+				//trying long
+				ps.setLong(i+1+parameterOffset, Long.parseLong(f.getValue()));
+			}
 			break;				
-			case STRING: ps.setString(i+1,f.getValue());
+			case STRING: ps.setString(i+1+parameterOffset,f.getValue());
 			break;
 			
 			}			
@@ -53,11 +58,12 @@ public class PostGresSQLDBSession extends DBSession {
 		return ps;
 	}
 
+	
 	@Override
 	public boolean checkExist(String tableName, List<Field> keys)
 			throws Exception {
 		PreparedStatement ps=getPreparedStatementForQuery(keys, tableName, null, null);
-		ResultSet rs=fillParameters(keys, ps).executeQuery();
+		ResultSet rs=fillParameters(keys,0, ps).executeQuery();
 		return rs.first();
 	}
 
@@ -66,14 +72,14 @@ public class PostGresSQLDBSession extends DBSession {
 	public int deleteOperation(String tableName, List<Field> filters)
 			throws Exception {
 		PreparedStatement ps=getPreparedStatementForDelete(filters, tableName);
-		return fillParameters(filters, ps).executeUpdate();
+		return fillParameters(filters,0, ps).executeUpdate();
 	}
 
 
 	@Override
 	public int getCount(String tableName, List<Field> filters) throws Exception {
 		PreparedStatement ps=getPreparedStatementForCount(filters, tableName);
-		ResultSet rs=fillParameters(filters, ps).executeQuery();
+		ResultSet rs=fillParameters(filters,0, ps).executeQuery();
 		if(rs.next()) return rs.getInt(1);
 		else return 0;
 	}
@@ -119,7 +125,7 @@ public class PostGresSQLDBSession extends DBSession {
 		PreparedStatement ps= getPreparedStatementForInsert(rows.get(0), tableName);
 		
 		for(List<Field> row:rows){
-			ps=fillParameters(row, ps);
+			ps=fillParameters(row,0, ps);
 			if(ps.executeUpdate()>0)
 				toReturn.addAll(getGeneratedKeys(ps));
 		}
@@ -141,40 +147,11 @@ public class PostGresSQLDBSession extends DBSession {
 		
 		
 		for(int i=0;i<rows.size();i++){
-			//Setting 
-			for(int j=0;j<rows.get(i).size();j++){
-				Field f=rows.get(i).get(j);
-				switch(f.getType()){
-				case BOOLEAN:{ 
-					Integer value=Boolean.parseBoolean(f.getValue())?1:0;
-					ps.setInt(j+1, value);
-					break;
-					}
-				case DOUBLE: ps.setDouble(j+1, Double.parseDouble(f.getValue()));
-								break;
-				case INTEGER: ps.setInt(j+1, Integer.parseInt(f.getValue()));
-				break;				
-				case STRING: ps.setString(j+1,f.getValue());
-				break;
-				}
-			}
-			for(int j=0;j<keys.get(i).size();j++){
-				Field f=keys.get(i).get(j);
-				switch(f.getType()){
-				case BOOLEAN:{ 
-					Integer value=Boolean.parseBoolean(f.getValue())?1:0;
-					ps.setInt(j+1+rows.get(i).size(), value);
-					break;
-					}
-				case DOUBLE: ps.setDouble(j+1+rows.get(i).size(), Double.parseDouble(f.getValue()));
-								break;
-				case INTEGER: ps.setInt(j+1+rows.get(i).size(), Integer.parseInt(f.getValue()));
-				break;				
-				case STRING: ps.setString(j+1+rows.get(i).size(),f.getValue());
-				break;
-				}
-			}
 			
+			//fill values
+			ps=fillParameters(rows.get(i), 0, ps);
+			//fill keys
+			ps=fillParameters(keys.get(i),rows.get(i).size(),ps);
 			count+=ps.executeUpdate();
 		}
 		return count;
@@ -222,6 +199,17 @@ public class PostGresSQLDBSession extends DBSession {
 			throws Exception {
 		//TODO
 		throw new Exception("YET TO IMPLEMENT");
+	}
+
+
+
+
+
+	@Override
+	public ResultSet getDistinct(Field toSelect,List<Field> filters, String table,
+			String orderColumn, String orderMode) throws Exception {
+		PreparedStatement ps=getPreparedStatementForDISTINCT(filters, toSelect, table, orderColumn, orderMode);
+		return fillParameters(filters,0, ps).executeQuery();
 	}
 	
 }

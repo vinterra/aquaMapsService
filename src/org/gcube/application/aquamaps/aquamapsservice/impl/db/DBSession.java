@@ -215,6 +215,11 @@ public abstract class DBSession {
 		return connection.prepareStatement(formSelectQueryStringFromFields(filters, table,orderColumn,orderDirection));
 	}	
 
+	public PreparedStatement getPreparedStatementForDISTINCT(List<Field> filters, Field toSelect,String table,String orderColumn,String orderDirection) throws SQLException{
+		return connection.prepareStatement(formSelectDistinctQueryStringFromFields(filters, toSelect,table,orderColumn,orderDirection));
+	}	
+	
+	
 	public PreparedStatement getPreparedStatementForUpdate(List<Field> toSet,List<Field> keys,String tableName)throws SQLException{
 		return this.connection.prepareStatement(formUpdateQuery(toSet, keys, tableName),Statement.RETURN_GENERATED_KEYS);
 	}
@@ -243,7 +248,7 @@ public abstract class DBSession {
 		fieldsName.append(")");
 
 		String query="INSERT INTO "+table+" "+fieldsName+" VALUES "+fieldsValues;
-		logger.trace("the prepared statement is :"+ query);
+		logger.debug("the prepared statement is :"+ query);
 		PreparedStatement ps= connection.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
 		return ps;
 	}
@@ -261,7 +266,7 @@ public abstract class DBSession {
 		return this.connection.prepareStatement(query,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 	}
 		
-	public abstract PreparedStatement fillParameters(List<Field> fields,
+	public abstract PreparedStatement fillParameters(List<Field> fields,int parameterOffset,
 			PreparedStatement ps) throws SQLException ;
 	
 	
@@ -286,7 +291,8 @@ public abstract class DBSession {
 			return rs.getInt(1);
 		else return 0;
 	}
-
+	
+	public abstract ResultSet getDistinct(Field toSelect, List<Field> filters, String table, String orderColumn, String orderMode) throws Exception;
 
 	@Deprecated
 	public void executeUpdate(String query) throws Exception{
@@ -320,6 +326,16 @@ public abstract class DBSession {
 		return toReturn;
 	}
 
+	
+	protected static String formSelectDistinctQueryStringFromFields(List<Field> filters,Field toSelectField,String table,String sortColumn,String sortDirection){
+		String toReturn="SELECT DISTINCT("+toSelectField.getName()+") FROM "+table+
+		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
+		((sortColumn!=null)?" ORDER BY "+sortColumn+" "+sortDirection:"");
+		logger.debug("QUERY STRING IS : "+toReturn);
+		return toReturn;
+	}
+	
+	
 	protected static String formSelectCountString(List<Field> filters, String tableName){
 		return "SELECT COUNT(*) FROM "+tableName+(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"");
 	}

@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
@@ -15,6 +16,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 
 public interface AquaMapsServiceInterface {
 
@@ -29,7 +31,7 @@ public interface AquaMapsServiceInterface {
 
 	public String getJSONOccurrenceCells(String speciesId, PagedRequestSettings settings)throws Exception;
 
-	public String getJSONPhilogeny()throws Exception;
+	public String getJSONPhilogeny(SpeciesOccursumFields level, ArrayList<Field> filters, PagedRequestSettings settings)throws Exception;
 
 	/**wraps getProfile
 	 * 

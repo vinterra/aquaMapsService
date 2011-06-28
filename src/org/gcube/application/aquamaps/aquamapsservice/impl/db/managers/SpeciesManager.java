@@ -13,11 +13,13 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
@@ -59,6 +61,24 @@ public class SpeciesManager {
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
+	
+	
+	public static Set<Species> getList(List<Field> filters,Resource hspen)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			String app=ServiceUtils.generateId("spec", "");
+			String query="CREATE TABLE "+app+" AS (SELECT * FROM "+speciesOccurSum+" WHERE "+SpeciesOccursumFields.speciesid+" IN (SELECT "+SpeciesOccursumFields.speciesid+" FROM "+hspen.getTableName()+"))";
+			logger.debug("QUERY IS : "+query);
+			session.executeUpdate(query);
+			Set<Species> toReturn= loadRS(session.executeFilteredQuery(filters, app,null,null));
+			session.dropTable(app);
+			return toReturn;
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
+	
 	public static String getJsonList(String orderBy, String orderDir, int limit, int offset, List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
 		String[] queries;
 		String selHspen=SourceManager.getSourceName(ResourceType.HSPEN, HSPENId);
@@ -204,4 +224,16 @@ public class SpeciesManager {
 		}
 		return toReturn;
 	}
+	
+	
+	public static String getJSONTaxonomy(Field toSelect, List<Field> filters, PagedRequestSettings settings)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			return DBUtils.toJSon(session.getDistinct(toSelect, filters, speciesOccurSum, 
+					settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
 }
