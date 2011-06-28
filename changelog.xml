@@ -9,4 +9,7 @@
 		<Change>Data Definition AquaMapsSchema.xsd</Change>
 		<Change>Moved to one configuration file</Change>
 	</Changeset>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2011-06-28">
+		<Change>DataManagemementFacility features</Change>
+	</Changeset>
 </ReleaseNotes>
