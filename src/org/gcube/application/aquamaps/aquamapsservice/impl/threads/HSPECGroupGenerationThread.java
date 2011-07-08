@@ -36,7 +36,7 @@ public class HSPECGroupGenerationThread extends Thread {
 		BatchGeneratorI batch = null;
 		try{
 			logger.trace("Starting execution for request ID "+request.getId());
-			
+			HSPECGroupGenerationRequestsManager.setStartTime(request.getId());
 			HashMap<ResourceType,Resource> sources=new HashMap<ResourceType, Resource>();
 			sources.put(ResourceType.HCAF, SourceManager.getById(ResourceType.HCAF, request.getHcafsearchid()));
 			if(sources.get(ResourceType.HCAF)==null) throw new Exception ("Unable to find hcaf with id "+request.getHcafsearchid());
