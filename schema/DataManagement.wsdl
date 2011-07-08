@@ -84,21 +84,18 @@
 				<xsd:sequence>
 					<xsd:element name="author" type="xsd:string" />
 					<xsd:element name="generationName" type="xsd:string" />
-					<xsd:element name="algorithms" type="xsd:string" />
-					<xsd:element name="enableLayerGeneration" type="xsd:boolean" />
-					<xsd:element name="enableImageGeneration" type="xsd:boolean" />
-					<xsd:element name="description" type="xsd:string" />
-					<xsd:element name="isUploadHcaf" type="xsd:boolean" />
-					<xsd:element name="isUploadHspen" type="xsd:boolean" />
-					<xsd:element name="toUploadHcafRSLocator" type="xsd:string" />
-					<xsd:element name="toUploadHspenRSLocator" type="xsd:string" />
 					<xsd:element name="description" type="xsd:string" />
 					<xsd:element name="hcafSearchId" type="xsd:int" />
 					<xsd:element name="hspenSearchId" type="xsd:int" />
-					<xsd:element name="cloud" type="xsd:boolean" />
-					<xsd:element name="backend" type="xsd:string" />
-					<xsd:element name="endpointUrl" type="xsd:string"/>
-					<xsd:element name="resourceNumber" type="xsd:int"/>
+					<xsd:element name="submissionBackend" type="xsd:string" />
+					<xsd:element name="executionEnvironment" type="xsd:string" />
+					<xsd:element name="backendUrl" type="xsd:string"/>
+					<xsd:element name="environmentConfiguration" type="xsd:string"/>
+					<xsd:element name="logic" type="xsd:string"/>
+					<xsd:element name="numPartitions" type="xsd:int"/>
+					<xsd:element name="algorithms" type="xsd:string" />
+					<xsd:element name="enableLayerGeneration" type="xsd:boolean" />
+					<xsd:element name="enableImageGeneration" type="xsd:boolean" />
 				</xsd:sequence>
 			</xsd:complexType>
 

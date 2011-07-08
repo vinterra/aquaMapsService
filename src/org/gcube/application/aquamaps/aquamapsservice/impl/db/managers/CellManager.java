@@ -9,6 +9,8 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
@@ -46,16 +48,16 @@ public class CellManager {
 	}
 
 
-	public static String getJSONCells(String orderBy, String orderDir, int limit, int offset) throws Exception{
+	public static String getJSONCells(PagedRequestSettings settings) throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), HCAF_S, orderBy, orderDir), offset, offset+limit);
+			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), HCAF_S, settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
 
-	public static String getJSONOccurrenceCells(String speciesId, String orderBy, String orderDir, int limit, int offset) throws Exception{
+	public static String getJSONOccurrenceCells(String speciesId, PagedRequestSettings settings) throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
@@ -64,7 +66,7 @@ public class CellManager {
 			String HCAF=SourceManager.getSourceName(ResourceType.HCAF, SourceManager.getDefaultId(ResourceType.HCAF));
 			PreparedStatement ps= session.preparedStatement("SELECT * FROM "+occurrenceCells+" as o INNER JOIN "+HCAF+" as h ON " +
 					"o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+" WHERE o."+SpeciesOccursumFields.speciesid+" = ?");
-			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), offset, offset+limit);
+			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
@@ -79,7 +81,7 @@ public class CellManager {
 			for(String code: items){
 				List<Field> field= new ArrayList<Field>();
 				field.add(new Field(HCAF_SFields.csquarecode+"",code,FieldType.STRING));
-				if(ps==null) ps=session.getPreparedStatementForQuery(field, HCAF_S, HCAF_SFields.csquarecode+"", "ASC");
+				if(ps==null) ps=session.getPreparedStatementForQuery(field, HCAF_S, HCAF_SFields.csquarecode+"", OrderDirection.ASC);
 				ResultSet rs=session.fillParameters(field,0, ps).executeQuery();
 				if(rs.next())				
 					toReturn.add(new Cell(Field.loadRow(rs)));
@@ -108,7 +110,7 @@ public class CellManager {
 			for(Cell c: toUpdate){
 				List<Field> filter=new ArrayList<Field>();
 				filter.add(new Field(HCAF_SFields.csquarecode+"",c.getCode(),FieldType.STRING));
-				if(ps==null)ps=session.getPreparedStatementForQuery(filter, HCAFName,HCAF_SFields.csquarecode+"","ASC");
+				if(ps==null)ps=session.getPreparedStatementForQuery(filter, HCAFName,HCAF_SFields.csquarecode+"",OrderDirection.ASC);
 				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
 					c.attributesList.addAll(Field.loadRow(rs));
@@ -130,7 +132,7 @@ public class CellManager {
 				List<Field> filter=new ArrayList<Field>();
 				filter.add(new Field(HCAF_SFields.csquarecode+"",c.getCode(),FieldType.STRING));
 				filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
-				if(ps==null)ps=session.getPreparedStatementForQuery(filter, occurrenceCells,HCAF_SFields.csquarecode+"","ASC");
+				if(ps==null)ps=session.getPreparedStatementForQuery(filter, occurrenceCells,HCAF_SFields.csquarecode+"",OrderDirection.ASC);
 				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
 					c.attributesList.addAll(Field.loadRow(rs));
@@ -148,7 +150,7 @@ public class CellManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> cellFilter=new ArrayList<Field>();
 			cellFilter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
-			Set<Cell> cellsInTable = Cell.loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.csquarecode+"", "ASC"));
+			Set<Cell> cellsInTable = Cell.loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.csquarecode+"", OrderDirection.ASC));
 			logger.trace("Found "+cellsInTable.size()+" occurrence cells, going to filter..");
 			Set<Cell> toReturn = new HashSet<Cell>();
 

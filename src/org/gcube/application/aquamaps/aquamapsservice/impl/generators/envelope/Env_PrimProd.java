@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
@@ -23,7 +22,7 @@ public class Env_PrimProd extends EnvEngine {
 	private double prodPMin;
 	private double prodPMax;
 	
-	public Env_PrimProd() {
+	public Env_PrimProd() throws Exception{
 		super();
 	}
 
@@ -42,8 +41,8 @@ public class Env_PrimProd extends EnvEngine {
 		
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			Double primProdValue=cell.getFieldbyName(HCAF_DFields.primprodmean+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+			Double primProdValue=cell.getFieldbyName(HCAF_DFields.primprodmean+"").getValueAsDouble(defaultDoubleValue+"");
+			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(defaultDoubleValue+"");
 			if (primProdValue != null && oceanArea> 0) {
 				filterCells.add(cell);
 			}

@@ -60,7 +60,7 @@
 					<xsd:element name="author" type="xsd:string" />
 					<xsd:element name="disclaimer" type="xsd:string" />
 					<xsd:element name="provenance" type="xsd:string" />
-					<xsd:element name="date" type="xsd:string" />
+					<xsd:element name="date" type="xsd:long" />
 					<xsd:element name="sourceHCAFId" type="xsd:int" />
 					<xsd:element name="sourceHSPENId" type="xsd:int" />
 					<xsd:element name="sourceHSPECId" type="xsd:int" />
@@ -96,7 +96,7 @@
 					<xsd:element name="boundingBox" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="author" type="xsd:string" />
-					<xsd:element name="date" type="xsd:string" />
+					<xsd:element name="date" type="xsd:long" />
 					<xsd:element name="id" type="xsd:int" />
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="selectedSpecies" type="tns:speciesArray" />
@@ -124,7 +124,7 @@
 					<xsd:element name="selectedAreas" type="tns:areasArray" />
 					<xsd:element name="weights" type="tns:envelopeWeightArray" />
 					<xsd:element name="author" type="xsd:string" />
-					<xsd:element name="date" type="xsd:string" />
+					<xsd:element name="date" type="xsd:long" />
 					<xsd:element name="relatedResources" type="tns:fileArray" />
 					<xsd:element name="gis" type="xsd:boolean" />
 					<xsd:element name="groupId" type="xsd:string"/>
@@ -143,7 +143,9 @@
 			<xsd:complexType name="submitted">
 			<xsd:sequence>
 				<xsd:element name="author" type="xsd:string"/>
-				<xsd:element name="date" type="xsd:string"/>
+				<xsd:element name="startTime" type="xsd:long"/>
+				<xsd:element name="endTime" type="xsd:long"/>
+				<xsd:element name="submissionTime" type="xsd:long"/>
 				<xsd:element name="gisEnabled" type="xsd:boolean"/>
 				<xsd:element name="publishedIds" type="xsd:string"/>
 				<xsd:element name="gisReferences" type="xsd:string"/>

@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 
@@ -23,7 +24,7 @@ public class PostGresSQLDBSession extends DBSession {
 	
 
 	@Override
-	public ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, String orderMode)throws Exception{
+	public ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, OrderDirection orderMode)throws Exception{
 		PreparedStatement ps=getPreparedStatementForQuery(filters, table, orderColumn, orderMode);
 		return fillParameters(filters,0, ps).executeQuery();
 	}
@@ -207,7 +208,7 @@ public class PostGresSQLDBSession extends DBSession {
 
 	@Override
 	public ResultSet getDistinct(Field toSelect,List<Field> filters, String table,
-			String orderColumn, String orderMode) throws Exception {
+			String orderColumn, OrderDirection orderMode) throws Exception {
 		PreparedStatement ps=getPreparedStatementForDISTINCT(filters, toSelect, table, orderColumn, orderMode);
 		return fillParameters(filters,0, ps).executeQuery();
 	}

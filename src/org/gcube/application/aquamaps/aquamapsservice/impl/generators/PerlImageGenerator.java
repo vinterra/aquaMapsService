@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -53,8 +54,8 @@ public class PerlImageGenerator implements Generator{
 				BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 				String line = null;
 				while ((line = input.readLine())!=null){
-					if(ServiceContext.getContext().isEnableScriptLogging())
-					logger.debug(line);
+					if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.ENABLE_SCRIPT_LOGGING))
+					logger.trace(line);
 				}
 
 				try {

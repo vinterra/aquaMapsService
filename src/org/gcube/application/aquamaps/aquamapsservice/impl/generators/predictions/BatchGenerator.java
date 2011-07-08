@@ -1,14 +1,22 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions;
 
+import java.util.HashMap;
+
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBConnectionParameters;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.DistributionGenerator;
 import org.gcube.common.core.utils.logging.GCUBELog;
+
 
 public class BatchGenerator implements BatchGeneratorI {
 
@@ -31,38 +39,11 @@ public class BatchGenerator implements BatchGeneratorI {
 	public String generateHSPECTable(String hcaf, String hspen,
 			AlgorithmType type,Boolean iscloud,String endpoint,Integer resourceNumber) throws Exception {
 		
-		String toGenerate=ServiceUtils.generateId("hspec", "");
-
-		logger.trace("generating hspec : "+toGenerate);
-		logger.trace("hspen : "+hspen);
-		logger.trace("hcaf : "+hcaf);
-		logger.trace("algorithm : "+type);
-		logger.trace("cloud : "+iscloud);
-		logger.trace("endpoint : "+endpoint);
-		logger.trace("resource number : "+resourceNumber);
-		
-		
-		//hspen reference table
-		e.setHspenTable(hspen);
-		//hcaf reference table
-		e.setHcafTable(hcaf);
-		//output table - created if the CreateTable flag is true
-		e.setDistributionTable(toGenerate);
-		//native generation flag set to false - default value
-		e.setNativeGeneration(type.equals(AlgorithmType.NativeRange)||type.equals(AlgorithmType.NativeRange2050));
-		//2050 generation flag set to false - default value
-		e.setType2050(type.equals(AlgorithmType.NativeRange2050)||type.equals(AlgorithmType.SuitableRange2050));
-		
-		e.setGenerator(iscloud?GenerationModel.REMOTE_AQUAMAPS:GenerationModel.AQUAMAPS);
-		if(iscloud)e.setRemoteCalculator(endpoint);
-		
-		e.setNumberOfThreads(resourceNumber);
-		
-		dg= new DistributionGenerator(e);
-		//calculation
-		dg.generateHSPEC();
-		
-		return toGenerate;
+		return generateHSPEC(hcaf, hspen, 
+				type.equals(AlgorithmType.NativeRange)||type.equals(AlgorithmType.NativeRange2050),
+				type.equals(AlgorithmType.SuitableRange2050)||type.equals(AlgorithmType.NativeRange2050), 
+				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.BATCH_POOL_SIZE),
+				"", "", "", new HashMap<String, String>(), GenerationModel.AQUAMAPS);
 	}
 	@Override
 	public void setConfiguration(String path, DBCredentialDescriptor credentials) {
@@ -118,4 +99,68 @@ public class BatchGenerator implements BatchGeneratorI {
 	}
 	
 	
+	@Override
+	public String generateTable(TableGenerationConfiguration configuration)
+			throws Exception {
+		return generateHSPEC(configuration.getSources().get(ResourceType.HCAF).getTableName(),
+				configuration.getSources().get(ResourceType.HSPEN).getTableName(),
+				configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
+				configuration.getAlgorithm().equals(AlgorithmType.SuitableRange2050)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
+				configuration.getPartitionsNumber(),
+				configuration.getBackendUrl(),
+				configuration.getAuthor(),
+				configuration.getExecutionEnvironment(),
+				configuration.getConfiguration(),
+				configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getProperty(PropertiesConstants.LOCAL_BACKEND))?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS);
+	}
+	
+	
+	private String generateHSPEC(String hcafTable, String hspenTable,boolean isNative,boolean is2050,int threadNum,
+			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,GenerationModel model)throws Exception{
+		
+		String toGenerate=ServiceUtils.generateId("hspec", "");
+
+		logger.trace("generating hspec : "+toGenerate);
+		
+		logger.trace("hspen : "+hspenTable);
+		logger.trace("hcaf : "+hcafTable);
+		logger.trace("native : "+isNative);
+		logger.trace("2050 : "+is2050);
+		logger.trace("thread N : "+threadNum);
+		logger.trace("url : "+calculatorUrl);
+		logger.trace("calculation user : "+calculationUser);
+		logger.trace("model : "+model);
+		logger.trace("environment : "+executioneEnvironment);
+		logger.trace("config values : "+calculationConfig.size());
+		
+		
+		
+		
+		//hspen reference table
+		e.setHspenTable(hspenTable);
+		//hcaf reference table
+		e.setHcafTable(hcafTable);
+		//output table - created if the CreateTable flag is true
+		e.setDistributionTable(toGenerate);
+		//native generation flag set to false - default value
+		e.setNativeGeneration(isNative);
+		//2050 generation flag set to false - default value
+		e.setType2050(is2050);
+		
+		e.setGenerator(model);
+		e.setRemoteCalculator(calculatorUrl);
+		e.setServiceUserName(calculationUser);
+		
+		e.setRemoteEnvironment(executioneEnvironment);
+		e.setNumberOfThreads(threadNum);
+		e.setGeneralProperties(calculationConfig);
+		e.setGenerator(model);
+		
+		
+		dg= new DistributionGenerator(e);
+		//calculation
+		dg.generateHSPEC();
+		
+		return toGenerate;
+	}
 }

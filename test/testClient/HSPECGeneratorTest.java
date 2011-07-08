@@ -2,6 +2,7 @@ package testClient;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,15 +13,22 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortTy
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.WrapperUtils;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.environments.ComputationalInfrastructure;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.test.DummyObjects;
 import org.gcube.application.aquamaps.dataModel.xstream.EnvelopeConverter;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
@@ -36,14 +44,15 @@ public class HSPECGeneratorTest {
 	 */
 	public static void main(String[] args)throws Exception {
 //		fromSpeciesAndCell();
-		fromCSVList();
+//		fromCSVList();
+//		fromRequestToGeneralEnvironment();
 		System.out.println("END");
 	}
 	
 	
 	private static void fromSpeciesAndCell()throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
 		
 		Species s=wrapper.loadEnvelope("Fis-22836",1);
 //		Envelope env=wrapper.loadEnvelope(s.getId(), 1);

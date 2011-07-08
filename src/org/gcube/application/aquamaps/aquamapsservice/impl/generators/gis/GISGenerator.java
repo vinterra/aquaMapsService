@@ -27,6 +27,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.BadRequest
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
@@ -35,7 +36,6 @@ import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
 import org.gcube.common.gis.dataModel.types.LayersType;
-import org.json.JSONException;
 
 public class GISGenerator implements Generator{
 
@@ -136,7 +136,7 @@ public class GISGenerator implements Generator{
 				if(!createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle()))
 					throw new Exception("Unable to generate Layer "+request.getMapName());
 
-				String url = ServiceContext.getContext().getGeoServerUrl()+"/wms/"+layerTable;
+				String url = ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL)+"/wms/"+layerTable;
 				logger.trace("Layer url : "+url);
 				
 				request.setGeServerLayerId(layerTable);
@@ -310,12 +310,12 @@ public class GISGenerator implements Generator{
 	private static String createLayerTable(String appTableName,String layerName,String featureLabel,DBSession session)throws Exception{
 
 		String featureTable=ServiceUtils.generateId(layerName, "").replaceAll(" ", "").replaceAll("_","").toLowerCase();
-
+		String worldTable=ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_WORLD_TABLE);
 		logger.trace("Creating table "+featureTable);
 		session.executeUpdate("Create table "+featureTable+" AS (Select "+
-				ServiceContext.getContext().getWorldTable()+".*, app."+featureLabel+
-				" FROM "+appTableName+" AS app inner join "+ServiceContext.getContext().getWorldTable()+
-				" ON app."+HCAF_SFields.csquarecode+"="+ServiceContext.getContext().getWorldTable()+"."+HCAF_SFields.csquarecode+")");
+				worldTable+".*, app."+featureLabel+
+				" FROM "+appTableName+" AS app inner join "+worldTable+
+				" ON app."+HCAF_SFields.csquarecode+"="+worldTable+"."+HCAF_SFields.csquarecode+")");
 		logger.trace(featureTable+" created");
 		logger.trace("going do drop appTable "+appTableName);
 		session.dropTable(appTableName);
@@ -333,7 +333,9 @@ public class GISGenerator implements Generator{
 
 	public static boolean generateStyle(StyleGenerationRequest req)throws Exception{
 		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
 		String style;
 		if(req.getTypeValue()==Integer.class){
 			switch(req.getClusterScaleType()){
@@ -361,9 +363,11 @@ public class GISGenerator implements Generator{
 
 
 	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex) throws Exception{		
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();
-		featureTypeRest.setDatastore(ServiceContext.getContext().getPostGis_database());
+		featureTypeRest.setDatastore(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME));
 		featureTypeRest.setEnabled(true);
 		featureTypeRest.setLatLonBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
 		featureTypeRest.setNativeBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
@@ -373,7 +377,7 @@ public class GISGenerator implements Generator{
 		featureTypeRest.setSrs("EPSG:4326");
 		featureTypeRest.setNativeCRS(crs);
 		featureTypeRest.setTitle(featureTable);
-		featureTypeRest.setWorkspace(ServiceContext.getContext().getGeoServerWorkspace()); 
+		featureTypeRest.setWorkspace(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_WORKSPACE)); 
 		logger.debug("Invoking Caller for registering layer : ");
 		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
 		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());
@@ -391,9 +395,11 @@ public class GISGenerator implements Generator{
 
 	private static boolean createGroupOnGeoServer(Set<String> layers,Map<String,String> styles, String groupName)throws Exception{	 
 		logger.trace("Creating group on geo server...");
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getGeoServerUrl(),ServiceContext.getContext().getGeoServerUser(),ServiceContext.getContext().getGeoServerPwd());
-		logger.trace("Getting template group : "+ServiceContext.getContext().getTemplateGroup());
-		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getTemplateGroup());
+		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
+		logger.trace("Getting template group : "+ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_TEMPLATE_GROUP));
+		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_TEMPLATE_GROUP));
 		//		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
 		//        g.setLayers(list);
 		//        g.setStyles(styles);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
@@ -22,7 +21,7 @@ public class Env_Temp extends EnvEngine{
 	private double tempPMin;            
 	private double tempPMax;
 	
-	public Env_Temp() {
+	public Env_Temp() throws Exception{
 		super();
 	}
 
@@ -45,8 +44,8 @@ public class Env_Temp extends EnvEngine{
 		
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			Double fldValue=cell.getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+			Double fldValue=cell.getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
+			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(defaultDoubleValue+"");
 			if (fldValue != null &&	fldValue != -9999 && oceanArea> 0) {
 				filterCells.add(cell);
 			}

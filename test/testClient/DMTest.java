@@ -1,11 +1,15 @@
 package testClient;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
-import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
+import org.gcube.application.aquamaps.dataModel.Types.LogicType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.MalformedScopeExpressionException;
 
@@ -17,15 +21,52 @@ public class DMTest {
 	 * @throws MalformedScopeExpressionException 
 	 */
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
-		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
+		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
-		System.out.println(dmInterface.getJSONSPECGroupGenreationRequests(new PagedRequestSettings(5, 0, GroupGenerationRequestFields.submissiontime+"", "ASC")));
-		EnvironmentalExecutionReportItem report= dmInterface.getReport(0);
-		System.out.println("**** REPORT *****");
-		System.out.println("resources Map : "+report.getResourcesMap());
-		System.out.println("resources Load : "+report.getResourceLoad());
-		System.out.println("percent : "+report.getPercent());
-		System.out.println("Species : "+report.getElaboratedSpecies());
+//		dmInterface.generateMaps("fabio.sinibaldi", false, 13, new ArrayList<Field>());
+		fromRequestToGeneralEnvironment();
+		System.out.println("Done");
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+//		System.out.println(dmInterface.getJSONSPECGroupGenreationRequests(new PagedRequestSettings(5, 0, GroupGenerationRequestFields.submissiontime+"", "ASC")));
+//		EnvironmentalExecutionReportItem report= dmInterface.getReport(0);
+//		System.out.println("**** REPORT *****");
+//		System.out.println("resources Map : "+report.getResourcesMap());
+//		System.out.println("resources Load : "+report.getResourceLoad());
+//		System.out.println("percent : "+report.getPercent());
+//		System.out.println("Species : "+report.getElaboratedSpecies());
 	}
 
+	
+	private static void fromRequestToGeneralEnvironment()throws Exception{
+		HSPECGroupGenerationRequest request=new HSPECGroupGenerationRequest();
+		request.setAuthor("genericTester");
+		request.setGenerationname("Test execution");
+		request.setDescription("Just a simple execution");
+		request.setHcafsearchid(1);
+		request.setHspensearchid(11);
+//		request.setSubmissionBackend("AquaMapsVRE");
+		request.setSubmissionBackend("RainyCloud");
+		request.setExecutionEnvironment("Private Cloud");
+		request.setBackendURL("http://node16.d.d4science.research-infrastructures.eu:9000/RainyCloud-web-0.00.01");
+		request.setEnvironmentConfiguration(new HashMap<String, String>());
+		request.setLogic(LogicType.HSPEC);
+		request.setNumPartitions(4);
+		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.NativeRange+""}));
+		request.setEnableimagegeneration(false);
+		request.setEnablelayergeneration(false);
+		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
+		dmInterface.submitRequest(request);
+	}
+	
 }

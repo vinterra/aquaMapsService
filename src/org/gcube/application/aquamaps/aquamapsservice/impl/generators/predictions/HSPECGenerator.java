@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
@@ -19,9 +18,19 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.dataModel.enhanced.*;
-import org.gcube.application.aquamaps.dataModel.Types.*;
-import org.gcube.application.aquamaps.dataModel.fields.*;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.dataModel.fields.OccurrenceCellsFields;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 /**
@@ -36,12 +45,12 @@ public class HSPECGenerator {
 	private static Map<EnvelopeFields,Boolean> defaultWeights=new HashMap<EnvelopeFields, Boolean>();
 
 	static {
-		defaultWeights.put(EnvelopeFields.Depth, ServiceContext.getContext().isEvaluateDepth());
-		defaultWeights.put(EnvelopeFields.IceConcentration, ServiceContext.getContext().isEvaluateIceConcentration());
-		defaultWeights.put(EnvelopeFields.LandDistance, ServiceContext.getContext().isEvaluateLandDistance());
-		defaultWeights.put(EnvelopeFields.PrimaryProduction, ServiceContext.getContext().isEvaluatePrimaryProduction());
-		defaultWeights.put(EnvelopeFields.Salinity, ServiceContext.getContext().isEvaluateSalinity());
-		defaultWeights.put(EnvelopeFields.Temperature, ServiceContext.getContext().isEvaluateTemperature());
+		defaultWeights.put(EnvelopeFields.Depth, true);
+		defaultWeights.put(EnvelopeFields.IceConcentration, true);
+		defaultWeights.put(EnvelopeFields.LandDistance, true);
+		defaultWeights.put(EnvelopeFields.PrimaryProduction, true);
+		defaultWeights.put(EnvelopeFields.Salinity, true);
+		defaultWeights.put(EnvelopeFields.Temperature, true);
 	}
 	
 
@@ -135,6 +144,12 @@ public class HSPECGenerator {
 	private List<Field>probabilityLogRow=new ArrayList<Field>();
 
 
+	
+	
+	
+	
+	
+	
 	//*** CONSTRUCTORS
 	//TODO change for allow suitable/native 
 
@@ -428,7 +443,7 @@ public class HSPECGenerator {
 		//		logger.trace("species query is "+queryhspen);
 
 		List<Field> filter=new ArrayList<Field>(); 
-		hspenRes=session.executeFilteredQuery(filter, hspenTable, SpeciesOccursumFields.speciesid+"", "ASC");
+		hspenRes=session.executeFilteredQuery(filter, hspenTable, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC);
 
 		logger.trace("HSPEN query took "+(System.currentTimeMillis()-startGeneration));
 
@@ -523,10 +538,10 @@ public class HSPECGenerator {
 		if(isEnableProbabilitiesLog())
 			probabilityLogRow.get(0).setValue(currentSpecies.getId());
 
-		Bounduary bounds=getBounduary(currentSpecies.getFieldbyName(HspenFields.nmostlat+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-				currentSpecies.getFieldbyName(HspenFields.smostlat+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-				currentSpecies.getFieldbyName(HspenFields.emostlong+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-				currentSpecies.getFieldbyName(HspenFields.wmostlong+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),currentSpecies.getId());
+		Bounduary bounds=getBounduary(currentSpecies.getFieldbyName(HspenFields.nmostlat+"").getValueAsDouble(""),
+				currentSpecies.getFieldbyName(HspenFields.smostlat+"").getValueAsDouble(""),
+				currentSpecies.getFieldbyName(HspenFields.emostlong+"").getValueAsDouble(""),
+				currentSpecies.getFieldbyName(HspenFields.wmostlong+"").getValueAsDouble(""),currentSpecies.getId());
 
 		//************ Insert if inFAO && inBox
 		//************ NB for suita
@@ -552,7 +567,7 @@ public class HSPECGenerator {
 			//Copy from suitable
 			List<Field> filters=new ArrayList<Field>();
 			filters.add(new Field(SpeciesOccursumFields.speciesid+"",currentSpecies.getId(),FieldType.STRING));			
-			ResultSet rs =session.executeFilteredQuery(filters, resultsSuitable, HCAF_SFields.csquarecode+"", "ASC");
+			ResultSet rs =session.executeFilteredQuery(filters, resultsSuitable, HCAF_SFields.csquarecode+"", OrderDirection.ASC);
 
 			while(rs.next()){
 				boolean inBox=rs.getBoolean(HSPECFields.boundboxyn+"");
@@ -577,9 +592,9 @@ public class HSPECGenerator {
 				currentCell.attributesList.addAll(Field.loadRow(hcafRes));
 				try{
 					Double probability=null;
-					boolean inFAO= this.getInFao(currentCell.getFieldbyName(HCAF_SFields.faoaream+"").getValueAsInteger(ServiceContext.getContext().getIntegerDefault()),
+					boolean inFAO= this.getInFao(currentCell.getFieldbyName(HCAF_SFields.faoaream+"").getValueAsInteger(""),
 							currentSpecies.getFieldbyName(HspenFields.faoareas+"").getValue());
-					boolean inBox= this.getInBox(currentCell.getFieldbyName(HCAF_SFields.centerlat+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), bounds);
+					boolean inBox= this.getInBox(currentCell.getFieldbyName(HCAF_SFields.centerlat+"").getValueAsDouble(""), bounds);
 
 					probabilityRow.get(1).setValue(currentCell.getCode());
 
@@ -624,56 +639,56 @@ public class HSPECGenerator {
 
 	private Double getOverallProbability() throws Exception{
 		Double preparedSeaIce= prepareSeaIceForSpecies(currentSpecies.getId(),
-				currentSpecies.getFieldbyName(HspenFields.iceconmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),session);
+				currentSpecies.getFieldbyName(HspenFields.iceconmin+"").getValueAsDouble(""),session);
 		Double landValue=(currentWeights.get(EnvelopeFields.LandDistance))?
-				getLandDistance(currentSpecies.getFieldbyName(HspenFields.landdistyn+"").getValueAsInteger(ServiceContext.getContext().getIntegerDefault()),
-						currentCell.getFieldbyName(HCAF_SFields.landdist+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.landdistmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.landdistprefmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.landdistprefmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.landdistmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault())):1.0; 
+				getLandDistance(currentSpecies.getFieldbyName(HspenFields.landdistyn+"").getValueAsInteger(""),
+						currentCell.getFieldbyName(HCAF_SFields.landdist+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.landdistmin+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.landdistprefmin+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.landdistprefmax+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.landdistmax+"").getValueAsDouble("")):1.0; 
 		Double sstValue=(currentWeights.get(EnvelopeFields.Temperature))?
-				getSST(currentCell.getFieldbyName(HCAF_DFields.sstanmean+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentCell.getFieldbyName(HCAF_DFields.sbtanmean+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.tempmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),						
-						currentSpecies.getFieldbyName(HspenFields.tempmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.tempprefmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.tempprefmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
+				getSST(currentCell.getFieldbyName(HCAF_DFields.sstanmean+"").getValueAsDouble(""),
+						currentCell.getFieldbyName(HCAF_DFields.sbtanmean+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.tempmin+"").getValueAsDouble(""),						
+						currentSpecies.getFieldbyName(HspenFields.tempmax+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.tempprefmin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.tempprefmax+"").getValueAsDouble(""), 
 						currentSpecies.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0]):1.0;
 				
 				
 				Double depthValue=(currentWeights.get(EnvelopeFields.Depth))?getDepth(
-						currentCell.getFieldbyName(HCAF_DFields.depthmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentCell.getFieldbyName(HCAF_DFields.depthmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.pelagic+"").getValueAsInteger(ServiceContext.getContext().getIntegerDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.depthmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.depthmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.depthprefmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.depthprefmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						currentSpecies.getFieldbyName(HspenFields.meandepth+"").getValueAsInteger(ServiceContext.getContext().getIntegerDefault()),
-						currentCell.getFieldbyName(HCAF_DFields.depthmean+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault())):1.0;
+						currentCell.getFieldbyName(HCAF_DFields.depthmax+"").getValueAsDouble(""), 
+						currentCell.getFieldbyName(HCAF_DFields.depthmin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.pelagic+"").getValueAsInteger(""), 
+						currentSpecies.getFieldbyName(HspenFields.depthmax+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.depthmin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.depthprefmax+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.depthprefmin+"").getValueAsDouble(""),
+						currentSpecies.getFieldbyName(HspenFields.meandepth+"").getValueAsInteger(""),
+						currentCell.getFieldbyName(HCAF_DFields.depthmean+"").getValueAsDouble("")):1.0;
 				
 				
 		Double salinityValue=(currentWeights.get(EnvelopeFields.Salinity))?
-				getSalinity(currentCell.getFieldbyName(HCAF_DFields.salinitymean+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentCell.getFieldbyName(HCAF_DFields.salinitybmean+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
+				getSalinity(currentCell.getFieldbyName(HCAF_DFields.salinitymean+"").getValueAsDouble(""), 
+						currentCell.getFieldbyName(HCAF_DFields.salinitybmean+"").getValueAsDouble(""), 
 						currentSpecies.getFieldbyName(HspenFields.layer+"").getValue().toCharArray()[0], 
-						currentSpecies.getFieldbyName(HspenFields.salinitymin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.salinitymax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.salinityprefmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.salinityprefmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault())):1.0;
+						currentSpecies.getFieldbyName(HspenFields.salinitymin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.salinitymax+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.salinityprefmin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.salinityprefmax+"").getValueAsDouble("")):1.0;
 		Double primaryProductsValue=(currentWeights.get(EnvelopeFields.PrimaryProduction))?
-					getPrimaryProduction(currentCell.getFieldbyName(HCAF_DFields.primprodmean+"").getValueAsInteger(ServiceContext.getContext().getIntegerDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.primprodmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.primprodprefmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.primprodmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
-						currentSpecies.getFieldbyName(HspenFields.primprodprefmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault())):1.0;
+					getPrimaryProduction(currentCell.getFieldbyName(HCAF_DFields.primprodmean+"").getValueAsInteger(""), 
+						currentSpecies.getFieldbyName(HspenFields.primprodmin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.primprodprefmin+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.primprodmax+"").getValueAsDouble(""), 
+						currentSpecies.getFieldbyName(HspenFields.primprodprefmax+"").getValueAsDouble("")):1.0;
 		Double seaIceConcentration=(currentWeights.get(EnvelopeFields.IceConcentration))?
-				getSeaIceConcentration(currentCell.getFieldbyName(HCAF_DFields.iceconann+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-						(preparedSeaIce!=-9999.0)?preparedSeaIce:currentSpecies.getFieldbyName(HspenFields.iceconmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-								currentSpecies.getFieldbyName(HspenFields.iceconprefmin+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-								currentSpecies.getFieldbyName(HspenFields.iceconmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()),
-								currentSpecies.getFieldbyName(HspenFields.iceconprefmax+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault()), 
+				getSeaIceConcentration(currentCell.getFieldbyName(HCAF_DFields.iceconann+"").getValueAsDouble(""),
+						(preparedSeaIce!=-9999.0)?preparedSeaIce:currentSpecies.getFieldbyName(HspenFields.iceconmin+"").getValueAsDouble(""),
+								currentSpecies.getFieldbyName(HspenFields.iceconprefmin+"").getValueAsDouble(""),
+								currentSpecies.getFieldbyName(HspenFields.iceconmax+"").getValueAsDouble(""),
+								currentSpecies.getFieldbyName(HspenFields.iceconprefmax+"").getValueAsDouble(""), 
 								currentSpecies.getId()):1.0;
 		Double probability=landValue*sstValue*depthValue*salinityValue*primaryProductsValue*seaIceConcentration;
 		if(isEnableProbabilitiesLog()){

@@ -7,6 +7,8 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 
@@ -31,7 +33,7 @@ public class SourceGenerationManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(searchId,generationId+"",FieldType.INTEGER));
-			ResultSet rs= session.executeFilteredQuery(filter, generationTable, searchId, "ASC");
+			ResultSet rs= session.executeFilteredQuery(filter, generationTable, searchId, OrderDirection.ASC);
 			if(rs.next())
 				return rs.getObject(fieldName);
 			else return null;
@@ -94,11 +96,11 @@ public class SourceGenerationManager {
 	
 	
 	
-	public static String getReport(String orderColumn, String orderMode, int offset, int limit)throws Exception{
+	public static String getReport(PagedRequestSettings settings)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), generationTable, orderColumn, orderMode),
+			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), generationTable, settings.getOrderColumn(), settings.getOrderDirection()),
 					session.getCount(generationTable, new ArrayList<Field>()));
 		}catch (Exception e){
 			throw e;

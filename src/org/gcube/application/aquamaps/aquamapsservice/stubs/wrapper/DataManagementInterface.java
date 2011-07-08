@@ -2,9 +2,9 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
 import java.util.List;
 
-import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 
 public interface DataManagementInterface {
 

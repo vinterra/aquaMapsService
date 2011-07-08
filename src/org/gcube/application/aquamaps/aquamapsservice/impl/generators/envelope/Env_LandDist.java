@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
@@ -22,7 +21,7 @@ public class Env_LandDist extends EnvEngine {
 	private double landPMin;
 	private double landPMax;
 	
-	public Env_LandDist() {
+	public Env_LandDist() throws Exception{
 		super();
 	}
 	
@@ -40,8 +39,8 @@ public class Env_LandDist extends EnvEngine {
 */
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			Double landDistValue=cell.getFieldbyName(HCAF_SFields.landdist+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+			Double landDistValue=cell.getFieldbyName(HCAF_SFields.landdist+"").getValueAsDouble(defaultDoubleValue+"");
+			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(defaultDoubleValue+"");
 			if (landDistValue != null &&	landDistValue != -9999 && oceanArea> 0) {
 				filterCells.add(cell);
 			}

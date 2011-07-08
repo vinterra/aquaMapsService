@@ -40,7 +40,7 @@ public class DummyObjects {
 		Job toReturn= new Job();
 		toReturn.setName("Dummy Testing Job");
 		toReturn.setAuthor("fabio.sinibaldi");
-		toReturn.setDate("2/10/2010");
+		toReturn.setDate(System.currentTimeMillis());
 		toReturn.setIsGis(false);
 		Set<Species> basket=getSpeciesBasket();
 		toReturn.addSpecies(basket);

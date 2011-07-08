@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
@@ -25,16 +26,15 @@ public class WrapperTest {
 	
 	public static void main(String[] args) throws Exception{
 		
-//		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.SERVICE_URI);
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
 		
 		
-		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", "ASC")));
+		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
 //		System.out.println(wrapper.getJSONPhilogeny());
-		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", "ASC"), ResourceType.HCAF));
-		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", "ASC"), ResourceType.HSPEN));
-		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", "ASC"), ResourceType.HSPEC));
-//		System.out.println(wrapper.getJSONSubmitted(true, null, null, null, null, new PagedRequestSettings(3, 0, SubmittedFields.searchid+"", "ASC")));
+		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HCAF));
+		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEN));
+		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEC));
+//		System.out.println(wrapper.getJSONSubmitted(true, null, null, null, null, new PagedRequestSettings(3, 0, SubmittedFields.searchid+"", OrderDirection.ASC)));
 		
 		Species s=new Species(specId);
 		System.out.println("loading Envelope for Species ");
@@ -65,7 +65,7 @@ public class WrapperTest {
 
 //		wrapper.getJSONSubmitted(String userName,boolean showObjects,String date,Integer jobId,SubmittedStatus status,ObjectType objType, PagedRequestSettings settings)throws Exception;
 
-		System.out.println(wrapper.getJSONOccurrenceCells(DummyObjects.getSpeciesBasket().iterator().next().getId(), new PagedRequestSettings(1,0,HCAF_SFields.csquarecode+"","ASC")));
+		System.out.println(wrapper.getJSONOccurrenceCells(DummyObjects.getSpeciesBasket().iterator().next().getId(), new PagedRequestSettings(1,0,HCAF_SFields.csquarecode+"",OrderDirection.ASC)));
 
 //		public AquaMapsObject loadObject(int objectId)throws Exception;
 
@@ -81,7 +81,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(35961)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(63768)));
 		
 		
 		

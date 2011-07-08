@@ -2,10 +2,10 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.generators;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceGenerator implements Generator{
@@ -29,7 +29,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 	
 	
 	
-	private static int  generateCSV(String inputFile,String outputFile) throws IOException{
+	private static int  generateCSV(String inputFile,String outputFile) throws Exception{
 
 
 		Runtime rt  = Runtime.getRuntime();
@@ -42,7 +42,7 @@ private static GCUBELog logger= new GCUBELog(SourceGenerator.class);
 		BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
 		String line = null;
 		while ((line = input.readLine())!=null){
-			if(ServiceContext.getContext().isEnableScriptLogging())
+			if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.ENABLE_SCRIPT_LOGGING))
 			logger.trace(line);
 		}
 

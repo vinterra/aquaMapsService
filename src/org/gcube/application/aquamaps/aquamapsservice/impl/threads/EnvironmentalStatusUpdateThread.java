@@ -8,9 +8,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.prediction
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.common.core.utils.logging.GCUBELog;

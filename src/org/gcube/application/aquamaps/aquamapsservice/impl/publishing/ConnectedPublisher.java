@@ -16,7 +16,7 @@ import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.RSWrapper;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.ZipUtils;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.wrapper.AquaMapsPublisherWrapper;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
@@ -25,7 +25,6 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.informationsystem.client.ISClient;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -52,8 +51,8 @@ public class ConnectedPublisher implements Publisher{
 	
 	private ConnectedPublisher(){};
 	
-	public static Publisher getPublisher(){
-		if(ServiceContext.getContext().isUseDummyPublisher())return new DummyPublisher();
+	public static Publisher getPublisher()throws Exception{
+		if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.USE_DUMMY_PUBLISHER))return new DummyPublisher();
 		else return instance;}
 	
 	private static GCUBELog logger= new GCUBELog(ConnectedPublisher.class);
@@ -292,7 +291,7 @@ public class ConnectedPublisher implements Publisher{
 	private AquaMapsPublisherWrapper getWrapper() throws Exception{
 		
 		if(wrapper==null) {
-			String url=ServiceContext.getContext().getDefaultPublisherUrl();
+			String url=ServiceContext.getContext().getProperty(PropertiesConstants.DEFAULT_PUBLISHER_URL);
 			logger.trace("Init publisher wrapper with default url : "+url);
 			logger.trace("Constructing wrapper..");
 			
@@ -575,10 +574,10 @@ public class ConnectedPublisher implements Publisher{
         layer.setTitle(title);
         layer.set_abstract(abstractDescription);
         //GEOSERVER
-        layer.setUrl(ServiceContext.getContext().getGeoServerUrl());
+        layer.setUrl(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL));
         layer.setServerProtocol("OGC:WMS");
-        layer.setServerLogin(ServiceContext.getContext().getGeoServerUser());
-        layer.setServerPassword(ServiceContext.getContext().getGeoServerPwd());
+        layer.setServerLogin(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER));
+        layer.setServerPassword(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
         layer.setServerType("geoserver");
         layer.setSrs("EPSG:4326");
         

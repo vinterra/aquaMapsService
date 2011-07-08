@@ -34,7 +34,7 @@ public class CommonServiceLogic {
 		logger.trace("loaded "+job.getSelectedSpecies().size()+" species..");
 		job.setAuthor(author);
 		logger.trace("HSPEC is "+AquaMapsXStream.getXMLInstance().toXML(hspec));
-		job.setIsGis(false);
+		job.setIsGis(true);
 		job.setName(hspec.getTitle()+"_All Maps");
 		for(Species s: job.getSelectedSpecies()){
 			AquaMapsObject object=new AquaMapsObject(s.getFieldbyName(SpeciesOccursumFields.scientific_name+"").getValue(), 0, ObjectType.SpeciesDistribution);

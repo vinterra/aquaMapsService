@@ -36,6 +36,7 @@ etc/security_descriptor.xml -text
 lib/backport-util-concurrent-3.0.jar -text
 lib/javassist.jar -text
 schema/AquaMapsService.wsdl -text
+schema/AquaMapsTypes.wsdl -text
 schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
 schema/GISTypes.xsd -text
@@ -47,6 +48,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/ThreadManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBConnectionParameters.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBCredentialDescriptor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBType.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/MySQLDBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
@@ -61,6 +63,11 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManage
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesStatus.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SubmittedManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/request/AquaMapsObjectWorker.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/request/JobWorker.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/request/Request.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/request/RequestManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/request/Worker.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/BadRequestException.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GISGeneratorFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/GenerationRequest.java -text
@@ -98,6 +105,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/H
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/Report.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/SimpleGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/SimpleGeneratorI.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/TableGenerationConfiguration.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/generators/predictions/utils/ModelTranslation.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/HSQLDB.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/ReportItem.java -text
@@ -117,6 +125,8 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SimulationThread
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SourceGenerationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SpeciesPerturbationThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/SubmittedMonitorThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesConstants.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesReader.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsCall.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsServiceCall.java -text

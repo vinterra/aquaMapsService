@@ -12,6 +12,7 @@ import org.gcube.application.aquamaps.aquamapspublisher.impl.AquaMapsPublisherWr
 import org.gcube.application.aquamaps.aquamapspublisher.impl.PublisherContext;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.TemplateLayerType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
@@ -294,10 +295,10 @@ public class EmbeddedPublisher implements Publisher{
         layer.setTitle(title);
         layer.set_abstract(abstractDescription);
         //GEOSERVER
-        layer.setUrl(ServiceContext.getContext().getGeoServerUrl());
+        layer.setUrl(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL));
         layer.setServerProtocol("OGC:WMS");
-        layer.setServerLogin(ServiceContext.getContext().getGeoServerUser());
-        layer.setServerPassword(ServiceContext.getContext().getGeoServerPwd());
+        layer.setServerLogin(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER));
+        layer.setServerPassword(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
         layer.setServerType("geoserver");
         layer.setSrs("EPSG:4326");
         

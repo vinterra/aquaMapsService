@@ -14,6 +14,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -37,7 +39,7 @@ public class SubmittedManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(SubmittedFields.searchid+"",id+"",FieldType.INTEGER));
-			ResultSet rs= session.executeFilteredQuery(filter, submittedTable, SubmittedFields.searchid+"", "ASC");
+			ResultSet rs= session.executeFilteredQuery(filter, submittedTable, SubmittedFields.searchid+"", OrderDirection.ASC);
 			if(rs.next())
 				return rs.getObject(field.toString());
 			else return null;
@@ -215,11 +217,11 @@ public class SubmittedManager {
 		finally{session.close();}
 	}
 
-	public static String getJsonList(List<Field> filters,String orderBy, String orderDir, int limit, int offset)throws Exception{
+	public static String getJsonList(List<Field> filters,PagedRequestSettings settings)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,orderBy,orderDir),offset, offset+limit);
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,settings.getOrderColumn(),settings.getOrderDirection()),settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}

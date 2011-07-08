@@ -3,7 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGroupGenerationRequestsManager;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
-import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class HSPECGroupGenerationManagerThread extends Thread {

@@ -1,10 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -20,10 +18,10 @@ public class EnvironmentalLogicManager {
 	
 	
 	static{
-		batchPool.setLifo(false);
-		batchPool.setMaxActive(ServiceContext.getContext().getBATCH_POOL_SIZE());
-		batchPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 		try{
+		batchPool.setLifo(false);
+		batchPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.BATCH_POOL_SIZE));
+		batchPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 			for(int i =0;i<batchPool.getMaxActive();i++){
 				batchPool.addObject();
 			}

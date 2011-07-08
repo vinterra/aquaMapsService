@@ -16,6 +16,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorM
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
@@ -93,7 +94,7 @@ public class JobManager extends SubmittedManager{
 			List<Field> filter=new ArrayList<Field>();
 			filter.add(new Field(SubmittedFields.searchid+"",submittedId+"",FieldType.INTEGER));
 			filter.add(new Field(tableTypeField,tableType,FieldType.STRING));
-			ResultSet rs= session.executeFilteredQuery(filter, workingTables, tableField, "ASC");
+			ResultSet rs= session.executeFilteredQuery(filter, workingTables, tableField, OrderDirection.ASC);
 			if(rs.next())
 				return rs.getString(tableField);
 			else return null;
@@ -157,7 +158,7 @@ public class JobManager extends SubmittedManager{
 				List<Field> filter=new ArrayList<Field>();
 				filter.add(new Field(tempFoldersJobId,jobId+"",FieldType.INTEGER));
 				boolean found= false;
-				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(filter, tempFolders, tempFoldersJobId, "ASC"))){
+				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(filter, tempFolders, tempFoldersJobId, OrderDirection.ASC))){
 					for(Field g:f)
 						if(g.getName().equals(tempFoldersFolderName)&&g.getValue().equals(folderName));
 					found=true;
@@ -203,7 +204,7 @@ public class JobManager extends SubmittedManager{
 			List<Field> filters= new ArrayList<Field>();
 			filters.add(new Field(selectedSpeciesJobId,jobId+"",FieldType.INTEGER));
 			if(status!=null) filters.add(new Field(selectedSpeciesStatus,status+"",FieldType.STRING));
-			ResultSet rs = session.executeFilteredQuery(filters, selectedSpecies, selectedSpeciesStatus, "ASC");
+			ResultSet rs = session.executeFilteredQuery(filters, selectedSpecies, selectedSpeciesStatus, OrderDirection.ASC);
 			ArrayList<String> toReturn=new ArrayList<String>(); 
 			while(rs.next()){
 				toReturn.add(rs.getString(selectedSpeciesSpeciesID));
@@ -246,7 +247,7 @@ public class JobManager extends SubmittedManager{
 			logger.debug("cleaning tables for : "+jobId);
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(toDropTablesJobId,jobId+"",FieldType.INTEGER));
-			ResultSet rs=session.executeFilteredQuery(filter, toDropTables, toDropTablesTableName, "ASC");
+			ResultSet rs=session.executeFilteredQuery(filter, toDropTables, toDropTablesTableName, OrderDirection.ASC);
 			while(rs.next()){
 				String table=rs.getString(toDropTablesTableName);
 				session.dropTable(table);
@@ -254,7 +255,7 @@ public class JobManager extends SubmittedManager{
 			session.deleteOperation(toDropTables, filter);
 
 			logger.debug("cleaning folders for : "+jobId);
-			rs=session.executeFilteredQuery(filter, tempFolders, tempFoldersFolderName, "ASC");
+			rs=session.executeFilteredQuery(filter, tempFolders, tempFoldersFolderName, OrderDirection.ASC);
 
 			while(rs.next()){
 				String folder=rs.getString(tempFoldersFolderName);
@@ -294,7 +295,7 @@ public class JobManager extends SubmittedManager{
 			filter.add(idField);
 			for(String id : toCheck){
 				idField.setValue(id);
-				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, "ASC");
+				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, OrderDirection.ASC);
 				if(rs.next()){
 					if(!rs.getString(selectedSpeciesStatus).equalsIgnoreCase(SpeciesStatus.Ready+""))
 						return false;
@@ -350,7 +351,7 @@ public class JobManager extends SubmittedManager{
 			filter.add(idField);
 			for(String id : ids){
 				idField.setValue(id);
-				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, "ASC");
+				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, OrderDirection.ASC);
 				if(rs.next()){
 					if(rs.getInt(selectedSpeciesIsCustomized)==0)
 						return false;
@@ -362,7 +363,7 @@ public class JobManager extends SubmittedManager{
 			logger.error("unable to check species customization flag",e);
 			throw e;
 		}finally{
-			if(!session.getConnection().isClosed())session.close();
+			session.close();
 		}
 	}
 
@@ -376,7 +377,6 @@ public class JobManager extends SubmittedManager{
 	 */
 	public static Job insertNewJob(Job toPerform) throws Exception{
 		logger.trace("Creating new pending Job");
-		String myData = ServiceUtils.getDate();
 		DBSession session=null;
 
 		////*************** Send to publisher
@@ -439,7 +439,7 @@ public class JobManager extends SubmittedManager{
 
 
 			Field author=new Field(SubmittedFields.author+"",toPerform.getAuthor(),FieldType.STRING);
-			Field date= new Field (SubmittedFields.date+"",myData,FieldType.STRING);
+			Field date= new Field (SubmittedFields.submissiontime+"",System.currentTimeMillis()+"",FieldType.INTEGER);
 			Field isAquaMaps= new Field(SubmittedFields.isaquamap+"","true",FieldType.BOOLEAN);
 			Field sourceHCAF=new Field(SubmittedFields.sourcehcaf+"",toPerform.getSourceHCAF().getSearchId()+"",FieldType.INTEGER);
 			Field sourceHSPEN=new Field(SubmittedFields.sourcehspen+"",toPerform.getSourceHSPEN().getSearchId()+"",FieldType.INTEGER);

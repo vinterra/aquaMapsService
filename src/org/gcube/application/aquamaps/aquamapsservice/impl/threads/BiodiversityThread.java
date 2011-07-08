@@ -19,6 +19,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.PredictionLayerGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
@@ -139,7 +140,7 @@ public class BiodiversityThread extends Thread {
 //					String attributeName=rs.getMetaData().getColumnLabel(2);
 					logger.trace(this.getName()+" Found minValue : "+minValue+"; maxValue : "+maxValue+" for AttributeName :"+AquaMapsManager.maxSpeciesCountInACell);
 					String csvFile=null;
-					if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
+					if((ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.GIS_MODE))&&(gisEnabled)){
 						csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
 						FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
 						GenerationUtils.ResultSetToCSVFile(rs, csvFile);				
@@ -158,7 +159,7 @@ public class BiodiversityThread extends Thread {
 						
 						/// *************************** GIS GENERATION
 
-						if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
+						if((ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.GIS_MODE))&&(gisEnabled)){
 							logger.trace(this.getName()+"is gisEnabled");
 							
 							Resource hcaf= new Resource (ResourceType.HCAF,SubmittedManager.getHCAFTableId(jobId));

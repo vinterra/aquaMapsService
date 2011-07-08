@@ -10,6 +10,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ThreadManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -132,7 +133,7 @@ public class JobSubmissionThread extends Thread {
 					}
 
 
-					if(ServiceContext.getContext().isGISMode())
+					if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.GIS_MODE))
 						if(toPerform.getIsGis())
 							JobManager.createGroup(toPerform.getId());
 

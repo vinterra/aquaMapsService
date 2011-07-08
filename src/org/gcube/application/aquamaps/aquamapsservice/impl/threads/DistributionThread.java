@@ -18,6 +18,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.PredictionLayerGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
@@ -95,7 +96,7 @@ public class DistributionThread extends Thread {
 			ResultSet rs=queryForProbabilities();
 			SubmittedManager.updateStatus(aquamapsId, SubmittedStatus.Generating);
 			String csvFile=null;
-			if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
+			if((ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.GIS_MODE))&&(gisEnabled)){
 				csvFile=generateCsvFile(rs);	
 			}
 
@@ -118,7 +119,7 @@ public class DistributionThread extends Thread {
 
 				/// *************************** GIS GENERATION
 
-				if((ServiceContext.getContext().isGISMode())&&(gisEnabled)){
+				if((ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.GIS_MODE))&&(gisEnabled)){
 
 					Resource hcaf= new Resource (ResourceType.HCAF,SubmittedManager.getHCAFTableId(jobId));
 					Resource hspen=new Resource (ResourceType.HSPEN,SubmittedManager.getHSPENTableId(jobId));

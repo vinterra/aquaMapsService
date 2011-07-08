@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
@@ -22,7 +21,7 @@ public class Env_SeaIce extends EnvEngine {
 	private double icePMin;
 	private double icePMax;
 	
-	public Env_SeaIce() {
+	public Env_SeaIce() throws Exception{
 		super();
 	}
 
@@ -39,8 +38,8 @@ public class Env_SeaIce extends EnvEngine {
 */
 		List<Cell> filterCells = new ArrayList<Cell>();
 		for (Cell cell: goodCells) {
-			Double iceConValue=cell.getFieldbyName(HCAF_DFields.iceconann+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+			Double iceConValue=cell.getFieldbyName(HCAF_DFields.iceconann+"").getValueAsDouble(defaultDoubleValue+"");
+			Double oceanArea=cell.getFieldbyName(HCAF_SFields.oceanarea+"").getValueAsDouble(defaultDoubleValue+"");
 			if (iceConValue != null &&	oceanArea> 0) {
 				filterCells.add(cell);
 			}

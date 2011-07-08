@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
@@ -50,40 +52,41 @@ public abstract class DBSession {
 	 * @throws Exception
 	 */
 
-	public static DBCredentialDescriptor getInternalCredentials(){
+	public static DBCredentialDescriptor getInternalCredentials()throws Exception{
 		return new DBCredentialDescriptor(
-				ServiceContext.getContext().getInternalDBHost(),
-				ServiceContext.getContext().getInternalDBPort(),
-				ServiceContext.getContext().getInternalDBName(),
-				ServiceContext.getContext().getInternalDbUsername(),
-				ServiceContext.getContext().getInternalDbPassword());
+				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_HOST),
+				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PORT),
+				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_NAME),
+				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_USERNAME),
+				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PASSWORD));
 	}
-	public static DBCredentialDescriptor getPostGisCredentials(){
+	public static DBCredentialDescriptor getPostGisCredentials()throws Exception{
 		return new DBCredentialDescriptor(
-				ServiceContext.getContext().getPostGis_host(),
-				ServiceContext.getContext().getPostGis_port(),
-				ServiceContext.getContext().getPostGis_database(),
-				ServiceContext.getContext().getPostGis_user(),
-				ServiceContext.getContext().getPostGis_passwd());
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_HOST),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PORT),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_USERNAME),
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PASSWORD));
 	}
 	
 
 	public static DBSession getInternalDBSession()throws Exception{
 		try{
 			Connection conn=PoolManager.getInternalDBConnection();
-			switch(ServiceContext.getContext().getInternalDBType()){
+			DBType dbType=DBType.valueOf(ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TYPE));
+			switch(dbType){
 			case mySql: return new MySQLDBSession(conn);
 			default: return new PostGresSQLDBSession(conn);
 			}
 		}catch(Exception e){
 			logger.fatal("ERROR ON OPENING CONNECTION ",e);
 			logger.fatal("Connection parameters were : ");
-			logger.fatal("USER : "+ServiceContext.getContext().getInternalDbUsername());
-			logger.fatal("PASSWORD : "+ServiceContext.getContext().getInternalDbPassword());
-			logger.fatal("DB NAME : "+ServiceContext.getContext().getInternalDBName());
-			logger.fatal("DB HOST : "+ServiceContext.getContext().getInternalDBHost());
-			logger.fatal("DB PORT : "+ServiceContext.getContext().getInternalDBPort());
-			logger.fatal("TYPE : "+ServiceContext.getContext().getInternalDBType());
+			logger.fatal("USER : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_USERNAME));
+			logger.fatal("PASSWORD : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PASSWORD));
+			logger.fatal("DB NAME : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_NAME));
+			logger.fatal("DB HOST : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_HOST));
+			logger.fatal("DB PORT : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PORT));
+			logger.fatal("TYPE : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TYPE));
 			logger.fatal("Connection String was : "+PoolManager.getInternalConnectionString());
 			throw e;
 		}
@@ -211,11 +214,11 @@ public abstract class DBSession {
 		return connection.prepareStatement(formSelectCountString(filters, tableName));
 	}
 
-	public PreparedStatement getPreparedStatementForQuery(List<Field> filters, String table,String orderColumn,String orderDirection) throws SQLException{
+	public PreparedStatement getPreparedStatementForQuery(List<Field> filters, String table,String orderColumn,OrderDirection orderDirection) throws SQLException{
 		return connection.prepareStatement(formSelectQueryStringFromFields(filters, table,orderColumn,orderDirection));
 	}	
 
-	public PreparedStatement getPreparedStatementForDISTINCT(List<Field> filters, Field toSelect,String table,String orderColumn,String orderDirection) throws SQLException{
+	public PreparedStatement getPreparedStatementForDISTINCT(List<Field> filters, Field toSelect,String table,String orderColumn,OrderDirection orderDirection) throws SQLException{
 		return connection.prepareStatement(formSelectDistinctQueryStringFromFields(filters, toSelect,table,orderColumn,orderDirection));
 	}	
 	
@@ -277,7 +280,7 @@ public abstract class DBSession {
 	public abstract boolean checkExist(String tableName, List<Field> keys)throws Exception;
 	public abstract List<List<Field>> insertOperation(String tableName, List<List<Field>> rows) throws Exception;
 	public abstract int updateOperation(String tableName, List<List<Field>> keys,List<List<Field>> rows) throws Exception;
-	public abstract ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, String orderMode)throws Exception;
+	public abstract ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, OrderDirection orderMode)throws Exception;
 
 
 	public abstract int getCount(String tableName, List<Field> filters) throws Exception;
@@ -292,7 +295,7 @@ public abstract class DBSession {
 		else return 0;
 	}
 	
-	public abstract ResultSet getDistinct(Field toSelect, List<Field> filters, String table, String orderColumn, String orderMode) throws Exception;
+	public abstract ResultSet getDistinct(Field toSelect, List<Field> filters, String table, String orderColumn, OrderDirection orderMode) throws Exception;
 
 	@Deprecated
 	public void executeUpdate(String query) throws Exception{
@@ -318,7 +321,7 @@ public abstract class DBSession {
 	//********************* STRING FORM UTILITIES
 
 
-	protected static String formSelectQueryStringFromFields(List<Field> filters,String table,String sortColumn,String sortDirection){
+	protected static String formSelectQueryStringFromFields(List<Field> filters,String table,String sortColumn,OrderDirection sortDirection){
 		String toReturn="SELECT * FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
 		((sortColumn!=null)?" ORDER BY "+sortColumn+" "+sortDirection:"");
@@ -327,7 +330,7 @@ public abstract class DBSession {
 	}
 
 	
-	protected static String formSelectDistinctQueryStringFromFields(List<Field> filters,Field toSelectField,String table,String sortColumn,String sortDirection){
+	protected static String formSelectDistinctQueryStringFromFields(List<Field> filters,Field toSelectField,String table,String sortColumn,OrderDirection sortDirection){
 		String toReturn="SELECT DISTINCT("+toSelectField.getName()+") FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
 		((sortColumn!=null)?" ORDER BY "+sortColumn+" "+sortDirection:"");

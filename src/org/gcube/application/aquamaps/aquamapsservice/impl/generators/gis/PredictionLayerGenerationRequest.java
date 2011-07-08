@@ -8,6 +8,7 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.StyleGenerationRequest.ClusterScaleType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
@@ -16,7 +17,6 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.gis.dataModel.types.LayersType;
 
 public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
@@ -47,7 +47,7 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 	 */
 	public PredictionLayerGenerationRequest(int objectId,String objectName,Species species, Resource hcaf,Resource hspen,
 			Map<String,Perturbation> envelopeCustomization, Map<EnvelopeFields,Field> envelopeWeights,
-			Set<Area> areaSelection, BoundingBox bb, String csvFile, boolean isNative) {
+			Set<Area> areaSelection, BoundingBox bb, String csvFile, boolean isNative) throws Exception{
 		super(csvFile,HSPECFields.probability+"","real",objectName);
 		this.setMapType(isNative?LayersType.NativeRange:LayersType.SuitableRange);
 		this.getSpeciesCoverage().add(species.getId());
@@ -60,7 +60,7 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 		this.setHcaf(hcaf);
 		this.setHspen(hspen);
 		this.setObjectId(objectId);
-		this.getToAssociateStyles().add(ServiceContext.getContext().getDistributionDefaultStyle());
+		this.getToAssociateStyles().add(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DEFAULT_DISTRIBUTION_STYLE));
 		this.setDefaultStyle(0);
 	}
 	

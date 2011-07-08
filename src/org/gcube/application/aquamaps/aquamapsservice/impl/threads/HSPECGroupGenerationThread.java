@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.threads;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.CommonServiceLogic;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
@@ -11,13 +12,14 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManage
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.EnvironmentalLogicManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.TableGenerationConfiguration;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
+import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class HSPECGroupGenerationThread extends Thread {
@@ -34,10 +36,14 @@ public class HSPECGroupGenerationThread extends Thread {
 		BatchGeneratorI batch = null;
 		try{
 			logger.trace("Starting execution for request ID "+request.getId());
-			Resource hcaf=SourceManager.getById(ResourceType.HCAF, request.getHcafsearchid());
-			if(hcaf == null ) throw new Exception ("Unable to find hcaf with id "+request.getHcafsearchid());
-			Resource hspen=SourceManager.getById(ResourceType.HSPEN, request.getHspensearchid());
-			if(hspen == null ) throw new Exception ("Unable to find hspen with id "+request.getHcafsearchid());
+			
+			HashMap<ResourceType,Resource> sources=new HashMap<ResourceType, Resource>();
+			sources.put(ResourceType.HCAF, SourceManager.getById(ResourceType.HCAF, request.getHcafsearchid()));
+			if(sources.get(ResourceType.HCAF)==null) throw new Exception ("Unable to find hcaf with id "+request.getHcafsearchid());
+			sources.put(ResourceType.HSPEN, SourceManager.getById(ResourceType.HSPEN, request.getHspensearchid()));
+			if(sources.get(ResourceType.HSPEN)==null) throw new Exception ("Unable to find hspen with id "+request.getHcafsearchid());
+			
+			
 			batch=EnvironmentalLogicManager.getBatch();
 			logger.debug("Got batch Id "+batch.getReportId());
 
@@ -52,19 +58,21 @@ public class HSPECGroupGenerationThread extends Thread {
 					AlgorithmType algorithmType=AlgorithmType.valueOf(algorithmString);
 					long startTime=System.currentTimeMillis();
 					logger.trace("Found algorithm "+algorithmType+", submitting generation..");	
-					String generatedHSPECTable=batch.generateHSPECTable(hcaf.getTableName(),hspen.getTableName(), algorithmType, 
-							request.getIsCloud(),request.getBackend_url(),request.getResources());
+					String generatedHSPECTable=batch.generateTable(
+							new TableGenerationConfiguration(LogicType.HSPEC, AlgorithmType.valueOf(algorithmString), sources, 
+									request.getSubmissionBackend(), request.getExecutionEnvironment(), request.getBackendURL(), request.getEnvironmentConfiguration(),
+									request.getNumPartitions(), request.getAuthor()));
 					logger.trace("Generated Table "+generatedHSPECTable+" in "+(startTime-System.currentTimeMillis()));
 					Resource toRegister=new Resource(ResourceType.HSPEC,0);
 					toRegister.setAlgorithm(algorithmType);
 					toRegister.setAuthor(request.getAuthor());
-					toRegister.setDate(ServiceUtils.getTimeStamp());
+					toRegister.setGenerationTime(System.currentTimeMillis());
 					toRegister.setDescription(request.getDescription());
-					toRegister.setProvenance("Generated on AquaMaps VRE, submitted on "+(request.getIsCloud()?"CLOUD":"Embedded Library"));
-					toRegister.setSourceHCAFId(hcaf.getSearchId());
-					toRegister.setSourceHCAFTable(hcaf.getTableName());
-					toRegister.setSourceHSPENId(hspen.getSearchId());
-					toRegister.setSourceHSPENTable(hspen.getTableName());
+					toRegister.setProvenance("Generated on AquaMaps VRE, submitted on "+request.getExecutionEnvironment());
+					toRegister.setSourceHCAFId(sources.get(ResourceType.HCAF).getSearchId());
+					toRegister.setSourceHCAFTable(sources.get(ResourceType.HCAF).getTableName());
+					toRegister.setSourceHSPENId(sources.get(ResourceType.HSPEN).getSearchId());
+					toRegister.setSourceHSPENTable(sources.get(ResourceType.HSPEN).getTableName());
 					toRegister.setStatus("Completed");
 					toRegister.setTableName(generatedHSPECTable);
 					toRegister.setTitle(request.getGenerationname()+"_"+algorithmType);
@@ -108,7 +116,6 @@ public class HSPECGroupGenerationThread extends Thread {
 			logger.trace("Generation "+request.getId()+" : All jobs complete!");
 
 			HSPECGroupGenerationRequestsManager.setPhase(HSPECGroupGenerationPhase.completed,request.getId());
-			HSPECGroupGenerationRequestsManager.setPhasePercent(100, request.getId());
 		}catch(Exception e){
 			logger.error("Unexpected Exception while executing request "+request.getId(), e);
 			try{

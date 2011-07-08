@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -28,8 +29,16 @@ public abstract class EnvEngine {
 	private double paraAdjMax;
 	private double paraAdjMin;
 
-	public EnvEngine() {
+	protected Double defaultDoubleValue;
+	protected Boolean defaultBooleanValue;
+	protected Integer defaultIntegerValue;
+	
+	
+	public EnvEngine() throws Exception{
 		super();
+		defaultDoubleValue=ServiceContext.getContext().getPropertyAsDouble(PropertiesConstants.DOUBLE_DEFAULT_VALUE);
+		defaultBooleanValue=ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.BOOLEAN_DEFAULT_VALUE);
+		defaultIntegerValue=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.INTEGER_DEFAULT_VALUE);
 	}
 	
 	public abstract void re_computes(Species species, Set<Cell> goodCells) throws Exception;
@@ -51,12 +60,12 @@ public abstract class EnvEngine {
 		}
 		
 		//get percentiles
-		this.min = goodCells.get(0).getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-		this.max = goodCells.get(reccount-1).getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-		this.para25 = goodCells.get((int) this.rec25).getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-		this.para75 = goodCells.get((int) rec75).getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-		this.pMin = goodCells.get((int) rec10).getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
-		this.pMax = goodCells.get((int) rec90).getFieldbyName(fld).getValueAsDouble(ServiceContext.getContext().getDoubleDefault());
+		this.min = goodCells.get(0).getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
+		this.max = goodCells.get(reccount-1).getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
+		this.para25 = goodCells.get((int) this.rec25).getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
+		this.para75 = goodCells.get((int) rec75).getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
+		this.pMin = goodCells.get((int) rec10).getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
+		this.pMax = goodCells.get((int) rec90).getFieldbyName(fld).getValueAsDouble(defaultDoubleValue+"");
 
 		
 		

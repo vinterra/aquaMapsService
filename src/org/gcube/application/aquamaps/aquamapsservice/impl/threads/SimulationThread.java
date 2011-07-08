@@ -15,6 +15,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
@@ -159,7 +160,7 @@ public class SimulationThread extends Thread {
 	 * @throws Exception
 	 */
 	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp)throws Exception{
-		if(ServiceContext.getContext().isUseEnvironmentModelingLib()){
+		if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.USE_ENVIRONMENT_MODELLING_LIB)){
 			logger.trace("HSPEC Generation with Environmental Modeling..");
 			//************ fine processing
 //			// TODO implement for less then (config param) species

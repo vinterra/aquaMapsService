@@ -9,10 +9,11 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPE
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
-import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -70,16 +71,21 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			HspecGroupGenerationRequestType stubRequest=new HspecGroupGenerationRequestType();
 			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
 			stubRequest.setAuthor(request.getAuthor());
-			stubRequest.setCloud(request.getIsCloud());
-			stubRequest.setDescription(request.getDescription());
-			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
-			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
 			stubRequest.setGenerationName(request.getGenerationname());
+			stubRequest.setDescription(request.getDescription());
+			
 			stubRequest.setHcafSearchId(request.getHcafsearchid());
 			stubRequest.setHspenSearchId(request.getHspensearchid());
-			stubRequest.setBackend(request.getBackend());
-			stubRequest.setEndpointUrl(request.getBackend_url());
-			stubRequest.setResourceNumber(request.getResources());
+			stubRequest.setSubmissionBackend(request.getSubmissionBackend());
+			stubRequest.setExecutionEnvironment(request.getExecutionEnvironment());
+			stubRequest.setBackendUrl(request.getBackendURL());
+			stubRequest.setEnvironmentConfiguration(AquaMapsXStream.getXMLInstance().toXML(request.getEnvironmentConfiguration()));
+			stubRequest.setLogic(request.getLogic()+"");
+			stubRequest.setNumPartitions(request.getNumPartitions());
+			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
+			
+			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
+			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
 			return pt.generateHSPECGroup(stubRequest);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -109,7 +115,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			request.setLimit(settings.getLimit());
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection());
+			request.setSortDirection(settings.getOrderDirection()+"");
 			return pt.getJSONSubmittedHSPECGroup(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -162,20 +168,8 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public void editRequest(HSPECGroupGenerationRequest request)
 			throws Exception {
 		try{
-			HspecGroupGenerationRequestType stubRequest=new HspecGroupGenerationRequestType();
-			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-			stubRequest.setAuthor(request.getAuthor());
-			stubRequest.setCloud(request.getIsCloud());
-			stubRequest.setDescription(request.getDescription());
-			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
-			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
-			stubRequest.setGenerationName(request.getGenerationname());
-			stubRequest.setHcafSearchId(request.getHcafsearchid());
-			stubRequest.setHspenSearchId(request.getHspensearchid());
-			stubRequest.setBackend(request.getBackend());
-			stubRequest.setEndpointUrl(request.getBackend_url());
-			stubRequest.setResourceNumber(request.getResources());
-			pt.editHSPECGroupDetails(stubRequest);
+			throw new GCUBEFault("Not Ymplemented");
+//			pt.editHSPECGroupDetails(stubRequest);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

@@ -2,22 +2,31 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
 public class PagedRequestSettings {
 
-	private int limit;
+	public enum OrderDirection{
+		ASC,DESC
+	}
+	
+	
+	private int pageSize;
 	private int offset;
 	private String orderColumn;
-	private String orderDirection;
+	private OrderDirection orderDirection;
 	
-	public PagedRequestSettings(int limit,int offset, String orderColumn, String orderDirection){
-		this.limit=limit;
+	public PagedRequestSettings(int pageSize,int offset, String orderColumn, OrderDirection orderDirection){
+		this.pageSize=pageSize;
 		this.offset=offset;
 		this.orderColumn=orderColumn;
 		this.orderDirection=orderDirection;
 	}
 	
 	
-	
+	/**
+	 * return row limit as offset+pageSize 
+	 * 
+	 * @return
+	 */
 	public int getLimit() {
-		return limit;
+		return pageSize+offset;
 	}
 	public int getOffset() {
 		return offset;
@@ -25,10 +34,10 @@ public class PagedRequestSettings {
 	public String getOrderColumn() {
 		return orderColumn;
 	}
-	public String getOrderDirection() {
+	public OrderDirection getOrderDirection() {
 		return orderDirection;
 	}
-	
+	public int getPageSize(){return pageSize;}
 	
 	
 }

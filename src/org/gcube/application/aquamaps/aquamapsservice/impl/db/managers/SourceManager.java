@@ -9,6 +9,9 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
@@ -31,11 +34,11 @@ public class SourceManager {
 //		throw new Exception("Source type not valid "+type.toString());
 	}
 	
-	public static int getDefaultId(ResourceType type){
+	public static int getDefaultId(ResourceType type)throws Exception{
 		switch(type){
-		case HCAF: return ServiceContext.getContext().getDefaultHCAFID();
-		case HSPEC: return ServiceContext.getContext().getDefaultHSPECID();
-		case HSPEN: return ServiceContext.getContext().getDefaultHSPENID();
+		case HCAF: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HCAF_ID);
+		case HSPEC: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEC_ID);
+		case HSPEN: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEN_ID);
 		}		
 		return 0;
 		
@@ -58,7 +61,7 @@ public class SourceManager {
 			ArrayList<Field> row= new ArrayList<Field>();
 			row.add(toRegister.getField(MetaSourceFields.algorithm));
 			row.add(toRegister.getField(MetaSourceFields.author));
-			row.add(toRegister.getField(MetaSourceFields.date));
+			row.add(toRegister.getField(MetaSourceFields.generationtime));
 			row.add(toRegister.getField(MetaSourceFields.description));
 			row.add(toRegister.getField(MetaSourceFields.disclaimer));
 			row.add(toRegister.getField(MetaSourceFields.parameters));
@@ -126,7 +129,7 @@ public class SourceManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
-			ResultSet rs= session.executeFilteredQuery(filter, metaTable, MetaSourceFields.searchid+"", "ASC");
+			ResultSet rs= session.executeFilteredQuery(filter, metaTable, MetaSourceFields.searchid+"", OrderDirection.ASC);
 			if(rs.next())
 				return rs.getObject(field+"");
 			else return null;
@@ -166,17 +169,17 @@ public class SourceManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return loadRS((session.executeFilteredQuery(new ArrayList<Field>(), getMetaTable(type), MetaSourceFields.searchid+"", "ASC")));
+			return loadRS((session.executeFilteredQuery(new ArrayList<Field>(), getMetaTable(type), MetaSourceFields.searchid+"", OrderDirection.ASC)));
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
-	public static String getJsonList(ResourceType type, String orderBy, String orderDir, int limit, int offset)throws Exception{
+	public static String getJsonList(ResourceType type, PagedRequestSettings settings)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(MetaSourceFields.type+"",type+"",FieldType.STRING));
-			return DBUtils.toJSon(session.executeFilteredQuery(filter, getMetaTable(type), orderBy, orderDir), offset, limit+offset);
+			return DBUtils.toJSon(session.executeFilteredQuery(filter, getMetaTable(type), settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
@@ -198,7 +201,7 @@ public class SourceManager {
 			String table = getMetaTable(type);
 			List<Field> filters=new ArrayList<Field>();
 			filters.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
-			return loadRS(session.executeFilteredQuery(filters, table, MetaSourceFields.searchid+"", "ASC")).iterator().next();
+			return loadRS(session.executeFilteredQuery(filters, table, MetaSourceFields.searchid+"", OrderDirection.ASC)).iterator().next();
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}

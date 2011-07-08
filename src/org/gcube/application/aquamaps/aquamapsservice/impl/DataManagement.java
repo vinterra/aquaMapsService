@@ -26,12 +26,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGeneration
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -66,7 +67,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			GetHCAFgenerationReportRequestType arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			return SourceGenerationManager.getReport(arg0.getSortColumn(), arg0.getSortDirection(), arg0.getOffset(), arg0.getLimit());			
+			return SourceGenerationManager.getReport(new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection())));			
 		}catch(Exception e){
 			logger.error("",e);
 			throw new GCUBEFault("Unexpected error");
@@ -158,9 +159,9 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			logger.trace("Checking settings..");
 			Resource hcaf= SourceManager.getById(ResourceType.HCAF, arg0.getHcafSearchId());
 			Resource hspen= SourceManager.getById(ResourceType.HSPEN, arg0.getHspenSearchId());
-			return HSPECGroupGenerationRequestsManager.insertRequest(arg0.getAuthor(), 
-					arg0.getGenerationName(), arg0.getAlgorithms(), arg0.isEnableLayerGeneration(), arg0.isEnableImageGeneration(), 
-					arg0.getDescription(), hcaf,hspen,arg0.isCloud(),arg0.getBackend(),arg0.getEndpointUrl(),arg0.getResourceNumber());
+			return HSPECGroupGenerationRequestsManager.insertRequest(arg0.getAuthor(), arg0.getGenerationName(), arg0.getAlgorithms(), 
+					arg0.getDescription(), arg0.getSubmissionBackend(), arg0.getExecutionEnvironment(), arg0.getBackendUrl(), 
+					arg0.getEnvironmentConfiguration(), LogicType.valueOf(arg0.getLogic()), hcaf, hspen, arg0.getNumPartitions(), arg0.isEnableLayerGeneration(), arg0.isEnableImageGeneration());
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -173,7 +174,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			GetJSONSubmittedHSPECRequestType arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), arg0.getSortDirection());
+			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection()));
 			return HSPECGroupGenerationRequestsManager.getJSONList(new ArrayList<Field>(), settings);
 			
 		}catch(Exception e){

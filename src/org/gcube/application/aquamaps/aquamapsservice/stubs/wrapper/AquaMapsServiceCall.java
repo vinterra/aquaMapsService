@@ -151,7 +151,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			if(status!=null)request.setObjectStatusValue(status.toString());
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection());
+			request.setSortDirection(settings.getOrderDirection()+"");
 			request.setTypeEnabled(objType!=null);
 			if(objType!=null)request.setTypeValue(objType.toString());
 			return pt.getAquaMapsPerUser(request);
@@ -168,7 +168,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			request.setSpeciesID(speciesId);
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection());
+			request.setSortDirection(settings.getOrderDirection()+"");
 			request.setLimit(settings.getLimit());
 			return pt.getOccurrenceCells(request);
 		}catch(GCUBEFault f){
@@ -213,7 +213,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			request.setType(type.toString());
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection());
+			request.setSortDirection(settings.getOrderDirection()+"");
 			request.setLimit(settings.getLimit());
 			return pt.getResourceList(request);
 		}catch(GCUBEFault f){
@@ -232,7 +232,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			request.setNameFilters(Filter.toStubsVersion(names));
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection());
+			request.setSortDirection(settings.getOrderDirection()+"");
 			request.setLimit(settings.getLimit());
 			return	pt.getSpeciesByFilters(request);			
 		}catch(GCUBEFault f){
@@ -300,7 +300,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			request.setLimit(settings.getLimit());
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection());
+			request.setSortDirection(settings.getOrderDirection()+"");
 			request.setToSelect(new Field(level+"","",FieldType.STRING).toStubsVersion());
 			return pt.getPhylogeny(request);
 		}catch(GCUBEFault f){
