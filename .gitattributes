@@ -113,6 +113,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/monitor/StatusMonitorThr
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/ConnectedPublisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/DummyPublisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/EmbeddedPublisher.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/LayerLockManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/Publisher.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/BiodiversityThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/threads/DistributionThread.java -text
