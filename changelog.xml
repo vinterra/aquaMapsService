@@ -1,0 +1,15 @@
+<ReleaseNotes>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2010-10-22">
+		<Change>Added DataManagement port type</Change>				
+	</Changeset>	
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2011-01-28">
+		<Change>Improved stubs with data model definition and service wrapper</Change>
+		<Change>Refactoring with Hibernate-like DBManagement</Change>
+		<Change>Bug Fix : Biodiversity check if empty result set</Change>
+		<Change>Data Definition AquaMapsSchema.xsd</Change>
+		<Change>Moved to one configuration file</Change>
+	</Changeset>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2011-06-28">
+		<Change>DataManagemementFacility features</Change>
+	</Changeset>
+</ReleaseNotes>

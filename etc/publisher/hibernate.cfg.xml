@@ -1,0 +1,58 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+ "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+ "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+	<session-factory>
+		<!-- Database connection settings -->
+		<property name="connection.driver_class">org.postgresql.Driver</property>
+		<property name="connection.provider_class">org.hibernate.connection.C3P0ConnectionProvider</property>
+		<!-- property name="connection.url">jdbc:mysql://localhost/apublisherdb</property-->
+		
+		<property name="connection.url">jdbc:postgresql://dbtest.research-infrastructures.eu/apublisherdb</property>
+		
+		<property name="connection.username">utente</property>
+		<property name="connection.password">d4science</property>
+		<!-- JDBC connection pool (use the built-in) -->
+		<!--  property name="connection.pool_size">1</property-->
+		
+		<!-- SQL dialect -->
+		<!--  property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property-->
+		<property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+		<property name="hibernate.hbm2ddl.auto">update</property>
+		<property name="transaction.factory_class">org.hibernate.transaction.JDBCTransactionFactory</property>
+		<!--  property name="hibernate.connection.pool_size">2</property-->
+		<property name="current_session_context_class">thread</property>
+		
+		<property name="c3p0.idleConnectionTestPeriod">3600</property> <!-- seconds -->
+		<property name="c3p0.automaticTestTable">connectiontesttable</property>
+		
+		<!--
+			thread is the short name for
+			org.hibernate.context.ThreadLocalSessionContext and let Hibernate
+			bind the session automatically to the thread
+		-->
+
+		<!-- JDBC connection pool (use the built-in) -->
+		<!--<property name="connection.pool_size">1</property-->
+		<property name="c3p0.timeout">7200</property>
+		<property name="c3p0.idle_test_period">3600</property>
+		<property name="c3p0.max_size">10</property> 
+		<property name="c3p0.max_statements">0</property> 
+		<property name="c3p0.min_size">1</property>
+
+		<property name="show_sql">false</property>
+		
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Job_AObject" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.WMSContext_Layer" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.AquaImagePath" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Job_check" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Aqua_check" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.AquaLayerId" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Job_WMSContext" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Aqua_xmlStream" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Job_xmlStream" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.Layer_xmlStream" />
+		<mapping class="org.gcube.application.aquamaps.aquamapspublisher.db.tables.WMSContext_xmlStream" />
+	</session-factory>
+</hibernate-configuration>
