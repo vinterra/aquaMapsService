@@ -21,6 +21,7 @@ public class StatusMonitorThread extends Thread {
 
 
 	public StatusMonitorThread(long waitTime,long freeSpaceThreshold) {
+		super("Machine status monitor");
 		this.interval=waitTime;
 		this.freeSpaceThreshold=freeSpaceThreshold;
 	}

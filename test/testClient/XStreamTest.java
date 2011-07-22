@@ -1,33 +1,48 @@
 package testClient;
 
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import java.security.MessageDigest;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.LayerGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.PredictionLayerGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Job;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 
 public class XStreamTest {
 
 	/**
 	 * @param args
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) {
-//		XStream xstream = new XStream();
-//		xstream.alias("ReportItem", org.gcube.application.aquamaps.aquamapsservice.impl.monitor.ReportItem.class);
-//		ReportItem rep=new ReportItem();
-//		rep.setActualValue(10);
-//		rep.setOvercomesInLast10Hours(15);
-//		rep.setOvercomesInLast24Hours(24);
-//		rep.setOvercomesTotal(100);
-//		rep.setThreshold(5);
-//		rep.setValueName("Disk Free Space");
-//		System.out.println(xstream.toXML(rep));
+	public static void main(String[] args) throws Exception {
+		Job dummy=DummyObjects.createDummyJob(true, true, true, true);
+		AquaMapsObject obj=dummy.getAquaMapsObjectList().get(1);
+		LayerGenerationRequest theRequest=null;
 		
-		Species spec= new Species("Fis-XXX");
-		spec.addField(new Field(SpeciesOccursumFields.english_name+"","Pisci friscu",FieldType.STRING));
 		
-//		System.out.println(AquaMapsXStream.getJSONInstance().toXML(spec));
 		
+		if(obj.getType().equals(ObjectType.Biodiversity)){
+			Set<String> speciesCoverage=new HashSet<String>();
+			for(Species s:obj.getSelectedSpecies()) speciesCoverage.add(s.getId());
+			theRequest=new PredictionLayerGenerationRequest(obj.getId(), speciesCoverage,
+					dummy.getSourceHCAF(), dummy.getSourceHSPEN(), dummy.getEnvelopeCustomization(), dummy.getEnvelopeWeights(),
+					dummy.getSelectedAreas(), obj.getBoundingBox(), obj.getThreshold(), "bla.csv", obj.getName(), 1, 5);
+		}else{
+			Species selectedSpecies=obj.getSelectedSpecies().iterator().next();
+			theRequest=new PredictionLayerGenerationRequest(obj.getId(),obj.getName(),selectedSpecies,
+					dummy.getSourceHCAF(),dummy.getSourceHSPEN(),dummy.getEnvelopeCustomization().get(selectedSpecies.getId()),
+					dummy.getEnvelopeWeights().get(selectedSpecies.getId()),dummy.getSelectedAreas(),obj.getBoundingBox(),".csv",true);
+		}
+		String xml=AquaMapsXStream.getXMLInstance().toXML(theRequest);
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(theRequest));
+		System.out.println("********** MD5************");
+		System.out.println(MessageDigest.getInstance("MD5").digest(xml.getBytes()));
 	}
 
 }

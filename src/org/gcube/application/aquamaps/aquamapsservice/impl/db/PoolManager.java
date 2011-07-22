@@ -63,8 +63,10 @@ public class PoolManager {
 			e.printStackTrace();
 		}
 		internalDBconnectionPool = new GenericObjectPool(null);
-		internalDBconnectionPool.setMaxActive(30);
+		internalDBconnectionPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.INTERNAL_DB_MAX_CONNECTION));
+//		internalDBconnectionPool.setMaxIdle(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.INTERNAL_DB_MAX_IDLE));
 		internalDBconnectionPool.setTestOnBorrow(true);
+		internalDBconnectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 		internalDBconnectionFactory = new DriverManagerConnectionFactory(internalDBconnectionString,  ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_USERNAME), 
 				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PASSWORD));
 
@@ -83,8 +85,10 @@ public class PoolManager {
 			e.printStackTrace();
 		}
 		postGISconnectionPool = new GenericObjectPool(null);
-		postGISconnectionPool.setMaxActive(30);
+		postGISconnectionPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_DB_MAX_CONNECTION));
+//		postGISconnectionPool.setMaxIdle(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_DB_MAX_IDLE));
 		postGISconnectionPool.setTestOnBorrow(true);
+		postGISconnectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 		postGISconnectionFactory = new DriverManagerConnectionFactory("jdbc:"+"postgresql"+"://"+ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_HOST)+":"+
 				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PORT)+"/"+
 				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME),

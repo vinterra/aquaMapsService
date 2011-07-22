@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -33,7 +33,7 @@ public class CommonServiceLogic {
 		job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
 		logger.trace("loaded "+job.getSelectedSpecies().size()+" species..");
 		job.setAuthor(author);
-		logger.trace("HSPEC is "+AquaMapsXStream.getXMLInstance().toXML(hspec));
+		logger.debug("HSPEC is "+hspec.toXML());
 		job.setIsGis(true);
 		job.setName(hspec.getTitle()+"_All Maps");
 		for(Species s: job.getSelectedSpecies()){
@@ -49,10 +49,15 @@ public class CommonServiceLogic {
 		
 		
 		logger.trace("Submiting job "+job.getName());
-		JobSubmissionThread thread=new JobSubmissionThread(job);
-		ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
-		ThreadManager.getExecutor().execute(thread);
-		return (int) thread.getId();
+		
+		return JobExecutionManager.insertJobExecutionRequest(job);
+		
+		
+		
+//		JobSubmissionThread thread=new JobSubmissionThread(job);
+//		ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
+//		ThreadManager.getExecutor().execute(thread);
+//		return (int) thread.getId();
 	}
 
 }

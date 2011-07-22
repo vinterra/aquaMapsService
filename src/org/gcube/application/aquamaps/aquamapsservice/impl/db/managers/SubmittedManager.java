@@ -1,9 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,7 +11,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
@@ -24,7 +21,6 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SubmittedManager {
@@ -170,6 +166,7 @@ public class SubmittedManager {
 	public static void updateStatus(int jobId,SubmittedStatus statusValue)throws SQLException, IOException, Exception{
 		updateField(jobId,SubmittedFields.status,FieldType.STRING,statusValue.toString());
 		if(statusValue.equals(SubmittedStatus.Error)||statusValue.equals(SubmittedStatus.Completed)){
+			updateField(jobId,SubmittedFields.endtime,FieldType.INTEGER,System.currentTimeMillis()+"");
 			logger.trace("Found status "+statusValue+", updateing Publisher..");
 			Publisher pub=ServiceContext.getContext().getPublisher();
 			if(isAquaMap(jobId)){
@@ -182,27 +179,24 @@ public class SubmittedManager {
 				pub.publishJob(job);
 			}
 		}
-		logger.trace("done Job status updateing status : "+statusValue.toString());
+		logger.trace("done submitted[ID : "+jobId+"] status updateing status : "+statusValue.toString());
 	}
 
 	
-//	protected static int insertInTable(String title,boolean isAquaMaps,int jobId)throws Exception{
-//		DBSession session=null;
-//		try{
-//			session=DBSession.getInternalDBSession();
-//			List<Field> row=new ArrayList<Field>();
-//			row.add(new Field(SubmittedFields.title+"",title,FieldType.STRING));
-//			row.add(new Field(SubmittedFields.isaquamap+"",isAquaMaps+"",FieldType.BOOLEAN));
-//			row.add(new Field(SubmittedFields.jobid+"",jobId+"",FieldType.INTEGER));
-//			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
-//			session.fillParameters(row, ps).executeUpdate();
-//			ResultSet rs=ps.getGeneratedKeys();
-//			if(rs.next())
-//				return rs.getInt(SubmittedFields.searchid+"");
-//			else return 0;
-//		}catch(Exception e){throw e;}
-//		finally{session.close();}
-//	}
+	public static Submitted insertInTable(Submitted toInsert)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			List<List<Field>> rows=new ArrayList<List<Field>>();
+			List<Field> row=new ArrayList<Field>();
+			for(Field f: toInsert.toRow())
+				if(!f.getName().equals(SubmittedFields.searchid+"")) row.add(f);
+			rows.add(row);
+			List<List<Field>> inserted=session.insertOperation(submittedTable,rows);
+			return new Submitted(inserted.get(0));
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
 
 
 
@@ -229,59 +223,46 @@ public class SubmittedManager {
 	public static Submitted getSubmittedById(int objId) throws Exception{
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.searchid+"",objId+"",FieldType.INTEGER));
-		List<Submitted> found= getList(filter);
+		List<Submitted> found= getList(filter,new PagedRequestSettings(1, 0, SubmittedFields.searchid+"", OrderDirection.ASC));
 		return found.get(0);
 	}
 
-	//*************** QUEUE MANAGEMENT
 	
-	
-	private static String queueTable="submitted_queue";
-	private static String path="path";
-	private static String idField="id";
-	
-	private static String queueDir="QUEUE";
-	
-	public static String addInQueue(Job toPerform) throws Exception {
-		DBSession session=null;
-		try{
-			String id=ServiceUtils.generateId("job", "xml");
-			
-			File f= new File(ServiceContext.getContext().getPersistenceRoot()+File.separator+queueDir+File.separator+id);
-			f.mkdirs();
-			BufferedWriter out = new BufferedWriter(new FileWriter(f));
-			out.write(AquaMapsXStream.getXMLInstance().toXML(toPerform));
-			out.close();
-			List<List<Field>> toInsert=new ArrayList<List<Field>>();
-			List<Field> row= new ArrayList<Field>();
-			row.add(new Field(path,f.getAbsolutePath(),FieldType.STRING));
-			row.add(new Field(idField,id,FieldType.STRING));
-			toInsert.add(row);
-			session=DBSession.getInternalDBSession();
-			session.insertOperation(queueTable, toInsert);
-			return id;
-		}catch(Exception e){throw e;}
-		finally{session.close();}
-	}
-
-	public static Job loadFromQueue(String id)throws Exception{
+	public static void update(Submitted toUpdate)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			List<Field> filter= new ArrayList<Field>();
-			filter.add(new Field(idField,id,FieldType.STRING));
-			ResultSet rs= session.executeFilteredQuery(filter, queueTable, null, null);
-			if (rs.next()){
-				String filePath=rs.getString(path);
-				String data=ServiceUtils.fileToString(filePath);
-				return (Job) AquaMapsXStream.getXMLInstance().fromXML(data);
-			}else throw new Exception("ID "+id+" not found in table..");
+			ArrayList<Field> id=new ArrayList<Field>();
+			id.add(toUpdate.getField(SubmittedFields.searchid));
+			ArrayList<Field> values=new ArrayList<Field>();
+			for(Field f: toUpdate.toRow())
+				if(!f.getName().equals(SubmittedFields.searchid+"")) values.add(f);
+			PreparedStatement psUpdate=session.getPreparedStatementForUpdate(values, id, submittedTable);
+			psUpdate=session.fillParameters(values, 0, psUpdate);
+			psUpdate=session.fillParameters(id, values.size(), psUpdate);
+			psUpdate.executeUpdate();
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
 	
 	
-	public static long getCount(ArrayList<Field> filter)throws Exception{
+	public static List<Submitted> getList(List<Field> filter, PagedRequestSettings settings)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			ArrayList<Submitted> toReturn=new ArrayList<Submitted>();
+			ResultSet rs=session.executeFilteredQuery(filter, submittedTable, settings.getOrderColumn(), settings.getOrderDirection());
+			int rowIndex=0;
+			while(rs.next()&&toReturn.size()<settings.getPageSize()){
+				if(rowIndex>=settings.getOffset()) toReturn.add(new Submitted(rs));
+				rowIndex++;				
+			}
+			return toReturn;
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
+	public static int getCount(List<Field> filter)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
@@ -290,4 +271,7 @@ public class SubmittedManager {
 		finally{session.close();}
 	}
 	
+	public static void setStartTime(int submittedId)throws Exception{
+		updateField(submittedId,SubmittedFields.starttime,FieldType.INTEGER,System.currentTimeMillis());
+	}
 }

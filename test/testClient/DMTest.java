@@ -23,8 +23,9 @@ public class DMTest {
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
-//		dmInterface.generateMaps("fabio.sinibaldi", false, 13, new ArrayList<Field>());
-		fromRequestToGeneralEnvironment();
+//		dmInterface.generateMaps("fabio.sinibaldi", true, 36, new ArrayList<Field>());
+		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
+		
 		System.out.println("Done");
 		
 		
@@ -48,25 +49,25 @@ public class DMTest {
 	}
 
 	
-	private static void fromRequestToGeneralEnvironment()throws Exception{
+	private static String fromRequestToGeneralEnvironment()throws Exception{
 		HSPECGroupGenerationRequest request=new HSPECGroupGenerationRequest();
 		request.setAuthor("genericTester");
 		request.setGenerationname("Test execution");
 		request.setDescription("Just a simple execution");
 		request.setHcafsearchid(1);
-		request.setHspensearchid(11);
-//		request.setSubmissionBackend("AquaMapsVRE");
-		request.setSubmissionBackend("RainyCloud");
+		request.setHspensearchid(3);
+		request.setSubmissionBackend("AquaMapsVRE");
+//		request.setSubmissionBackend("RainyCloud");
 		request.setExecutionEnvironment("Private Cloud");
 		request.setBackendURL("http://node16.d.d4science.research-infrastructures.eu:9000/RainyCloud-web-0.00.01");
 		request.setEnvironmentConfiguration(new HashMap<String, String>());
 		request.setLogic(LogicType.HSPEC);
 		request.setNumPartitions(4);
 		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.NativeRange+""}));
-		request.setEnableimagegeneration(false);
-		request.setEnablelayergeneration(false);
+		request.setEnableimagegeneration(true);
+		request.setEnablelayergeneration(true);
 		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
-		dmInterface.submitRequest(request);
+		return dmInterface.submitRequest(request);
 	}
 	
 }

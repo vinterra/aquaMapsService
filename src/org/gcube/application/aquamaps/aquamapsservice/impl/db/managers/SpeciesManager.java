@@ -86,12 +86,19 @@ public class SpeciesManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			ResultSet rs=session.executeQuery(queries[1]);
+			PreparedStatement psCount=session.preparedStatement(queries[1]);
+			PreparedStatement psSelection=session.preparedStatement(queries[0]+
+					((orderBy!=null)?" order by "+getCompleteName(selHspen, orderBy)+" "+orderDir:"")+" LIMIT "+
+					limit+" OFFSET "+offset);
+			if(characteristics.size()>0){
+				psCount=session.fillParameters(characteristics, 0, psCount);
+				psSelection=session.fillParameters(characteristics, 0, psSelection);
+			}
+			
+			ResultSet rs=psCount.executeQuery();
 			rs.next();
 			int totalCount=rs.getInt(1);
-			return DBUtils.toJSon(session.executeQuery(queries[0]+
-					((orderBy!=null)?" order by "+getCompleteName(selHspen, orderBy)+" "+orderDir:"")+" LIMIT "+
-					limit+" OFFSET "+offset), totalCount);
+			return DBUtils.toJSon(psSelection.executeQuery(), totalCount);
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
@@ -118,8 +125,9 @@ public class SpeciesManager {
 			for(Field field:characteristics){				
 				String fieldName=field.getName();
 				characteristicsFilter.append(getCompleteName(selHspen, fieldName));
-				String value=(field.getType().equals(FieldType.STRING))?"'"+field.getValue()+"'":field.getValue();
-				characteristicsFilter.append(" "+field.getOperator()+" "+value+" AND");
+				String value="?";
+//				(field.getType().equals(FieldType.STRING))?"'"+field.getValue()+"'":field.getValue();
+				characteristicsFilter.append(" "+field.getOperator()+" "+value+" AND ");
 			}
 //			logger.debug("characteristics filter string : "+characteristicsFilter);
 			int index=characteristicsFilter.lastIndexOf("AND");
@@ -150,8 +158,12 @@ public class SpeciesManager {
 			filter.append("( "+codesFilter.toString()+")");			
 		}
 		
-		String fromString = " from "+speciesOccurSum +((filter.indexOf(selHspen)>-1)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+" = "+selHspen+"."+SpeciesOccursumFields.speciesid:"");
-		String query= "Select "+speciesOccurSum+".* "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
+		
+		String fromString = " from "+speciesOccurSum +((true)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+" = "+selHspen+"."+SpeciesOccursumFields.speciesid:"");
+		
+		String query= "Select "+speciesOccurSum+".* , "+
+				selHspen+"."+HspenFields.pelagic+				
+				fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		String count= "Select count("+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		logger.trace("filterSpecies: "+query);
 		logger.trace("filterSpecies: "+count);

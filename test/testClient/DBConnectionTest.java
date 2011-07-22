@@ -3,6 +3,7 @@ package testClient;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 
@@ -13,7 +14,7 @@ public class DBConnectionTest {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-//		DBSession session=DBSession.getInternalDBSession();
+		DBSession session=DBSession.getInternalDBSession();
 //		String query=(args.length>0)&&(args[0]!=null)?args[0]:"Select * from selectedSpecies";
 //		ResultSet rs=session.executeQuery(query);
 //		System.out.println(DBUtils.toJSon(rs));	

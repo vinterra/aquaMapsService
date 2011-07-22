@@ -1,6 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
@@ -32,14 +31,10 @@ private static final GCUBELog logger=new GCUBELog(PropertiesReader.class);
 	}
 	
 	public String getParam(String paramName) throws Exception{
-		System.out.println("requested param "+paramName);
 		long secondsFromLastRead=(System.currentTimeMillis()-lastAccessed)/1000;
-		System.out.println("Time since last read : "+secondsFromLastRead+", refreshTime : "+refreshTime);
 		if(secondsFromLastRead>=refreshTime){
-			System.out.println("loading..");
 			load();
 			lastAccessed=System.currentTimeMillis();
-			System.out.println("setted last Accessed time to "+lastAccessed);
 		}
 		return props.getProperty(paramName).trim();
 	}

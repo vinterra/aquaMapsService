@@ -9,10 +9,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManag
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.envelope.SpEnvelope;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobSubmissionThread;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SubmittedMonitorThread;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.envelope.SpEnvelope;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
@@ -166,18 +164,10 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 				}
 			
 			job.setIsGis(enableGis);
-			if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.POSTPONE_SUBMISSION)){
 			
-			String file=SubmittedMonitorThread.getInstance().putInQueue(job);
-			logger.trace("Queued with "+file);
-			return file;}
-			else{
-				
-				JobSubmissionThread thread=new JobSubmissionThread(job);
-				ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
-				ThreadManager.getExecutor().execute(thread);
-				return "";
-			}
+			return JobExecutionManager.insertJobExecutionRequest(job)+"";
+			
+			
 		}catch(Exception e){
 			logger.error("Unable to execute Job "+req.getName(), e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

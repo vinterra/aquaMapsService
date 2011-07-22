@@ -12,9 +12,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequest
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
@@ -39,36 +37,23 @@ public class HSPECGroupGenerationRequestsManager {
 	}
 
 
-	public static String insertRequest(String author, String generationName, String algorithms,String description,
-			String submissionBackend,String executionEnvironment, String backendUrl,String environmentConfiguration,LogicType logic,
-			  Resource hcaf, Resource hspen,Integer partitionsNumber,boolean enableLayer,boolean enableImage)throws Exception{
+	public static String insertRequest(HSPECGroupGenerationRequest toInsert)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			List<Field> toInsertRow=new ArrayList<Field>();
-			String id=ServiceUtils.generateId("HGGR", "");
-			toInsertRow.add(new Field(GroupGenerationRequestFields.author+"",author,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.generationname+"",generationName,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.id+"",id,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.description+"",description,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.pending+"",FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.submissiontime+"",System.currentTimeMillis()+"",FieldType.INTEGER));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.hcafsearchid+"",hcaf.getSearchId()+"",FieldType.INTEGER));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.hspensearchid+"",hspen.getSearchId()+"",FieldType.INTEGER));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.submissionbackend+"",submissionBackend,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.executionenvironment+"",executionEnvironment,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.backendurl+"",backendUrl,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.environmentconfiguration+"",environmentConfiguration,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.logic+"",logic+"",FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.numpartitions+"",partitionsNumber+"",FieldType.INTEGER));
-			
-			toInsertRow.add(new Field(GroupGenerationRequestFields.algorithms+"",algorithms,FieldType.STRING));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.enableimagegeneration+"",enableImage+"",FieldType.BOOLEAN));
-			toInsertRow.add(new Field(GroupGenerationRequestFields.enablelayergeneration+"",enableLayer+"",FieldType.BOOLEAN));
+			toInsert.setId(ServiceUtils.generateId("HGGR", ""));
+			toInsert.setPhase(HSPECGroupGenerationPhase.pending);
 			List<List<Field>> rows=new ArrayList<List<Field>>();
+			List<Field> toInsertRow=new ArrayList<Field>();
+			logger.debug("Inserting request, fields are :");
+			for(Field f:toInsert.toRow())
+				if(!f.getValue().equalsIgnoreCase("null")){
+					toInsertRow.add(f);
+					logger.debug(f.toXML());
+				}
 			rows.add(toInsertRow);
 			session.insertOperation(requestsTable, rows);
-			return id;
+			return toInsert.getId();
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -94,12 +79,12 @@ public class HSPECGroupGenerationRequestsManager {
 		}
 	}
 
-	public static HSPECGroupGenerationRequest getFirst()throws Exception{
-		ArrayList<Field> filter= new ArrayList<Field>();
-		filter.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.pending+"",FieldType.STRING));
-		ArrayList<HSPECGroupGenerationRequest> requests=getList(filter);
-		return (requests.size()>0)?requests.get(0):null;
-	}
+//	public static HSPECGroupGenerationRequest getFirst()throws Exception{
+//		ArrayList<Field> filter= new ArrayList<Field>();
+//		filter.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.pending+"",FieldType.STRING));
+//		ArrayList<HSPECGroupGenerationRequest> requests=getList(filter);
+//		return (requests.size()>0)?requests.get(0):null;
+//	}
 
 
 	public static ArrayList<HSPECGroupGenerationRequest> getList(ArrayList<Field> filter)throws Exception{
@@ -116,6 +101,26 @@ public class HSPECGroupGenerationRequestsManager {
 		}
 	}
 
+	
+	public static List<HSPECGroupGenerationRequest> getList(List<Field> filter, PagedRequestSettings settings)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			ArrayList<HSPECGroupGenerationRequest> toReturn=new ArrayList<HSPECGroupGenerationRequest>();
+			ResultSet rs=session.executeFilteredQuery(filter,requestsTable, settings.getOrderColumn(), settings.getOrderDirection());
+			int rowIndex=0;
+			while(rs.next()&&toReturn.size()<settings.getPageSize()){
+				if(rowIndex>=settings.getOffset()) toReturn.add(new HSPECGroupGenerationRequest(rs));
+				rowIndex++;				
+			}
+			return toReturn;
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
+	
+	
+	
 
 	private static Field getField(String id, String field)throws Exception{
 		DBSession session=null;
@@ -204,6 +209,17 @@ public class HSPECGroupGenerationRequestsManager {
 		}
 	}
 
-	
+	public static int getCount(List<Field> filter)throws Exception{
+		DBSession session=null;
+		if(filter==null) filter=new ArrayList<Field>();
+		try{
+			session=DBSession.getInternalDBSession();
+			return session.getCount(requestsTable, filter);
+		}catch(Exception e){
+			throw e;
+		}finally{
+			session.close();
+		}
+	}
 	
 }

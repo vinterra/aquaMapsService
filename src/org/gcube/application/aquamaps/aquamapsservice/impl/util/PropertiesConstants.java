@@ -4,14 +4,15 @@ public class PropertiesConstants {
 	
 	//********************** PROPERTIES
 	//*********	GENERAL
-	public static final String GIS_MODE="GIS_MODE";
+//	public static final String GIS_MODE="GIS_MODE";
 	public static final String STANDALONE_MODE="STANDALONE_MODE";
 	public static final String USE_DUMMY_PUBLISHER="USE_DUMMY_PUBLISHER";
 	public static final String USE_ENVIRONMENT_MODELLING_LIB="USE_ENVIRONMENT_MODELLING_LIB";
 	public static final String ENABLE_SCRIPT_LOGGING="ENABLE_SCRIPT_LOGGING";
-	public static final String POSTPONE_SUBMISSION="POSTPONE_SUBMISSION";
+//	public static final String POSTPONE_SUBMISSION="POSTPONE_SUBMISSION";
 	public static final String DEFAULT_PUBLISHER_URL="DEFAULT_PUBLISHER_URL";
-	
+	public static final String PURGE_PENDING_OBJECTS="PURGE_PENDING_OBJECTS";
+	public static final String PURGE_PENDING_HSPEC_REQUESTS="PURGE_PENDING_HSPEC_REQUESTS";
 	
 	
 	//*********	ENVIRONMENT LIBRARY
@@ -26,6 +27,9 @@ public class PropertiesConstants {
 	public static final String INTERNAL_DB_NAME="INTERNAL_DB_NAME";
 	public static final String INTERNAL_DB_HOST="INTERNAL_DB_HOST";
 	public static final String INTERNAL_DB_PORT="INTERNAL_DB_PORT";
+	
+	public static final String INTERNAL_DB_MAX_CONNECTION="INTERNAL_DB_MAX_CONNECTION"; 
+//	public static final String INTERNAL_DB_MAX_IDLE="INTERNAL_DB_MAX_IDLE";
 	
 	//********	INTERNAL WEB SERVER
 	
@@ -46,6 +50,11 @@ public class PropertiesConstants {
 	public static final String GEOSERVER_DB_HOST="GEOSERVER_DB_HOST";
 	public static final String GEOSERVER_DB_PORT="GEOSERVER_DB_PORT";
 	
+	public static final String GEOSERVER_DB_MAX_CONNECTION="GEOSERVER_DB_MAX_CONNECTION"; 
+//	public static final String GEOSERVER_DB_MAX_IDLE="GEOSERVER_DB_MAX_IDLE";
+	
+	
+	
 	public static final String GEOSERVER_WORKSPACE="GEOSERVER_WORKSPACE";
 	public static final String GEOSERVER_WORLD_TABLE="GEOSERVER_WORLD_TABLE";
 	public static final String GEOSERVER_URL="GEOSERVER_URL";
@@ -59,10 +68,18 @@ public class PropertiesConstants {
 	
 	public static final String JOB_MAX_WORKERS="JOB_MAX_WORKERS";
 	public static final String JOB_MIN_WORKERS="JOB_MIN_WORKERS";
-	public static final String JOB_INTERVAL_TIME="JOB_INTERVAL";
+	public static final String JOB_INTERVAL_TIME="JOB_INTERVAL_TIME";
+	public static final String JOB_PRIORITY="JOB_PRIORITY";
 	
 	public static final String AQUAMAPS_OBJECT_MAX_WORKERS="AQUAMAPS_OBJECT_MAX_WORKERS";
 	public static final String AQUAMAPS_OBJECT_MIN_WORKERS="AQUAMAPS_OBJECT_MIN_WORKERS";
+	public static final String AQUAMAPS_OBJECT_INTERVAL_TIME="AQUAMAPS_OBJECT_INTERVAL_TIME";
+	public static final String AQUAMAPS_OBJECT_PRIORITY="AQUAMAPS_OBJECT_PRIORITY";
+	
+	public static final String HSPEC_GROUP_MAX_WORKERS="HSPEC_GROUP_MAX_WORKERS";
+	public static final String HSPEC_GROUP_MIN_WORKERS="HSPEC_GROUP_MIN_WORKERS";
+	public static final String HSPEC_GROUP_INTERVAL_TIME="HSPEC_GROUP_INTERVAL_TIME";
+	public static final String HSPEC_GROUP_PRIORITY="HSPEC_GROUP_PRIORITY";
 	
 	//********* SOURCES
 	

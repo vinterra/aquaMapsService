@@ -2,14 +2,15 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.EnvironmentalStatusUpdateThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.HSPECGroupMonitor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.ConnectedPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.DummyPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.EmbeddedPublisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.EnvironmentalStatusUpdateThread;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.HSPECGroupGenerationManagerThread;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SubmittedMonitorThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesReader;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
@@ -153,17 +154,14 @@ public class ServiceContext extends GCUBEServiceContext {
 				"; freespaceThreshold="+getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
 		t.start();
 		
-		logger.trace("Starting submitted monitor..");
-		SubmittedMonitorThread t2=new SubmittedMonitorThread(getPersistenceRoot()+File.separator+"JOBS", 4*1000);
-		t2.start();
-		logger.trace("Starting hspec group request monitor..");
-		HSPECGroupGenerationManagerThread t3=new HSPECGroupGenerationManagerThread(4*1000);
-		t3.start();
+//		logger.trace("Starting hspec group request monitor..");
+//		HSPECGroupMonitor t3=new HSPECGroupMonitor(4*1000);
+//		t3.start();
+//		
+//		
 		
-		logger.trace("Starting hspec group request status updater..");
-		EnvironmentalStatusUpdateThread t4=new EnvironmentalStatusUpdateThread(2*1000);
-		t4.start();
-		
+		JobExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_OBJECTS));
+		TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS));
 	}
 	
 	/**

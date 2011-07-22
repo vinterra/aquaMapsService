@@ -12,8 +12,8 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.gis.GroupGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
@@ -29,7 +29,9 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
+
 
 public class JobManager extends SubmittedManager{
 
@@ -272,6 +274,15 @@ public class JobManager extends SubmittedManager{
 			}
 			session.deleteOperation(tempFolders, filter);
 
+			logger.debug("Cleaning serialized requests...");
+			for(Submitted obj:getObjects(jobId))
+				try{
+					if(obj.getSerializedPath()!=null)ServiceUtils.deleteFile(obj.getSerializedPath());
+				}catch(Exception e){
+					logger.warn("Unable to delete file "+obj.getSerializedPath(), e);
+				}
+			
+			
 			logger.debug("cleaning speceisSelection for : "+jobId);
 			session.deleteOperation(selectedSpecies, filter);
 			logger.debug("cleaning references to working tables for : "+jobId);
@@ -376,39 +387,65 @@ public class JobManager extends SubmittedManager{
 	 * @return new job id
 	 */
 	public static Job insertNewJob(Job toPerform) throws Exception{
-		logger.trace("Creating new pending Job");
+//		logger.trace("Creating new pending Job");
 		DBSession session=null;
 
 		////*************** Send to publisher
 		try{
 
 			session=DBSession.getInternalDBSession();
+			session.disableAutoCommit();
 			Publisher publisher= ServiceContext.getContext().getPublisher();
 
 			////*************** Insert references into local DB
 			logger.trace("Inserting references into internal DB...");
 
-			List<Field> row=new ArrayList<Field>();
-			row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
-			row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
-			row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
-			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
-			session.fillParameters(row,0, ps).executeUpdate();
-			ResultSet rs=ps.getGeneratedKeys();
-			rs.next();
-			toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
-
-			ps=null;
 			
+			//Uncomment here to insert job references
+			
+//			List<Field> row=new ArrayList<Field>();
+//			row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
+//			row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
+//			row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
+//			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
+//			session.fillParameters(row,0, ps).executeUpdate();
+//			ResultSet rs=ps.getGeneratedKeys();
+//			rs.next();
+//			toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
+//
+//			ps=null;
+			
+			PreparedStatement ps=null;
+			List<Field> row=null;
+			ResultSet rs=null;
+			Submitted submittedJob=getSubmittedById(toPerform.getId());
+			logger.debug("Submitted Job is "+submittedJob.toXML());
 			for(AquaMapsObject obj : toPerform.getAquaMapsObjectList()){
+//				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+//				row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
+//				row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
+//				row.add(new Field)
+				
+				
 				row=new ArrayList<Field>();
-				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+				row.add(submittedJob.getField(SubmittedFields.author));
+				row.add(new Field(SubmittedFields.gisenabled+"",obj.getGis()+"",FieldType.BOOLEAN));
 				row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
-				row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
+				row.add(new Field(SubmittedFields.jobid+"",submittedJob.getSearchId()+"",FieldType.INTEGER));
+				row.add(new Field(SubmittedFields.saved+"",false+"",FieldType.BOOLEAN));
+				row.add(submittedJob.getField(SubmittedFields.sourcehcaf));
+				row.add(submittedJob.getField(SubmittedFields.sourcehspec));
+				row.add(submittedJob.getField(SubmittedFields.sourcehspen));
+				row.add(new Field(SubmittedFields.status+"",SubmittedStatus.Pending+"",FieldType.STRING));
+				row.add(submittedJob.getField(SubmittedFields.submissiontime));
+				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+				row.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
+				
 				if(ps==null)ps=session.getPreparedStatementForInsert(row, submittedTable);
 				session.fillParameters(row,0, ps).executeUpdate();
 				rs=ps.getGeneratedKeys();
 				rs.next();
+				
 				obj.setId(rs.getInt(SubmittedFields.searchid+""));
 			}
 
@@ -428,23 +465,12 @@ public class JobManager extends SubmittedManager{
 						obj.getSelectedSpecies().add(updated);
 					}
 			}
-
+			session.commit();
 			logger.trace("Sending job to publisher..");
 			////*************** Send to publisher
 			toPerform=publisher.publishJob(toPerform);		
 
 			////*************** update references in local DB
-
-
-
-
-			Field author=new Field(SubmittedFields.author+"",toPerform.getAuthor(),FieldType.STRING);
-			Field date= new Field (SubmittedFields.submissiontime+"",System.currentTimeMillis()+"",FieldType.INTEGER);
-			Field isAquaMaps= new Field(SubmittedFields.isaquamap+"","true",FieldType.BOOLEAN);
-			Field sourceHCAF=new Field(SubmittedFields.sourcehcaf+"",toPerform.getSourceHCAF().getSearchId()+"",FieldType.INTEGER);
-			Field sourceHSPEN=new Field(SubmittedFields.sourcehspen+"",toPerform.getSourceHSPEN().getSearchId()+"",FieldType.INTEGER);
-			Field sourceHSPEC=new Field(SubmittedFields.sourcehspec+"",toPerform.getSourceHSPEC().getSearchId()+"",FieldType.INTEGER);
-			Field jobIdField=new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER);
 
 
 			PreparedStatement psUpdateObjects=null;
@@ -454,25 +480,14 @@ public class JobManager extends SubmittedManager{
 			for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
 				objRow= new ArrayList<Field>();
 				objKey= new ArrayList<Field>();
-				objRow.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
-				objRow.add(author);
-				objRow.add(date);
 
 				objRow.add(new Field(SubmittedFields.status+"",obj.getStatus()+"",FieldType.STRING));
-
-				objRow.add(isAquaMaps);
-				objRow.add(sourceHCAF);
-				objRow.add(sourceHSPEN);
-				objRow.add(sourceHSPEC);
-				objRow.add(jobIdField);
-				objRow.add(new Field(SubmittedFields.gisenabled+"",obj.getGis()+"",FieldType.BOOLEAN));
 				ArrayList<String> layersId=new ArrayList<String>();
 				ArrayList<String> layersUri=new ArrayList<String>();
 				for(LayerInfo info: obj.getLayers()){
 					layersId.add(info.getId());
 					layersUri.add(info.getUrl()+"/"+info.getName());
 				}
-				objRow.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
 				objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
 				objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
 				
@@ -491,18 +506,12 @@ public class JobManager extends SubmittedManager{
 
 			ArrayList<Field> jobRow= new ArrayList<Field>();
 			ArrayList<Field> jobKey=new ArrayList<Field>();
-			jobRow.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
-			jobRow.add(author);
-			jobRow.add(date);
-
-			jobRow.add(new Field(SubmittedFields.status+"",toPerform.getStatus()+"",FieldType.STRING));
-
-			jobRow.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
-			jobRow.add(sourceHCAF);
-			jobRow.add(sourceHSPEN);
-			jobRow.add(sourceHSPEC);
-
-			jobRow.add(new Field(SubmittedFields.gisenabled+"",toPerform.getIsGis()+"",FieldType.BOOLEAN));
+			
+			//************** toPerform seems to have pending status when returned from publisher, this would trigger duplicate execution
+			if(toPerform.getStatus().equals(SubmittedStatus.Completed))
+				jobRow.add(new Field(SubmittedFields.status+"",toPerform.getStatus()+"",FieldType.STRING));
+			
+			
 			jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
 
 			jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
@@ -555,6 +564,7 @@ public class JobManager extends SubmittedManager{
 
 
 			}
+			session.commit();
 			return toPerform;
 		}catch (Exception e){
 			throw e;

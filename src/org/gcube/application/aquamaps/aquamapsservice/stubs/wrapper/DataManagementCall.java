@@ -68,25 +68,25 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public String submitRequest(HSPECGroupGenerationRequest request)
 			throws Exception {
 		try{
-			HspecGroupGenerationRequestType stubRequest=new HspecGroupGenerationRequestType();
-			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-			stubRequest.setAuthor(request.getAuthor());
-			stubRequest.setGenerationName(request.getGenerationname());
-			stubRequest.setDescription(request.getDescription());
-			
-			stubRequest.setHcafSearchId(request.getHcafsearchid());
-			stubRequest.setHspenSearchId(request.getHspensearchid());
-			stubRequest.setSubmissionBackend(request.getSubmissionBackend());
-			stubRequest.setExecutionEnvironment(request.getExecutionEnvironment());
-			stubRequest.setBackendUrl(request.getBackendURL());
-			stubRequest.setEnvironmentConfiguration(AquaMapsXStream.getXMLInstance().toXML(request.getEnvironmentConfiguration()));
-			stubRequest.setLogic(request.getLogic()+"");
-			stubRequest.setNumPartitions(request.getNumPartitions());
-			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-			
-			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
-			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
-			return pt.generateHSPECGroup(stubRequest);
+//			HspecGroupGenerationRequestType stubRequest=new HspecGroupGenerationRequestType();
+//			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
+//			stubRequest.setAuthor(request.getAuthor());
+//			stubRequest.setGenerationName(request.getGenerationname());
+//			stubRequest.setDescription(request.getDescription());
+//			
+//			stubRequest.setHcafSearchId(request.getHcafsearchid());
+//			stubRequest.setHspenSearchId(request.getHspensearchid());
+//			stubRequest.setSubmissionBackend(request.getSubmissionBackend());
+//			stubRequest.setExecutionEnvironment(request.getExecutionEnvironment());
+//			stubRequest.setBackendUrl(request.getBackendURL());
+//			stubRequest.setEnvironmentConfiguration(AquaMapsXStream.getXMLInstance().toXML(request.getEnvironmentConfiguration()));
+//			stubRequest.setLogic(request.getLogic()+"");
+//			stubRequest.setNumPartitions(request.getNumPartitions());
+//			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
+//			
+//			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
+//			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
+			return pt.generateHSPECGroup(request.toStubsVersion());
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

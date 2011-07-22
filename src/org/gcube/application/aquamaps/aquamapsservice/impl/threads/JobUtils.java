@@ -11,10 +11,11 @@ import java.util.Map;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.ImageGeneratorRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.image.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
+
 
 
 
@@ -183,7 +184,6 @@ public class JobUtils {
 	 */
 	public static boolean createImages(int objId, StringBuilder[] csq_str) throws Exception{
 		logger.trace("Submitting image generation for obj "+objId);
-		SubmittedManager.updateStatus(objId, SubmittedStatus.Publishing);
 		ImageGeneratorRequest request=new ImageGeneratorRequest(csq_str,objId);
 		boolean result=GeneratorManager.requestGeneration(request);
 		logger.trace(objId+" Image generation exit message :"+result);		
@@ -198,6 +198,12 @@ public class JobUtils {
 			}else logger.warn("Generator returned true but no files where found for objId "+objId);
 		}
 		return result;
+		
+		
+//		logger.trace("DUMMY CREATE IMAGE, OBJ ID "+objId);
+//		Thread.sleep(2000);
+//		logger.trace("COMPLETED DUMMY CREATE IMAGE, OBJ ID "+objId);
+//		return true;
 	}
 
 }

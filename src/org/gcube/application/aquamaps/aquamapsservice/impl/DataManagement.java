@@ -2,17 +2,12 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGroupGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.BatchGeneratorObjectFactory;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.predictions.HSPECGenerator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.threads.SourceGenerationThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
@@ -30,7 +25,6 @@ import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
@@ -49,14 +43,13 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public VOID generateHCAF(GenerateHCAFRequestType arg0)
 	throws RemoteException, GCUBEFault {
 		try{
-			logger.trace("Submitting request for "+arg0.getResultingHCAFName()+" generation submitted by "+arg0.getUserId());
-			String[] sources=arg0.getUrls().getItems();
-			for(String s:sources) logger.trace("found source : "+s);
-			int id=SourceGenerationManager.insertHCAFRequest(arg0.getUserId(),Integer.parseInt(arg0.getSourceHCAFId()), arg0.getResultingHCAFName(), sources);
-			logger.trace("Inserted request with id : "+id);
-			SourceGenerationThread t=new SourceGenerationThread(id);
-			ThreadManager.getExecutor().execute(t);
-			return new VOID();
+			throw new GCUBEFault("DISCONTINUED IMPLEMENTATION");
+//			logger.trace("Submitting request for "+arg0.getResultingHCAFName()+" generation submitted by "+arg0.getUserId());
+//			String[] sources=arg0.getUrls().getItems();
+//			for(String s:sources) logger.trace("found source : "+s);
+//			int id=SourceGenerationManager.insertHCAFRequest(arg0.getUserId(),Integer.parseInt(arg0.getSourceHCAFId()), arg0.getResultingHCAFName(), sources);
+//			logger.trace("Inserted request with id : "+id);
+//			return new VOID();
 		}catch(Exception e){
 			logger.error("",e);
 			throw new GCUBEFault("Unexpected error");
@@ -78,52 +71,55 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public VOID generateHSPEC(GenerateHSPECRequestType arg0)
 	throws RemoteException, GCUBEFault {
 		try{
-			String hcaf=SourceManager.getSourceName(ResourceType.HCAF, arg0.getSourceHCAFId());
-			String hspen=SourceManager.getSourceName(ResourceType.HSPEN, arg0.getSourceHSPENId());
-
-			//TODO ASynchronous generation
-			if(arg0.getSpeciesSelection()!=null && arg0.getSpeciesSelection().getItems().length>0){
-				Set<Species> toInsert=new HashSet<Species>();
-				for(String id: arg0.getSpeciesSelection().getItems())
-					toInsert.add(new Species(id));
-				hspen=SpeciesManager.getFilteredHSPEN(hspen, toInsert);
-			}
-
-			HSPECGenerator generator= new HSPECGenerator(hcaf,hspen,arg0.isGenerateNative(),arg0.isGenerateSuitable());	
-
-			generator.setEnableProbabilitiesLog(arg0.isEnableLog());
+			throw new Exception ("OBSOLETE METHOD");
 			
-			generator.generate();
-			if(arg0.isGenerateNative()){
-				String generatedNative=generator.getNativeTable();
-				try{
-					logger.trace("generated Native Table "+generatedNative);
-					String nativeTitle=arg0.getToGeneratePrefix().toLowerCase()+"_native";
-					//FIXME Registration
-//					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedNative, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
-//					SourceManager.setTableTitle(ResourceType.HSPEC, id, nativeTitle);
-				}catch(Exception e){
-					logger.error("UNABLE TO REGISTER GENERATED HSPEC NATIVE table name : "+generatedNative,e);
-				}
-			}
-			if(arg0.isGenerateSuitable()){
-				String generatedSuitable=generator.getSuitableTable();
-				try{
-					logger.trace("generated Suitable Table "+generatedSuitable);
-					String suitableTitle=arg0.getToGeneratePrefix().toLowerCase()+"suitable";
-					//FIXME Registration
-//					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedSuitable, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
-//					SourceManager.setTableTitle(ResourceType.HSPEC, id, suitableTitle);
-				}catch(Exception e){
-					logger.error("UNABLE TO REGISTER GENERATED HSPEC SUITABLE table name : "+generatedSuitable,e);
-				}
-			}
-			if(arg0.getSpeciesSelection()!=null && arg0.getSpeciesSelection().getItems().length>0){
-				logger.trace("Dropping temp hspen table");
-				DBSession.getInternalDBSession().dropTable(hspen);
-			}
-			if(arg0.isEnableLog())logger.trace("Log table is "+generator.getLogTable());
-			return new VOID();
+			
+//			String hcaf=SourceManager.getSourceName(ResourceType.HCAF, arg0.getSourceHCAFId());
+//			String hspen=SourceManager.getSourceName(ResourceType.HSPEN, arg0.getSourceHSPENId());
+//
+//			//TODO ASynchronous generation
+//			if(arg0.getSpeciesSelection()!=null && arg0.getSpeciesSelection().getItems().length>0){
+//				Set<Species> toInsert=new HashSet<Species>();
+//				for(String id: arg0.getSpeciesSelection().getItems())
+//					toInsert.add(new Species(id));
+//				hspen=SpeciesManager.getFilteredHSPEN(hspen, toInsert);
+//			}
+//
+//			HSPECGenerator generator= new HSPECGenerator(hcaf,hspen,arg0.isGenerateNative(),arg0.isGenerateSuitable());	
+//
+//			generator.setEnableProbabilitiesLog(arg0.isEnableLog());
+//			
+//			generator.generate();
+//			if(arg0.isGenerateNative()){
+//				String generatedNative=generator.getNativeTable();
+//				try{
+//					logger.trace("generated Native Table "+generatedNative);
+//					String nativeTitle=arg0.getToGeneratePrefix().toLowerCase()+"_native";
+//					//FIXME Registration
+////					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedNative, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
+////					SourceManager.setTableTitle(ResourceType.HSPEC, id, nativeTitle);
+//				}catch(Exception e){
+//					logger.error("UNABLE TO REGISTER GENERATED HSPEC NATIVE table name : "+generatedNative,e);
+//				}
+//			}
+//			if(arg0.isGenerateSuitable()){
+//				String generatedSuitable=generator.getSuitableTable();
+//				try{
+//					logger.trace("generated Suitable Table "+generatedSuitable);
+//					String suitableTitle=arg0.getToGeneratePrefix().toLowerCase()+"suitable";
+//					//FIXME Registration
+////					int id=SourceManager.registerSource(ResourceType.HSPEC, generatedSuitable, "GENERATED", arg0.getUserId(), arg0.getSourceHCAFId(), ResourceType.HCAF);
+////					SourceManager.setTableTitle(ResourceType.HSPEC, id, suitableTitle);
+//				}catch(Exception e){
+//					logger.error("UNABLE TO REGISTER GENERATED HSPEC SUITABLE table name : "+generatedSuitable,e);
+//				}
+//			}
+//			if(arg0.getSpeciesSelection()!=null && arg0.getSpeciesSelection().getItems().length>0){
+//				logger.trace("Dropping temp hspen table");
+//				DBSession.getInternalDBSession().dropTable(hspen);
+//			}
+//			if(arg0.isEnableLog())logger.trace("Log table is "+generator.getLogTable());
+//			return new VOID();
 		}catch(Exception e){
 			logger.error("",e);
 			throw new GCUBEFault("Unexpected error");
@@ -157,11 +153,11 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		logger.trace("Id will be "+id);
 		try{//Inserting request into db
 			logger.trace("Checking settings..");
-			Resource hcaf= SourceManager.getById(ResourceType.HCAF, arg0.getHcafSearchId());
-			Resource hspen= SourceManager.getById(ResourceType.HSPEN, arg0.getHspenSearchId());
-			return HSPECGroupGenerationRequestsManager.insertRequest(arg0.getAuthor(), arg0.getGenerationName(), arg0.getAlgorithms(), 
-					arg0.getDescription(), arg0.getSubmissionBackend(), arg0.getExecutionEnvironment(), arg0.getBackendUrl(), 
-					arg0.getEnvironmentConfiguration(), LogicType.valueOf(arg0.getLogic()), hcaf, hspen, arg0.getNumPartitions(), arg0.isEnableLayerGeneration(), arg0.isEnableImageGeneration());
+			HSPECGroupGenerationRequest request=new HSPECGroupGenerationRequest(arg0);
+			if(SourceManager.getById(ResourceType.HCAF, request.getHcafsearchid())==null)throw new Exception("Invalid HCAF id "+request.getHcafsearchid());
+			if(SourceManager.getById(ResourceType.HSPEN, request.getHspensearchid())==null)throw new Exception("Invalid HSPEN id "+request.getHspensearchid());
+			logger.debug("Received request "+request.toXML());
+			return TableGenerationExecutionManager.insertRequest(request);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

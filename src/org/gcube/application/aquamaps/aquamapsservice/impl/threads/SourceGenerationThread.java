@@ -20,13 +20,14 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.GeneratorManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.generators.SourceGeneratorRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GeneratorManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.SourceGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.common.core.utils.logging.GCUBELog;
+
 
 public class SourceGenerationThread extends Thread {
 

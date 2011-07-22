@@ -29,21 +29,21 @@ public class WrapperTest {
 		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
 		
 		
-		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
+//		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
 //		System.out.println(wrapper.getJSONPhilogeny());
-		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HCAF));
-		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEN));
-		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEC));
+//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HCAF));
+//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEN));
+//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEC));
 //		System.out.println(wrapper.getJSONSubmitted(true, null, null, null, null, new PagedRequestSettings(3, 0, SubmittedFields.searchid+"", OrderDirection.ASC)));
 		
-		Species s=new Species(specId);
-		System.out.println("loading Envelope for Species ");
-		
-		
-		
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML((wrapper.loadEnvelope(s.getId(), 3))));
-		
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
+//		Species s=new Species(specId);
+//		System.out.println("loading Envelope for Species ");
+//		
+//		
+//		
+//		System.out.println(AquaMapsXStream.getXMLInstance().toXML((wrapper.loadEnvelope(s.getId(), 3))));
+//		
+//		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
 		
 //		System.out.println(wrapper.loadResource(1, ResourceType.HCAF));
 //		System.out.println(wrapper.loadResource(1, ResourceType.HSPEN));
@@ -81,7 +81,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(63768)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(91861)));
 		
 		
 		
