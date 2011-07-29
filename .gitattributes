@@ -17,7 +17,6 @@ etc/generator/ALog.properties -text
 etc/generator/DestinationDBHibernate.cfg.xml -text
 etc/jndi-config.xml -text
 etc/profile.xml -text
-etc/profile.xml.bck -text
 etc/publisher/build.properties -text
 etc/publisher/deploy-jndi-config.xml -text
 etc/publisher/deploy-server.wsdd -text
