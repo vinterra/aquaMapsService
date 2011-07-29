@@ -12,4 +12,9 @@
 	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2011-06-28">
 		<Change>DataManagemementFacility features</Change>
 	</Changeset>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice" date="2011-07-29">
+		<Change>Refactored thread and request management</Change>
+		<Change>Check for available space</Change>
+		<Change>Check for pending requests</Change>
+	</Changeset>
 </ReleaseNotes>
