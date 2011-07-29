@@ -57,7 +57,8 @@ public class JobWorker extends Thread{
 			current.setId(tableReference.getSearchId());
 
 
-			current=JobManager.insertNewJob(current);
+			current=JobManager.insertNewJob(current,tableReference.getPostponePublishing());
+			
 			if(current.getStatus().equals(SubmittedStatus.Completed)){
 				logger.debug("No need to generate for job "+tableReference.getSearchId()+", publisher returned Complete.");
 			}else{
@@ -167,7 +168,7 @@ public class JobWorker extends Thread{
 			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);		
 		}else{
 			Log.debug(" jobId "+jobId+" no needs");
-			JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(ResourceType.HSPEC, JobManager.getHSPECTableId(jobId)));
+			JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(JobManager.getHSPECTableId(jobId)));
 		}
 
 	}
@@ -176,7 +177,7 @@ public class JobWorker extends Thread{
 
 	private static String filterByArea(int jobId,Set<Area> areaSelection,ResourceType tableType,int sourceId)throws Exception{
 
-		return filterByArea(jobId,areaSelection,tableType,SourceManager.getSourceName(tableType, sourceId));
+		return filterByArea(jobId,areaSelection,tableType,SourceManager.getSourceName(sourceId));
 
 	}
 	@Deprecated

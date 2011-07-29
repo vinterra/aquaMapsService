@@ -211,13 +211,19 @@ public class EmbeddedPublisher implements Publisher{
 	public boolean publishImages(
 			int objectId,Map<String, String> toPublishList) throws Exception {
 		logger.trace("Received request for publishing images for objId :"+objectId);
-
-		List<File> imgSet=new ArrayList<File>();
-		for(String s:toPublishList.values())
-			imgSet.add(new File(s));
-		
-		 getWrapper().storeImage(imgSet, objectId);
-		 return true;
+		if(toPublishList.size()>0){				
+			logger.trace(" found "+toPublishList.size()+" files to publish");
+			List<File> imgSet=new ArrayList<File>();
+			for(String s:toPublishList.values())
+				imgSet.add(new File(s));
+			
+			getWrapper().storeImage(imgSet, objectId);
+			logger.trace("Published Images for object "+objectId);
+			return true;
+		}else {
+			logger.warn("No Images to Publish for objId "+objectId);
+			return false;
+		}
 	}
 
 	

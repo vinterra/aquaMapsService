@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
@@ -14,6 +17,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
@@ -21,7 +25,10 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube.common.gis.dataModel.enhanced.LayerInfo;
+import org.gcube.common.gis.dataModel.types.LayersType;
 
 public class SubmittedManager {
 
@@ -68,8 +75,8 @@ public class SubmittedManager {
 
 
 	protected static int deleteFromTables(int submittedId)throws Exception{
-		
-		
+
+
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
@@ -110,7 +117,7 @@ public class SubmittedManager {
 	public static List<String> getGisId(int submittedId)throws Exception{
 		return CSVUtils.CSVToList((String) getField(submittedId,SubmittedFields.gispublishedid));
 	}
-	
+
 	public static SubmittedStatus getStatus(int submittedId)throws Exception{
 		return SubmittedStatus.valueOf((String) getField(submittedId,SubmittedFields.status));
 	}
@@ -122,9 +129,13 @@ public class SubmittedManager {
 		return ((Integer) getField(submittedId,SubmittedFields.isaquamap)==1);
 	}
 
+	public static Boolean isPostponePublishing(int submittedId)throws Exception{
+		return ((Integer) getField(submittedId,SubmittedFields.postponepublishing)==1);
+	} 
 
-
-
+	
+	
+	
 	//**************************************** setters **********************************
 	//
 	//	public static int setHCAFTable(int HCAFId,int jobId)throws Exception{
@@ -155,34 +166,79 @@ public class SubmittedManager {
 		logger.debug("Setting geo server references id : "+value+" for Submitted id : "+submittedId);
 		return updateField(submittedId,SubmittedFields.geoserverreference,FieldType.STRING,value);
 	}
+
 	
-	
+	public static int setSerializedPath(int submittedId,String path)throws Exception{
+		return updateField(submittedId,SubmittedFields.serializedpath,FieldType.STRING,path);
+	}
+
 	//******** Logic
 
 	/**
 	 * Updates internal Status, in case of Error status updates published element as side effect
 	 */
-	
-	public static void updateStatus(int jobId,SubmittedStatus statusValue)throws SQLException, IOException, Exception{
-		updateField(jobId,SubmittedFields.status,FieldType.STRING,statusValue.toString());
+
+	public static void updateStatus(int toUpdateId,SubmittedStatus statusValue)throws SQLException, IOException, Exception{
+		updateField(toUpdateId,SubmittedFields.status,FieldType.STRING,statusValue.toString());
+		Boolean postponePublishing=isPostponePublishing(toUpdateId);
 		if(statusValue.equals(SubmittedStatus.Error)||statusValue.equals(SubmittedStatus.Completed)){
-			updateField(jobId,SubmittedFields.endtime,FieldType.INTEGER,System.currentTimeMillis()+"");
-			logger.trace("Found status "+statusValue+", updateing Publisher..");
+			updateField(toUpdateId,SubmittedFields.endtime,FieldType.INTEGER,System.currentTimeMillis()+"");
 			Publisher pub=ServiceContext.getContext().getPublisher();
-			if(isAquaMap(jobId)){
-				AquaMapsObject obj = pub.getAquaMapsObjectById(jobId);
-				obj.setStatus(statusValue);
-				pub.publishAquaMapsObject(obj);
+
+			if(isAquaMap(toUpdateId)){
+				if(!postponePublishing){				
+					logger.trace("Object status was "+statusValue+", updateing Publisher..");
+					AquaMapsObject obj = pub.getAquaMapsObjectById(toUpdateId);
+					obj.setStatus(statusValue);
+					pub.publishAquaMapsObject(obj);
+				}
 			}else{
-				Job job=pub.getJobById(jobId);
-				job.setStatus(statusValue);
-				pub.publishJob(job);
+				Job job=null;
+				if(!postponePublishing){
+					job=pub.getJobById(toUpdateId);
+					job.setStatus(statusValue);
+					pub.publishJob(job);
+				}else{
+					HashMap<Integer,Map<String,String>> toPublishMaps=new HashMap<Integer, Map<String,String>>();
+					logger.trace("Job was skip Publisher enabled, loading generated data links..");
+					job=(Job) AquaMapsXStream.deSerialize((String)getField(toUpdateId, SubmittedFields.serializedpath));
+					for(Submitted submittedObj:JobManager.getObjects(toUpdateId)){
+						for(AquaMapsObject obj:job.getAquaMapsObjectList())
+							if(obj.getId()==submittedObj.getSearchId()){	
+								try{
+									obj.setStatus(submittedObj.getStatus());
+									if(submittedObj.getGisEnabled())
+										for(String layerId:submittedObj.getGisPublishedId()){
+											LayerInfo layer=pub.getLayerByIdAndType(layerId,(
+													submittedObj.getType().equals(ObjectType.Biodiversity)?LayersType.Biodiversity:
+														LayersType.NativeRange));
+											if(layer!=null)
+												obj.getLayers().add(layer);
+											else logger.warn("Unable to load published layer ID "+layerId);
+										}
+									toPublishMaps.put(obj.getId(), (Map<String, String>) AquaMapsXStream.deSerialize(submittedObj.getSerializedPath()));
+								}catch(Exception e){
+									logger.error("Unable to load layers and images for obj "+submittedObj.getSearchId(),e);
+								}
+							}
+					}
+					
+					job.setStatus(statusValue);
+					logger.debug("Publishing job...");
+					pub.publishJob(job);
+					logger.debug("Publishing images for "+toPublishMaps.size()+" objects..");
+					for(Entry<Integer,Map<String,String>> entry:toPublishMaps.entrySet())
+						pub.publishImages(entry.getKey(), entry.getValue());
+					logger.trace("Update Complete");
+				}
+				
+							
 			}
 		}
-		logger.trace("done submitted[ID : "+jobId+"] status updateing status : "+statusValue.toString());
+		logger.trace("done submitted[ID : "+toUpdateId+"] status updateing status : "+statusValue.toString());
 	}
 
-	
+
 	public static Submitted insertInTable(Submitted toInsert)throws Exception{
 		DBSession session=null;
 		try{
@@ -227,7 +283,7 @@ public class SubmittedManager {
 		return found.get(0);
 	}
 
-	
+
 	public static void update(Submitted toUpdate)throws Exception{
 		DBSession session=null;
 		try{
@@ -244,8 +300,8 @@ public class SubmittedManager {
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
-	
-	
+
+
 	public static List<Submitted> getList(List<Field> filter, PagedRequestSettings settings)throws Exception{
 		DBSession session=null;
 		try{
@@ -261,7 +317,7 @@ public class SubmittedManager {
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
-	
+
 	public static int getCount(List<Field> filter)throws Exception{
 		DBSession session=null;
 		try{
@@ -270,7 +326,7 @@ public class SubmittedManager {
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
-	
+
 	public static void setStartTime(int submittedId)throws Exception{
 		updateField(submittedId,SubmittedFields.starttime,FieldType.INTEGER,System.currentTimeMillis());
 	}

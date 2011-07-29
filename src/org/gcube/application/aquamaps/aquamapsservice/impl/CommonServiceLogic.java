@@ -1,19 +1,22 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CommonServiceLogic {
@@ -25,12 +28,23 @@ public class CommonServiceLogic {
 		logger.trace("Gnerating job for maps generation :");
 		logger.trace("HSPEC id :" +hspecId);
 		
+		if(speciesFilter.size()==0){
+			Submitted existing=getAlreadySubmitted(hspecId, author, enableGIS);
+			if(existing!=null) {
+				logger.trace("Found existing job "+existing.getJobId()+", submitted by "+existing.getAuthor());
+				return existing.getJobId();
+			}
+		}
+		
 		Job job=new Job();
-		Resource hspec=SourceManager.getById(ResourceType.HSPEC, hspecId);
+		Resource hspec=SourceManager.getById(hspecId);
 		job.setSourceHSPEC(hspec);
-		job.setSourceHCAF(SourceManager.getById(ResourceType.HCAF, hspec.getSourceHCAFId()));
-		job.setSourceHSPEN(SourceManager.getById(ResourceType.HSPEN, hspec.getSourceHSPENId()));
+		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFId()));
+		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENId()));
 		job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
+		if(job.getSelectedSpecies().size()==0) throw new Exception("NO SPECIES SELECTED");
+		
+		
 		logger.trace("loaded "+job.getSelectedSpecies().size()+" species..");
 		job.setAuthor(author);
 		logger.debug("HSPEC is "+hspec.toXML());
@@ -50,14 +64,17 @@ public class CommonServiceLogic {
 		
 		logger.trace("Submiting job "+job.getName());
 		
-		return JobExecutionManager.insertJobExecutionRequest(job);
+		return JobExecutionManager.insertJobExecutionRequest(job,true);
 		
-		
-		
-//		JobSubmissionThread thread=new JobSubmissionThread(job);
-//		ServiceContext.getContext().setScope(thread,ServiceContext.getContext().getStartScopes());
-//		ThreadManager.getExecutor().execute(thread);
-//		return (int) thread.getId();
 	}
 
+	
+	private static Submitted getAlreadySubmitted(int hspecId, String author, boolean GIS)throws Exception{
+		logger.trace("Looking for submitted job for hspecID : "+hspecId+", GIS :"+GIS);
+		ArrayList<Field> filter=new ArrayList<Field>();
+		filter.add(new Field(SubmittedFields.sourcehspec+"",hspecId+"",FieldType.INTEGER));
+		filter.add(new Field(SubmittedFields.postponepublishing+"",true+"",FieldType.BOOLEAN));
+		if(GIS) filter.add(new Field(SubmittedFields.gisenabled+"",true+"",FieldType.BOOLEAN));
+		return SubmittedManager.getList(filter).iterator().next();
+	}	
 }

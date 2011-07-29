@@ -6,6 +6,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServ
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
@@ -31,7 +32,10 @@ public class WrapperTest {
 		
 //		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
 //		System.out.println(wrapper.getJSONPhilogeny());
-//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HCAF));
+		
+		ArrayList<Field> filter=new ArrayList<Field>();
+		filter.add(new Field(MetaSourceFields.type+"",ResourceType.HSPEC+"",FieldType.STRING));
+		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), filter));
 //		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEN));
 //		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEC));
 //		System.out.println(wrapper.getJSONSubmitted(true, null, null, null, null, new PagedRequestSettings(3, 0, SubmittedFields.searchid+"", OrderDirection.ASC)));
@@ -81,7 +85,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(91861)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(334667)));
 		
 		
 		

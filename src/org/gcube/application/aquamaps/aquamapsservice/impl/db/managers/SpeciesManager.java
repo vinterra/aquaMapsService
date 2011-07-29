@@ -15,7 +15,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
@@ -44,7 +43,7 @@ public class SpeciesManager {
 				if(row!=null) toReturn.attributesList.addAll(row);
 			}
 			if(fetchEnvelope){
-				String hspenTable=SourceManager.getSourceName(ResourceType.HSPEN, hspenId);
+				String hspenTable=SourceManager.getSourceName(hspenId);
 				List<Field> row=Field.loadResultSet(session.executeFilteredQuery(filters, hspenTable,null,null)).get(0);
 				if(row!=null) toReturn.attributesList.addAll(row);
 			}
@@ -81,7 +80,7 @@ public class SpeciesManager {
 	
 	public static String getJsonList(String orderBy, String orderDir, int limit, int offset, List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
 		String[] queries;
-		String selHspen=SourceManager.getSourceName(ResourceType.HSPEN, HSPENId);
+		String selHspen=SourceManager.getSourceName(HSPENId);
 		queries=formfilterQueries(characteristics, names, codes, selHspen);
 		DBSession session=null;
 		try{

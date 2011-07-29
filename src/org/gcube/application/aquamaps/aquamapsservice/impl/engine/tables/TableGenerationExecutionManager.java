@@ -2,6 +2,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGroupGenerationRequestsManager;
@@ -9,16 +11,13 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.MyPooledE
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
 
 import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
 
@@ -28,6 +27,9 @@ public class TableGenerationExecutionManager {
 	
 	private static PooledExecutor pool=null;
 	private static Semaphore insertedRequest=null;
+	
+	private static ConcurrentHashMap <Execution,Semaphore> subscribedGenerations=new ConcurrentHashMap<Execution, Semaphore>();
+	
 	
 	
 	public static void init(boolean purgeInvalid)throws Exception{
@@ -49,10 +51,6 @@ public class TableGenerationExecutionManager {
 				}
 			logger.trace("Purged "+count+" requests");
 		}
-		
-//		ArrayList<Field> filter= new ArrayList<Field>();
-//		filter.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.pending+"",FieldType.STRING));
-//		int count=HSPECGroupGenerationRequestsManager.getCount(filter);
 		
 		
 		insertedRequest=new Semaphore(0);
@@ -85,4 +83,21 @@ public class TableGenerationExecutionManager {
 		pool.execute(thread);
 	}
 	
+	public static void signForGeneration(AlgorithmType algorithm, Integer hspenId, Integer hcafId)throws Exception{
+		logger.trace("Signing up for generation [Algorith : "+algorithm+" ; HSPEN ID : "+hspenId+" ; HCAF ID : "+hcafId+"]");
+		Execution identifier=new Execution(algorithm, hcafId, hspenId);
+		if(!subscribedGenerations.containsKey(identifier)) subscribedGenerations.put(identifier, new Semaphore(0));
+		subscribedGenerations.get(identifier).wait();
+	}
+	
+	public static void notifyGeneration(AlgorithmType algorithm, Integer hspenId, Integer hcafId) throws Exception{
+		logger.trace("Notifying generation for [Algorith : "+algorithm+" ; HSPEN ID : "+hspenId+" ; HCAF ID : "+hcafId+"]");
+		Execution identifier=new Execution(algorithm, hcafId, hspenId);
+		if(subscribedGenerations.containsKey(identifier)){
+			Semaphore sem=subscribedGenerations.get(identifier);
+			logger.trace(sem.getQueueLength()+" execution are waiting..");
+			sem.notifyAll();
+			subscribedGenerations.remove(identifier);
+		}
+	}
 }

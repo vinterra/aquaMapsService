@@ -281,15 +281,15 @@ public class JobManager extends SubmittedManager{
 				}catch(Exception e){
 					logger.warn("Unable to delete file "+obj.getSerializedPath(), e);
 				}
-			
-			
-			logger.debug("cleaning speceisSelection for : "+jobId);
-			session.deleteOperation(selectedSpecies, filter);
-			logger.debug("cleaning references to working tables for : "+jobId);
 
-			filter=new ArrayList<Field>();
-			filter.add(new Field(SubmittedFields.searchid+"",jobId+"",FieldType.INTEGER));
-			session.deleteOperation(workingTables, filter);
+
+				logger.debug("cleaning speceisSelection for : "+jobId);
+				session.deleteOperation(selectedSpecies, filter);
+				logger.debug("cleaning references to working tables for : "+jobId);
+
+				filter=new ArrayList<Field>();
+				filter.add(new Field(SubmittedFields.searchid+"",jobId+"",FieldType.INTEGER));
+				session.deleteOperation(workingTables, filter);
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -386,8 +386,8 @@ public class JobManager extends SubmittedManager{
 	 * 
 	 * @return new job id
 	 */
-	public static Job insertNewJob(Job toPerform) throws Exception{
-//		logger.trace("Creating new pending Job");
+	public static Job insertNewJob(Job toPerform,boolean skipPublishing) throws Exception{
+		//		logger.trace("Creating new pending Job");
 		DBSession session=null;
 
 		////*************** Send to publisher
@@ -400,33 +400,34 @@ public class JobManager extends SubmittedManager{
 			////*************** Insert references into local DB
 			logger.trace("Inserting references into internal DB...");
 
-			
+
 			//Uncomment here to insert job references
-			
-//			List<Field> row=new ArrayList<Field>();
-//			row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
-//			row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
-//			row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
-//			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
-//			session.fillParameters(row,0, ps).executeUpdate();
-//			ResultSet rs=ps.getGeneratedKeys();
-//			rs.next();
-//			toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
-//
-//			ps=null;
-			
+
+			//			List<Field> row=new ArrayList<Field>();
+			//			row.add(new Field(SubmittedFields.title+"",toPerform.getName(),FieldType.STRING));
+			//			row.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
+			//			row.add(new Field(SubmittedFields.jobid+"",0+"",FieldType.INTEGER));
+			//			PreparedStatement ps=session.getPreparedStatementForInsert(row, submittedTable);
+			//			session.fillParameters(row,0, ps).executeUpdate();
+			//			ResultSet rs=ps.getGeneratedKeys();
+			//			rs.next();
+			//			toPerform.setId(rs.getInt(SubmittedFields.searchid+""));
+			//
+			//			ps=null;
+
 			PreparedStatement ps=null;
 			List<Field> row=null;
 			ResultSet rs=null;
 			Submitted submittedJob=getSubmittedById(toPerform.getId());
 			logger.debug("Submitted Job is "+submittedJob.toXML());
+			
 			for(AquaMapsObject obj : toPerform.getAquaMapsObjectList()){
-//				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
-//				row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
-//				row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
-//				row.add(new Field)
-				
-				
+				//				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
+				//				row.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
+				//				row.add(new Field(SubmittedFields.jobid+"",toPerform.getId()+"",FieldType.INTEGER));
+				//				row.add(new Field)
+
+
 				row=new ArrayList<Field>();
 				row.add(submittedJob.getField(SubmittedFields.author));
 				row.add(new Field(SubmittedFields.gisenabled+"",obj.getGis()+"",FieldType.BOOLEAN));
@@ -440,12 +441,12 @@ public class JobManager extends SubmittedManager{
 				row.add(submittedJob.getField(SubmittedFields.submissiontime));
 				row.add(new Field(SubmittedFields.title+"",obj.getName(),FieldType.STRING));
 				row.add(new Field(SubmittedFields.type+"",obj.getType()+"",FieldType.STRING));
-				
+				row.add(submittedJob.getField(SubmittedFields.postponepublishing));
 				if(ps==null)ps=session.getPreparedStatementForInsert(row, submittedTable);
 				session.fillParameters(row,0, ps).executeUpdate();
 				rs=ps.getGeneratedKeys();
 				rs.next();
-				
+
 				obj.setId(rs.getInt(SubmittedFields.searchid+""));
 			}
 
@@ -467,63 +468,67 @@ public class JobManager extends SubmittedManager{
 			}
 			session.commit();
 			logger.trace("Sending job to publisher..");
+			
 			////*************** Send to publisher
-			toPerform=publisher.publishJob(toPerform);		
+			if(!skipPublishing){
+				toPerform=publisher.publishJob(toPerform);		
 
-			////*************** update references in local DB
+				////*************** update references in local DB
 
 
-			PreparedStatement psUpdateObjects=null;
-			ArrayList<Field> objRow=null;
-			ArrayList<Field> objKey=null;
-			
-			for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
-				objRow= new ArrayList<Field>();
-				objKey= new ArrayList<Field>();
+				PreparedStatement psUpdateObjects=null;
+				ArrayList<Field> objRow=null;
+				ArrayList<Field> objKey=null;
 
-				objRow.add(new Field(SubmittedFields.status+"",obj.getStatus()+"",FieldType.STRING));
-				ArrayList<String> layersId=new ArrayList<String>();
-				ArrayList<String> layersUri=new ArrayList<String>();
-				for(LayerInfo info: obj.getLayers()){
-					layersId.add(info.getId());
-					layersUri.add(info.getUrl()+"/"+info.getName());
+				for(AquaMapsObject obj: toPerform.getAquaMapsObjectList()){
+					objRow= new ArrayList<Field>();
+					objKey= new ArrayList<Field>();
+
+					objRow.add(new Field(SubmittedFields.status+"",obj.getStatus()+"",FieldType.STRING));
+					ArrayList<String> layersId=new ArrayList<String>();
+					ArrayList<String> layersUri=new ArrayList<String>();
+					for(LayerInfo info: obj.getLayers()){
+						layersId.add(info.getId());
+						layersUri.add(info.getUrl()+"/"+info.getName());
+					}
+					objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
+					objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
+
+					objKey.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.INTEGER));
+
+					if(psUpdateObjects==null) psUpdateObjects=session.getPreparedStatementForUpdate(objRow, objKey, submittedTable);
+
+					//fill values
+					psUpdateObjects=session.fillParameters(objRow, 0, psUpdateObjects);
+					//fill keys
+					psUpdateObjects=session.fillParameters(objKey,objRow.size(),psUpdateObjects);
+
+					psUpdateObjects.executeUpdate();
 				}
-				objRow.add(new Field(SubmittedFields.gispublishedid+"",CSVUtils.listToCSV(layersId),FieldType.STRING));
-				objRow.add(new Field(SubmittedFields.geoserverreference+"",CSVUtils.listToCSV(layersUri),FieldType.STRING));
-				
-				objKey.add(new Field(SubmittedFields.searchid+"",obj.getId()+"",FieldType.INTEGER));
-				
-				if(psUpdateObjects==null) psUpdateObjects=session.getPreparedStatementForUpdate(objRow, objKey, submittedTable);
-				
-				//fill values
-				psUpdateObjects=session.fillParameters(objRow, 0, psUpdateObjects);
-				//fill keys
-				psUpdateObjects=session.fillParameters(objKey,objRow.size(),psUpdateObjects);
-				
-				psUpdateObjects.executeUpdate();
+
+
+				ArrayList<Field> jobRow= new ArrayList<Field>();
+				ArrayList<Field> jobKey=new ArrayList<Field>();
+
+				//************** toPerform seems to have pending status when returned from publisher, this would trigger duplicate execution
+				if(toPerform.getStatus().equals(SubmittedStatus.Completed))
+					jobRow.add(new Field(SubmittedFields.status+"",toPerform.getStatus()+"",FieldType.STRING));
+
+
+				jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
+
+				jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
+
+
+				PreparedStatement psJobUpdate=session.getPreparedStatementForUpdate(jobRow, jobKey, submittedTable);
+
+				psJobUpdate=session.fillParameters(jobRow, 0, psJobUpdate);
+				psJobUpdate=session.fillParameters(jobKey, jobRow.size(), psJobUpdate);
+				psJobUpdate.executeUpdate();
+
 			}
-
-
-			ArrayList<Field> jobRow= new ArrayList<Field>();
-			ArrayList<Field> jobKey=new ArrayList<Field>();
-			
-			//************** toPerform seems to have pending status when returned from publisher, this would trigger duplicate execution
-			if(toPerform.getStatus().equals(SubmittedStatus.Completed))
-				jobRow.add(new Field(SubmittedFields.status+"",toPerform.getStatus()+"",FieldType.STRING));
 			
 			
-			jobRow.add(new Field(SubmittedFields.gispublishedid+"",toPerform.getWmsContextId(),FieldType.STRING));
-
-			jobKey.add(new Field(SubmittedFields.searchid+"",toPerform.getId()+"",FieldType.INTEGER));
-			
-			
-			PreparedStatement psJobUpdate=session.getPreparedStatementForUpdate(jobRow, jobKey, submittedTable);
-			
-			psJobUpdate=session.fillParameters(jobRow, 0, psJobUpdate);
-			psJobUpdate=session.fillParameters(jobKey, jobRow.size(), psJobUpdate);
-			psJobUpdate.executeUpdate();
-
-
 			if(!toPerform.getStatus().equals(SubmittedStatus.Completed)){
 				//Initialize working variables 
 				if((toPerform.getSelectedSpecies().size()>0)){
@@ -558,11 +563,11 @@ public class JobManager extends SubmittedManager{
 
 				//Setting selected sources as working tables
 
-				setWorkingHCAF(toPerform.getId(), SourceManager.getSourceName(ResourceType.HCAF, toPerform.getSourceHCAF().getSearchId()));
-				setWorkingHSPEC(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEC, toPerform.getSourceHSPEC().getSearchId()));
-				setWorkingHSPEN(toPerform.getId(), SourceManager.getSourceName(ResourceType.HSPEN, toPerform.getSourceHSPEN().getSearchId()));
+				setWorkingHCAF(toPerform.getId(), SourceManager.getSourceName(toPerform.getSourceHCAF().getSearchId()));
+				setWorkingHSPEC(toPerform.getId(), SourceManager.getSourceName(toPerform.getSourceHSPEC().getSearchId()));
+				setWorkingHSPEN(toPerform.getId(), SourceManager.getSourceName(toPerform.getSourceHSPEN().getSearchId()));
 
-
+				AquaMapsXStream.serialize(submittedJob.getSerializedPath(), toPerform);
 			}
 			session.commit();
 			return toPerform;

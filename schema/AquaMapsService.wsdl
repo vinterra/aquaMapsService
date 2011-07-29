@@ -112,7 +112,7 @@
 
 			<xsd:complexType name="getResourceListRequestType">
 				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
+					<xsd:element name="filters" type="aqtypes:fieldArray" />
 					<xsd:element name="sortColumn" type="xsd:string" />
 					<xsd:element name="sortDirection" type="xsd:string" />
 					<xsd:element name="limit" type="xsd:int" />

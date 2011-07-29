@@ -103,7 +103,7 @@ public class SourceGenerationThread extends Thread {
 			String targetHCAFName=SourceGenerationManager.getGeneratedHCAFName(requestId);
 			String targetHCAFTable=ServiceUtils.generateId("hcaf", "");
 			int sourceHCAFId=SourceGenerationManager.getSourceId(requestId);
-			String sourceHCAFName=SourceManager.getSourceName(ResourceType.HCAF, sourceHCAFId);
+			String sourceHCAFName=SourceManager.getSourceName(sourceHCAFId);
 			
 			logger.trace("Starting merging imported data with "+sourceHCAFName+" (id:"+sourceHCAFId+")");
 			SourceGenerationManager.setStatus(requestId, SourceGenerationStatus.Merging);

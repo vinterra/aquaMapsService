@@ -8,6 +8,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGen
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
@@ -21,14 +22,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGeneration
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
+import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
 import org.gcube.common.core.types.VOID;
@@ -148,14 +148,18 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	@Override
 	public String generateHSPECGroup(HspecGroupGenerationRequestType arg0)
 			throws RemoteException, GCUBEFault {
-		logger.trace("Received hspec group generation request, title : "+arg0.getGenerationName());
-		String id=ServiceUtils.generateId("HGGR", "");
-		logger.trace("Id will be "+id);
 		try{//Inserting request into db
+			long availableSpace=GHNContext.getContext().getFreeSpace(GHNContext.getContext().getLocation());
+			long threshold=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD);
+			if(availableSpace<threshold)throw new Exception("NOT ENOUGH SPACE, REMAINING : "+availableSpace+", THRESHOLD : "+threshold);
+			
+			logger.trace("Received hspec group generation request, title : "+arg0.getGenerationName());
+			String id=ServiceUtils.generateId("HGGR", "");
+			logger.trace("Id will be "+id);
 			logger.trace("Checking settings..");
 			HSPECGroupGenerationRequest request=new HSPECGroupGenerationRequest(arg0);
-			if(SourceManager.getById(ResourceType.HCAF, request.getHcafsearchid())==null)throw new Exception("Invalid HCAF id "+request.getHcafsearchid());
-			if(SourceManager.getById(ResourceType.HSPEN, request.getHspensearchid())==null)throw new Exception("Invalid HSPEN id "+request.getHspensearchid());
+			if(SourceManager.getById(request.getHcafsearchid())==null)throw new Exception("Invalid HCAF id "+request.getHcafsearchid());
+			if(SourceManager.getById(request.getHspensearchid())==null)throw new Exception("Invalid HSPEN id "+request.getHspensearchid());
 			logger.debug("Received request "+request.toXML());
 			return TableGenerationExecutionManager.insertRequest(request);
 		}catch(Exception e){

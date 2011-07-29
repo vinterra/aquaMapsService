@@ -14,13 +14,14 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.Ba
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.TableGenerationConfiguration;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class HSPECGroupWorker extends Thread {
@@ -40,9 +41,9 @@ public class HSPECGroupWorker extends Thread {
 			logger.debug("Request is "+request.toXML());
 			HSPECGroupGenerationRequestsManager.setStartTime(request.getId());
 			HashMap<ResourceType,Resource> sources=new HashMap<ResourceType, Resource>();
-			sources.put(ResourceType.HCAF, SourceManager.getById(ResourceType.HCAF, request.getHcafsearchid()));
+			sources.put(ResourceType.HCAF, SourceManager.getById(request.getHcafsearchid()));
 			if(sources.get(ResourceType.HCAF)==null) throw new Exception ("Unable to find hcaf with id "+request.getHcafsearchid());
-			sources.put(ResourceType.HSPEN, SourceManager.getById(ResourceType.HSPEN, request.getHspensearchid()));
+			sources.put(ResourceType.HSPEN, SourceManager.getById(request.getHspensearchid()));
 			if(sources.get(ResourceType.HSPEN)==null) throw new Exception ("Unable to find hspen with id "+request.getHcafsearchid());
 
 
@@ -58,43 +59,55 @@ public class HSPECGroupWorker extends Thread {
 			for(String algorithmString:request.getAlgorithms()){
 				try{
 					AlgorithmType algorithmType=AlgorithmType.valueOf(algorithmString);
-					long startTime=System.currentTimeMillis();
-					logger.trace("Found algorithm "+algorithmType+", submitting generation..");	
-					String generatedHSPECTable=batch.generateTable(
-							new TableGenerationConfiguration(
-									LogicType.HSPEC, 
-									AlgorithmType.valueOf(algorithmString), 
-									sources, 
-									request.getSubmissionBackend(), 
-									request.getExecutionEnvironment(), 
-									request.getBackendURL(), 
-									request.getEnvironmentConfiguration(),
-									request.getNumPartitions(), 
-									request.getAuthor()));
-					logger.trace("Generated Table "+generatedHSPECTable+" in "+(startTime-System.currentTimeMillis()));
-					Resource toRegister=new Resource(ResourceType.HSPEC,0);
-					toRegister.setAlgorithm(algorithmType);
-					toRegister.setAuthor(request.getAuthor());
-					toRegister.setGenerationTime(System.currentTimeMillis());
-					toRegister.setDescription(request.getDescription());
-					toRegister.setProvenance("Generated on AquaMaps VRE, submitted on "+request.getExecutionEnvironment());
-					toRegister.setSourceHCAFId(sources.get(ResourceType.HCAF).getSearchId());
-					toRegister.setSourceHCAFTable(sources.get(ResourceType.HCAF).getTableName());
-					toRegister.setSourceHSPENId(sources.get(ResourceType.HSPEN).getSearchId());
-					toRegister.setSourceHSPENTable(sources.get(ResourceType.HSPEN).getTableName());
-					toRegister.setStatus("Completed");
-					toRegister.setTableName(generatedHSPECTable);
-					toRegister.setTitle(request.getGenerationname()+"_"+algorithmType);
-					toRegister=SourceManager.registerSource(toRegister);
-					logger.trace("Registered HSPEC with id "+toRegister.getSearchId());
-					HSPECGroupGenerationRequestsManager.addGeneratedHSPEC(toRegister.getSearchId(), request.getId());
-					generatedHspec.add(toRegister);
+					
+					Resource existing=getExisting(algorithmType, request.getHspensearchid(), request.getHcafsearchid(), request.getId());
+					
+					if(existing==null){
+						long startTime=System.currentTimeMillis();
+						logger.trace("No Resources found, submitting generation..");	
+						String generatedHSPECTable=batch.generateTable(
+								new TableGenerationConfiguration(
+										LogicType.HSPEC, 
+										AlgorithmType.valueOf(algorithmString), 
+										sources, 
+										request.getSubmissionBackend(), 
+										request.getExecutionEnvironment(), 
+										request.getBackendURL(), 
+										request.getEnvironmentConfiguration(),
+										request.getNumPartitions(), 
+										request.getAuthor()));
+						logger.trace("Generated Table "+generatedHSPECTable+" in "+(startTime-System.currentTimeMillis()));
+						Resource toRegister=new Resource(ResourceType.HSPEC,0);
+						toRegister.setAlgorithm(algorithmType);
+						toRegister.setAuthor(request.getAuthor());
+						toRegister.setGenerationTime(System.currentTimeMillis());
+						toRegister.setDescription(request.getDescription());
+						toRegister.setProvenance("Generated on AquaMaps VRE, submitted on "+request.getExecutionEnvironment());
+						toRegister.setSourceHCAFId(sources.get(ResourceType.HCAF).getSearchId());
+						toRegister.setSourceHCAFTable(sources.get(ResourceType.HCAF).getTableName());
+						toRegister.setSourceHSPENId(sources.get(ResourceType.HSPEN).getSearchId());
+						toRegister.setSourceHSPENTable(sources.get(ResourceType.HSPEN).getTableName());
+						toRegister.setStatus("Completed");
+						toRegister.setTableName(generatedHSPECTable);
+						toRegister.setTitle(request.getGenerationname()+"_"+algorithmType);
+						toRegister=SourceManager.registerSource(toRegister);
+						logger.trace("Registered HSPEC with id "+toRegister.getSearchId());
+						HSPECGroupGenerationRequestsManager.addGeneratedHSPEC(toRegister.getSearchId(), request.getId());
+						generatedHspec.add(toRegister);
+						TableGenerationExecutionManager.notifyGeneration(algorithmType, request.getHspensearchid(), request.getHcafsearchid());
+					}else{
+						logger.trace("Found Resource "+existing.toXML());
+						generatedHspec.add(existing);
+					}
 				}catch(Exception e){
 					logger.error("Unable to generate data for  algorithm "+algorithmString,e);
 				}
 			}
 			EnvironmentalLogicManager.leaveBatch(batch);
 			logger.trace("Generated "+generatedHspec.size()+" hspec table(s)");
+			
+			
+			
 			if(request.getEnableimagegeneration()){
 				logger.trace("Generating jobs for request "+request.getId());
 				ArrayList<Integer> jobIds=new ArrayList<Integer>();
@@ -142,4 +155,28 @@ public class HSPECGroupWorker extends Thread {
 			}
 		}
 	}
+	
+	
+	
+	private static Resource getExisting(AlgorithmType algorithm, Integer hspenId, Integer hcafId,String currentRequestId)throws Exception{
+		logger.trace("Request "+currentRequestId+" looking for existing generated Table [Algorith : "+algorithm+" ; HSPEN ID : "+hspenId+" ; HCAF ID : "+hcafId+"]");
+		ArrayList<Field> requestFilter= new ArrayList<Field>();
+		requestFilter.add(new Field(MetaSourceFields.sourcehspen+"",hspenId+"",FieldType.INTEGER));
+		requestFilter.add(new Field(MetaSourceFields.sourcehcaf+"",hcafId+"",FieldType.INTEGER));
+		for(HSPECGroupGenerationRequest request: HSPECGroupGenerationRequestsManager.getList(requestFilter)){
+			if(!request.getId().equals(currentRequestId)&&request.getAlgorithms().contains(algorithm)){
+				if(request.getPhase().equals(HSPECGroupGenerationPhase.pending)||request.getPhase().equals(HSPECGroupGenerationPhase.datageneration)){
+					logger.trace("Found existing request [PHASE : "+request.getPhase()+" ; ID : "+request.getId()+"], waiting for generation");
+					TableGenerationExecutionManager.signForGeneration(algorithm, hspenId, hcafId);
+				}
+			}
+		}
+		ArrayList<Field> resourceFilter= new ArrayList<Field>();
+		resourceFilter.add(new Field(MetaSourceFields.algorithm+"",algorithm+"",FieldType.STRING));
+		resourceFilter.add(new Field(MetaSourceFields.sourcehspen+"",hspenId+"",FieldType.INTEGER));
+		resourceFilter.add(new Field(MetaSourceFields.sourcehcaf+"",hcafId+"",FieldType.INTEGER));
+		return SourceManager.getList(resourceFilter).iterator().next();	
+	}
+	
+	
 }

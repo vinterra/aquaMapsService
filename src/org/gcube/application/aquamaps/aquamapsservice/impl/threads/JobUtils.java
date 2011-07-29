@@ -10,10 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.image.ImageGeneratorRequest;
-import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -22,8 +20,6 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class JobUtils {
 
 	private static GCUBELog logger= new GCUBELog(JobUtils.class);
-	//	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-//	private static final String xmlHeader="<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>";
 
 	private static final Map<String,String> imageFileAndName= new HashMap<String, String>();
 
@@ -163,47 +159,19 @@ public class JobUtils {
 
 	
 
-//	public static Map<String,String> parsePublished(List<String> publishedUrls){
-//		Map<String,String> toReturn=new HashMap<String, String>();		
-//		for(String url : publishedUrls){
-//			for(String suffix: imageFileAndName.keySet()){
-//				if(url.endsWith(suffix)){
-//					toReturn.put(imageFileAndName.get(suffix), url);
-//					break;
-//				}
-//			}
-//		}
-//		return toReturn;
-//	}
 
 	/**
-	 *  Creates Images and sends them to the publisher
+	 *  Creates Images Map
 	 *  
 	 * @return list of published Images
 	 * @throws Exception 
 	 */
-	public static boolean createImages(int objId, StringBuilder[] csq_str) throws Exception{
+	public static Map<String,String> createImages(int objId, StringBuilder[] csq_str,boolean postponePublishing) throws Exception{
 		logger.trace("Submitting image generation for obj "+objId);
 		ImageGeneratorRequest request=new ImageGeneratorRequest(csq_str,objId);
 		boolean result=GeneratorManager.requestGeneration(request);
 		logger.trace(objId+" Image generation exit message :"+result);		
-		if(!result) logger.warn("No images were generated");
-		else {
-			Map<String,String> app=request.getGeneratedImagesNameAndPath();
-			logger.trace(" found "+app.size()+" files to publish");
-			if(app.size()>0){
-				result=ServiceContext.getContext().getPublisher().publishImages(objId,app);
-				if(!result) throw new Exception("Couldn't publish images for objId "+objId+", publisher returned false");
-				else logger.trace("Published Images for object "+objId);
-			}else logger.warn("Generator returned true but no files where found for objId "+objId);
-		}
-		return result;
-		
-		
-//		logger.trace("DUMMY CREATE IMAGE, OBJ ID "+objId);
-//		Thread.sleep(2000);
-//		logger.trace("COMPLETED DUMMY CREATE IMAGE, OBJ ID "+objId);
-//		return true;
+		return request.getGeneratedImagesNameAndPath();
 	}
 
 }

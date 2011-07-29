@@ -42,7 +42,7 @@ public interface AquaMapsServiceInterface {
 
 	public Resource loadResource(int resId,ResourceType type)throws Exception;
 
-	public String getJSONResources(PagedRequestSettings settings, ResourceType type)throws Exception;
+	public String getJSONResources(PagedRequestSettings settings, List<Field> filter)throws Exception;
 
 	public String getJSONSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception;
 

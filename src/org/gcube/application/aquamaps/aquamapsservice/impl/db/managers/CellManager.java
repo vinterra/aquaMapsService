@@ -63,7 +63,7 @@ public class CellManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> filter=new ArrayList<Field>();
 			filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesId,FieldType.STRING));
-			String HCAF=SourceManager.getSourceName(ResourceType.HCAF, SourceManager.getDefaultId(ResourceType.HCAF));
+			String HCAF=SourceManager.getSourceName(SourceManager.getDefaultId(ResourceType.HCAF));
 			PreparedStatement ps= session.preparedStatement("SELECT * FROM "+occurrenceCells+" as o INNER JOIN "+HCAF+" as h ON " +
 					"o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+" WHERE o."+SpeciesOccursumFields.speciesid+" = ?");
 			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), settings.getOffset(), settings.getLimit());
@@ -104,7 +104,7 @@ public class CellManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();			
-			String HCAFName=SourceManager.getSourceName(ResourceType.HCAF, HCAFId);
+			String HCAFName=SourceManager.getSourceName(HCAFId);
 			logger.trace("loading environemental data from table "+HCAFName+"("+HCAFId+") for" +toUpdate.size()+" cells" );
 			PreparedStatement ps=null;			
 			for(Cell c: toUpdate){

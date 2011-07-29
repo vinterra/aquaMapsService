@@ -77,7 +77,7 @@ public class HSPECGenerator {
 
 	private String occurenceCellsTable;
 	private String occurrenceCellsViewTable=null;
-	private String hspecTableStructure=SourceManager.getSourceName(ResourceType.HSPEC, SourceManager.getDefaultId(ResourceType.HSPEC));
+	private String hspecTableStructure=SourceManager.getSourceName(SourceManager.getDefaultId(ResourceType.HSPEC));
 
 
 	//******** LAZY MODE PARAMETERS
@@ -158,7 +158,7 @@ public class HSPECGenerator {
 		this.hcafDynamicTable=HCAF_D;
 		this.hcafStaticTable=HCAF_S;
 		this.hspenTable = HSPEN;
-		this.hspecNativeTable= SourceManager.getSourceName(ResourceType.HSPEC, JobManager.getHSPECTableId(jobId));
+		this.hspecNativeTable= SourceManager.getSourceName(JobManager.getHSPECTableId(jobId));
 		this.occurenceCellsTable = SpeciesManager.GOOD_CELLS;
 		this.jobId=jobId;
 		this.jobWeights=envelopeWeights;

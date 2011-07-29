@@ -207,10 +207,10 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	}
 
 	@Override
-	public String getJSONResources(PagedRequestSettings settings, ResourceType type)throws Exception{
+	public String getJSONResources(PagedRequestSettings settings, List<Field> filter) throws Exception{
 		try{
 			GetResourceListRequestType request=new GetResourceListRequestType();
-			request.setType(type.toString());
+			request.setFilters(Field.toStubsVersion(filter));
 			request.setOffset(settings.getOffset());
 			request.setSortColumn(settings.getOrderColumn());
 			request.setSortDirection(settings.getOrderDirection()+"");

@@ -7,9 +7,11 @@ import java.util.HashMap;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.MalformedScopeExpressionException;
 
@@ -22,9 +24,12 @@ public class DMTest {
 	 */
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
-		
-//		dmInterface.generateMaps("fabio.sinibaldi", true, 36, new ArrayList<Field>());
-		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
+		ArrayList<Field> filter= new ArrayList<Field>();
+//		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Bivalvia",FieldType.STRING)); // ~ 300 species
+//		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Holothuroidea",FieldType.STRING)); // 21 species
+		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species
+		dmInterface.generateMaps("fabio.sinibaldi", true, 87, filter);
+//		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
 		
 		System.out.println("Done");
 		

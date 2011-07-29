@@ -1,15 +1,13 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
@@ -119,10 +117,10 @@ public class JobExecutionManager {
 	}
 
 
-	public static int insertJobExecutionRequest(Job toExecute)throws Exception{
+	public static int insertJobExecutionRequest(Job toExecute,boolean postponePublishing)throws Exception{
 		String file=persistencePath+File.separator+ServiceUtils.generateId("Job", ".xml");
 		logger.debug("Serializing job "+toExecute.getName()+" to "+file);
-		serialize(file, toExecute);
+		AquaMapsXStream.serialize(file, toExecute);
 		Submitted toInsert=new Submitted(0);
 		toInsert.setAuthor(toExecute.getAuthor());
 		toInsert.setSubmissionTime(System.currentTimeMillis());
@@ -137,7 +135,7 @@ public class JobExecutionManager {
 		toInsert.setSourceHSPEN(toExecute.getSourceHSPEN().getSearchId());
 		toInsert.setStatus(SubmittedStatus.Pending);
 		toInsert.setTitle(toExecute.getName());
-
+		toInsert.setPostponePublishing(postponePublishing);
 		toInsert=SubmittedManager.insertInTable(toInsert);
 		logger.trace("Assigned id "+toInsert.getSearchId()+" to Job "+toInsert.getTitle()+" [ "+toInsert.getAuthor()+" ]");
 
@@ -151,19 +149,18 @@ public class JobExecutionManager {
 		for(AquaMapsObjectExecutionRequest request:requests){
 			String file=persistencePath+File.separator+ServiceUtils.generateId("AQ", ".xml");
 			logger.debug("Serializing object "+request.getObject().getTitle()+" to "+file);
-			serialize(file, request);
 			request.getObject().setSerializedPath(file);
 			request.getObject().setStatus(SubmittedStatus.Generating);
+			AquaMapsXStream.serialize(file, request);
 		}
 		int jobId=requests.get(0).getObject().getJobId();
 		logger.trace("Creating "+requests.size()+" requests for objects execution for job "+jobId);
 		blockedJobs.put(jobId, new Semaphore(-(requests.size()-1)));
-		for(AquaMapsObjectExecutionRequest request:requests)
-			SubmittedManager.update(request.getObject());	
-
+		
+		
+		AquaMapsManager.insertRequests(requests);
 
 		insertedObjects.release(requests.size());
-
 
 		//************* BLOCKS current job
 		((Semaphore)blockedJobs.get(jobId)).acquire();
@@ -173,7 +170,7 @@ public class JobExecutionManager {
 	private static void startJob(Submitted job)throws Exception{
 		SubmittedManager.updateStatus(job.getSearchId(), SubmittedStatus.Simulating);
 		Submitted submittedJob=SubmittedManager.getSubmittedById(job.getSearchId());
-		Job toExecute=(Job) deSerialize(submittedJob.getSerializedPath());
+		Job toExecute=(Job) AquaMapsXStream.deSerialize(submittedJob.getSerializedPath());
 		JobWorker worker=new JobWorker(toExecute,submittedJob);
 		jobPool.execute(worker);
 	}
@@ -181,7 +178,7 @@ public class JobExecutionManager {
 	private static void startAquaMapsObject(Submitted object)throws Exception{
 		SubmittedManager.updateStatus(object.getSearchId(), SubmittedStatus.Publishing);
 		Submitted submittedObject=SubmittedManager.getSubmittedById(object.getSearchId());		
-		AquaMapsObjectExecutionRequest toExecute=(AquaMapsObjectExecutionRequest) deSerialize(submittedObject.getSerializedPath());
+		AquaMapsObjectExecutionRequest toExecute=(AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submittedObject.getSerializedPath());
 		AquaMapsObjectWorker worker=new AquaMapsObjectWorker(toExecute);
 		aqPool.execute(worker);
 	}
@@ -221,29 +218,7 @@ public class JobExecutionManager {
 	}
 
 
-	private static void serialize(String path,Object toSerialize)throws Exception{
-		ObjectOutputStream stream=AquaMapsXStream.getXMLInstance().createObjectOutputStream(new FileWriter(path));
-		stream.writeObject(toSerialize);
-		stream.flush();
-		stream.close();
-		System.out.println("Wrote File "+path);
-	}
-
-	private static Object deSerialize(String path)throws Exception{
-		logger.debug("Loading object from file "+path);
-		ObjectInputStream is=null;
-		Object toReturn=null;
-		try{
-			is=AquaMapsXStream.getXMLInstance().createObjectInputStream(new FileReader(path));
-			while(true){
-				toReturn=is.readObject();
-			}
-		}catch(EOFException e){
-			if(is!=null)is.close();
-		}
-		if(toReturn==null) throw new Exception("Unable to load object from path "+path+", no objects found");
-		else return toReturn;
-	}
+	
 
 	public static List<Submitted> getAvailableRequests(boolean object)throws Exception {
 		if(object) insertedObjects.acquire();

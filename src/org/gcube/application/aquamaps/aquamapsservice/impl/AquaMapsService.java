@@ -165,7 +165,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			
 			job.setIsGis(enableGis);
 			
-			return JobExecutionManager.insertJobExecutionRequest(job)+"";
+			return JobExecutionManager.insertJobExecutionRequest(job,false)+"";
 			
 			
 		}catch(Exception e){
@@ -225,7 +225,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		
 		try{
 		
-		return SourceManager.getById(toReturn.getType(), toReturn.getSearchId()).toStubsVersion();
+		return SourceManager.getById(toReturn.getSearchId()).toStubsVersion();
 		}catch(Exception e){
 			logger.error("Unable to load source details. id: "+myResource.getSearchId(), e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -235,8 +235,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	public String getResourceList(GetResourceListRequestType req) throws GCUBEFault{
 		logger.debug("entroin getResourceList");
 		try{
-	
-			return SourceManager.getJsonList(ResourceType.valueOf(req.getType()),
+			
+			return SourceManager.getJsonList(Field.load(req.getFilters()),
 					 new PagedRequestSettings(req.getLimit(), req.getOffset(), req.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(req.getSortDirection())));
 		}catch(Exception e){
 			logger.error("Errors while performing getResourceList operation",e);

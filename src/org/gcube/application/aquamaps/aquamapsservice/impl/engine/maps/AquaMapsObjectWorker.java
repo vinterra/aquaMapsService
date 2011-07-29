@@ -1,6 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -19,7 +21,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GenerationUtil
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.PredictionLayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
@@ -35,6 +36,7 @@ import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class AquaMapsObjectWorker extends Thread {
@@ -100,9 +102,15 @@ public class AquaMapsObjectWorker extends Thread {
 
 				if(toMapData==null) logger.trace(aquamapsName+"Empty selection, nothing to render");
 				else {
-					if(!JobUtils.createImages(aquamapsId,toMapData.getCsq_str()))
-						throw new Exception("NO IMAGES GENERATED OR PUBLISHED");
-
+					Map<String,String> images=JobUtils.createImages(aquamapsId,toMapData.getCsq_str(),request.getObject().getPostponePublishing());
+					
+					if(request.getObject().getPostponePublishing()){
+						logger.debug("Postponing publishing..");
+						AquaMapsXStream.serialize(request.getObject().getSerializedPath(), images);
+					}else{
+						if(!ServiceContext.getContext().getPublisher().publishImages(aquamapsId, images))
+							throw new Exception("OBJECT ID "+aquamapsId+" WAS UNABLE TO PUBLISH IMG FILES");
+					}
 
 					/// *************************** GIS GENERATION
 
@@ -159,8 +167,18 @@ public class AquaMapsObjectWorker extends Thread {
 
 				///************************ PERL IMAGES GENERATION AND PUBBLICATION
 
-				if(!JobUtils.createImages(aquamapsId,toMapData.getCsq_str()))
-					throw new Exception("NO IMAGES GENERATED OR PUBLISHED");
+				Map<String,String> images=JobUtils.createImages(aquamapsId,toMapData.getCsq_str(),request.getObject().getPostponePublishing());
+				
+				if(request.getObject().getPostponePublishing()){
+					logger.debug("Postponing publishing..");
+					AquaMapsXStream.serialize(request.getObject().getSerializedPath(), images);
+				}else{
+					if(!ServiceContext.getContext().getPublisher().publishImages(aquamapsId, images))
+						throw new Exception("OBJECT ID "+aquamapsId+" WAS UNABLE TO PUBLISH IMG FILES");
+				}
+				
+				
+					
 				
 
 
@@ -201,26 +219,26 @@ public class AquaMapsObjectWorker extends Thread {
 	}
 
 	
-	private static String generateCsvFile(ResultSet rs,int jobId,String aquamapsName)throws Exception{
-		String csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
-		FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
-		GenerationUtils.ResultSetToCSVFile(rs, csvFile);
-		return csvFile;
-	}
-
-
-	private static ResultSet queryForProbabilities(DBSession session,int jobId,int aquamapsId,String speciesId)throws Exception{
-		String HSPECName=JobManager.getWorkingHSPEC(jobId);
-		session=DBSession.getInternalDBSession();
-
-		String clusteringQuery=clusteringDistributionQuery(HSPECName);
-		logger.trace("Gonna use query "+clusteringQuery);
-		PreparedStatement ps= session.preparedStatement(clusteringQuery);
-		ps.setString(1,speciesId);
-
-
-		return ps.executeQuery();
-	}
+//	private static String generateCsvFile(ResultSet rs,int jobId,String aquamapsName)throws Exception{
+//		String csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+jobId+File.separator+aquamapsName+".csv";
+//		FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
+//		GenerationUtils.ResultSetToCSVFile(rs, csvFile);
+//		return csvFile;
+//	}
+//
+//
+//	private static ResultSet queryForProbabilities(DBSession session,int jobId,int aquamapsId,String speciesId)throws Exception{
+//		String HSPECName=JobManager.getWorkingHSPEC(jobId);
+//		session=DBSession.getInternalDBSession();
+//
+//		String clusteringQuery=clusteringDistributionQuery(HSPECName);
+//		logger.trace("Gonna use query "+clusteringQuery);
+//		PreparedStatement ps= session.preparedStatement(clusteringQuery);
+//		ps.setString(1,speciesId);
+//
+//
+//		return ps.executeQuery();
+//	}
 
 
 	public static String clusteringDistributionQuery(String hspecName){
@@ -314,5 +332,7 @@ public class AquaMapsObjectWorker extends Thread {
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}
 	}
+	
+	
 	
 }

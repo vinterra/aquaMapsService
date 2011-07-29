@@ -23,16 +23,9 @@ public class SourceManager {
 
 	private static final GCUBELog logger=new GCUBELog(SourceManager.class);	
 	
-	private static String getMetaTable(ResourceType type) throws Exception{
-		
-		return "meta_sources";
-//		switch(type){
-//		case HCAF: return "meta_hcaf";
-//		case HSPEC: return "meta_hspec";
-//		case HSPEN: return "meta_hspen";
-//		}
-//		throw new Exception("Source type not valid "+type.toString());
-	}
+	private static final String sourcesTable="meta_sources";
+	
+	
 	
 	public static int getDefaultId(ResourceType type)throws Exception{
 		switch(type){
@@ -55,7 +48,6 @@ public class SourceManager {
 //			logger.trace("source not found, skipping..");			
 //		}
 		try{
-			String metaTable=getMetaTable(toRegister.getType());
 			session=DBSession.getInternalDBSession();
 			List<List<Field>> rows= new ArrayList<List<Field>>();
 			ArrayList<Field> row= new ArrayList<Field>();
@@ -77,7 +69,7 @@ public class SourceManager {
 			row.add(toRegister.getField(MetaSourceFields.title));
 			row.add(toRegister.getField(MetaSourceFields.type));
 			rows.add(row);
-			List<List<Field>> ids = session.insertOperation(metaTable, rows);
+			List<List<Field>> ids = session.insertOperation(sourcesTable, rows);
 			for(Field f: ids.get(0)) 
 				if(f.getName().equals(MetaSourceFields.searchid+"")) toRegister.setSearchId(f.getValueAsInteger());
 			logger.trace("registered source with id : "+toRegister.getSearchId());
@@ -89,14 +81,13 @@ public class SourceManager {
 		}
 	}
 	
-	public static void deleteSource(ResourceType type,int id) throws Exception{
+	public static void deleteSource(int id) throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			String metaTable=getMetaTable(type);
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
-			session.deleteOperation(metaTable, filter);
+			session.deleteOperation(sourcesTable, filter);
 		}catch(Exception e){
 			throw e;			
 		}finally{
@@ -104,32 +95,31 @@ public class SourceManager {
 		}
 	}
 	
-	public static String getSourceName(ResourceType type, int id)throws Exception{
-		return (String) getField(type, id, MetaSourceFields.tablename);
+	public static String getSourceName(int id)throws Exception{
+		return (String) getField(id, MetaSourceFields.tablename);
 	}
 	
-	public static String getSourceTitle(ResourceType type, int id)throws Exception{
-		return (String) getField(type,id,MetaSourceFields.title);
+	public static String getSourceTitle(int id)throws Exception{
+		return (String) getField(id,MetaSourceFields.title);
 	}
 	
 	public static int getSourceId(ResourceType type,int id)throws Exception{
 		switch(type){
-		case HCAF : return (Integer) getField(type, id, MetaSourceFields.sourcehcaf);
-		case HSPEC: return (Integer) getField(type, id, MetaSourceFields.sourcehspec);
-		case HSPEN : return (Integer) getField(type, id, MetaSourceFields.sourcehspen);
+		case HCAF : return (Integer) getField(id, MetaSourceFields.sourcehcaf);
+		case HSPEC: return (Integer) getField(id, MetaSourceFields.sourcehspec);
+		case HSPEN : return (Integer) getField(id, MetaSourceFields.sourcehspen);
 		default : throw new Exception("INVALID TYPE");
 		}
 		
 	}
 	
-	private static Object getField(ResourceType type, int id, MetaSourceFields field)throws Exception{
+	private static Object getField(int id, MetaSourceFields field)throws Exception{
 		DBSession session=null;
 		try{
-			String metaTable=getMetaTable(type);
 			session=DBSession.getInternalDBSession();
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
-			ResultSet rs= session.executeFilteredQuery(filter, metaTable, MetaSourceFields.searchid+"", OrderDirection.ASC);
+			ResultSet rs= session.executeFilteredQuery(filter, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC);
 			if(rs.next())
 				return rs.getObject(field+"");
 			else return null;
@@ -139,10 +129,9 @@ public class SourceManager {
 			session.close();
 		}
 	}
-	private static void updateField(ResourceType type, int id, MetaSourceFields field, FieldType objectType,Object value)throws Exception{
+	private static void updateField(int id, MetaSourceFields field, FieldType objectType,Object value)throws Exception{
 		DBSession session=null;
 		try{
-			String metaTable=getMetaTable(type);
 			session=DBSession.getInternalDBSession();
 			List<List<Field>> keys=new ArrayList<List<Field>>();
 			List<Field> filter= new ArrayList<Field>();
@@ -152,7 +141,7 @@ public class SourceManager {
 			List<Field> valueList=new ArrayList<Field>();
 			valueList.add(new Field(field+"",value+"",objectType));
 			values.add(valueList);
-			session.updateOperation(metaTable, keys, values);
+			session.updateOperation(sourcesTable, keys, values);
 		}catch (Exception e){
 			throw e;
 		}finally {
@@ -161,25 +150,23 @@ public class SourceManager {
 	}
 	
 	
-	public static void setTableTitle(ResourceType type,int id, String tableTitle)throws Exception{
-		updateField(type, id, MetaSourceFields.title, FieldType.STRING,tableTitle);
+	public static void setTableTitle(int id, String tableTitle)throws Exception{
+		updateField( id, MetaSourceFields.title, FieldType.STRING,tableTitle);
 	}
 	
-	public static Set<Resource> getList(ResourceType type)throws Exception{
+	public static Set<Resource> getList(List<Field> filter)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return loadRS((session.executeFilteredQuery(new ArrayList<Field>(), getMetaTable(type), MetaSourceFields.searchid+"", OrderDirection.ASC)));
+			return loadRS((session.executeFilteredQuery(filter, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC)));
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
-	public static String getJsonList(ResourceType type, PagedRequestSettings settings)throws Exception{
+	public static String getJsonList(List<Field> filter, PagedRequestSettings settings)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			List<Field> filter= new ArrayList<Field>();
-			filter.add(new Field(MetaSourceFields.type+"",type+"",FieldType.STRING));
-			return DBUtils.toJSon(session.executeFilteredQuery(filter, getMetaTable(type), settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
@@ -194,14 +181,13 @@ public class SourceManager {
 	
 	
 	
-	public static Resource getById(ResourceType type, int id)throws Exception{
+	public static Resource getById(int id)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			String table = getMetaTable(type);
 			List<Field> filters=new ArrayList<Field>();
 			filters.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
-			return loadRS(session.executeFilteredQuery(filters, table, MetaSourceFields.searchid+"", OrderDirection.ASC)).iterator().next();
+			return loadRS(session.executeFilteredQuery(filters, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC)).iterator().next();
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}
