@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
@@ -27,9 +28,9 @@ public class DMTest {
 		ArrayList<Field> filter= new ArrayList<Field>();
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Bivalvia",FieldType.STRING)); // ~ 300 species
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Holothuroidea",FieldType.STRING)); // 21 species
-		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species
-		dmInterface.generateMaps("fabio.sinibaldi", true, 87, filter);
-//		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
+//		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species
+//		dmInterface.generateMaps("fabio.sinibaldi", true, 87, filter);
+		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
 		
 		System.out.println("Done");
 		
@@ -61,14 +62,14 @@ public class DMTest {
 		request.setDescription("Just a simple execution");
 		request.setHcafsearchid(1);
 		request.setHspensearchid(3);
-		request.setSubmissionBackend("AquaMapsVRE");
+		request.setSubmissionBackend(Constant.SERVICE_NAME);
 //		request.setSubmissionBackend("RainyCloud");
 		request.setExecutionEnvironment("Private Cloud");
 		request.setBackendURL("http://node16.d.d4science.research-infrastructures.eu:9000/RainyCloud-web-0.00.01");
 		request.setEnvironmentConfiguration(new HashMap<String, String>());
 		request.setLogic(LogicType.HSPEC);
-		request.setNumPartitions(4);
-		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.NativeRange+""}));
+		request.setNumPartitions(10);
+		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.SuitableRange2050+""}));
 		request.setEnableimagegeneration(true);
 		request.setEnablelayergeneration(true);
 		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);

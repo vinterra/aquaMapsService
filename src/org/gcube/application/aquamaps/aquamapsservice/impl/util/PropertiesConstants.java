@@ -94,6 +94,4 @@ public class PropertiesConstants {
 	public static final String BOOLEAN_DEFAULT_VALUE="BOOLEAN_DEFAULT_VALUE";
 	
 	
-	//********* Execution params
-	public static final String LOCAL_BACKEND="LOCAL_BACKEND";
 }
