@@ -22,7 +22,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGeneration
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
@@ -158,6 +157,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			logger.trace("Id will be "+id);
 			logger.trace("Checking settings..");
 			HSPECGroupGenerationRequest request=new HSPECGroupGenerationRequest(arg0);
+			request.setSubmissiontime(System.currentTimeMillis());
 			if(SourceManager.getById(request.getHcafsearchid())==null)throw new Exception("Invalid HCAF id "+request.getHcafsearchid());
 			if(SourceManager.getById(request.getHspensearchid())==null)throw new Exception("Invalid HSPEN id "+request.getHspensearchid());
 			logger.debug("Received request "+request.toXML());
