@@ -39,9 +39,9 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 	}
 	
 	
-	public static EnvironmentalExecutionReportItem getReport(int batchId)throws Exception{
+	public static EnvironmentalExecutionReportItem getReport(int batchId,boolean getResourceInfo)throws Exception{
 		try{
-			return batchGenerators.get(batchId).getReport();
+			return batchGenerators.get(batchId).getReport(getResourceInfo);
 		}catch (IndexOutOfBoundsException e){
 			return null;
 		}

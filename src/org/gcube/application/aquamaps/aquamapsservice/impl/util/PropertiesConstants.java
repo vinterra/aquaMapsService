@@ -18,6 +18,8 @@ public class PropertiesConstants {
 	//*********	ENVIRONMENT LIBRARY
 	
 	public static final String BATCH_POOL_SIZE="BATCH_POOL_SIZE";
+	public static final String PROGRESS_MONITOR_INTERVAL_SEC="PROGRESS_MONITOR_INTERVAL_SEC";
+	
 	
 	//*********	INTERNAL DB ACCESS
 	

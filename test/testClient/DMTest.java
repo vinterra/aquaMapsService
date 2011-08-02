@@ -23,8 +23,19 @@ public class DMTest {
 	 * @throws Exception 
 	 * @throws MalformedScopeExpressionException 
 	 */
+	
+	
+	private static DataManagementInterface dmInterface=null;
+	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
-		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
+		//DEV
+//		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
+		
+		
+		//PROD
+		dmInterface=DataManagementCall.getCall(
+				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
+				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");
 		ArrayList<Field> filter= new ArrayList<Field>();
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Bivalvia",FieldType.STRING)); // ~ 300 species
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Holothuroidea",FieldType.STRING)); // 21 species
@@ -57,22 +68,21 @@ public class DMTest {
 	
 	private static String fromRequestToGeneralEnvironment()throws Exception{
 		HSPECGroupGenerationRequest request=new HSPECGroupGenerationRequest();
-		request.setAuthor("genericTester");
-		request.setGenerationname("Test execution");
-		request.setDescription("Just a simple execution");
+		request.setAuthor("fabio.sinibaldi");
+		request.setGenerationname("Initial execution");
+		request.setDescription("First execution for suitable default hspec data");
 		request.setHcafsearchid(1);
 		request.setHspensearchid(3);
 		request.setSubmissionBackend(Constant.SERVICE_NAME);
 //		request.setSubmissionBackend("RainyCloud");
-		request.setExecutionEnvironment("Private Cloud");
+		request.setExecutionEnvironment("AquaMaps VRE");
 		request.setBackendURL("http://node16.d.d4science.research-infrastructures.eu:9000/RainyCloud-web-0.00.01");
 		request.setEnvironmentConfiguration(new HashMap<String, String>());
 		request.setLogic(LogicType.HSPEC);
-		request.setNumPartitions(10);
-		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.SuitableRange2050+""}));
+		request.setNumPartitions(16);
+		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.SuitableRange+""}));
 		request.setEnableimagegeneration(true);
 		request.setEnablelayergeneration(true);
-		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		return dmInterface.submitRequest(request);
 	}
 	

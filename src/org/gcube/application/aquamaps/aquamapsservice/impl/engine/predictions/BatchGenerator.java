@@ -78,15 +78,23 @@ public class BatchGenerator implements BatchGeneratorI {
 
 
 	@Override
-	public EnvironmentalExecutionReportItem getReport() {
+	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo) {
 //		logger.trace("Forming report, my ID is "+getReportId());
 //		logger.trace("DistributionGenerator = "+dg);
 		if(dg==null) return null;
 		EnvironmentalExecutionReportItem toReturn= new EnvironmentalExecutionReportItem();
 		toReturn.setPercent(dg.getStatus());
+		if(getResourceInfo){
 		toReturn.setResourceLoad(dg.getResourceLoad());
 		toReturn.setResourcesMap(dg.getResources());
 		toReturn.setElaboratedSpecies(dg.getSpeciesLoad());
+		}
+//		toReturn.setPercent(0.3d);
+//		
+//		toReturn.setResourceLoad("");
+//		toReturn.setResourcesMap("");
+//		toReturn.setElaboratedSpecies("");
+		
 		return toReturn;
 	}
 

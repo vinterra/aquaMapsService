@@ -32,7 +32,7 @@ public class TableGenerationExecutionManager {
 	
 	
 	
-	public static void init(boolean purgeInvalid)throws Exception{
+	public static void init(boolean purgeInvalid,int monitorInterval)throws Exception{
 		logger.trace("Initializing pools..");
 		pool=new MyPooledExecutor("HSPEC_WORKER", 
 //				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_PRIORITY),
@@ -55,7 +55,7 @@ public class TableGenerationExecutionManager {
 		
 		insertedRequest=new Semaphore(0);
 
-		EnvironmentalStatusUpdateThread t4=new EnvironmentalStatusUpdateThread(4*1000);
+		EnvironmentalStatusUpdateThread t4=new EnvironmentalStatusUpdateThread(monitorInterval*1000);
 		t4.start();
 		HSPECGroupMonitor monitor=new HSPECGroupMonitor();
 		monitor.start();

@@ -75,6 +75,8 @@ public class CommonServiceLogic {
 		filter.add(new Field(SubmittedFields.sourcehspec+"",hspecId+"",FieldType.INTEGER));
 		filter.add(new Field(SubmittedFields.postponepublishing+"",true+"",FieldType.BOOLEAN));
 		if(GIS) filter.add(new Field(SubmittedFields.gisenabled+"",true+"",FieldType.BOOLEAN));
-		return SubmittedManager.getList(filter).iterator().next();
+		List<Submitted> existing=SubmittedManager.getList(filter);
+		if(existing.isEmpty()) return null;
+		else return existing.get(0);
 	}	
 }

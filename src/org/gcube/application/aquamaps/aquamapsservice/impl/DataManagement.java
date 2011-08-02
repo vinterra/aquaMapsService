@@ -188,7 +188,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			int arg0) throws RemoteException, GCUBEFault {
 		try{
 			logger.trace("Serving get generation Live Report, generator ID is "+arg0);
-			EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(arg0);
+			EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(arg0,true);
 			if(report==null) throw new Exception("Execution finished or not yet started");
 			return new GetGenerationLiveReportResponseType(
 					report.getElaboratedSpecies(), report.getPercent(), report.getResourceLoad(), report.getResourcesMap());
