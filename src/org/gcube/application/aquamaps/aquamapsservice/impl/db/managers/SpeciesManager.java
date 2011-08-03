@@ -40,12 +40,12 @@ public class SpeciesManager {
 			Species toReturn=new Species(id);
 			if(fetchStatic){
 				List<Field> row=Field.loadResultSet(session.executeFilteredQuery(filters, speciesOccurSum,null,null)).get(0);
-				if(row!=null) toReturn.attributesList.addAll(row);
+				if(row!=null) toReturn.getAttributesList().addAll(row);
 			}
 			if(fetchEnvelope){
 				String hspenTable=SourceManager.getSourceName(hspenId);
 				List<Field> row=Field.loadResultSet(session.executeFilteredQuery(filters, hspenTable,null,null)).get(0);
-				if(row!=null) toReturn.attributesList.addAll(row);
+				if(row!=null) toReturn.getAttributesList().addAll(row);
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}
@@ -229,7 +229,7 @@ public class SpeciesManager {
 		List<List<Field>> rows=Field.loadResultSet(rs);
 		for(List<Field> row:rows){
 			Species toAdd=new Species("***");
-			toAdd.attributesList.addAll(row);
+			toAdd.getAttributesList().addAll(row);
 			toAdd.setId(toAdd.getFieldbyName(SpeciesOccursumFields.speciesid+"").getValue());
 			toReturn.add(toAdd);
 		}

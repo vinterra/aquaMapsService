@@ -246,7 +246,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			Species spec=new Species(speciesId);
 			GetSpeciesEnvelopeRequestType req=new GetSpeciesEnvelopeRequestType(hspenId, speciesId);
-			spec.attributesList.addAll(Field.load(pt.getSpeciesEnvelop(req)));
+			spec.getAttributesList().addAll(Field.load(pt.getSpeciesEnvelop(req)));
 			//			System.out.println("Loaded Fields : ");
 			//			for(Field f:spec.attributesList)
 			//				System.out.println(f.getName()+" : "+f.getValue());

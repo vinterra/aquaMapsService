@@ -312,7 +312,7 @@ public class HSPECGenerator {
 				while (hspenRes.next()){					
 					long startHspenLoop= System.currentTimeMillis();
 					currentSpecies=new Species(hspenRes.getString(SpeciesOccursumFields.speciesid+""));
-					currentSpecies.attributesList.addAll(Field.loadRow(hspenRes));
+					currentSpecies.getAttributesList().addAll(Field.loadRow(hspenRes));
 
 					//****** FOR LAZY MODE if no generation needed just copy species probs
 					if(mode.equals(GENERATION_MODE.LAZY)&&!toGenerateSpeciesIds.contains(currentSpecies.getId())){
@@ -589,7 +589,7 @@ public class HSPECGenerator {
 			while(hcafRes.next()){
 				// Load Cell
 				currentCell= new Cell(hcafRes.getString(HCAF_SFields.csquarecode+""));
-				currentCell.attributesList.addAll(Field.loadRow(hcafRes));
+				currentCell.getAttributesList().addAll(Field.loadRow(hcafRes));
 				try{
 					Double probability=null;
 					boolean inFAO= this.getInFao(currentCell.getFieldbyName(HCAF_SFields.faoaream+"").getValueAsInteger(""),

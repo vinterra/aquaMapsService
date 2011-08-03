@@ -184,7 +184,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("serving get Species envelope");
 		try{
 			Species selected=SpeciesManager.getSpeciesById(true,true,arg0.getSpeciesId(),arg0.getHspenId());
-			return Field.toStubsVersion(selected.attributesList);
+			return Field.toStubsVersion(selected.getAttributesList());
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
