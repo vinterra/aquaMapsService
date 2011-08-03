@@ -1,8 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -212,8 +210,14 @@ public class AquaMapsObjectWorker extends Thread {
 	
 	
 	private static String clusteringBiodiversityQuery(String hspecName, String tmpTable){
-		String query= "Select "+HCAF_SFields.csquarecode+", count("+hspecName+"."+SpeciesOccursumFields.speciesid+") AS "+AquaMapsManager.maxSpeciesCountInACell+" FROM "+hspecName+
-		" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesOccursumFields.speciesid+" = "+tmpTable+"."+SpeciesOccursumFields.speciesid+" where probability > ? GROUP BY "+HCAF_SFields.csquarecode+" ORDER BY MaxSpeciesCountInACell DESC";
+		
+		String query="Select "+HCAF_SFields.csquarecode+", count(k."+SpeciesOccursumFields.speciesid+") AS "+AquaMapsManager.maxSpeciesCountInACell+
+		" FROM "+hspecName+" as k Where  k."+SpeciesOccursumFields.speciesid+" in (select "+SpeciesOccursumFields.speciesid+" from "+tmpTable+" ) and "+HSPECFields.probability+
+		" > ? GROUP BY "+HCAF_SFields.csquarecode+" order by "+AquaMapsManager.maxSpeciesCountInACell+" DESC";
+		
+//		
+//		String query= "Select "+HCAF_SFields.csquarecode+", count("+hspecName+"."+SpeciesOccursumFields.speciesid+") AS "+AquaMapsManager.maxSpeciesCountInACell+" FROM "+hspecName+
+//		" INNER JOIN "+tmpTable+" ON "+hspecName+"."+SpeciesOccursumFields.speciesid+" = "+tmpTable+"."+SpeciesOccursumFields.speciesid+" where probability > ? GROUP BY "+HCAF_SFields.csquarecode+" ORDER BY MaxSpeciesCountInACell DESC";
 		logger.trace("clusteringBiodiversityQuery: "+query);
 		return query;
 	}

@@ -107,8 +107,10 @@ public class JobWorker extends Thread{
 				if(toSubmitRequests.size()>0)
 					JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
 
+				if(tableReference.getGisEnabled())JobManager.createGroup(tableReference.getSearchId());
+				
 				SubmittedManager.updateStatus(tableReference.getSearchId(), SubmittedStatus.Completed);
-			
+				
 			}
 
 
