@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.CommonServiceLogic;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
@@ -21,6 +22,7 @@ import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -161,8 +163,8 @@ public class HSPECGroupWorker extends Thread {
 	private static Resource getExisting(AlgorithmType algorithm, Integer hspenId, Integer hcafId,String currentRequestId)throws Exception{
 		logger.trace("Request "+currentRequestId+" looking for existing generated Table [Algorith : "+algorithm+" ; HSPEN ID : "+hspenId+" ; HCAF ID : "+hcafId+"]");
 		ArrayList<Field> requestFilter= new ArrayList<Field>();
-		requestFilter.add(new Field(MetaSourceFields.sourcehspen+"",hspenId+"",FieldType.INTEGER));
-		requestFilter.add(new Field(MetaSourceFields.sourcehcaf+"",hcafId+"",FieldType.INTEGER));
+		requestFilter.add(new Field(GroupGenerationRequestFields.hspensearchid+"",hspenId+"",FieldType.INTEGER));
+		requestFilter.add(new Field(GroupGenerationRequestFields.hcafsearchid+"",hcafId+"",FieldType.INTEGER));
 		for(HSPECGroupGenerationRequest request: HSPECGroupGenerationRequestsManager.getList(requestFilter)){
 			if(!request.getId().equals(currentRequestId)&&request.getAlgorithms().contains(algorithm)){
 				if(request.getPhase().equals(HSPECGroupGenerationPhase.pending)||request.getPhase().equals(HSPECGroupGenerationPhase.datageneration)){
@@ -175,7 +177,9 @@ public class HSPECGroupWorker extends Thread {
 		resourceFilter.add(new Field(MetaSourceFields.algorithm+"",algorithm+"",FieldType.STRING));
 		resourceFilter.add(new Field(MetaSourceFields.sourcehspen+"",hspenId+"",FieldType.INTEGER));
 		resourceFilter.add(new Field(MetaSourceFields.sourcehcaf+"",hcafId+"",FieldType.INTEGER));
-		return SourceManager.getList(resourceFilter).iterator().next();	
+		Set<Resource> existing=SourceManager.getList(resourceFilter);
+		if(existing.isEmpty()) return null;
+		else return existing.iterator().next();	
 	}
 	
 	

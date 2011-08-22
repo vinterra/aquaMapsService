@@ -3,8 +3,6 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 import java.io.File;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.EnvironmentalStatusUpdateThread;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.HSPECGroupMonitor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.ConnectedPublisher;
@@ -161,7 +159,7 @@ public class ServiceContext extends GCUBEServiceContext {
 //		
 		
 		JobExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_OBJECTS));
-		TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS));
+		TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS),getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
 	}
 	
 	/**

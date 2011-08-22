@@ -71,6 +71,7 @@
 					<xsd:element name="sourceHSPECTable" type="xsd:string" />
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="algorithm" type="xsd:string" />
+				<!-- 	<xsd:element name="defaultSource" type="xsd:boolean"/> -->
 				</xsd:sequence>
 			</xsd:complexType>
 

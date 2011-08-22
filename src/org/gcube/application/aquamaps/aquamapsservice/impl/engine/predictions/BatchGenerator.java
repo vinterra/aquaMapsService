@@ -5,13 +5,11 @@ import java.util.HashMap;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBConnectionParameters;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
-import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.DistributionGenerator;
@@ -80,15 +78,23 @@ public class BatchGenerator implements BatchGeneratorI {
 
 
 	@Override
-	public EnvironmentalExecutionReportItem getReport() {
+	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo) {
 //		logger.trace("Forming report, my ID is "+getReportId());
 //		logger.trace("DistributionGenerator = "+dg);
 		if(dg==null) return null;
 		EnvironmentalExecutionReportItem toReturn= new EnvironmentalExecutionReportItem();
 		toReturn.setPercent(dg.getStatus());
+		if(getResourceInfo){
 		toReturn.setResourceLoad(dg.getResourceLoad());
 		toReturn.setResourcesMap(dg.getResources());
 		toReturn.setElaboratedSpecies(dg.getSpeciesLoad());
+		}
+//		toReturn.setPercent(0.3d);
+//		
+//		toReturn.setResourceLoad("");
+//		toReturn.setResourcesMap("");
+//		toReturn.setElaboratedSpecies("");
+		
 		return toReturn;
 	}
 
@@ -111,7 +117,7 @@ public class BatchGenerator implements BatchGeneratorI {
 				configuration.getAuthor(),
 				configuration.getExecutionEnvironment(),
 				configuration.getConfiguration(),
-				configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getProperty(PropertiesConstants.LOCAL_BACKEND))?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS);
+				configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getName())?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS);
 	}
 	
 	

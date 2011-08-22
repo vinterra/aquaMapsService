@@ -452,7 +452,7 @@ public class JobManager extends SubmittedManager{
 
 			logger.trace("Preparing taxonomy for species selections");
 			for(Species s:toPerform.getSelectedSpecies()){
-				Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEC().getSearchId());
+				Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEN().getSearchId());
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.kingdom+""));
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.order+""));
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.phylum+""));

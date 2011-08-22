@@ -39,7 +39,7 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 				filter.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.datageneration+"",FieldType.STRING));
 				for(HSPECGroupGenerationRequest request : HSPECGroupGenerationRequestsManager.getList(filter)){
 					try{
-						EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(request.getReportID());
+						EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(request.getReportID(),false);
 						Double percent=(100/request.getAlgorithms().size()*request.getGeneratedhspec().size())+
 									(report.getPercent()/request.getAlgorithms().size());
 						HSPECGroupGenerationRequestsManager.setPhasePercent(percent, request.getId());

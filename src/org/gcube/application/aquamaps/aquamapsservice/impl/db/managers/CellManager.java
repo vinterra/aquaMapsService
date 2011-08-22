@@ -113,7 +113,7 @@ public class CellManager {
 				if(ps==null)ps=session.getPreparedStatementForQuery(filter, HCAFName,HCAF_SFields.csquarecode+"",OrderDirection.ASC);
 				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
-					c.attributesList.addAll(Field.loadRow(rs));
+					c.getAttributesList().addAll(Field.loadRow(rs));
 				else logger.warn("Row not found for cell "+c.getCode());
 
 			}
@@ -135,7 +135,7 @@ public class CellManager {
 				if(ps==null)ps=session.getPreparedStatementForQuery(filter, occurrenceCells,HCAF_SFields.csquarecode+"",OrderDirection.ASC);
 				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
-					c.attributesList.addAll(Field.loadRow(rs));
+					c.getAttributesList().addAll(Field.loadRow(rs));
 				else logger.warn("Row not found for cell "+c.getCode());
 			}
 			return toUpdate;

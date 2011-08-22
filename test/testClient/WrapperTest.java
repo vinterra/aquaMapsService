@@ -27,9 +27,11 @@ public class WrapperTest {
 	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
+//		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
 		
-		
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(
+				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
+				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");	
 //		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
 //		System.out.println(wrapper.getJSONPhilogeny());
 		
@@ -85,7 +87,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(334667)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(334708)));
 		
 		
 		

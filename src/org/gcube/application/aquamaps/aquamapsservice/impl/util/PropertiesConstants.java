@@ -18,6 +18,8 @@ public class PropertiesConstants {
 	//*********	ENVIRONMENT LIBRARY
 	
 	public static final String BATCH_POOL_SIZE="BATCH_POOL_SIZE";
+	public static final String PROGRESS_MONITOR_INTERVAL_SEC="PROGRESS_MONITOR_INTERVAL_SEC";
+	
 	
 	//*********	INTERNAL DB ACCESS
 	
@@ -94,6 +96,4 @@ public class PropertiesConstants {
 	public static final String BOOLEAN_DEFAULT_VALUE="BOOLEAN_DEFAULT_VALUE";
 	
 	
-	//********* Execution params
-	public static final String LOCAL_BACKEND="LOCAL_BACKEND";
 }
