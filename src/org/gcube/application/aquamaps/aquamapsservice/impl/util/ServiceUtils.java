@@ -26,17 +26,17 @@ public class ServiceUtils {
 
 		BufferedReader filebuf = null;
 		String nextStr = null;
-		String ret = new String();
+		StringBuilder ret = new StringBuilder();
 
 		filebuf = new BufferedReader(new FileReader(path));
 		nextStr = filebuf.readLine(); // legge una riga dal file
 		while (nextStr != null) {
-			ret += nextStr ;
+			ret.append(nextStr);
 			nextStr = filebuf.readLine(); // legge la prossima riga 
 		}
 		filebuf.close(); // chiude il file 
 
-		return ret;
+		return ret.toString();
 	}
 
 	public static String URLtoString(String path) throws IOException{

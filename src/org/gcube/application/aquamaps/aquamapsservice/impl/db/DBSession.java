@@ -187,20 +187,20 @@ public abstract class DBSession {
 		statement.close();
 	}
 
-	public List<List<String>> showTableMetadata(String tableName, String... whereClause) throws Exception{
-		String query="SHOW COLUMNS FROM "+tableName+" "+((whereClause!=null && whereClause.length>0)?"WHERE "+whereClause[0]:"")+";";
-		logger.debug("executing query: "+query);
-		ResultSet rs=this.executeQuery(query);
-		int columns=rs.getMetaData().getColumnCount();
-		List<List<String>> table=  new ArrayList<List<String>>();
-		while (rs.next()){
-			List<String> row= new ArrayList<String>();
-			for (int i=1; i<=columns; i++)
-				row.add(rs.getString(i));
-			table.add(row);
-		}
-		return table;
-	}
+//	public List<List<String>> showTableMetadata(String tableName, String... whereClause) throws Exception{
+//		String query="SHOW COLUMNS FROM "+tableName+" "+((whereClause!=null && whereClause.length>0)?"WHERE "+whereClause[0]:"")+";";
+//		logger.debug("executing query: "+query);
+//		ResultSet rs=this.executeQuery(query);
+//		int columns=rs.getMetaData().getColumnCount();
+//		List<List<String>> table=  new ArrayList<List<String>>();
+//		while (rs.next()){
+//			List<String> row= new ArrayList<String>();
+//			for (int i=1; i<=columns; i++)
+//				row.add(rs.getString(i));
+//			table.add(row);
+//		}
+//		return table;
+//	}
 
 
 	//*********************** DATA MANIPULATION
@@ -290,9 +290,12 @@ public abstract class DBSession {
 	public int getTableCount(String tableName) throws Exception{
 		Statement statement = connection.createStatement();
 		ResultSet rs =statement.executeQuery("SELECT COUNT(*) FROM "+tableName);
+		int value=0;
 		if(rs.next())
-			return rs.getInt(1);
-		else return 0;
+			value=rs.getInt(1);
+		
+		statement.close();
+		return value;
 	}
 	
 	public abstract ResultSet getDistinct(Field toSelect, List<Field> filters, String table, String orderColumn, OrderDirection orderMode) throws Exception;
@@ -301,6 +304,7 @@ public abstract class DBSession {
 	public void executeUpdate(String query) throws Exception{
 		Statement statement = connection.createStatement();
 		statement.executeUpdate(query);
+		statement.close();
 	}
 
 

@@ -73,7 +73,9 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 			}finally{
 				try{					
 					Thread.sleep(millis);
-				}catch(Exception e){}
+				}catch(InterruptedException e){
+					//Woken up
+				}
 			}
 		}
 	}

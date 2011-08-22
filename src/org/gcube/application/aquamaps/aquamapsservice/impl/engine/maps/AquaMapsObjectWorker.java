@@ -272,7 +272,7 @@ public class AquaMapsObjectWorker extends Thread {
 					String csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+
 					objectDescriptor.getJobId()+File.separator+objectDescriptor.getTitle()+".csv";
 					FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
-					GenerationUtils.ResultSetToCSVFile(rs, csvFile);
+					GenerationUtils.resultSetToCSVFile(rs, csvFile);
 					data.setCsvFile(csvFile);
 				}
 				logger.debug("DISTRIBUTION DATA FOR "+objectDescriptor.getSearchId()+".... COMPLETED");
@@ -327,7 +327,7 @@ public class AquaMapsObjectWorker extends Thread {
 					String csvFile=ServiceContext.getContext().getPersistenceRoot()+
 						File.separator+objectDescriptor.getJobId()+File.separator+objectDescriptor.getTitle()+".csv";
 					FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
-					GenerationUtils.ResultSetToCSVFile(rs, csvFile);
+					GenerationUtils.resultSetToCSVFile(rs, csvFile);
 					data.setCsvFile(csvFile);
 				}
 				return data;

@@ -162,8 +162,8 @@ public class JobManager extends SubmittedManager{
 				boolean found= false;
 				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(filter, tempFolders, tempFoldersJobId, OrderDirection.ASC))){
 					for(Field g:f)
-						if(g.getName().equals(tempFoldersFolderName)&&g.getValue().equals(folderName));
-					found=true;
+						if(g.getName().equals(tempFoldersFolderName)&&g.getValue().equals(folderName))
+							found=true;
 				}
 				if(!found)logger.warn("Unable to register temp folder "+folderName);
 			}

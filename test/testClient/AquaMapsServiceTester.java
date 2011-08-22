@@ -25,7 +25,7 @@ public class AquaMapsServiceTester {
 		try{
 //		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), SERVICE_URI);
 		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AQ_SERVICE_URI);
-		Species spec=new Species("Fis-29501");
+//		Species spec=new Species("Fis-29501");
 //		System.out.println("Occurrence cells for ");
 //		System.out.println(wrapper.getJSONOccurrenceCells(spec.getId(), new PagedRequestSettings(10, 0, Cell.ID, "ASC")));
 //		System.out.println("Getting envelope");

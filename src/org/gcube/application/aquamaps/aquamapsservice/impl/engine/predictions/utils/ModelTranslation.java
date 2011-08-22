@@ -75,7 +75,7 @@ public class ModelTranslation {
 		return toReturn;
 	}
 	
-	public static Hcaf Cell2Hcaf(Cell c){
+	public static Hcaf cell2Hcaf(Cell c){
 		Hcaf toReturn= new Hcaf();
 		toReturn.setCsquareCode(c.getCode());
 		toReturn.setCenterlat(c.getFieldbyName(HCAF_SFields.centerlat+"").getValue());

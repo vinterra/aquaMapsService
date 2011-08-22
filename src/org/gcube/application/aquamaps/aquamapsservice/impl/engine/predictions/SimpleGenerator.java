@@ -35,7 +35,7 @@ public class SimpleGenerator implements SimpleGeneratorI {
 	public List<Field> getProbability(Species species, Cell cell, Boolean useBoundingBox, Boolean useFao)
 			throws Exception {
 		
-		Hcaf hcaf=ModelTranslation.Cell2Hcaf(cell);
+		Hcaf hcaf=ModelTranslation.cell2Hcaf(cell);
 		Hspen hspen=ModelTranslation.species2HSPEN(species);
 		BoundingBoxInformation bb=generator.getBoudingBox(hcaf, hspen, false);
 		List<Field> row=null;

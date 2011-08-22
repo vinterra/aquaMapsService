@@ -34,7 +34,7 @@ public class SourceGenerationThread extends Thread {
 	private static final GCUBELog logger=new GCUBELog(SourceGenerationThread.class);
 	
 	
-	private static int requestId;
+	private int requestId;
 	
 	public SourceGenerationThread(int id) {
 		requestId=id;
@@ -126,7 +126,7 @@ public class SourceGenerationThread extends Thread {
 			//**************** Register
 			logger.trace("Registering new HCAF table "+targetHCAFName);
 			SourceGenerationManager.setStatus(requestId, SourceGenerationStatus.Registering);
-			String author=SourceGenerationManager.getAuthor(requestId);
+//			String author=SourceGenerationManager.getAuthor(requestId);
 			
 			//FIXME COMPLETE REGISTRATION
 //			Resource resource= new Resource(ResourceType.HCAF,0);

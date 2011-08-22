@@ -224,6 +224,7 @@ public class GISGenerator implements Generator{
 			case PointMap:{
 				PointMapGenerationRequest req=(PointMapGenerationRequest) request;
 				toReturn=publisher.getPointMapLayer(req.getSpecies().getId());
+				break;
 			}
 			default : {
 				PredictionLayerGenerationRequest req=(PredictionLayerGenerationRequest) request;
@@ -357,6 +358,7 @@ public class GISGenerator implements Generator{
 		else if(req.getTypeValue()==Float.class){
 			switch(req.getClusterScaleType()){
 			case logarithmic : style=MakeStyle.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
+			break;
 			default : 	style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
 			break;
 			}

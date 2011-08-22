@@ -45,6 +45,7 @@ public class HSQLDBTest {
 				Statement stmt=c.createStatement();
 				stmt.executeUpdate("CREATE CACHED TABLE ITEMS (registeredValue BIGINT, valueName VARCHAR(20), time TIMESTAMP, PRIMARY KEY(time))");
 //				logger.trace("Tables created..");
+				stmt.close();
 				c.commit();
 				c.close();
 				return DriverManager.getConnection(connectionString+";ifexists=true", "SA", "");
@@ -57,9 +58,10 @@ public class HSQLDBTest {
 
 	public static void insertReportItem(String valueName, long value)throws Exception{
 		Connection c = null;
+		PreparedStatement ps=null;
 		try{
 			c=getConnection();
-			PreparedStatement ps= c.prepareStatement("INSERT INTO ITEMS (registeredValue, valueName, time) values (?,?,?)");
+			ps= c.prepareStatement("INSERT INTO ITEMS (registeredValue, valueName, time) values (?,?,?)");
 			ps.setLong(1, value);
 			ps.setString(2,valueName);
 			ps.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
@@ -68,17 +70,19 @@ public class HSQLDBTest {
 //			logger.error("", e);
 			throw e;
 		}finally{
-			if(!c.isClosed()) c.close();
+			if(ps!=null&&!ps.isClosed()) ps.close();
+			if(c!=null&&!c.isClosed()) c.close();
 		}
 	}
 
 	public static ReportItem getReport(String valueName)throws Exception{
 		Connection c = null;
+		PreparedStatement ps=null;
 		try{
 			ReportItem toReturn=new ReportItem();
 			c= getConnection();
 			//totalCount
-			PreparedStatement ps=c.prepareStatement("Select count(*) from ITEMS where valueName=?");
+			ps=c.prepareStatement("Select count(*) from ITEMS where valueName=?");
 			ps.setString(1, valueName);
 			ResultSet rs=ps.executeQuery();
 			rs.next();
@@ -95,7 +99,8 @@ public class HSQLDBTest {
 //			logger.error("", e);
 			throw e;
 		}finally{
-			if(!c.isClosed()) c.close();
+			if(ps!=null&&!ps.isClosed()) ps.close();
+			if(c!=null&&!c.isClosed()) c.close();
 		}
 	}
 

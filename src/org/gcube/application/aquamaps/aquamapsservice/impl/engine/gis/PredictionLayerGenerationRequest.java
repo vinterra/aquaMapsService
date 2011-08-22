@@ -53,7 +53,7 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 		this.getSpeciesCoverage().add(species.getId());
 		if(envelopeCustomization!=null)
 			this.getEnvelopeCustomization().put(species.getId(), envelopeCustomization);
-		if(envelopeWeights!=null);
+		if(envelopeWeights!=null)
 			this.getEnvelopeWeights().put(species.getId(), envelopeWeights);
 		this.setSelectedAreas(areaSelection);
 		this.setBb(bb);

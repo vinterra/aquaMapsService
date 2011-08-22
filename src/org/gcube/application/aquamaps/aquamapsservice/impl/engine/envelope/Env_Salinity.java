@@ -31,7 +31,8 @@ public class Env_Salinity extends EnvEngine {
 	public void re_computes(Species species, Set<Cell> goodCells) throws Exception {
 		
 		String fld;
-		if (species.getFieldbyName(HspenFields.layer+"").equals("b")) {
+		String layerFieldValue=species.getFieldbyName(HspenFields.layer+"").getValue();
+		if (layerFieldValue!=null&&layerFieldValue.equals("b")) {
 			fld = HCAF_DFields.salinitybmean+"";			
 			this.salinUp = EnvCostants.salinBUpper; 	//reset absolute min and max for bottom
 			this.salinLow = EnvCostants.salinBLower;

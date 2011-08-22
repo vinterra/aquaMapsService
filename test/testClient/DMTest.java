@@ -36,7 +36,7 @@ public class DMTest {
 		dmInterface=DataManagementCall.getCall(
 				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
 				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");
-		ArrayList<Field> filter= new ArrayList<Field>();
+//		ArrayList<Field> filter= new ArrayList<Field>();
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Bivalvia",FieldType.STRING)); // ~ 300 species
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Holothuroidea",FieldType.STRING)); // 21 species
 //		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species

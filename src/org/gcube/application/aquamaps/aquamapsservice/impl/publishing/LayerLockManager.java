@@ -47,14 +47,14 @@ public class LayerLockManager {
 	public static String requestToMD5(LayerGenerationRequest theRequest)throws Exception{
 		MessageDigest md=MessageDigest.getInstance("MD5");
 		String toDigest=AquaMapsXStream.getXMLInstance().toXML(theRequest);
-		return md.digest(toDigest.getBytes())+"";
+		return new String(md.digest(toDigest.getBytes()));
 	}
 	
 	private static Map<String,LockObject> lockRequests=new ConcurrentHashMap<String, LayerLockManager.LockObject>();
 	
 	public static synchronized Ticket isLayerGenerationBooked(LayerGenerationRequest request) throws Exception{
 		String ticket=requestToMD5(request);
-		if(lockRequests.containsKey(request)){
+		if(lockRequests.containsKey(ticket)){
 			lockRequests.get(ticket).lockRead();
 			return new Ticket(ticket,true);
 		}else{

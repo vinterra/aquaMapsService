@@ -24,11 +24,18 @@ public class DBCredentialDescriptor {
 	}
 	
 	public DBCredentialDescriptor(String fileName) throws Exception{
-		Properties prop =new Properties();
-		prop.load(new FileInputStream(fileName));
+		FileInputStream fis=null;
+		try{
+			Properties prop =new Properties();
+		fis=new FileInputStream(fileName);
+		prop.load(fis);
 		for(DBConnectionParameters expectedValue:DBConnectionParameters.values())
 			if(prop.containsKey(expectedValue+""))values.put(expectedValue, prop.getProperty(expectedValue+"").trim());
 			else throw new Exception("Mandatory value "+expectedValue);
+		}catch(Exception e) {throw e;}
+		finally{
+			if(fis!=null)fis.close();
+		}
 	}
 	
 	@Deprecated

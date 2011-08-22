@@ -15,7 +15,7 @@ public class GenerationUtils {
 
 	static GCUBELog logger= new GCUBELog(GenerationUtils.class);
 	
-	public static long ResultSetToCSVFile(ResultSet rs, String outFile)throws IOException,SQLException{
+	public static long resultSetToCSVFile(ResultSet rs, String outFile)throws IOException,SQLException{
 		final FileWriter fileWriter = new FileWriter(outFile);
 		final CSVWriter csvWriter = new CSVWriter( fileWriter );	
 		//csvWriter.writeLine( new String[] { "column1", "column2", "column3" } );

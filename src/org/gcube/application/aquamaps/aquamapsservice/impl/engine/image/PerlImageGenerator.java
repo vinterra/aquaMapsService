@@ -40,8 +40,8 @@ public class PerlImageGenerator implements Generator{
 	
 	
 	private static int  generateImages(String file) throws Exception{
-
-		
+		BufferedReader  input=null;
+		try{
 		logger.trace("Checking perl...");
 		String perlFileLocation=System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid"+
 		File.separator+"bin"+File.separator+"cs_mapMod.pl";
@@ -53,8 +53,7 @@ public class PerlImageGenerator implements Generator{
 				Runtime rt  = Runtime.getRuntime();
 				String cmdLine[] = { "/usr/bin/perl", "-w", perlFileLocation ,file};
 				Process p = rt.exec(cmdLine);
-
-				BufferedReader  input = new BufferedReader (new InputStreamReader (p.getInputStream()));
+				input = new BufferedReader (new InputStreamReader (p.getInputStream())); 
 				String line = null;
 				while ((line = input.readLine())!=null){
 					if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.ENABLE_SCRIPT_LOGGING))
@@ -72,7 +71,10 @@ public class PerlImageGenerator implements Generator{
 				return value;
 			}else throw new Exception("No access to clustering file "+file);
 		}else throw new Exception("Perl File "+perlFileLocation+" NOT FOUND, unable to proceed");
-		
+		}catch(Exception e){throw e;}
+		finally{
+			if(input!=null) input.close();
+		}
 
 		 
 	}

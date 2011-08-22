@@ -14,12 +14,12 @@ public class DBConnectionTest {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
-		DBSession session=DBSession.getInternalDBSession();
+//		DBSession session=DBSession.getInternalDBSession();
 //		String query=(args.length>0)&&(args[0]!=null)?args[0]:"Select * from selectedSpecies";
 //		ResultSet rs=session.executeQuery(query);
 //		System.out.println(DBUtils.toJSon(rs));	
 //		session.close();
-		List<Field> filters=new ArrayList<Field>();
+//		List<Field> filters=new ArrayList<Field>();
 		List<Field> updates=new ArrayList<Field>();		
 		updates.add(new Field("fone","",FieldType.STRING));
 // 		System.out.println(DBSession.formSelectQueryStringFromFields(filters, "theTable", "gigi", "ASC"));

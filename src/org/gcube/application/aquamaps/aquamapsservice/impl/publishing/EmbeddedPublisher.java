@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapspublisher.impl.AquaMapsPublisherWrapperL;
 import org.gcube.application.aquamaps.aquamapspublisher.impl.PublisherContext;
@@ -85,9 +86,8 @@ public class EmbeddedPublisher implements Publisher{
 		//Weights
 		logger.trace("Checking weights...");
 		Set<String> toPurge=new HashSet<String>();
-		for(String specId: envelopeWeights.keySet()){
-			if(envelopeWeights.get(specId)==null) toPurge.add(specId);
-		}
+		for(Entry<String,Map<EnvelopeFields,Field>> entry: envelopeWeights.entrySet())
+			if(entry.getValue()==null) toPurge.add(entry.getKey());
 		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
 		for(String s: toPurge)
 			envelopeWeights.remove(s);
@@ -96,9 +96,8 @@ public class EmbeddedPublisher implements Publisher{
 		//Customization
 		logger.trace("Checking customizations ...");
 		toPurge=new HashSet<String>();
-		for(String specId: envelopeCustomization.keySet()){
-			if(envelopeCustomization.get(specId)==null) toPurge.add(specId);
-		}
+		for(Entry<String,Map<String,Perturbation>> entry : envelopeCustomization.entrySet())
+			if(entry.getValue()==null) toPurge.add(entry.getKey());
 		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
 		for(String s: toPurge)
 			envelopeCustomization.remove(s);
@@ -125,9 +124,9 @@ public class EmbeddedPublisher implements Publisher{
 		//Weights
 		logger.trace("Checking weights...");
 		Set<String> toPurge=new HashSet<String>();
-		for(String specId: envelopeWeights.keySet()){
-			if(envelopeWeights.get(specId)==null) toPurge.add(specId);
-		}
+		for(Entry<String,Map<EnvelopeFields,Field>> entry: envelopeWeights.entrySet())
+			if(entry.getValue()==null) toPurge.add(entry.getKey());
+		
 		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
 		for(String s: toPurge)
 			envelopeWeights.remove(s);
@@ -136,9 +135,9 @@ public class EmbeddedPublisher implements Publisher{
 		//Customization
 		logger.trace("Checking customizations ...");
 		toPurge=new HashSet<String>();
-		for(String specId: envelopeCustomization.keySet()){
-			if(envelopeCustomization.get(specId)==null) toPurge.add(specId);
-		}
+		for(Entry<String,Map<String,Perturbation>> entry : envelopeCustomization.entrySet())
+			if(entry.getValue()==null) toPurge.add(entry.getKey());
+		
 		logger.trace("purging "+toPurge.size()+" incorrect ids ..");
 		for(String s: toPurge)
 			envelopeCustomization.remove(s);
@@ -241,7 +240,7 @@ public class EmbeddedPublisher implements Publisher{
 	
 	public String publishPointMapLayer(String speciesId,
 			List<String> list, int defaultStyleIndex, String title, String table)throws Exception{
-		LayerInfo layer=getLayer(LayersType.PointMap, table, title, "", list, defaultStyleIndex);
+//		LayerInfo layer=getLayer(LayersType.PointMap, table, title, "", list, defaultStyleIndex);
 		//TODO IMPLEMENT
 		throw new Exception("NOT YET IMPLEMENTED");
 //		return getWrapper().storeLayer(layer,speciesId);
@@ -249,7 +248,7 @@ public class EmbeddedPublisher implements Publisher{
 	
 	public String publishEnvironmentalLayer(Resource hcaf,EnvelopeFields parameter,
 			List<String> styles, int defaultStyleIndex, String title, String table)throws Exception{
-		LayerInfo layer=getLayer(LayersType.Environment, table, title, "", styles, defaultStyleIndex);
+//		LayerInfo layer=getLayer(LayersType.Environment, table, title, "", styles, defaultStyleIndex);
 		//TODO IMPLEMENT
 		throw new Exception("NOT YET IMPLEMENTED");
 //		return getWrapper().storeLayer(info,new Resource(ResourceType.HCAF,hcafId),parameter+"");
@@ -312,7 +311,6 @@ public class EmbeddedPublisher implements Publisher{
         layer.setStyles(new ArrayList<String>());
         layer.getStyles().addAll(styles);
         layer.setDefaultStyle(styles.get(defaultStyleIndex));
-        ArrayList<String> fields = new ArrayList<String>();
         //TODO Transect Info
 		return layer;
 	}

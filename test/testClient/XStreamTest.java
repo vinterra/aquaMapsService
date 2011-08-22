@@ -42,7 +42,7 @@ public class XStreamTest {
 		String xml=AquaMapsXStream.getXMLInstance().toXML(theRequest);
 		System.out.println(AquaMapsXStream.getXMLInstance().toXML(theRequest));
 		System.out.println("********** MD5************");
-		System.out.println(MessageDigest.getInstance("MD5").digest(xml.getBytes()));
+		System.out.println(new String(MessageDigest.getInstance("MD5").digest(xml.getBytes())));
 	}
 
 }
