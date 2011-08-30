@@ -65,7 +65,7 @@ public class AquaMapsObjectWorker extends Thread {
 			}
 		}
 		finally{
-			JobExecutionManager.alertJob(request.getObject().getJobId());
+			JobExecutionManager.alertJob(request.getObject().getSearchId(),request.getObject().getJobId());
 			JobExecutionManager.cleanReferences(request.getObject());
 		}
 	}

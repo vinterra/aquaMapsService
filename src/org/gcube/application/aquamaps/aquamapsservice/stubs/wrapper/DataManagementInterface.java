@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 import java.util.List;
 
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 
@@ -15,4 +16,6 @@ public interface DataManagementInterface {
 	public HSPECGroupGenerationRequest getRequest(String id) throws Exception;
 	public String removeRequest(String id, boolean deleteData,boolean  deleteJobs)throws Exception;
 	public void editRequest(HSPECGroupGenerationRequest requestDetails) throws Exception;
+	public List<Field> getDefaultSources()throws Exception;
+	public Resource updateResource(Resource toUpdate)throws Exception;
 }

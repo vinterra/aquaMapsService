@@ -3,19 +3,20 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.publishing;
 import java.security.MessageDigest;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import edu.emory.mathcs.backport.java.util.concurrent.locks.ReentrantReadWriteLock;
+
 
 public class LayerLockManager {
 	private static GCUBELog logger= new GCUBELog(LayerLockManager.class);
 	
 	static class LockObject{
 		private long timestamp;
-		private ReentrantReadWriteLock lock= new ReentrantReadWriteLock();
+		private ReentrantReadWriteLock lock= new ReentrantReadWriteLock(true);
 		
 		public LockObject() {
 			timestamp=System.currentTimeMillis();
@@ -52,7 +53,7 @@ public class LayerLockManager {
 	
 	private static Map<String,LockObject> lockRequests=new ConcurrentHashMap<String, LayerLockManager.LockObject>();
 	
-	public static synchronized Ticket isLayerGenerationBooked(LayerGenerationRequest request) throws Exception{
+	public static Ticket isLayerGenerationBooked(LayerGenerationRequest request) throws Exception{
 		String ticket=requestToMD5(request);
 		if(lockRequests.containsKey(ticket)){
 			lockRequests.get(ticket).lockRead();
@@ -64,7 +65,7 @@ public class LayerLockManager {
 		
 	}
 	
-	public static synchronized void releaseLocks(Ticket ticket) throws Exception{
+	public static void releaseLocks(Ticket ticket) throws Exception{
 		if(lockRequests.containsKey(ticket.getMD5())){
 			lockRequests.get(ticket.getMD5()).release();
 			lockRequests.remove(ticket.getMD5());

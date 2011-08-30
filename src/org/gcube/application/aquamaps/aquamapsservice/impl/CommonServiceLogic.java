@@ -9,6 +9,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
@@ -31,8 +32,8 @@ public class CommonServiceLogic {
 		if(speciesFilter.size()==0){
 			Submitted existing=getAlreadySubmitted(hspecId, author, enableGIS);
 			if(existing!=null) {
-				logger.trace("Found existing job "+existing.getJobId()+", submitted by "+existing.getAuthor());
-				return existing.getJobId();
+				logger.trace("Found existing job "+existing.getSearchId()+", submitted by "+existing.getAuthor());
+				return existing.getSearchId();
 			}
 		}
 		
@@ -74,9 +75,11 @@ public class CommonServiceLogic {
 		ArrayList<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.sourcehspec+"",hspecId+"",FieldType.INTEGER));
 		filter.add(new Field(SubmittedFields.postponepublishing+"",true+"",FieldType.BOOLEAN));
+		filter.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));		
 		if(GIS) filter.add(new Field(SubmittedFields.gisenabled+"",true+"",FieldType.BOOLEAN));
 		List<Submitted> existing=SubmittedManager.getList(filter);
-		if(existing.isEmpty()) return null;
-		else return existing.get(0);
+		for(Submitted job:existing)
+			if(!job.getStatus().equals(SubmittedStatus.Error))return existing.get(0);
+		return null;
 	}	
 }

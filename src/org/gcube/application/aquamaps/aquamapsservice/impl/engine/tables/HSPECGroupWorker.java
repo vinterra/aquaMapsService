@@ -11,6 +11,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGroupGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.TableGenerationConfiguration;
@@ -19,8 +20,10 @@ import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
+import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
@@ -126,12 +129,13 @@ public class HSPECGroupWorker extends Thread {
 					logger.trace("Generation "+request.getId()+" : submitted "+jobIds.size()+" job, waiting for them to complete..");
 					Boolean completed=false;
 					while(!completed){
-						for(Integer id:jobIds)
-							if(!JobManager.isJobComplete(id)){
+						for(Integer id:jobIds){
+							Submitted submittedJob=SubmittedManager.getSubmittedById(id);
+							if(!submittedJob.getStatus().equals(SubmittedStatus.Completed)&&!submittedJob.getStatus().equals(SubmittedStatus.Error)){
 								completed=false;
 								break;
 							}else completed=true;
-
+						}
 						if(!completed)
 							try{
 								Thread.sleep(10*1000);

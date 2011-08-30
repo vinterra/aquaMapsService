@@ -43,7 +43,7 @@ private static final GCUBELog logger=new GCUBELog(PropertiesReader.class);
 	private void load()throws Exception{
 		InputStream is=null;
 		try{
-		logger.debug("******************* LOADING PROPERTIES FROM "+path);
+//		logger.debug("******************* LOADING PROPERTIES FROM "+path);
 		String propertiesFilePath = path;
 		logger.debug("******************* LOADING propertiesFilePath "+propertiesFilePath);
 		is= new FileInputStream (propertiesFilePath);

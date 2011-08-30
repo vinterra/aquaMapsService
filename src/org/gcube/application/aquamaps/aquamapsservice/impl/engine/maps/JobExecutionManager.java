@@ -1,12 +1,12 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
 import java.io.File;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
@@ -22,21 +22,17 @@ import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
-import edu.emory.mathcs.backport.java.util.concurrent.Semaphore;
-
 public class JobExecutionManager {
 
 	private static final GCUBELog logger=new GCUBELog(JobExecutionManager.class);
 
 
-	private static PooledExecutor jobPool=null;
-	private static PooledExecutor aqPool=null;
+	private static MyPooledExecutor jobPool=null;
+	private static MyPooledExecutor aqPool=null;
 
 	private static String persistencePath=null;
 
-	private static final ConcurrentHashMap blockedJobs=new ConcurrentHashMap();
+	private static final ConcurrentHashMap<Integer, Semaphore> blockedJobs=new ConcurrentHashMap<Integer, Semaphore>();
 
 	private static Semaphore insertedJobs=null;
 	private static Semaphore insertedObjects=null;
@@ -205,13 +201,13 @@ public class JobExecutionManager {
 
 
 
-	public static void alertJob(int jobId){
+	public static void alertJob(int objId,int jobId){
 		try{
 			if(blockedJobs.containsKey(jobId)){
 				Semaphore sem=((Semaphore) blockedJobs.get(jobId));
 				sem.release();
-				logger.trace("Released lock for job "+jobId+", still waiting for "+sem.availablePermits());
-			}else logger.warn("Unable to find queued job "+jobId);
+				logger.trace("Object "+objId+" released lock for job "+jobId+", still waiting for "+sem.availablePermits());
+			}else logger.warn("Unable to find queued job "+jobId+", object was "+objId);
 		}catch(Exception e){
 			logger.warn("UNABLE TO RELEASE LOCK FOR JOB [ID : "+jobId+"]",e);
 		}

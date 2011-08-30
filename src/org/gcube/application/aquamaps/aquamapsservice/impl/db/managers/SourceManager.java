@@ -6,10 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
@@ -27,16 +25,33 @@ public class SourceManager {
 	
 	
 	
+//	public static int getDefaultId(ResourceType type)throws Exception{
+//		switch(type){
+//		case HCAF: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HCAF_ID);
+//		case HSPEC: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEC_ID);
+//		case HSPEN: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEN_ID);
+//		}		
+//		return 0;
+//		
+////		return 1;
+//	}
+	
+	
 	public static int getDefaultId(ResourceType type)throws Exception{
-		switch(type){
-		case HCAF: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HCAF_ID);
-		case HSPEC: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEC_ID);
-		case HSPEN: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEN_ID);
-		}		
-		return 0;
-		
-//		return 1;
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			ArrayList<Field> filter=new ArrayList<Field>();
+			filter.add(new Field(MetaSourceFields.type+"",type+"",FieldType.STRING));
+			filter.add(new Field(MetaSourceFields.defaultsource+"",true+"",FieldType.BOOLEAN));
+			Set<Resource> found=loadRS(session.executeFilteredQuery(filter, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC));
+			if(found.isEmpty()) throw new Exception("No Default Found for type "+type);
+			else return found.iterator().next().getSearchId();
+		}catch(Exception e){throw e;}
+		finally{if(session!=null)session.close();}
 	}
+	
+	
 	
 	public static Resource registerSource(Resource toRegister)throws Exception{
 		DBSession session=null;
@@ -188,6 +203,41 @@ public class SourceManager {
 			List<Field> filters=new ArrayList<Field>();
 			filters.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
 			return loadRS(session.executeFilteredQuery(filters, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC)).iterator().next();
+		}catch(Exception e){throw e;}
+		finally{session.close();}
+	}
+	
+	
+	public static int update(Resource toUpdate)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			session.disableAutoCommit();
+			if(toUpdate.getDefaultSource()){
+				List<List<Field>> values=new ArrayList<List<Field>>();
+				List<Field> toSet=new ArrayList<Field>();
+				toSet.add(new Field(MetaSourceFields.defaultsource+"",false+"",FieldType.BOOLEAN));
+				values.add(toSet);
+				List<List<Field>> keys=new ArrayList<List<Field>>();
+				List<Field> key=new ArrayList<Field>();
+				key.add(toUpdate.getField(MetaSourceFields.type));
+				keys.add(key);
+				session.updateOperation(sourcesTable, keys, values);
+			}
+			List<List<Field>> values=new ArrayList<List<Field>>();
+			List<Field> value=new ArrayList<Field>();
+			value.add(toUpdate.getField(MetaSourceFields.title));
+			value.add(toUpdate.getField(MetaSourceFields.description));
+			value.add(toUpdate.getField(MetaSourceFields.disclaimer));
+			value.add(toUpdate.getField(MetaSourceFields.defaultsource));
+			values.add(value);
+			List<List<Field>> keys=new ArrayList<List<Field>>();
+			List<Field> key=new ArrayList<Field>();
+			key.add(toUpdate.getField(MetaSourceFields.searchid));
+			keys.add(key);
+			int rows=session.updateOperation(sourcesTable, keys, values);
+			session.commit();
+			return rows;
 		}catch(Exception e){throw e;}
 		finally{session.close();}
 	}

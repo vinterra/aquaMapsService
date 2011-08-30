@@ -84,10 +84,10 @@ public class PropertiesConstants {
 	public static final String HSPEC_GROUP_PRIORITY="HSPEC_GROUP_PRIORITY";
 	
 	//********* SOURCES
-	
-	public static final String DEFAULT_HSPEC_ID="DEFAULT_HSPEC_ID";
-	public static final String DEFAULT_HCAF_ID="DEFAULT_HCAF_ID";
-	public static final String DEFAULT_HSPEN_ID="DEFAULT_HSPEN_ID";
+//	
+//	public static final String DEFAULT_HSPEC_ID="DEFAULT_HSPEC_ID";
+//	public static final String DEFAULT_HCAF_ID="DEFAULT_HCAF_ID";
+//	public static final String DEFAULT_HSPEN_ID="DEFAULT_HSPEN_ID";
 	
 	//********* DEFAULT DB VALUES
 	

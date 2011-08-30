@@ -19,13 +19,11 @@ import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGeneratio
 import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import EDU.oswego.cs.dl.util.concurrent.PooledExecutor;
-
 public class TableGenerationExecutionManager {
 
 	private static final GCUBELog logger=new GCUBELog(TableGenerationExecutionManager.class);
 	
-	private static PooledExecutor pool=null;
+	private static MyPooledExecutor pool=null;
 	private static Semaphore insertedRequest=null;
 	
 	private static ConcurrentHashMap <Execution,Semaphore> subscribedGenerations=new ConcurrentHashMap<Execution, Semaphore>();

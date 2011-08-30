@@ -6,19 +6,18 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortTy
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
-import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.security.GCUBESecurityManager;
 import org.gcube.common.core.security.GCUBESecurityManagerImpl;
+import org.gcube.common.core.types.VOID;
 
 public class DataManagementCall extends AquaMapsCall implements DataManagementInterface {
 
@@ -170,6 +169,26 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 		try{
 			throw new GCUBEFault("Not Ymplemented");
 //			pt.editHSPECGroupDetails(stubRequest);
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public List<Field> getDefaultSources() throws Exception {
+		try{
+			return Field.load(pt.getDefaultSources(new VOID()));
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public Resource updateResource(Resource toUpdate) throws Exception {
+		try{
+			return new Resource(pt.editResource(toUpdate.toStubsVersion()));
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
