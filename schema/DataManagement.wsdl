@@ -127,7 +127,6 @@
 			</xsd:complexType>
 			
 			
-			
 
 			<!-- Data management request elements -->
 
@@ -165,6 +164,12 @@
 			
 			<xsd:element name="editHSPECGroupDetailsRequest" type="tns:hspecGroupGenerationRequestType" />
 			<xsd:element name="editHSPECGroupDetailsResponse" type="coretypes:VOID"/>
+
+			<xsd:element name="getDefaultSourcesRequest" type="coretypes:VOID"/>
+			<xsd:element name="getDefaultSourcesResponse" type="aqtypes:fieldArray"/>
+
+			<xsd:element name="editResourceRequest" type="aqtypes:resource"/>
+			<xsd:element name="editResourceResponse" type="aqtypes:resource"/>
 
 		</xsd:schema>
 	</types>
@@ -243,6 +248,19 @@
 		<part name="response" element="tns:editHSPECGroupDetailsResponse" />
 	</message>
 
+	<message name="GetDefaultSourcesRequest">
+		<part name="request" element="tns:getDefaultSourcesRequest" />
+	</message>
+	<message name="GetDefaultSourcesResponse">
+		<part name="response" element="tns:getDefaultSourcesResponse" />
+	</message>
+
+	<message name="EditResourceRequest">
+		<part name="request" element="tns:editResourceRequest" />
+	</message>
+	<message name="EditResourceResponse">
+		<part name="response" element="tns:editResourceResponse" />
+	</message>
 
 
 
@@ -296,6 +314,16 @@
 		<wsdl:operation name="EditHSPECGroupDetails">
 			<wsdl:input message="tns:EditHSPECGroupDetailsRequest" />
 			<wsdl:output message="tns:EditHSPECGroupDetailsResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetDefaultSources">
+			<wsdl:input message="tns:GetDefaultSourcesRequest" />
+			<wsdl:output message="tns:GetDefaultSourcesResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="EditResource">
+			<wsdl:input message="tns:EditResourceRequest" />
+			<wsdl:output message="tns:EditResourceResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>
