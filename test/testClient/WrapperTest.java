@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
@@ -27,11 +29,13 @@ public class WrapperTest {
 	
 	public static void main(String[] args) throws Exception{
 		
-//		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
+		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(
-				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
-				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");	
+		
+//		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(
+//				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
+//				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");	
 //		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
 //		System.out.println(wrapper.getJSONPhilogeny());
 		
@@ -51,20 +55,29 @@ public class WrapperTest {
 //		
 //		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
 		
-//		System.out.println(wrapper.loadResource(1, ResourceType.HCAF));
-//		System.out.println(wrapper.loadResource(1, ResourceType.HSPEN));
-//		System.out.println(wrapper.loadResource(1, ResourceType.HSPEC));
 		
+		System.out.println("Checking default sources");
+		for(Field f:dmInterface.getDefaultSources()){
+			try{
+				ResourceType type=ResourceType.valueOf(f.getName());
+				int id=f.getValueAsInteger();
+				System.out.println(wrapper.loadResource(id, type));
+			}catch(Exception e){
+				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
+				e.printStackTrace();
+			}
+		}
+			
 		
-		Envelope env=new Envelope();
-		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, true, true);
-		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
-		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, true, false);
-		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
-		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),false, true, true);
-		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
-		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, false, true);
-		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
+//		Envelope env=new Envelope();
+//		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, true, true);
+//		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
+//		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, true, false);
+//		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
+//		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),false, true, true);
+//		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
+//		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, false, true);
+//		System.out.println("Calculate env "+ AquaMapsXStream.getXMLInstance().toXML(env));
 //		calculateEnvelopeFromCellSelection(List<String> cellIds,String speciesId);
 
 //		public int deleteSubmitted(List<Integer> ids)throws Exception;
@@ -87,7 +100,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(334708)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(373832)));
 		
 		
 		

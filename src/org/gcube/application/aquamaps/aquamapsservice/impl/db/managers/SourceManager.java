@@ -96,13 +96,16 @@ public class SourceManager {
 		}
 	}
 	
-	public static void deleteSource(int id) throws Exception{
+	public static void deleteSource(int id,boolean deleteTable) throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
+			Resource toDelete=getById(id);
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
 			session.deleteOperation(sourcesTable, filter);
+			
+			if(deleteTable) session.dropTable(toDelete.getTableName());
 		}catch(Exception e){
 			throw e;			
 		}finally{

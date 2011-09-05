@@ -23,7 +23,6 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CellManager {
 
-	private static String occurrenceCells="occurrencecells";
 	public static String HCAF_S="hcaf_s";
 
 	private static final GCUBELog logger=new GCUBELog(CellManager.class);
@@ -64,6 +63,7 @@ public class CellManager {
 			List<Field> filter=new ArrayList<Field>();
 			filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesId,FieldType.STRING));
 			String HCAF=SourceManager.getSourceName(SourceManager.getDefaultId(ResourceType.HCAF));
+			String occurrenceCells=SourceManager.getById(SourceManager.getDefaultId(ResourceType.OCCURRENCECELLS)).getTableName();
 			PreparedStatement ps= session.preparedStatement("SELECT * FROM "+occurrenceCells+" as o INNER JOIN "+HCAF+" as h ON " +
 					"o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+" WHERE o."+SpeciesOccursumFields.speciesid+" = ?");
 			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), settings.getOffset(), settings.getLimit());
@@ -132,6 +132,7 @@ public class CellManager {
 				List<Field> filter=new ArrayList<Field>();
 				filter.add(new Field(HCAF_SFields.csquarecode+"",c.getCode(),FieldType.STRING));
 				filter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
+				String occurrenceCells=SourceManager.getById(SourceManager.getDefaultId(ResourceType.OCCURRENCECELLS)).getTableName();
 				if(ps==null)ps=session.getPreparedStatementForQuery(filter, occurrenceCells,HCAF_SFields.csquarecode+"",OrderDirection.ASC);
 				ResultSet rs=session.fillParameters(filter,0, ps).executeQuery();
 				if(rs.next())				
@@ -150,6 +151,7 @@ public class CellManager {
 			session=DBSession.getInternalDBSession();
 			List<Field> cellFilter=new ArrayList<Field>();
 			cellFilter.add(new Field(SpeciesOccursumFields.speciesid+"",speciesID,FieldType.STRING));
+			String occurrenceCells=SourceManager.getById(SourceManager.getDefaultId(ResourceType.OCCURRENCECELLS)).getTableName();
 			Set<Cell> cellsInTable = Cell.loadRS(session.executeFilteredQuery(cellFilter, occurrenceCells, HCAF_SFields.csquarecode+"", OrderDirection.ASC));
 			logger.trace("Found "+cellsInTable.size()+" occurrence cells, going to filter..");
 			Set<Cell> toReturn = new HashSet<Cell>();

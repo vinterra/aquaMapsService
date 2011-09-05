@@ -85,8 +85,9 @@
 					<xsd:element name="author" type="xsd:string" />
 					<xsd:element name="generationName" type="xsd:string" />
 					<xsd:element name="description" type="xsd:string" />
-					<xsd:element name="hcafSearchId" type="xsd:int" />
-					<xsd:element name="hspenSearchId" type="xsd:int" />
+					<xsd:element name="hspenId" type="xsd:int"/>
+					<xsd:element name="hcafId" type="xsd:int"/>
+					<xsd:element name="occurrenceCellsId" type="xsd:int"/>
 					<xsd:element name="submissionBackend" type="xsd:string" />
 					<xsd:element name="executionEnvironment" type="xsd:string" />
 					<xsd:element name="backendUrl" type="xsd:string"/>
@@ -107,7 +108,7 @@
 					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
-
+			
 
 			<xsd:complexType name="getGenerationLiveReportResponseType">
 				<xsd:sequence>
@@ -125,6 +126,17 @@
 					<xsd:element name="removeJobs" type="xsd:boolean" />
 				</xsd:sequence>
 			</xsd:complexType>
+			
+			<xsd:complexType name="queryResourceRequestType">
+				<xsd:sequence>
+					<xsd:element name="queryString" type="xsd:string"/>
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
 			
 			
 
@@ -171,6 +183,15 @@
 			<xsd:element name="editResourceRequest" type="aqtypes:resource"/>
 			<xsd:element name="editResourceResponse" type="aqtypes:resource"/>
 
+			<xsd:element name="removeResourceRequest" type="xsd:int"/>
+			<xsd:element name="removeResourceResponse" type="coretypes:VOID"/>
+				
+			<xsd:element name="exportResourceRequest" type="xsd:int"/>
+			<xsd:element name="exportResourceResponse" type="xsd:string"/>
+			
+			<xsd:element name="queryResourceRequest" type="tns:queryResourceRequestType"/>
+			<xsd:element name="queryResourceResponse" type="xsd:string"/>
+			
 		</xsd:schema>
 	</types>
 
@@ -262,6 +283,26 @@
 		<part name="response" element="tns:editResourceResponse" />
 	</message>
 
+	<message name="RemoveResourceRequest">
+		<part name="request" element="tns:removeResourceRequest" />
+	</message>
+	<message name="RemoveResourceResponse">
+		<part name="response" element="tns:removeResourceResponse" />
+	</message>
+
+<message name="ExportResourceRequest">
+		<part name="request" element="tns:exportResourceRequest" />
+	</message>
+	<message name="ExportResourceResponse">
+		<part name="response" element="tns:exportResourceResponse" />
+	</message>
+
+	<message name="QueryResourceRequest">
+		<part name="request" element="tns:queryResourceRequest" />
+	</message>
+	<message name="QueryResourceResponse">
+		<part name="response" element="tns:queryResourceResponse" />
+	</message>
 
 
 	<portType name="DataManagementPortType">
@@ -324,6 +365,21 @@
 		<wsdl:operation name="EditResource">
 			<wsdl:input message="tns:EditResourceRequest" />
 			<wsdl:output message="tns:EditResourceResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="RemoveResource">
+			<wsdl:input message="tns:RemoveResourceRequest" />
+			<wsdl:output message="tns:RemoveResourceResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ExportResource">
+			<wsdl:input message="tns:ExportResourceRequest" />
+			<wsdl:output message="tns:ExportResourceResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="QueryResource">
+			<wsdl:input message="tns:QueryResourceRequest" />
+			<wsdl:output message="tns:QueryResourceResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

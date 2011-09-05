@@ -18,7 +18,7 @@ public class AquaMapsServiceTester {
 	
 	static final String AQ_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	static final String DM_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
-	
+	static final String RS_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/common/searchservice/ResultSet";
 	
 	
 	public static void main(String[] args){

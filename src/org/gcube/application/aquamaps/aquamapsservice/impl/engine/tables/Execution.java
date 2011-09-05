@@ -1,11 +1,21 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
+import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 
 class Execution{
 	private AlgorithmType algorithm;
 	private Integer hcafId;
 	private Integer hspenId;
+	private Integer occurrenceCellsId;
+	private LogicType logic;
+	
+	public Integer getOccurrenceCellsId() {
+		return occurrenceCellsId;
+	}
+	public LogicType getLogic() {
+		return logic;
+	}
 	public AlgorithmType getAlgorithm() {
 		return algorithm;
 	}
@@ -15,12 +25,14 @@ class Execution{
 	public Integer getHspenId() {
 		return hspenId;
 	}
-	public Execution(AlgorithmType algorithm, Integer hcafId,
-			Integer hspenId) {
+	public Execution(AlgorithmType algorithm, Integer hcafId, Integer hspenId,
+			Integer occurrenceCellsId, LogicType logic) {
 		super();
 		this.algorithm = algorithm;
 		this.hcafId = hcafId;
 		this.hspenId = hspenId;
+		this.occurrenceCellsId = occurrenceCellsId;
+		this.logic = logic;
 	}
 	@Override
 	public int hashCode() {
@@ -30,6 +42,11 @@ class Execution{
 				+ ((algorithm == null) ? 0 : algorithm.hashCode());
 		result = prime * result + ((hcafId == null) ? 0 : hcafId.hashCode());
 		result = prime * result + ((hspenId == null) ? 0 : hspenId.hashCode());
+		result = prime * result + ((logic == null) ? 0 : logic.hashCode());
+		result = prime
+				* result
+				+ ((occurrenceCellsId == null) ? 0 : occurrenceCellsId
+						.hashCode());
 		return result;
 	}
 	@Override
@@ -53,7 +70,15 @@ class Execution{
 				return false;
 		} else if (!hspenId.equals(other.hspenId))
 			return false;
+		if (logic != other.logic)
+			return false;
+		if (occurrenceCellsId == null) {
+			if (other.occurrenceCellsId != null)
+				return false;
+		} else if (!occurrenceCellsId.equals(other.occurrenceCellsId))
+			return false;
 		return true;
 	}
+	
 	
 }

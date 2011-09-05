@@ -15,7 +15,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesStatus;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
@@ -159,7 +158,7 @@ public class HSPECGenerator {
 		this.hcafStaticTable=HCAF_S;
 		this.hspenTable = HSPEN;
 		this.hspecNativeTable= SourceManager.getSourceName(JobManager.getHSPECTableId(jobId));
-		this.occurenceCellsTable = SpeciesManager.GOOD_CELLS;
+		this.occurenceCellsTable = SourceManager.getById(SourceManager.getDefaultId(ResourceType.OCCURRENCECELLS)).getTableName();
 		this.jobId=jobId;
 		this.jobWeights=envelopeWeights;
 		this.generateNative=true;
@@ -180,7 +179,7 @@ public class HSPECGenerator {
 		this.hcafDynamicTable=hcaf_d;
 		this.hcafStaticTable=CellManager.HCAF_S;
 		this.hspenTable=hspen;
-		this.occurenceCellsTable=SpeciesManager.GOOD_CELLS;
+		this.occurenceCellsTable=SourceManager.getById(SourceManager.getDefaultId(ResourceType.OCCURRENCECELLS)).getTableName();
 		currentWeights=defaultWeights;
 
 		this.generateNative=generateNative;

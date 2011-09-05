@@ -64,11 +64,13 @@
 					<xsd:element name="sourceHCAFId" type="xsd:int" />
 					<xsd:element name="sourceHSPENId" type="xsd:int" />
 					<xsd:element name="sourceHSPECId" type="xsd:int" />
+					<xsd:element name="sourceOccurrenceCellsId" type="xsd:int"/>
 					<xsd:element name="parameters" type="xsd:string" />
 					<xsd:element name="status" type="xsd:string" />
 					<xsd:element name="sourceHCAFTable" type="xsd:string" />
 					<xsd:element name="sourceHSPENTable" type="xsd:string" />
 					<xsd:element name="sourceHSPECTable" type="xsd:string" />
+					<xsd:element name="sourceOccurrenceCellsTable" type="xsd:string" />
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="algorithm" type="xsd:string" />
 				 	<xsd:element name="defaultSource" type="xsd:boolean"/>

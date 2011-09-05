@@ -28,7 +28,7 @@ public class SpeciesManager {
 
 	private static GCUBELog logger= new GCUBELog(SpeciesManager.class);
 	public static final String speciesOccurSum="speciesoccursum";
-	public static final String GOOD_CELLS="occurrencecells";
+	
 	
 	
 	public static Species getSpeciesById(boolean fetchStatic,boolean fetchEnvelope, String id, int hspenId) throws Exception{

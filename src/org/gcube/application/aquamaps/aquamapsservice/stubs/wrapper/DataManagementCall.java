@@ -1,17 +1,20 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
+import java.io.File;
+import java.net.URI;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.QueryResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
-import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -64,10 +67,10 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	///****** INTERFACE IMPLEMENTATION
 	
 	@Override
-	public String submitRequest(HSPECGroupGenerationRequest request)
+	public String submitRequest(SourceGenerationRequest request)
 			throws Exception {
 		try{
-//			HspecGroupGenerationRequestType stubRequest=new HspecGroupGenerationRequestType();
+//			SourceGenerationRequestType stubRequest=new SourceGenerationRequestType();
 //			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
 //			stubRequest.setAuthor(request.getAuthor());
 //			stubRequest.setGenerationName(request.getGenerationname());
@@ -138,7 +141,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	}
 
 	@Override
-	public HSPECGroupGenerationRequest getRequest(String id) throws Exception {
+	public SourceGenerationRequest getRequest(String id) throws Exception {
 		try{
 			throw new GCUBEFault("not Ready");
 		}catch(GCUBEFault f){
@@ -164,7 +167,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	}
 
 	@Override
-	public void editRequest(HSPECGroupGenerationRequest request)
+	public void editRequest(SourceGenerationRequest request)
 			throws Exception {
 		try{
 			throw new GCUBEFault("Not Ymplemented");
@@ -189,6 +192,38 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public Resource updateResource(Resource toUpdate) throws Exception {
 		try{
 			return new Resource(pt.editResource(toUpdate.toStubsVersion()));
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public void deleteResource(int resourceId) throws Exception {
+		try{
+			pt.removeResource(resourceId);
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public File exportResource(int resourceId) throws Exception {
+		try{
+			String locator=pt.exportResource(resourceId);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public String queryResource(String query, PagedRequestSettings settings)
+			throws Exception {
+		try{
+			return pt.queryResource(new QueryResourceRequestType(settings.getLimit(), settings.getOffset(), query, settings.getOrderColumn(), settings.getOrderDirection()+""));
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

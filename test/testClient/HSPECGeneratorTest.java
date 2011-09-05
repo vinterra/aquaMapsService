@@ -12,7 +12,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortTy
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.WrapperUtils;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
 import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
@@ -21,6 +20,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
 import org.gcube.application.aquamaps.dataModel.xstream.EnvelopeConverter;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
@@ -95,7 +95,7 @@ public class HSPECGeneratorTest {
 		
 		System.out.println("Loading csv...");
 		 
-		for(List<Field> row: WrapperUtils.loadCSV(csvPath, ','))
+		for(List<Field> row: CSVUtils.loadCSV(csvPath, ','))
 			for(Field f : row) if(f.getName().equalsIgnoreCase(SpeciesOccursumFields.speciesid+""))ids.add(f.getValue());
 		
 		System.out.println("Loaded "+ids.size()+" ids");

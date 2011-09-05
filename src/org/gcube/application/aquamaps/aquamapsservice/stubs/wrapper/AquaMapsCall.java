@@ -20,6 +20,7 @@ public abstract class AquaMapsCall extends RICall{
 	
 	protected static ISClient isClient;
 
+	protected GCUBEScope scope=null;
 
 	static{
 		try {
@@ -37,6 +38,7 @@ public abstract class AquaMapsCall extends RICall{
 			GCUBESecurityManager[] securityManager,String defaultURI) throws Exception {
 		super(scope, securityManager);
 		// looking for service epr
+		this.scope=scope;
 		GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
 		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass",getServiceClass()));
 		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName",getServiceName()));

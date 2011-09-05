@@ -15,7 +15,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GenerationUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GeneratorManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.PredictionLayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.threads.JobUtils;
@@ -34,6 +33,7 @@ import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -272,7 +272,7 @@ public class AquaMapsObjectWorker extends Thread {
 					String csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+
 					objectDescriptor.getJobId()+File.separator+objectDescriptor.getTitle()+".csv";
 					FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
-					GenerationUtils.resultSetToCSVFile(rs, csvFile);
+					CSVUtils.resultSetToCSVFile(rs, csvFile,false);
 					data.setCsvFile(csvFile);
 				}
 				logger.debug("DISTRIBUTION DATA FOR "+objectDescriptor.getSearchId()+".... COMPLETED");
@@ -327,7 +327,7 @@ public class AquaMapsObjectWorker extends Thread {
 					String csvFile=ServiceContext.getContext().getPersistenceRoot()+
 						File.separator+objectDescriptor.getJobId()+File.separator+objectDescriptor.getTitle()+".csv";
 					FileUtils.newFileUtils().createNewFile(new File(csvFile), true);
-					GenerationUtils.resultSetToCSVFile(rs, csvFile);
+					CSVUtils.resultSetToCSVFile(rs, csvFile,false);
 					data.setCsvFile(csvFile);
 				}
 				return data;

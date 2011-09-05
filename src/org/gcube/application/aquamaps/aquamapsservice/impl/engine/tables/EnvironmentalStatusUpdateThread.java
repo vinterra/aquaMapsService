@@ -2,16 +2,16 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 
 import java.util.ArrayList;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.HSPECGroupGenerationRequestsManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.HSPECGroupGenerationPhase;
+import org.gcube.application.aquamaps.dataModel.Types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
-import org.gcube.application.aquamaps.dataModel.environments.HSPECGroupGenerationRequest;
-import org.gcube.application.aquamaps.dataModel.fields.GroupGenerationRequestFields;
+import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.fields.SourceGenerationRequestFields;
 import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -36,20 +36,20 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 
 				//Updating data generation percent...
 				ArrayList<Field> filter=new ArrayList<Field>();
-				filter.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.datageneration+"",FieldType.STRING));
-				for(HSPECGroupGenerationRequest request : HSPECGroupGenerationRequestsManager.getList(filter)){
+				filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.datageneration+"",FieldType.STRING));
+				for(SourceGenerationRequest request : SourceGenerationRequestsManager.getList(filter)){
 					try{
 						EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(request.getReportID(),false);
-						Double percent=(100/request.getAlgorithms().size()*request.getGeneratedhspec().size())+
+						Double percent=(100/request.getAlgorithms().size()*request.getGeneratedSources().size())+
 									(report.getPercent()/request.getAlgorithms().size());
-						HSPECGroupGenerationRequestsManager.setPhasePercent(percent, request.getId());
+						SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
 					}catch(Exception e){logger.warn("Skipping percent update for execution id "+request.getId()+", report id was "+request.getReportID(),e);}
 				}
 				//Updating map generation percent
 
 					filter=new ArrayList<Field>();
-					filter.add(new Field(GroupGenerationRequestFields.phase+"",HSPECGroupGenerationPhase.mapgeneration+"",FieldType.STRING));
-					for(HSPECGroupGenerationRequest request : HSPECGroupGenerationRequestsManager.getList(filter)){
+					filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.mapgeneration+"",FieldType.STRING));
+					for(SourceGenerationRequest request : SourceGenerationRequestsManager.getList(filter)){
 						try{
 							long completedObjCount=0;
 							long totalObjCount=0;
@@ -65,7 +65,7 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 								totalObjCount+=SubmittedManager.getCount(toCompleteFilter);
 							}
 							Double percent=100d*completedObjCount/totalObjCount;
-							HSPECGroupGenerationRequestsManager.setPhasePercent(percent, request.getId());
+							SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
 						}catch(Exception e){logger.warn("Skipping percent update for execution id "+request.getId(),e);}
 					}
 			}catch(Exception e){

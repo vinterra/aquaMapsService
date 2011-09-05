@@ -8,11 +8,14 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescri
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
+import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
+import org.gcube.application.aquamaps.ecomodelling.generators.connectors.EnvelopeModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.DistributionGenerator;
+import org.gcube.application.aquamaps.ecomodelling.generators.processing.EnvelopeGenerator;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -25,6 +28,7 @@ public class BatchGenerator implements BatchGeneratorI {
 	private static final int NUM_OF_THREADS=2;
 	
 	private DistributionGenerator dg =null;
+	private EnvelopeGenerator eg=null;
 	private Integer internalId;
 	
 	
@@ -81,19 +85,25 @@ public class BatchGenerator implements BatchGeneratorI {
 	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo) {
 //		logger.trace("Forming report, my ID is "+getReportId());
 //		logger.trace("DistributionGenerator = "+dg);
-		if(dg==null) return null;
-		EnvironmentalExecutionReportItem toReturn= new EnvironmentalExecutionReportItem();
-		toReturn.setPercent(dg.getStatus());
-		if(getResourceInfo){
-		toReturn.setResourceLoad(dg.getResourceLoad());
-		toReturn.setResourcesMap(dg.getResources());
-		toReturn.setElaboratedSpecies(dg.getSpeciesLoad());
+		EnvironmentalExecutionReportItem toReturn=null;
+		if(dg!=null){
+			toReturn= new EnvironmentalExecutionReportItem();
+			toReturn.setPercent(dg.getStatus());
+			if(getResourceInfo){
+				toReturn.setResourceLoad(dg.getResourceLoad());
+				toReturn.setResourcesMap(dg.getResources());
+				toReturn.setElaboratedSpecies(dg.getSpeciesLoad());
+			}
+		}else if(eg!=null){
+			toReturn= new EnvironmentalExecutionReportItem();
+			toReturn.setPercent(eg.getStatus());
+			if(getResourceInfo){
+				toReturn.setResourceLoad(eg.getResourceLoad());
+				toReturn.setResourcesMap(eg.getResources());
+				toReturn.setElaboratedSpecies(eg.getSpeciesLoad());
+			}
 		}
-//		toReturn.setPercent(0.3d);
-//		
-//		toReturn.setResourceLoad("");
-//		toReturn.setResourcesMap("");
-//		toReturn.setElaboratedSpecies("");
+
 		
 		return toReturn;
 	}
@@ -108,6 +118,7 @@ public class BatchGenerator implements BatchGeneratorI {
 	@Override
 	public String generateTable(TableGenerationConfiguration configuration)
 			throws Exception {
+		if(configuration.getLogic().equals(LogicType.HSPEC))
 		return generateHSPEC(configuration.getSources().get(ResourceType.HCAF).getTableName(),
 				configuration.getSources().get(ResourceType.HSPEN).getTableName(),
 				configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
@@ -118,6 +129,15 @@ public class BatchGenerator implements BatchGeneratorI {
 				configuration.getExecutionEnvironment(),
 				configuration.getConfiguration(),
 				configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getName())?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS);
+		else return generateHSPEN(configuration.getSources().get(ResourceType.HCAF).getTableName(),
+				configuration.getSources().get(ResourceType.HSPEN).getTableName(),
+				configuration.getSources().get(ResourceType.OCCURRENCECELLS).getTableName(),
+				configuration.getPartitionsNumber(),
+				configuration.getBackendUrl(),
+				configuration.getAuthor(),
+				configuration.getExecutionEnvironment(),
+				configuration.getConfiguration(),
+				EnvelopeModel.AQUAMAPS);
 	}
 	
 	
@@ -169,4 +189,52 @@ public class BatchGenerator implements BatchGeneratorI {
 		
 		return toGenerate;
 	}
+	
+	private String generateHSPEN(String hcafTable, String hspenTable,String occurrenceCellsTable, int threadNum,
+			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,EnvelopeModel model)throws Exception{
+		
+		
+		String toGenerate=ServiceUtils.generateId("hspen", "");
+
+		logger.trace("generating hspen : "+toGenerate);
+		
+		logger.trace("hspen : "+hspenTable);
+		logger.trace("hcaf : "+hcafTable);
+		
+		logger.trace("thread N : "+threadNum);
+		logger.trace("url : "+calculatorUrl);
+		logger.trace("calculation user : "+calculationUser);
+		logger.trace("model : "+model);
+		logger.trace("environment : "+executioneEnvironment);
+		logger.trace("config values : "+calculationConfig.size());
+		
+		
+		
+		
+		//hspen reference table
+		e.setOriginHspenTable(hspenTable);
+		
+		e.setHspenTable(toGenerate);
+		//hcaf reference table
+		e.setHcafTable(hcafTable);
+		
+		e.setOccurrenceCellsTable(occurrenceCellsTable);
+		e.setEnvelopeGenerator(model);
+		
+		
+		e.setRemoteCalculator(calculatorUrl);
+		e.setServiceUserName(calculationUser);
+		
+		e.setRemoteEnvironment(executioneEnvironment);
+		e.setNumberOfThreads(threadNum);
+		e.setGeneralProperties(calculationConfig);
+		
+		
+		
+		eg=new EnvelopeGenerator(e);
+		
+		eg.reGenerateEnvelopes();
+		return toGenerate;
+	}
+	
 }
