@@ -43,17 +43,17 @@ public class DMTest {
 //		System.out.println(dmInterface.queryResource("Select * from hspen where pelagic = 1", new PagedRequestSettings(2, 0, HspenFields.depthmax+"", OrderDirection.ASC)));
 		
 		
-//		System.out.println("Export Resource :");
-//
-//		File csv=dmInterface.exportResource(93);
-//		
-//		csv.renameTo(new File("exported.csv"));
-//		System.out.println("Exported to exported.csv"); 
+		System.out.println("Export Resource :");
+
+		File csv=dmInterface.exportResource(93);
+		
+		csv.renameTo(new File("exported.csv"));
+		System.out.println("Exported to exported.csv"); 
 		
 		
-		System.out.println("Delete Resource : ");
-		dmInterface.deleteResource(95);
-		System.out.println("DONE");
+//		System.out.println("Delete Resource : ");
+//		dmInterface.deleteResource(95);
+//		System.out.println("DONE");
 
 		
 //		System.out.println("GENERATE MAPS");
