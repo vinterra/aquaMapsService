@@ -40,7 +40,7 @@ public class SourceGenerationManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	private static void setValue(String fieldName,Object value,FieldType type,int generationId)throws Exception{
@@ -60,7 +60,7 @@ public class SourceGenerationManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -89,7 +89,7 @@ public class SourceGenerationManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 		
 	}
@@ -105,7 +105,7 @@ public class SourceGenerationManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 

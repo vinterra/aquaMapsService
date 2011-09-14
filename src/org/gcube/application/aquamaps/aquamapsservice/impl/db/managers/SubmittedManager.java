@@ -49,7 +49,7 @@ public class SubmittedManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -69,7 +69,7 @@ public class SubmittedManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -86,7 +86,7 @@ public class SubmittedManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -251,7 +251,7 @@ public class SubmittedManager {
 			List<List<Field>> inserted=session.insertOperation(submittedTable,rows);
 			return new Submitted(inserted.get(0));
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 
@@ -264,7 +264,7 @@ public class SubmittedManager {
 			session=DBSession.getInternalDBSession();
 			return Submitted.loadResultSet(session.executeFilteredQuery(filters, submittedTable,null,null));
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	public static String getJsonList(List<Field> filters,PagedRequestSettings settings)throws Exception{
@@ -273,7 +273,7 @@ public class SubmittedManager {
 			session=DBSession.getInternalDBSession();
 			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,settings.getOrderColumn(),settings.getOrderDirection()),settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	public static Submitted getSubmittedById(int objId) throws Exception{
@@ -298,7 +298,7 @@ public class SubmittedManager {
 			psUpdate=session.fillParameters(id, values.size(), psUpdate);
 			psUpdate.executeUpdate();
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 
@@ -315,16 +315,16 @@ public class SubmittedManager {
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
-	public static int getCount(List<Field> filter)throws Exception{
+	public static Long getCount(List<Field> filter)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
 			return session.getCount(submittedTable, filter);
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	public static void setStartTime(int submittedId)throws Exception{

@@ -32,7 +32,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -57,7 +57,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -75,7 +75,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -97,7 +97,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -115,7 +115,7 @@ public class SourceGenerationRequestsManager {
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -137,7 +137,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -191,7 +191,7 @@ public class SourceGenerationRequestsManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -205,7 +205,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -216,7 +216,7 @@ public class SourceGenerationRequestsManager {
 		return delete(filter);
 	}
 	
-	public static int getCount(List<Field> filter)throws Exception{
+	public static Long getCount(List<Field> filter)throws Exception{
 		DBSession session=null;
 		if(filter==null) filter=new ArrayList<Field>();
 		try{
@@ -225,7 +225,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	

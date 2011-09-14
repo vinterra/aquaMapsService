@@ -17,6 +17,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.Ta
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceStatus;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.Types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
@@ -96,9 +97,18 @@ public class HSPECGroupWorker extends Thread {
 						toRegister.setSourceHSPENTable(sources.get(ResourceType.HSPEN).getTableName());
 						toRegister.setSourceOccurrenceCellsId(sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
 						toRegister.setSourceOccurrenceCellsTable(sources.get(ResourceType.OCCURRENCECELLS).getTableName());
-						toRegister.setStatus("Completed");
+						toRegister.setStatus(ResourceStatus.Completed);
 						toRegister.setTableName(generatedTable);
 						toRegister.setTitle(request.getGenerationname()+"_"+algorithmType);
+						Long count=0l;
+						DBSession session=null;
+						try{
+							session=DBSession.getInternalDBSession();
+							count=session.getTableCount(generatedTable);
+						}catch(Exception e){
+							logger.warn("Unable to evaluate generated table "+generatedTable+" row count",e);
+						}finally{if (session!=null) session.close();}
+						toRegister.setRowCount(count);
 						toRegister=SourceManager.registerSource(toRegister);
 						logger.trace("Registered Resource with id "+toRegister.getSearchId());
 						SourceGenerationRequestsManager.addGeneratedResource(toRegister.getSearchId(), request.getId());

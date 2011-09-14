@@ -49,7 +49,7 @@ public class SpeciesManager {
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	public static Set<Species> getList(List<Field> filters)throws Exception{
@@ -58,7 +58,7 @@ public class SpeciesManager {
 			session=DBSession.getInternalDBSession();
 			return loadRS(session.executeFilteredQuery(filters, speciesOccurSum,null,null));
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -74,7 +74,7 @@ public class SpeciesManager {
 			session.dropTable(app);
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -96,10 +96,10 @@ public class SpeciesManager {
 			
 			ResultSet rs=psCount.executeQuery();
 			rs.next();
-			int totalCount=rs.getInt(1);
+			Long totalCount=rs.getLong(1);
 			return DBUtils.toJSon(psSelection.executeQuery(), totalCount);
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	/**
@@ -196,7 +196,7 @@ public class SpeciesManager {
 			if(tmpHspen!=null) session.dropTable(tmpHspen);
 			throw e;
 		}finally{
-			session.close();			
+			if(session!=null) session.close();			
 		}
 	}
 	
@@ -244,7 +244,7 @@ public class SpeciesManager {
 			return DBUtils.toJSon(session.getDistinct(toSelect, filters, speciesOccurSum, 
 					settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 }

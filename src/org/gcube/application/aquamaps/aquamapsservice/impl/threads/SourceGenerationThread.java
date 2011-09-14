@@ -155,7 +155,7 @@ public class SourceGenerationThread extends Thread {
 			if(f.exists()) FileUtils.delete(f);
 			try{
 				session.dropTable(appTable);
-				session.close();
+				if(session!=null) session.close();
 			}catch(Exception e){logger.error("unable to close session and/or delete temp tables");}
 		}
 	}
@@ -195,7 +195,7 @@ public class SourceGenerationThread extends Thread {
 			}});
 		
 		}catch(Exception e){throw e;}
-		finally{session.close();}	
+		finally{if(session!=null) session.close();}	
 		
 	}
 	

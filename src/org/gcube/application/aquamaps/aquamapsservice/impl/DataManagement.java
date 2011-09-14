@@ -1,13 +1,14 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
@@ -25,9 +26,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportB
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.QueryResourceRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewCustomQueryRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
 import org.gcube.application.aquamaps.dataModel.FieldArray;
 import org.gcube.application.aquamaps.dataModel.Resource;
@@ -406,26 +410,100 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		
 	}
 	
+//	@Override
+//	public String queryResource(QueryResourceRequestType arg0)
+//			throws RemoteException, GCUBEFault {
+//		DBSession session=null;
+//		try{
+//			logger.trace("Direct Query request : ");
+//			logger.trace("Query : "+arg0.getQueryString());
+//			logger.trace("Sort "+arg0.getSortColumn()+" "+arg0.getSortDirection());
+//			logger.trace("LIMIT "+arg0.getLimit()+" OFFSET "+arg0.getOffset());
+//			session=DBSession.getInternalDBSession();
+//			String query=arg0.getQueryString()+
+//				((arg0.getSortColumn()!=null&&!arg0.getSortDirection().equalsIgnoreCase("null"))?" ORDER BY "+arg0.getSortColumn()+" "+arg0.getSortDirection():" ");
+//			session.disableAutoCommit();
+//			logger.trace("Gonna execute direct query : "+query);
+//			return DBUtils.toJSon(session.executeQuery(query),arg0.getOffset(),arg0.getOffset()+arg0.getLimit());
+//		}catch(Exception e){
+//			logger.error("Unable to execute request ",e);
+//			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+//		}finally{
+//			if(session!=null)
+//				try {
+//					session.close();
+//				} catch (Exception e) {
+//					logger.error("Unexpected error while closing session ",e);
+//				}
+//		}
+//	}
+	
+	
 	@Override
-	public String queryResource(QueryResourceRequestType arg0)
+	public VOID setCustomQuery(SetUserCustomQueryRequestType arg0)
 			throws RemoteException, GCUBEFault {
-		DBSession session=null;
 		try{
-			session=DBSession.getInternalDBSession();
-			String query=arg0.getQueryString()+"ORDER BY "+arg0.getSortColumn()+" "+arg0.getSortDirection();
-			logger.trace("Gonna execute direct query : "+query);
-			session.disableAutoCommit();
-			return DBUtils.toJSon(session.executeQuery(query),arg0.getOffset(),arg0.getLimit()+arg0.getOffset());
+			logger.trace("Setting custom query, user : "+arg0.getUser()+", query : "+arg0.getQueryString());
+			CustomQueryManager.setUserCustomQuery(arg0.getUser(), arg0.getQueryString());
+			return new VOID();
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}finally{
-			if(session!=null)
-				try {
-					session.close();
-				} catch (Exception e) {
-					logger.error("Unexpected error while closing session ",e);
-				}
+		}
+	}
+	
+	@Override
+	public boolean deleteCustomQuery(String arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			logger.trace("Deleting custom query, user : "+arg0);
+			logger.trace("Deleted "+CustomQueryManager.deleteUserQuery(arg0)+" references.");
+			return true;
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	@Override
+	public int getImportStatus(int arg0) throws RemoteException, GCUBEFault {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	@Override
+	public int importResource(ImportResourceRequestType arg0)
+			throws RemoteException, GCUBEFault {
+		try{
+			logger.trace("Importing resource , user : "+arg0);
+			File csv=File.createTempFile("import", ".csv");
+			FileUtils.getFileUtils().copyFile(RSWrapper.getStreamFromLocator(new URI(arg0.getLocator())), csv);
+			
+			return SourceManager.importFromCSVFile(csv, arg0.getUser(), ResourceType.valueOf(arg0.getResourceType()));
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	
+	@Override
+	public String viewCustomQuery(ViewCustomQueryRequestType arg0)
+			throws RemoteException, GCUBEFault {
+		try{			
+			
+			return CustomQueryManager.getPagedResult(arg0.getUser(), 
+					new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), OrderDirection.valueOf(arg0.getSortDirection())));
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	@Override
+	public FieldArray isCustomQueryReady(String arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			return Field.toStubsVersion(CustomQueryManager.isCustomQueryReady(arg0));
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
 }

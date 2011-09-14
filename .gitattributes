@@ -56,13 +56,17 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -tex
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PostGresSQLDBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CellManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CustomQueryManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/JobManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/QueryConstructurThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationRequestsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationStatus.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceImporter.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SpeciesStatus.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/StatefullCSVLineProcessor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SubmittedManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/BadRequestException.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/GenerationRequest.java -text

@@ -147,7 +147,7 @@ public class DBUtils {
 
 	}
 	
-	public static String toJSon(ResultSet resultSet, int count) throws SQLException
+	public static String toJSon(ResultSet resultSet, Long count) throws SQLException
 	{
 		
 		StringBuilder json = new StringBuilder();

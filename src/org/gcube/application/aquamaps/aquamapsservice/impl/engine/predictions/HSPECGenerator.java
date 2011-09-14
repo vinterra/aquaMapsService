@@ -355,7 +355,7 @@ public class HSPECGenerator {
 			}finally{
 				if(hcafViewTable!=null) session.dropTable(hcafViewTable);
 				if(occurrenceCellsViewTable!=null) session.dropTable(occurrenceCellsViewTable);
-				session.close();
+				if(session!=null) session.close();
 			}
 			logger.trace("generation of HSPEC finished in "+((System.currentTimeMillis()-generationStart)/1000)+"secs");
 		}

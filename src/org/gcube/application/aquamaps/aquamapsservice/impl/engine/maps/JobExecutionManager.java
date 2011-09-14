@@ -85,7 +85,7 @@ public class JobExecutionManager {
 
 
 		logger.trace("Looking for existing obj requests...");			
-		int objCount=SubmittedManager.getCount(pendingObjFilter);
+		Integer objCount=SubmittedManager.getCount(pendingObjFilter).intValue();
 		insertedObjects=new Semaphore(objCount);
 		logger.trace("Found "+objCount+" requests");
 
@@ -94,7 +94,7 @@ public class JobExecutionManager {
 		List<Field> jobfilter=new ArrayList<Field>();
 		jobfilter.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
 		jobfilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Pending+"",FieldType.STRING));
-		int jobCount=SubmittedManager.getCount(jobfilter);
+		int jobCount=SubmittedManager.getCount(jobfilter).intValue();
 		insertedJobs=new Semaphore(jobCount);
 		logger.trace("Found "+jobCount+" requests");
 

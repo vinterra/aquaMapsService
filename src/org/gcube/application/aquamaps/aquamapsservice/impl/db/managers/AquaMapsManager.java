@@ -49,7 +49,7 @@ public class AquaMapsManager extends SubmittedManager{
 			session.commit();
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null)session.close();}
 		
 	}
 

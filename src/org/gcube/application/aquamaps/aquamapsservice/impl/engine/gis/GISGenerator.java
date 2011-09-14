@@ -162,7 +162,7 @@ public class GISGenerator implements Generator{
 					logger.error("Unable to create Layer ", e);
 					throw e;
 				}finally {
-					session.close();
+					if(session!=null) session.close();
 				}
 			}
 			}else{

@@ -37,113 +37,12 @@ public class ServiceContext extends GCUBEServiceContext {
 		//********PUBLISHER
 	private Publisher publisher;
 
-//	private String httpServerBasePath; 
-//	private int httpServerPort;
 	
-//	private String webServerUrl=null;
-//	private String internaldbUsername;
-//	private String internaldbPassword;
-//	private DBType internalDBType;
-//	private String internalDBName;
-//	private String internalDBPort;
-//	private String internalDBHost;
-//	
-//	
-//	private int queueSize;
-//	private int coreSize;
-//	private int maxSize;
-//	private long waitIdleTime;
-//	
-//	
-//	private  String postGis_dbtype;
-//	private  String postGis_host;
-//	private  String postGis_port;
-//	private  String postGis_database;
-//	private  String postGis_user; 
-//	private  String postGis_passwd;
-//	
-//	
-//	private String worldTable;
-//	private String geoServerUrl;
-//	private String geoServerUser;
-//	private String geoServerPwd;
-//	private String geoServerWorkspace;
-//
-//	private String templateGroup;
-//	
-//	private String distributionDefaultStyle;
-//	
-//	private boolean GISMode;
-//	private boolean standAloneMode;
-//	private boolean useDummyPublisher;
-//	private boolean useEnvironmentModelingLib;
-//	private boolean enableScriptLogging;
-//	private boolean postponeSubmission;
-//	
-//	private String defaultPublisherUrl;
-//	
-//	
-//	
-//	
-//	
-//	private long monitorInterval;
-//	private long monitorThreshold;
-//	
-//	//************ ALGORITHM
-//	
-//	private boolean evaluateDepth;
-//	private boolean evaluateTemperature;
-//	private boolean evaluateSalinity;
-//	private boolean evaluatePrimaryProduction;
-//	private boolean evaluateIceConcentration;
-//	private boolean evaluateLandDistance;
-//	
-//	
-//	//************ DEFAULT VALUES FOR DB
-//	
-//	private String integerDefault=null;
-//	private String doubleDefault=null;
-//	private String booleanDefault=null;
-//	
-//	//************ DEFAULT SOURCES
-//	
-//	private Integer defaultHSPENID=null;
-//	private Integer defaultHSPECID=null;
-//	private Integer defaultHCAFID=null;
-//	
-//	
-//	//************ Environmental library config
-//	
-//	private Integer BATCH_POOL_SIZE=null;
-//	
 	
 
 	protected void onReady() throws Exception{
 		
 		
-//		File serverPathDir= new File(this.getPersistenceRoot()+File.separator+httpServerBasePath);
-//		if(!serverPathDir.exists())
-//			serverPathDir.mkdirs();
-//				
-//		webServerUrl="http://"+GHNContext.getContext().getHostname()+":"+httpServerPort+"/";
-//		logger.debug("WEBSERVER URL: "+this.webServerUrl);
-//
-//		//initializing jetty
-//		Connector connector = new SelectChannelConnector();
-//		connector.setPort(httpServerPort);
-//		Server server = new Server(httpServerPort);
-//		server.setConnectors(new Connector[]{connector});
-//		ResourceHandler resourceHandler = new ResourceHandler();
-//		resourceHandler.setResourceBase(serverPathDir.getAbsolutePath());
-//		try {
-//			logger.debug("HTTP Server Base Path : " + resourceHandler.getBaseResource().getFile().getAbsolutePath());
-//		} catch (IOException e) {
-//			logger.error(e);
-//		}
-//		server.setHandler(resourceHandler);
-//		//starting the web server
-//		server.start();
-//	
 		
 //		//Monitoring
 		StatusMonitorThread t=new StatusMonitorThread(getPropertyAsInteger(PropertiesConstants.MONITOR_INTERVAL),
@@ -176,7 +75,7 @@ public class ServiceContext extends GCUBEServiceContext {
 				logger.trace("Publisher is Embedded");
 				setPublisher(new EmbeddedPublisher(
 						getPersistenceRoot().getAbsolutePath(),
-						ServiceContext.getContext().getFile("publisher", false).getAbsolutePath()+File.separator,						
+						getPublisherConfigDir().getAbsolutePath()+File.separator,						
 						(String) this.getProperty("httpServerBasePath", true),
 						Integer.parseInt((String)this.getProperty("httpServerPort",true))));
 				}else {
@@ -231,4 +130,10 @@ public class ServiceContext extends GCUBEServiceContext {
 		return publisher;
 	}
     
+	public File getPublisherConfigDir(){
+		return ServiceContext.getContext().getFile("publisher", false);
+	}
+	public File getEcoligicalConfigDir(){
+		return ServiceContext.getContext().getFile("generator", false);
+	} 
 }

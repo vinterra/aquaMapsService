@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +10,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManag
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.envelope.SpEnvelope;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.SimpleGenerator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.SimpleGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
@@ -110,8 +112,17 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 				species.getFieldbyName(HspenFields.layer+"").setValue("b");
 			else species.getFieldbyName(HspenFields.layer+"").setValue("u");
  			
-			SpEnvelope envelope=new SpEnvelope();
-			envelope.reCalculate(species, foundCells);
+			
+			
+			
+//			SpEnvelope envelope=new SpEnvelope();
+//			envelope.reCalculate(species, foundCells);
+			
+			SimpleGeneratorI generator=new SimpleGenerator(ServiceContext.getContext().getEcoligicalConfigDir().getAbsolutePath()+File.separator);
+			
+			
+			for(Field f:generator.getEnvelope(species, foundCells))species.addField(f);
+			
 			
 			return species.extractEnvelope().toFieldArray();
 		} catch (Exception e){
@@ -128,8 +139,14 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			Set<Cell> selected=CellManager.getCellsByIds(true,request.getSpeciesID(),true,SourceManager.getDefaultId(ResourceType.HCAF),
 					request.getCellIds().getItems());
 			Species spec=SpeciesManager.getSpeciesById(true,true,request.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HSPEN));
-			SpEnvelope envelope=new SpEnvelope();
-			envelope.reCalculate(spec, selected);
+//			SpEnvelope envelope=new SpEnvelope();
+//			envelope.reCalculate(spec, selected);
+			
+			SimpleGeneratorI generator=new SimpleGenerator(ServiceContext.getContext().getEcoligicalConfigDir().getAbsolutePath()+File.separator);
+			
+			
+			for(Field f:generator.getEnvelope(spec, selected))spec.addField(f);
+			
 			
 			return spec.extractEnvelope().toFieldArray();
 		} catch (Exception e){

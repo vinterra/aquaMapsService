@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 import java.io.File;
 import java.util.List;
 
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
@@ -21,5 +22,10 @@ public interface DataManagementInterface {
 	public Resource updateResource(Resource toUpdate)throws Exception;
 	public void deleteResource(int resourceId)throws Exception;
 	public File exportResource(int resourceId)throws Exception;
-	public String queryResource(String query, PagedRequestSettings settings)throws Exception;
+	public void setCustomQuery(String userId,String queryString)throws Exception;
+	public Boolean deleteCustomQuery(String userId)throws Exception;
+	public String viewCustomQuery(String userId,PagedRequestSettings settings)throws Exception;
+	public Integer importResource(File toImport,String userId, ResourceType type) throws Exception;
+	public Integer getImportStatus(Integer resourceId)throws Exception;
+	public List<Field> getCustomQueryFields(String userId)throws Exception;
 }

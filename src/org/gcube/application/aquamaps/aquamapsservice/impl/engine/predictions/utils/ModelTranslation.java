@@ -1,7 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.utils;
 
-import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
+import java.util.ArrayList;
+
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
+import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
@@ -95,6 +99,51 @@ public class ModelTranslation {
 		return toReturn;
 	}
 	
-	
+	public static ArrayList<Field> Hspen2Fields(Hspen hspen){
+		ArrayList<Field> toReturn=new ArrayList<Field>();
+		toReturn.add(new Field(HspenFields.depthmin+"",hspen.getDepth().getMin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.depthprefmin+"",hspen.getDepth().getPrefmin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.depthprefmax+"",hspen.getDepth().getPrefmax(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.depthmax+"",hspen.getDepth().getMax(),FieldType.DOUBLE));
+		
+		toReturn.add(new Field(HspenFields.iceconmin+"",hspen.getIceConcentration().getMin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.iceconprefmin+"",hspen.getIceConcentration().getPrefmin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.iceconprefmax+"",hspen.getIceConcentration().getPrefmax(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.iceconmax+"",hspen.getIceConcentration().getMax(),FieldType.DOUBLE));
+		
+		toReturn.add(new Field(HspenFields.landdistmin+"",hspen.getLandDistance().getMin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.landdistprefmin+"",hspen.getLandDistance().getPrefmin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.landdistprefmax+"",hspen.getLandDistance().getPrefmax(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.landdistmax+"",hspen.getLandDistance().getMax(),FieldType.DOUBLE));
+		
+		toReturn.add(new Field(HspenFields.tempmin+"",hspen.getTemperature().getMin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.tempprefmin+"",hspen.getTemperature().getPrefmin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.tempprefmax+"",hspen.getTemperature().getPrefmax(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.tempmax+"",hspen.getTemperature().getMax(),FieldType.DOUBLE));
+		
+		toReturn.add(new Field(HspenFields.primprodmin+"",hspen.getPrimaryProduction().getMin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.primprodmin+"",hspen.getPrimaryProduction().getPrefmin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.primprodprefmax+"",hspen.getPrimaryProduction().getPrefmax(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.primprodmax+"",hspen.getPrimaryProduction().getMax(),FieldType.DOUBLE));
+		
+		toReturn.add(new Field(HspenFields.salinitymin+"",hspen.getSalinity().getMin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.salinitymin+"",hspen.getSalinity().getPrefmin(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.salinityprefmax+"",hspen.getSalinity().getPrefmax(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.salinitymax+"",hspen.getSalinity().getMax(),FieldType.DOUBLE));
+		
+		
+		toReturn.add(new Field(HspenFields.emostlong+"",hspen.getCoordinates().getEMostLong(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.wmostlong+"",hspen.getCoordinates().getWMostLong(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.nmostlat+"",hspen.getCoordinates().getNMostLat(),FieldType.DOUBLE));
+		toReturn.add(new Field(HspenFields.smostlat+"",hspen.getCoordinates().getSMostLat(),FieldType.DOUBLE));
+		
+		toReturn.add(new Field(HspenFields.faoareas+"",hspen.getFaoAreas()+"",FieldType.STRING));
+
+		toReturn.add(new Field(HspenFields.pelagic+"",hspen.isPelagic()+"",FieldType.BOOLEAN));
+		
+		toReturn.add(new Field(HspenFields.layer+"",hspen.getLayer()+"",FieldType.STRING));
+		
+		return toReturn;
+	}
 	
 }

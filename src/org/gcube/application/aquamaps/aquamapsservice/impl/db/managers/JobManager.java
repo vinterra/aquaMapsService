@@ -85,7 +85,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -103,7 +103,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -140,7 +140,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	public static void addToDeleteTempFolder(int jobId,String folderName)throws Exception{
@@ -170,7 +170,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -195,7 +195,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	public static String[] getSpeciesByStatus(int jobId,SpeciesStatus status)throws Exception{
@@ -215,7 +215,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	public static boolean isJobComplete(int jobId) throws Exception{
@@ -239,7 +239,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	public static void cleanTemp(int jobId)throws Exception{
@@ -293,7 +293,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	public static boolean isSpeciesListReady(int jobId,Set<String> toCheck)throws Exception{
@@ -316,7 +316,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -374,7 +374,7 @@ public class JobManager extends SubmittedManager{
 			logger.error("unable to check species customization flag",e);
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -574,7 +574,7 @@ public class JobManager extends SubmittedManager{
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 

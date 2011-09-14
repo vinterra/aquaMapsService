@@ -29,8 +29,21 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public abstract class DBSession {
 
 	protected static GCUBELog logger= new GCUBELog(DBSession.class);
-
-
+	protected static String DEFAULT_BOOLEAN_VALUE=null;
+	protected static String DEFAULT_INTEGER_VALUE=null;
+	protected static String DEFAULT_LONG_VALUE=null;
+	protected static String DEFAULT_DOUBLE_VALUE=null;
+	static{
+		try{
+			DEFAULT_BOOLEAN_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.BOOLEAN_DEFAULT_VALUE);
+			DEFAULT_DOUBLE_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.DOUBLE_DEFAULT_VALUE);
+			DEFAULT_INTEGER_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.INTEGER_DEFAULT_VALUE);
+			DEFAULT_LONG_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.INTEGER_DEFAULT_VALUE);
+		}catch(Exception e){
+			logger.fatal("Unable to evaluate DB default values",e);
+		}
+	}
+	
 	
 	
 	protected Connection connection;
@@ -187,6 +200,13 @@ public abstract class DBSession {
 		statement.close();
 	}
 
+	public void dropView(String view) throws Exception{
+		Statement statement = connection.createStatement();
+		statement.executeUpdate("DROP VIEW IF EXISTS "+view+" ");
+		statement.close();
+	}
+	
+	
 //	public List<List<String>> showTableMetadata(String tableName, String... whereClause) throws Exception{
 //		String query="SHOW COLUMNS FROM "+tableName+" "+((whereClause!=null && whereClause.length>0)?"WHERE "+whereClause[0]:"")+";";
 //		logger.debug("executing query: "+query);
@@ -283,16 +303,16 @@ public abstract class DBSession {
 	public abstract ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, OrderDirection orderMode)throws Exception;
 
 
-	public abstract int getCount(String tableName, List<Field> filters) throws Exception;
+	public abstract Long getCount(String tableName, List<Field> filters) throws Exception;
 	public abstract int deleteOperation(String tableName, List<Field> filters) throws Exception;
 
 
-	public int getTableCount(String tableName) throws Exception{
+	public long getTableCount(String tableName) throws Exception{
 		Statement statement = connection.createStatement();
 		ResultSet rs =statement.executeQuery("SELECT COUNT(*) FROM "+tableName);
-		int value=0;
+		long value=0l;
 		if(rs.next())
-			value=rs.getInt(1);
+			value=rs.getLong(1);
 		
 		statement.close();
 		return value;
@@ -328,8 +348,8 @@ public abstract class DBSession {
 	protected static String formSelectQueryStringFromFields(List<Field> filters,String table,String sortColumn,OrderDirection sortDirection){
 		String toReturn="SELECT * FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
-		((sortColumn!=null)?" ORDER BY "+sortColumn+" "+sortDirection:"");
-//		logger.debug("QUERY STRING IS : "+toReturn);
+		((sortColumn!=null&&!sortColumn.equalsIgnoreCase("null"))?" ORDER BY "+sortColumn+" "+sortDirection:"");
+		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 
@@ -337,7 +357,7 @@ public abstract class DBSession {
 	protected static String formSelectDistinctQueryStringFromFields(List<Field> filters,Field toSelectField,String table,String sortColumn,OrderDirection sortDirection){
 		String toReturn="SELECT DISTINCT("+toSelectField.getName()+") FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
-		((sortColumn!=null)?" ORDER BY "+sortColumn+" "+sortDirection:"");
+		((sortColumn!=null&&!sortColumn.equalsIgnoreCase("null"))?" ORDER BY "+sortColumn+" "+sortDirection:"");
 		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
@@ -354,7 +374,7 @@ public abstract class DBSession {
 	protected static String formUpdateQuery(List<Field> toSet, List<Field> keys,String tableName){
 		String toReturn="UPDATE "+tableName+" SET "+getCondition(toSet,",")+
 		(((keys!=null)&&keys.size()>0)?" WHERE "+getCondition(keys,"AND"):"");
-//		logger.debug("QUERY STRING IS : "+toReturn);
+		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 	

@@ -127,9 +127,9 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
-			<xsd:complexType name="queryResourceRequestType">
+			<xsd:complexType name="viewCustomQueryRequestType">
 				<xsd:sequence>
-					<xsd:element name="queryString" type="xsd:string"/>
+					<xsd:element name="user" type="xsd:string"/>
 					<xsd:element name="sortColumn" type="xsd:string" />
 					<xsd:element name="sortDirection" type="xsd:string" />
 					<xsd:element name="limit" type="xsd:int" />
@@ -137,8 +137,20 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
+			<xsd:complexType name="setUserCustomQueryRequestType">
+				<xsd:sequence>
+					<xsd:element name="user" type="xsd:string"/>
+					<xsd:element name="queryString" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
 			
-			
+			<xsd:complexType name="importResourceRequestType">
+				<xsd:sequence>
+					<xsd:element name="user" type="xsd:string"/>
+					<xsd:element name="resourceType" type="xsd:string"/>					
+					<xsd:element name="locator" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
 
 			<!-- Data management request elements -->
 
@@ -189,8 +201,23 @@
 			<xsd:element name="exportResourceRequest" type="xsd:int"/>
 			<xsd:element name="exportResourceResponse" type="xsd:string"/>
 			
-			<xsd:element name="queryResourceRequest" type="tns:queryResourceRequestType"/>
-			<xsd:element name="queryResourceResponse" type="xsd:string"/>
+			<xsd:element name="viewCustomQueryRequest" type="tns:viewCustomQueryRequestType"/>
+			<xsd:element name="viewCustomQueryResponse" type="xsd:string"/>
+			
+			<xsd:element name="setCustomQueryRequest" type="tns:setUserCustomQueryRequestType"/>
+			<xsd:element name="setCustomQueryResponse" type="coretypes:VOID"/>
+			
+			<xsd:element name="deleteCustomQueryRequest" type="xsd:string"/>
+			<xsd:element name="deleteCustomQueryResponse" type="xsd:boolean"/>
+			
+			<xsd:element name="importResourceRequest" type="tns:importResourceRequestType"/>
+			<xsd:element name="importResourceResponse" type="xsd:int"/>
+			
+			<xsd:element name="getImportStatusRequest" type="xsd:int"/>
+			<xsd:element name="getImportStatusResponse" type="xsd:int"/>
+			
+			<xsd:element name="isCustomQueryReadyRequest" type ="xsd:string"/>
+			<xsd:element name="isCustomQueryReadyResponse" type ="aqtypes:fieldArray"/>
 			
 		</xsd:schema>
 	</types>
@@ -297,13 +324,45 @@
 		<part name="response" element="tns:exportResourceResponse" />
 	</message>
 
-	<message name="QueryResourceRequest">
-		<part name="request" element="tns:queryResourceRequest" />
+	<message name="ViewCustomQueryRequest">
+		<part name="request" element="tns:viewCustomQueryRequest" />
 	</message>
-	<message name="QueryResourceResponse">
-		<part name="response" element="tns:queryResourceResponse" />
+	<message name="ViewCustomQueryResponse">
+		<part name="response" element="tns:viewCustomQueryResponse" />
+	</message>
+	<message name="SetCustomQueryRequest">
+		<part name="request" element="tns:setCustomQueryRequest" />
+	</message>
+	<message name="SetCustomQueryResponse">
+		<part name="response" element="tns:setCustomQueryResponse" />
+	</message>
+	<message name="DeleteCustomQueryRequest">
+		<part name="request" element="tns:deleteCustomQueryRequest" />
+	</message>
+	<message name="DeleteCustomQueryResponse">
+		<part name="response" element="tns:deleteCustomQueryResponse" />
 	</message>
 
+
+	<message name="ImportResourceRequest">
+		<part name="request" element="tns:importResourceRequest" />
+	</message>
+	<message name="ImportResourceResponse">
+		<part name="response" element="tns:importResourceResponse" />
+	</message>
+	<message name="GetImportStatusRequest">
+		<part name="request" element="tns:getImportStatusRequest" />
+	</message>
+	<message name="GetImportStatusResponse">
+		<part name="response" element="tns:getImportStatusResponse" />
+	</message>
+
+	<message name="IsCustomQueryReadyRequest">
+		<part name="request" element="tns:isCustomQueryReadyRequest" />
+	</message>
+	<message name="IsCustomQueryReadyResponse">
+		<part name="response" element="tns:isCustomQueryReadyResponse" />
+	</message>
 
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
@@ -377,10 +436,36 @@
 			<wsdl:output message="tns:ExportResourceResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		<wsdl:operation name="QueryResource">
-			<wsdl:input message="tns:QueryResourceRequest" />
-			<wsdl:output message="tns:QueryResourceResponse" />
+		<wsdl:operation name="ViewCustomQuery">
+			<wsdl:input message="tns:ViewCustomQueryRequest" />
+			<wsdl:output message="tns:ViewCustomQueryResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		<wsdl:operation name="SetCustomQuery">
+			<wsdl:input message="tns:SetCustomQueryRequest" />
+			<wsdl:output message="tns:SetCustomQueryResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="DeleteCustomQuery">
+			<wsdl:input message="tns:DeleteCustomQueryRequest" />
+			<wsdl:output message="tns:DeleteCustomQueryResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ImportResource">
+			<wsdl:input message="tns:ImportResourceRequest" />
+			<wsdl:output message="tns:ImportResourceResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetImportStatus">
+			<wsdl:input message="tns:GetImportStatusRequest" />
+			<wsdl:output message="tns:GetImportStatusResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="IsCustomQueryReady">
+			<wsdl:input message="tns:IsCustomQueryReadyRequest" />
+			<wsdl:output message="tns:IsCustomQueryReadyResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		
 	</portType>
 </definitions>

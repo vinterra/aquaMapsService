@@ -68,6 +68,8 @@ public class WrapperTest {
 			}
 		}
 			
+		System.out.println(wrapper.loadResource(113, ResourceType.OCCURRENCECELLS));
+		
 		
 //		Envelope env=new Envelope();
 //		env=wrapper.calculateEnvelope(new BoundingBox(),DummyObjects.getAreaSelection(),DummyObjects.getSpeciesBasket().iterator().next().getId(),true, true, true);
@@ -100,7 +102,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(373832)));
+//		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(373832)));
 		
 		
 		

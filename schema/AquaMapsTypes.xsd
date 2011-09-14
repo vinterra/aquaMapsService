@@ -74,6 +74,7 @@
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="algorithm" type="xsd:string" />
 				 	<xsd:element name="defaultSource" type="xsd:boolean"/>
+				 	<xsd:element name="percent" type="xsd:long"/>
 				</xsd:sequence>
 			</xsd:complexType>
 

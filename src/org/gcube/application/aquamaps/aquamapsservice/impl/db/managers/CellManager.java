@@ -43,7 +43,7 @@ public class CellManager {
 
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 
@@ -53,7 +53,7 @@ public class CellManager {
 			session=DBSession.getInternalDBSession();
 			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), HCAF_S, settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	public static String getJSONOccurrenceCells(String speciesId, PagedRequestSettings settings) throws Exception{
@@ -68,7 +68,7 @@ public class CellManager {
 					"o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+" WHERE o."+SpeciesOccursumFields.speciesid+" = ?");
 			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	public static Set<Cell> getCellsByIds(boolean fetchGoodCells,String speciesID, boolean fetchEnvironment,int HcafId, String[] items) throws Exception{
@@ -96,7 +96,7 @@ public class CellManager {
 			return toReturn;
 
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 
@@ -119,7 +119,7 @@ public class CellManager {
 			}
 			return toUpdate;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	private static Set<Cell> loadGoodCellsData(String speciesID, Set<Cell> toUpdate)throws Exception{
@@ -141,7 +141,7 @@ public class CellManager {
 			}
 			return toUpdate;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	public static Set<Cell> calculateGoodCells(BoundingBox bb, List<Area> areas, String speciesID, int hcafId)throws Exception{
@@ -178,7 +178,7 @@ public class CellManager {
 			toReturn=loadEnvironmentData(hcafId, toReturn);
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 
 	private static boolean isInBoundingBox(Cell c,BoundingBox bb){

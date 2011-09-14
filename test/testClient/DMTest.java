@@ -12,6 +12,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequest
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
@@ -38,17 +39,25 @@ public class DMTest {
 //				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
 //				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");
 		
-
+//
 //		System.out.println("Query Resource :");
-//		System.out.println(dmInterface.queryResource("Select * from hspen where pelagic = 1", new PagedRequestSettings(2, 0, HspenFields.depthmax+"", OrderDirection.ASC)));
-		
+//		System.out.println(dmInterface.queryResource("Select * from hspen where pelagic = 1", new PagedRequestSettings(2, 0, null, OrderDirection.ASC)));
+//		
 		
 		System.out.println("Export Resource :");
 
-		File csv=dmInterface.exportResource(93);
+		File csv=dmInterface.exportResource(109);
 		
-		csv.renameTo(new File("exported.csv"));
-		System.out.println("Exported to exported.csv"); 
+		csv.renameTo(new File("exported_mini.csv"));
+		
+		System.out.println("Exported to exported_mini.csv"); 
+		
+		
+//		System.out.println("Import Resource :");
+//
+//		System.out.println("ID IS "+dmInterface.importResource(new File("exported.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS));
+		
+		
 		
 		
 //		System.out.println("Delete Resource : ");

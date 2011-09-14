@@ -249,7 +249,7 @@ public class JobWorker extends Thread{
 			//					//load cell
 			//					//insert probability
 			//			
-			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator,
+			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getEcoligicalConfigDir().getAbsolutePath()+File.separator,
 					DBSession.getInternalCredentials());
 			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), AlgorithmType.NativeRange, false, null, 1);
 		}else{

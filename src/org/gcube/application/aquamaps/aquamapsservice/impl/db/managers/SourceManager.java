@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -8,9 +9,11 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceStatus;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
@@ -48,14 +51,14 @@ public class SourceManager {
 			if(found.isEmpty()) throw new Exception("No Default Found for type "+type);
 			else return found.iterator().next().getSearchId();
 		}catch(Exception e){throw e;}
-		finally{if(session!=null)session.close();}
+		finally{if(session!=null)if(session!=null) session.close();}
 	}
 	
 	
 	
 	public static Resource registerSource(Resource toRegister)throws Exception{
 		DBSession session=null;
-		logger.trace("registering source "+toRegister.getTableName()+" ("+toRegister.getType()+")");
+		logger.trace("registering source "+toRegister);
 //		String toSetSourceName=null;
 //		try{
 //			toRegister.setSgetSourceName(sourceType, toSetSourceId);
@@ -79,10 +82,13 @@ public class SourceManager {
 			row.add(toRegister.getField(MetaSourceFields.sourcehspectable));
 			row.add(toRegister.getField(MetaSourceFields.sourcehspen));
 			row.add(toRegister.getField(MetaSourceFields.sourcehspentable));
+			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecells));
+			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecellstable));
 			row.add(toRegister.getField(MetaSourceFields.status));
 			row.add(toRegister.getField(MetaSourceFields.tablename));
 			row.add(toRegister.getField(MetaSourceFields.title));
 			row.add(toRegister.getField(MetaSourceFields.type));
+			row.add(toRegister.getField(MetaSourceFields.rowcount));
 			rows.add(row);
 			List<List<Field>> ids = session.insertOperation(sourcesTable, rows);
 			for(Field f: ids.get(0)) 
@@ -92,7 +98,7 @@ public class SourceManager {
 		}catch(Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	
@@ -109,7 +115,7 @@ public class SourceManager {
 		}catch(Exception e){
 			throw e;			
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	
@@ -144,7 +150,7 @@ public class SourceManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	private static void updateField(int id, MetaSourceFields field, FieldType objectType,Object value)throws Exception{
@@ -163,7 +169,7 @@ public class SourceManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	
@@ -171,14 +177,16 @@ public class SourceManager {
 	public static void setTableTitle(int id, String tableTitle)throws Exception{
 		updateField( id, MetaSourceFields.title, FieldType.STRING,tableTitle);
 	}
-	
+	public static void setCountRow(int id, Long count)throws Exception{
+		updateField( id, MetaSourceFields.rowcount, FieldType.INTEGER,count);
+	}
 	public static Set<Resource> getList(List<Field> filter)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
 			return loadRS((session.executeFilteredQuery(filter, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC)));
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	public static String getJsonList(List<Field> filter, PagedRequestSettings settings)throws Exception{
 		DBSession session=null;
@@ -186,7 +194,7 @@ public class SourceManager {
 			session=DBSession.getInternalDBSession();
 			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	private static Set<Resource> loadRS(ResultSet rs) throws Exception{
@@ -207,7 +215,7 @@ public class SourceManager {
 			filters.add(new Field(MetaSourceFields.searchid+"",id+"",FieldType.INTEGER));
 			return loadRS(session.executeFilteredQuery(filters, sourcesTable, MetaSourceFields.searchid+"", OrderDirection.ASC)).iterator().next();
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -233,6 +241,8 @@ public class SourceManager {
 			value.add(toUpdate.getField(MetaSourceFields.description));
 			value.add(toUpdate.getField(MetaSourceFields.disclaimer));
 			value.add(toUpdate.getField(MetaSourceFields.defaultsource));
+			value.add(toUpdate.getField(MetaSourceFields.status));
+			value.add(toUpdate.getField(MetaSourceFields.rowcount));
 			values.add(value);
 			List<List<Field>> keys=new ArrayList<List<Field>>();
 			List<Field> key=new ArrayList<Field>();
@@ -242,8 +252,34 @@ public class SourceManager {
 			session.commit();
 			return rows;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
+	
+	public static Integer importFromCSVFile(final File csvFile,final String author,final ResourceType type)throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();
+			logger.debug("Importing "+csvFile.getAbsolutePath()+" to TABLE "+tableName+" [ "+type+" ]");
+			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());
+			
+			Resource toRegister=new Resource(type, 0);
+			toRegister.setAuthor(author);
+			toRegister.setDefaultSource(false);
+			toRegister.setGenerationTime(System.currentTimeMillis());
+			toRegister.setDescription("Imported csv file ");
+			toRegister.setTableName(tableName);
+			toRegister.setTitle("Import_"+author);
+			toRegister.setStatus(ResourceStatus.Importing);
+			toRegister.setRowCount(0l);
+			toRegister=registerSource(toRegister);
+			SourceImporter t=new SourceImporter(csvFile, toRegister.getSearchId());
+			t.start();
+			return toRegister.getSearchId();
+		}catch(Exception e){throw e;}
+		finally{if(session!=null) session.close();}
+	}
+	
 	
 }
 
