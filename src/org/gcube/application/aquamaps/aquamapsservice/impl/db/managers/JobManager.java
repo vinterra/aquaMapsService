@@ -454,10 +454,10 @@ public class JobManager extends SubmittedManager{
 			for(Species s:toPerform.getSelectedSpecies()){
 				Species updated=SpeciesManager.getSpeciesById(true, false, s.getId(), toPerform.getSourceHSPEN().getSearchId());
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.kingdom+""));
-				s.addField(updated.getFieldbyName(SpeciesOccursumFields.order+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.ordercolumn+""));
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.phylum+""));
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.classcolumn+""));
-				s.addField(updated.getFieldbyName(SpeciesOccursumFields.family+""));
+				s.addField(updated.getFieldbyName(SpeciesOccursumFields.familycolumn+""));
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.species+""));
 				s.addField(updated.getFieldbyName(SpeciesOccursumFields.genus+""));
 				for(AquaMapsObject obj:toPerform.getAquaMapsObjectList())

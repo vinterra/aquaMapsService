@@ -241,6 +241,7 @@ public class SpeciesManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
+			
 			return DBUtils.toJSon(session.getDistinct(toSelect, filters, speciesOccurSum, 
 					settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
