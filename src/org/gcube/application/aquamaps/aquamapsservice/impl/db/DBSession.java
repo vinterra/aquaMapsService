@@ -349,7 +349,7 @@ public abstract class DBSession {
 		String toReturn="SELECT * FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
 		((sortColumn!=null&&!sortColumn.equalsIgnoreCase("null"))?" ORDER BY "+sortColumn+" "+sortDirection:"");
-		logger.debug("QUERY STRING IS : "+toReturn);
+//		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 
@@ -358,7 +358,7 @@ public abstract class DBSession {
 		String toReturn="SELECT DISTINCT("+toSelectField.getName()+") FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
 		((sortColumn!=null&&!sortColumn.equalsIgnoreCase("null"))?" ORDER BY "+sortColumn+" "+sortDirection:"");
-		logger.debug("QUERY STRING IS : "+toReturn);
+//		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 	

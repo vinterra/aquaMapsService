@@ -219,6 +219,9 @@
 			<xsd:element name="isCustomQueryReadyRequest" type ="xsd:string"/>
 			<xsd:element name="isCustomQueryReadyResponse" type ="aqtypes:fieldArray"/>
 			
+			<xsd:element name="exportTableAsCSVRequest" type="xsd:string"/>
+			<xsd:element name="exportTableAsCSVResponse" type="xsd:string" />
+			
 		</xsd:schema>
 	</types>
 
@@ -317,7 +320,7 @@
 		<part name="response" element="tns:removeResourceResponse" />
 	</message>
 
-<message name="ExportResourceRequest">
+	<message name="ExportResourceRequest">
 		<part name="request" element="tns:exportResourceRequest" />
 	</message>
 	<message name="ExportResourceResponse">
@@ -363,6 +366,14 @@
 	<message name="IsCustomQueryReadyResponse">
 		<part name="response" element="tns:isCustomQueryReadyResponse" />
 	</message>
+
+	<message name="ExportTableAsCSVRequest">
+		<part name="request" element="tns:exportTableAsCSVRequest" />
+	</message>
+	<message name="ExportTableAsCSVResponse">
+		<part name="response" element="tns:exportTableAsCSVResponse" />
+	</message>
+
 
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
@@ -466,6 +477,10 @@
 			<wsdl:output message="tns:IsCustomQueryReadyResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		
+		<wsdl:operation name="ExportTableAsCSV">
+			<wsdl:input message="tns:ExportTableAsCSVRequest" />
+			<wsdl:output message="tns:ExportTableAsCSVResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
 	</portType>
 </definitions>

@@ -23,6 +23,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListReque
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
 import org.gcube.application.aquamaps.dataModel.AquaMap;
 import org.gcube.application.aquamaps.dataModel.FieldArray;
 import org.gcube.application.aquamaps.dataModel.Types.AreaType;
@@ -42,6 +43,7 @@ import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
+import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
 
@@ -335,6 +337,26 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}catch(Exception e){
 			logger.error("",e);
 			throw new GCUBEFault("Impossible to load Object from Publisher : "+e.getMessage());
+		}
+	}
+
+	@Override
+	public String getSpeciesByFiltersASCSV(GetSpeciesByFiltersRequestType arg0)
+			throws RemoteException, GCUBEFault {
+		logger.trace("Serving getSpecies by filters");
+		
+		try{
+			File toExport=SpeciesManager.getCSVList(Field.load(arg0.getCharacteristicFilters()), Filter.load(arg0.getNameFilters()), Filter.load(arg0.getCodeFilters()), arg0.getHspen());
+			GCUBEScope scope=ServiceContext.getContext().getScope();
+			logger.trace("Caller scope is "+scope);
+			RSWrapper wrapper=new RSWrapper(scope);
+			wrapper.add(toExport);
+			String locator = wrapper.getLocator().toString();
+			logger.trace("Added file to locator "+locator);
+			return locator;
+		} catch (Exception e){
+			logger.error("General Exception, unable to serve request",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
 

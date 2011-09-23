@@ -111,9 +111,8 @@ public class AquaMapsObjectWorker extends Thread {
 					}
 
 					/// *************************** GIS GENERATION
-
+					logger.trace("Object "+aquamapsName+" ID "+aquamapsId+" GIS is : "+gisEnabled);
 					if(gisEnabled){
-						logger.trace(aquamapsName+"is gisEnabled");
 
 						Resource hcaf= new Resource (ResourceType.HCAF,SubmittedManager.getHCAFTableId(jobId));
 						Resource hspen=new Resource (ResourceType.HSPEN,SubmittedManager.getHSPENTableId(jobId));
@@ -181,9 +180,9 @@ public class AquaMapsObjectWorker extends Thread {
 
 
 				/// *************************** GIS GENERATION
-
+				logger.trace("Object "+aquamapsName+" ID "+aquamapsId+" GIS is : "+gisEnabled);
 				if(gisEnabled){
-
+					
 					Resource hcaf= new Resource (ResourceType.HCAF,SubmittedManager.getHCAFTableId(jobId));
 					Resource hspen=new Resource (ResourceType.HSPEN,SubmittedManager.getHSPENTableId(jobId));
 					ArrayList<String> layersId=new ArrayList<String>();

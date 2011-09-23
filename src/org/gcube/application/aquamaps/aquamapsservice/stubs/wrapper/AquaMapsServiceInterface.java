@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +47,8 @@ public interface AquaMapsServiceInterface {
 
 	public String getJSONSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception;
 
+	public File getCSVSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes)throws Exception;
+	
 	public Species loadEnvelope(String speciesId, int hspenId)throws Exception;
 
 	public void markSaved(List<Integer> submittedIds)throws Exception;

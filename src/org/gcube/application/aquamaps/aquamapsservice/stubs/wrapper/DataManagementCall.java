@@ -291,4 +291,15 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
+	
+	@Override
+	public File exportTableAsCSV(String table) throws Exception {
+		try{
+			String locator=pt.exportTableAsCSV(table);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
 }

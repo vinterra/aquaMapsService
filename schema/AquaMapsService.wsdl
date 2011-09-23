@@ -181,6 +181,11 @@
 				<xsd:element name="getSpeciesByFiltersResponse" type="xsd:string" />
 
 
+			<xsd:element name="getSpeciesByFiltersASCSVRequest" type="tns:getSpeciesByFiltersRequestType" />
+
+				<xsd:element name="getSpeciesByFiltersASCSVResponse" type="xsd:string" />
+
+
 			<xsd:element name="getResourceListRequest" type="tns:getResourceListRequestType" />
 
 			<xsd:element name="getResourceListResponse" type="xsd:string" />
@@ -283,6 +288,15 @@
 		<part name="response" element="tns:getSpeciesByFiltersResponse" />
 	</message>
 
+	<message name="GetSpeciesByFiltersASCSVRequest">
+		<part name="request" element="tns:getSpeciesByFiltersASCSVRequest" />
+	</message>
+	<message name="GetSpeciesByFiltersASCSVResponse">
+		<part name="response" element="tns:getSpeciesByFiltersASCSVResponse" />
+	</message>
+
+
+
 	<message name="GetPhylogenyRequest">
 		<part name="request" element="tns:getPhylogenyRequest" />
 	</message>
@@ -382,6 +396,12 @@
 		<wsdl:operation name="getSpeciesByFilters">
 			<input message="tns:GetSpeciesByFiltersRequest" />
 			<output message="tns:GetSpeciesByFiltersResponse" />
+			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
+		</wsdl:operation>
+
+		<wsdl:operation name="getSpeciesByFiltersASCSV">
+			<input message="tns:GetSpeciesByFiltersASCSVRequest" />
+			<output message="tns:GetSpeciesByFiltersASCSVResponse" />
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
 

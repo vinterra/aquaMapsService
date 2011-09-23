@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +23,7 @@ import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {
@@ -101,6 +103,27 @@ public class SpeciesManager {
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}
+	
+	public static File getCSVList(List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
+		String[] queries;
+		String selHspen=SourceManager.getSourceName(HSPENId);
+		queries=formfilterQueries(characteristics, names, codes, selHspen);
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			PreparedStatement psSelection=session.preparedStatement(queries[0]);
+			if(characteristics.size()>0){				
+				psSelection=session.fillParameters(characteristics, 0, psSelection);
+			}
+			File out=File.createTempFile("speciesSelection", ".csv");
+			
+			CSVUtils.resultSetToCSVFile(psSelection.executeQuery(),out.getAbsolutePath(),true);
+			return out;
+		}catch(Exception e){throw e;}
+		finally{if(session!=null) session.close();}
+	}
+	
+	
 	
 	/**
 	 * Creates a query string to filter species against characteristic OR names OR codes filtering

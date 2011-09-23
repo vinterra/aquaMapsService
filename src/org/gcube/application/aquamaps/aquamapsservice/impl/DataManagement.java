@@ -182,7 +182,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			request.setSubmissiontime(System.currentTimeMillis());
 			if(SourceManager.getById(request.getHcafId())==null)throw new Exception("Invalid HCAF id "+request.getHcafId());
 			if(SourceManager.getById(request.getHspenId())==null)throw new Exception("Invalid HSPEN id "+request.getHspenId());
-			if(SourceManager.getById(request.getOccurrenceCellId())==null)throw new Exception("Invalid Occurrence Cells  id "+request.getOccurrenceCellId());
+			if(request.getLogic().equals(LogicType.HSPEN))if(SourceManager.getById(request.getOccurrenceCellId())==null)throw new Exception("Invalid Occurrence Cells  id "+request.getOccurrenceCellId());
 			logger.debug("Received request "+request.toXML());
 			return TableGenerationExecutionManager.insertRequest(request);
 		}catch(Exception e){
@@ -504,6 +504,38 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	
+	@Override
+	public String exportTableAsCSV(String arg0) throws RemoteException,
+			GCUBEFault {
+		DBSession session=null;
+		try{
+			
+			session=DBSession.getInternalDBSession();
+			File out=File.createTempFile(arg0, ".csv");
+			
+			logger.trace("Exporting table "+arg0+" to file "+out);
+			CSVUtils.resultSetToCSVFile(session.executeQuery("Select * from "+arg0),out.getAbsolutePath(),true);
+			
+			GCUBEScope scope=ServiceContext.getContext().getScope();
+			logger.trace("Caller scope is "+scope);
+			RSWrapper wrapper=new RSWrapper(scope);
+			wrapper.add(out);
+			String locator = wrapper.getLocator().toString();
+			logger.trace("Added file to locator "+locator);
+			return locator;
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}finally{
+			if(session!=null)
+				try {
+					session.close();
+				} catch (Exception e) {
+					logger.error("Unexpected error while closing session ",e);
+				}
 		}
 	}
 }

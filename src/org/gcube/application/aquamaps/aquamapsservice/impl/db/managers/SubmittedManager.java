@@ -182,7 +182,7 @@ public class SubmittedManager {
 		updateField(toUpdateId,SubmittedFields.status,FieldType.STRING,statusValue.toString());
 		Boolean postponePublishing=isPostponePublishing(toUpdateId);
 		if(statusValue.equals(SubmittedStatus.Error)||statusValue.equals(SubmittedStatus.Completed)){
-			updateField(toUpdateId,SubmittedFields.endtime,FieldType.INTEGER,System.currentTimeMillis()+"");
+			updateField(toUpdateId,SubmittedFields.endtime,FieldType.LONG,System.currentTimeMillis()+"");
 			Publisher pub=ServiceContext.getContext().getPublisher();
 
 			if(isAquaMap(toUpdateId)){
@@ -328,6 +328,6 @@ public class SubmittedManager {
 	}
 
 	public static void setStartTime(int submittedId)throws Exception{
-		updateField(submittedId,SubmittedFields.starttime,FieldType.INTEGER,System.currentTimeMillis());
+		updateField(submittedId,SubmittedFields.starttime,FieldType.LONG,System.currentTimeMillis());
 	}
 }

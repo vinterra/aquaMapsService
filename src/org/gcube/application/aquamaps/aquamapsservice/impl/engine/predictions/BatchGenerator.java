@@ -11,6 +11,7 @@ import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.ecomodelling.generators.aquamapsorg.MaxMinGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.EnvelopeModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
@@ -173,6 +174,9 @@ public class BatchGenerator implements BatchGeneratorI {
 		//2050 generation flag set to false - default value
 		e.setType2050(is2050);
 		
+		
+		e.setMaxminLatTable("maxminlat_"+hspenTable);
+		
 		e.setGenerator(model);
 		e.setRemoteCalculator(calculatorUrl);
 		e.setServiceUserName(calculationUser);
@@ -234,6 +238,12 @@ public class BatchGenerator implements BatchGeneratorI {
 		eg=new EnvelopeGenerator(e);
 		
 		eg.reGenerateEnvelopes();
+		
+		logger.trace("Generating Max Min table..");
+		
+		MaxMinGenerator maxmin = new MaxMinGenerator(e);
+		maxmin.populatemaxminlat(toGenerate);
+		
 		return toGenerate;
 	}
 	

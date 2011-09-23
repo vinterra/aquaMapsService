@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -307,6 +309,25 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
+	}
+
+	@Override
+	public File getCSVSpecies(int hspenId, List<Field> characteristcs,
+			List<Filter> names, List<Filter> codes) throws Exception {
+		try{
+			GetSpeciesByFiltersRequestType request=new GetSpeciesByFiltersRequestType();
+			request.setCharacteristicFilters(Field.toStubsVersion(characteristcs));
+			request.setCodeFilters(Filter.toStubsVersion(codes));
+			request.setHspen(hspenId);
+			request.setNameFilters(Filter.toStubsVersion(names));			
+					
+			String locator=pt.getSpeciesByFiltersASCSV(request);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));
+			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
 	}
 
 }

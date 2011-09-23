@@ -28,4 +28,5 @@ public interface DataManagementInterface {
 	public Integer importResource(File toImport,String userId, ResourceType type) throws Exception;
 	public Integer getImportStatus(Integer resourceId)throws Exception;
 	public List<Field> getCustomQueryFields(String userId)throws Exception;
+	public File exportTableAsCSV(String table)throws Exception;
 }
