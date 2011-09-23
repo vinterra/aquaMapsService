@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
@@ -59,6 +60,7 @@ public class ServiceContext extends GCUBEServiceContext {
 		
 		JobExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_OBJECTS));
 		TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS),getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
+		SourceManager.checkTables();
 	}
 	
 	/**

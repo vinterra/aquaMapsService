@@ -208,6 +208,7 @@ public class SourceManager {
 	
 	
 	public static Resource getById(int id)throws Exception{
+		if(id==0) return null;
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
@@ -280,7 +281,62 @@ public class SourceManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-	
+	public static void checkTables()throws Exception{
+		DBSession session =null;
+		Set<Resource> list=getList(new ArrayList<Field>());
+		try{
+			session=DBSession.getInternalDBSession();
+		for(Resource r:list){
+			try{
+				//check table Existance
+				logger.trace("Checking "+r);
+				boolean existing=true;
+				try{
+					logger.trace("Updateing row count");
+					r.setRowCount(session.getCount(r.getTableName(), new ArrayList<Field>()));					
+				}catch(Exception e){
+					logger.warn("Unable to detect row count, going to delete resource");
+					deleteSource(r.getSearchId(), false);
+					existing=false;
+				}
+				if(existing){
+					if(r.getSourceHCAFId()!=0){
+						Resource HCAF=getById(r.getSourceHCAFId());
+						if(HCAF!=null) r.setSourceHCAFTable(HCAF.getTableName());
+						else{
+							logger.trace("Unable to find source HCAF, id was "+r.getSourceHCAFId());
+						}
+					}else r.setSourceHCAFTable("");
+					if(r.getSourceHSPENId()!=0){
+						Resource HSPEN=getById(r.getSourceHSPENId());
+						if(HSPEN!=null) r.setSourceHSPENTable(HSPEN.getTableName());
+						else{
+							logger.trace("Unable to find source HSPEN, id was "+r.getSourceHSPENId());
+						}
+					}else r.setSourceHSPENTable("");
+					if(r.getSourceHSPECId()!=0){
+						Resource HSPEC=getById(r.getSourceHSPECId());
+						if(HSPEC!=null) r.setSourceHSPECTable(HSPEC.getTableName());
+						else{
+							logger.trace("Unable to find source HSPEC, id was "+r.getSourceHSPECId());
+						}
+					}else r.setSourceHSPECTable("");
+					if(r.getSourceOccurrenceCellsId()!=0){
+						Resource OCCURRENCE=getById(r.getSourceOccurrenceCellsId());
+						if(OCCURRENCE!=null) r.setSourceOccurrenceCellsTable(OCCURRENCE.getTableName());
+						else{
+							logger.trace("Unable to find source OCCURRENCE CELLS, id was "+r.getSourceOccurrenceCellsId());
+						}
+					}else r.setSourceOccurrenceCellsTable("");
+					update(r);
+				}
+			}catch (Exception e){
+				logger.warn("Unable to check resource "+r.getSearchId());
+			}
+		}
+		}catch(Exception e){throw e;}
+		finally{if(session!=null)session.close();}
+	}
 }
 
 

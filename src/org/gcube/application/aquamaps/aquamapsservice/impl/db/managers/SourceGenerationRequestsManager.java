@@ -47,7 +47,7 @@ public class SourceGenerationRequestsManager {
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");
 			for(Field f:toInsert.toRow())
-				if(!f.getValue().equalsIgnoreCase("null")){
+				if(f.getValue()!=null&&!f.getValue().equalsIgnoreCase("null")){
 					toInsertRow.add(f);
 					logger.debug(f.toXML());
 				}
@@ -144,10 +144,11 @@ public class SourceGenerationRequestsManager {
 	public static void setPhase(SourceGenerationPhase phase, String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
 		fields.add(new Field(SourceGenerationRequestFields.phase+"",phase+"",FieldType.STRING));
-		if(phase.equals(SourceGenerationPhase.completed)){
-			fields.add(new Field(SourceGenerationRequestFields.endtime+"",System.currentTimeMillis()+"",FieldType.INTEGER));
+		if(phase.equals(SourceGenerationPhase.completed)||phase.equals(SourceGenerationPhase.error)){
+			fields.add(new Field(SourceGenerationRequestFields.endtime+"",System.currentTimeMillis()+"",FieldType.LONG));
 			fields.add(new Field(SourceGenerationRequestFields.currentphasepercent+"",100+"",FieldType.DOUBLE));
 		}
+		
 		updateField(id, fields);
 	}
 	public static void setReportId(int reportId, String id)throws Exception{
@@ -177,7 +178,7 @@ public class SourceGenerationRequestsManager {
 
 	public static void setStartTime(String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
-		fields.add(new Field(SourceGenerationRequestFields.starttime+"",System.currentTimeMillis()+"",FieldType.INTEGER));
+		fields.add(new Field(SourceGenerationRequestFields.starttime+"",System.currentTimeMillis()+"",FieldType.LONG));
 		updateField(id,fields);
 	}
 

@@ -51,8 +51,10 @@ public class HSPECGroupWorker extends Thread {
 			if(sources.get(ResourceType.HCAF)==null) throw new Exception ("Unable to find hcaf with id "+request.getHcafId());
 			sources.put(ResourceType.HSPEN, SourceManager.getById(request.getHspenId()));
 			if(sources.get(ResourceType.HSPEN)==null) throw new Exception ("Unable to find hspen with id "+request.getHspenId());
-			sources.put(ResourceType.OCCURRENCECELLS, SourceManager.getById(request.getOccurrenceCellId()));
-			if(sources.get(ResourceType.OCCURRENCECELLS)==null) throw new Exception ("Unable to find occurrence cells  with id "+request.getOccurrenceCellId());
+			if(request.getLogic().equals(LogicType.HSPEN)){
+				sources.put(ResourceType.OCCURRENCECELLS, SourceManager.getById(request.getOccurrenceCellId()));
+				if(sources.get(ResourceType.OCCURRENCECELLS)==null) throw new Exception ("Unable to find occurrence cells  with id "+request.getOccurrenceCellId());
+			}
 
 
 			batch=EnvironmentalLogicManager.getBatch();
@@ -95,8 +97,10 @@ public class HSPECGroupWorker extends Thread {
 						toRegister.setSourceHCAFTable(sources.get(ResourceType.HCAF).getTableName());
 						toRegister.setSourceHSPENId(sources.get(ResourceType.HSPEN).getSearchId());
 						toRegister.setSourceHSPENTable(sources.get(ResourceType.HSPEN).getTableName());
-						toRegister.setSourceOccurrenceCellsId(sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
-						toRegister.setSourceOccurrenceCellsTable(sources.get(ResourceType.OCCURRENCECELLS).getTableName());
+						if(request.getLogic().equals(LogicType.HSPEN)){
+							toRegister.setSourceOccurrenceCellsId(sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
+							toRegister.setSourceOccurrenceCellsTable(sources.get(ResourceType.OCCURRENCECELLS).getTableName());
+						}
 						toRegister.setStatus(ResourceStatus.Completed);
 						toRegister.setTableName(generatedTable);
 						toRegister.setTitle(request.getGenerationname()+"_"+algorithmType);
@@ -114,7 +118,7 @@ public class HSPECGroupWorker extends Thread {
 						SourceGenerationRequestsManager.addGeneratedResource(toRegister.getSearchId(), request.getId());
 						generatedSources.add(toRegister);
 						TableGenerationExecutionManager.notifyGeneration(algorithmType,request.getLogic(),sources.get(ResourceType.HSPEN).getSearchId(),
-								sources.get(ResourceType.HCAF).getSearchId(),sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
+								sources.get(ResourceType.HCAF).getSearchId(),request.getLogic().equals(LogicType.HSPEN)?sources.get(ResourceType.OCCURRENCECELLS).getSearchId():0);
 					}else{
 						logger.trace("Found Resource "+existing.toXML());
 						generatedSources.add(existing);
