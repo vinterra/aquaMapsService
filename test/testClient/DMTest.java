@@ -32,7 +32,7 @@ public class DMTest {
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
+		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/d4science.research-infrastructures.eu/FARM"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
@@ -44,13 +44,13 @@ public class DMTest {
 //		System.out.println(dmInterface.queryResource("Select * from hspen where pelagic = 1", new PagedRequestSettings(2, 0, null, OrderDirection.ASC)));
 //		
 		
-		System.out.println("Export Resource :");
-
-		File csv=dmInterface.exportResource(109);
-		
-		csv.renameTo(new File("exported_mini.csv"));
-		
-		System.out.println("Exported to exported_mini.csv"); 
+//		System.out.println("Export Resource :");
+//
+//		File csv=dmInterface.exportResource(109);
+//		
+//		csv.renameTo(new File("exported_mini.csv"));
+//		
+//		System.out.println("Exported to exported_mini.csv"); 
 		
 		
 //		System.out.println("Import Resource :");
@@ -83,11 +83,11 @@ public class DMTest {
 		
 		
 		
-//		for(Field f:dmInterface.getDefaultSources())
-//			System.out.println(f);
-//		
-//		System.out.println("Done");
+		for(Field f:dmInterface.getDefaultSources())
+			System.out.println(f);
 		
+////		System.out.println("Done");
+//		
 		
 		
 		

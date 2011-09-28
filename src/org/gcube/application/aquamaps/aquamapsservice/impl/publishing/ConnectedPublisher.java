@@ -18,6 +18,7 @@ import org.gcube.application.aquamaps.aquamapspublisher.stubs.utils.ZipUtils;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.wrapper.AquaMapsPublisherWrapper;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
@@ -363,7 +364,7 @@ public class ConnectedPublisher implements Publisher{
 			Resource hcaf,Resource hspen, Set<Area> areaSelection,
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
-			BoundingBox bounds,boolean getNative) throws Exception {
+			BoundingBox bounds,AlgorithmType algorithm) throws Exception {
 		if(bounds==null)bounds=new BoundingBox();
 		if(envelopeWeights==null) envelopeWeights= new HashMap<String, Map<EnvelopeFields,Field>>();
 		//****purging null species ids
@@ -388,9 +389,10 @@ public class ConnectedPublisher implements Publisher{
 
 		
 		areaSelection.remove(null);
-		
+		boolean isNative=algorithm.equals(AlgorithmType.NativeRange)||algorithm.equals(AlgorithmType.NativeRange2050);
+		boolean is2050=algorithm.equals(AlgorithmType.NativeRange2050)|| algorithm.equals(AlgorithmType.SuitableRange2050);
 				
-		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,	areaSelection,speciesId,getNative,envelopeWeights);
+		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,	areaSelection,speciesId,isNative,is2050,envelopeWeights);
 	}
 
 	public LayerInfo getEnvironmentalLayer(EnvelopeFields parameter,

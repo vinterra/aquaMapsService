@@ -39,10 +39,12 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 				filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.datageneration+"",FieldType.STRING));
 				for(SourceGenerationRequest request : SourceGenerationRequestsManager.getList(filter)){
 					try{
-						EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(request.getReportID(),false);
-						Double percent=(100/request.getAlgorithms().size()*request.getGeneratedSources().size())+
-									(report.getPercent()/request.getAlgorithms().size());
-						SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
+						if(request.getReportID()!=-1){
+							EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(request.getReportID(),false);
+							Double percent=(100/request.getAlgorithms().size()*request.getGeneratedSources().size())+
+										(report.getPercent()/request.getAlgorithms().size());
+							SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
+						}
 					}catch(Exception e){logger.warn("Skipping percent update for execution id "+request.getId()+", report id was "+request.getReportID(),e);}
 				}
 				//Updating map generation percent

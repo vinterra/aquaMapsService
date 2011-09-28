@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.PredictionLayerGenerationRequest;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
@@ -37,7 +38,7 @@ public class XStreamTest {
 			Species selectedSpecies=obj.getSelectedSpecies().iterator().next();
 			theRequest=new PredictionLayerGenerationRequest(obj.getId(),obj.getName(),selectedSpecies,
 					dummy.getSourceHCAF(),dummy.getSourceHSPEN(),dummy.getEnvelopeCustomization().get(selectedSpecies.getId()),
-					dummy.getEnvelopeWeights().get(selectedSpecies.getId()),dummy.getSelectedAreas(),obj.getBoundingBox(),".csv",true);
+					dummy.getEnvelopeWeights().get(selectedSpecies.getId()),dummy.getSelectedAreas(),obj.getBoundingBox(),".csv",AlgorithmType.NativeRange);
 		}
 		String xml=AquaMapsXStream.getXMLInstance().toXML(theRequest);
 		System.out.println(AquaMapsXStream.getXMLInstance().toXML(theRequest));

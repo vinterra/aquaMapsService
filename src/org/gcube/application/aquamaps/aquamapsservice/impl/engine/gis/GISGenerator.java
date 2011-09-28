@@ -26,12 +26,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.BadRequestException;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.GenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.Generator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.image.ImageGeneratorRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.LayerLockManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.LayerLockManager.Ticket;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.FieldType;
 import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
@@ -182,12 +182,13 @@ public class GISGenerator implements Generator{
 		Map<String,String> layersAndStyles=new HashMap<String, String>();
 		logger.trace("loading layer infos..");
 		for(Entry<String, ObjectType> layer:request.getLayers().entrySet()){
-			LayerInfo found=null;
-			switch(layer.getValue()){
-			case Biodiversity :	found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.Biodiversity);
-			break;
-			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.NativeRange);
-			}
+//			LayerInfo found=null;
+//			switch(layer.getValue()){
+//			case Biodiversity :	found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.Biodiversity);
+//			break;
+//			default : found=publisher.getLayerByIdAndType(layer.getKey(), LayersType.NativeRange);
+//			}
+			LayerInfo found=publisher.getLayerById(layer.getKey());
 			if(found!=null){
 				layersAndStyles.put(found.getName(),found.getDefaultStyle());
 				layers.add(found);
@@ -229,7 +230,7 @@ public class GISGenerator implements Generator{
 			default : {
 				PredictionLayerGenerationRequest req=(PredictionLayerGenerationRequest) request;
 				toReturn=publisher.getDistributionLayer(req.getSpeciesCoverage().iterator().next(), req.getHcaf(), req.getHspen(), req.getSelectedAreas(), 
-						req.getEnvelopeCustomization(), req.getEnvelopeWeights(), req.getBb(), req.getMapType().equals(LayersType.NativeRange));
+						req.getEnvelopeCustomization(), req.getEnvelopeWeights(), req.getBb(), AlgorithmType.valueOf(req.getMapType()+""));
 				break;
 			}
 			}

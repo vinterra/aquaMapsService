@@ -6,14 +6,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapspublisher.impl.AquaMapsPublisherWrapperL;
 import org.gcube.application.aquamaps.aquamapspublisher.impl.PublisherContext;
 import org.gcube.application.aquamaps.aquamapspublisher.stubs.TemplateLayerType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
@@ -117,7 +118,7 @@ public class EmbeddedPublisher implements Publisher{
 			Resource hcaf,Resource hspen, Set<Area> areaSelection,
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
-			BoundingBox bounds,boolean getNative) throws Exception {
+			BoundingBox bounds,AlgorithmType algorithm) throws Exception {
 		if(bounds==null)bounds=new BoundingBox();
 		if(envelopeWeights==null) envelopeWeights= new HashMap<String, Map<EnvelopeFields,Field>>();
 		//****purging null species ids
@@ -145,8 +146,10 @@ public class EmbeddedPublisher implements Publisher{
 		
 		areaSelection.remove(null);
 		
+		boolean isNative=algorithm.equals(AlgorithmType.NativeRange)||algorithm.equals(AlgorithmType.NativeRange2050);
+		boolean is2050=algorithm.equals(AlgorithmType.NativeRange2050)|| algorithm.equals(AlgorithmType.SuitableRange2050);
 				
-		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,	areaSelection,speciesId,getNative,envelopeWeights);
+		return getWrapper().getLayer(bounds+"", envelopeCustomization, hcaf, hspen,	areaSelection,speciesId,isNative,is2050,envelopeWeights);
 	}
 
 	public LayerInfo getEnvironmentalLayer(EnvelopeFields parameter,
@@ -162,7 +165,7 @@ public class EmbeddedPublisher implements Publisher{
 		//TODO call new method on stubs
 		throw new Exception ("NOT IMPLEMENTED");
 	}
-
+	@Override
 	public LayerInfo getLayerById(String id) throws Exception{
 		return getWrapper().getLayerById(id);
 	}

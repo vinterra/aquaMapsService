@@ -98,7 +98,7 @@ public class JobWorker extends Thread{
 									(current.getEnvelopeWeights().containsKey(selected.getId()))? current.getEnvelopeWeights().get(selected.getId()):new HashMap<EnvelopeFields,Field>();
 
 									toSubmitRequests.add(new DistributionObjectExecutionRequest(SubmittedManager.getSubmittedById(object.getId()), 
-											current.getSelectedAreas(), object.getBoundingBox(), object.getSelectedSpecies(), envelopeCustomization	, envelopeWeights));
+											current.getSelectedAreas(), object.getBoundingBox(), object.getSelectedSpecies(), envelopeCustomization	, envelopeWeights,object.getAlgorithmType()));
 						}
 				}
 
@@ -157,7 +157,7 @@ public class JobWorker extends Thread{
 			Log.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
 			String filteredHcaf=filterByArea(jobId, area, ResourceType.HCAF, JobManager.getHCAFTableId(jobId));
 			JobManager.setWorkingHCAF(jobId,filteredHcaf);
-			String generatedHSPEC=generateHSPEC(jobId, weights, true);
+			String generatedHSPEC=generateHSPEC(jobId, weights, true,toExecute.getAquaMapsObjectList().get(0).getAlgorithmType());
 			String toUseHSPEC=filterByArea(jobId,area,ResourceType.HSPEC,generatedHSPEC);
 			JobManager.setWorkingHSPEC(jobId,toUseHSPEC);	
 
@@ -166,7 +166,7 @@ public class JobWorker extends Thread{
 			JobManager.setWorkingHSPEC(jobId,filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId)));
 		}else if (needToGenerate){				
 			Log.debug(" jobId "+jobId+" : Re-generate");
-			String generatedHSPEC=generateHSPEC(jobId,  weights,true);
+			String generatedHSPEC=generateHSPEC(jobId,  weights,true,toExecute.getAquaMapsObjectList().get(0).getAlgorithmType());
 			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);		
 		}else{
 			Log.debug(" jobId "+jobId+" no needs");
@@ -238,7 +238,7 @@ public class JobWorker extends Thread{
 	 * @return
 	 * @throws Exception
 	 */
-	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp)throws Exception{
+	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp,AlgorithmType algorithm)throws Exception{
 		if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.USE_ENVIRONMENT_MODELLING_LIB)){
 			logger.trace("HSPEC Generation with Environmental Modeling..");
 			//************ fine processing
@@ -251,7 +251,7 @@ public class JobWorker extends Thread{
 			//			
 			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getEcoligicalConfigDir().getAbsolutePath()+File.separator,
 					DBSession.getInternalCredentials());
-			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), AlgorithmType.NativeRange, false, null, 1);
+			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), algorithm, false, null, 1);
 		}else{
 			logger.trace("Embedded HSPEC Generation");
 			String HCAF_DName=JobManager.getWorkingHCAF(jobId);		

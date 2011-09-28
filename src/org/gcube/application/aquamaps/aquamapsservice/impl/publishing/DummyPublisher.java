@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
@@ -109,7 +110,7 @@ public class DummyPublisher implements Publisher {
 			Resource hspen, Set<Area> areaSelection,
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
-			BoundingBox bounds, boolean getNative) throws Exception {
+			BoundingBox bounds, AlgorithmType algorithm) throws Exception {
 		logger.trace("getDistrLayerById return  null");
 		return null;
 	}
@@ -151,6 +152,12 @@ public class DummyPublisher implements Publisher {
 	@Override
 	public void removeWMSContext(String id) throws Exception {
 		logger.trace("removeWMS..");
+	}
+
+	@Override
+	public LayerInfo getLayerById(String id) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

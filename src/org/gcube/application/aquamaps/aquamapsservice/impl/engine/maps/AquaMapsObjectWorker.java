@@ -190,7 +190,7 @@ public class AquaMapsObjectWorker extends Thread {
 					
 					//TODO check algorithm
 					PredictionLayerGenerationRequest layerRequest= new PredictionLayerGenerationRequest(aquamapsId,aquamapsName, selectedSpecies.iterator().next(), hcaf, hspen, 
-							envelopeCustomization, envelopeWeights, selectedAreas, bb, toMapData.getCsvFile(), true);
+							envelopeCustomization, envelopeWeights, selectedAreas, bb, toMapData.getCsvFile(), request.getAlgorithm());
 					
 
 					if(GeneratorManager.requestGeneration(layerRequest)){

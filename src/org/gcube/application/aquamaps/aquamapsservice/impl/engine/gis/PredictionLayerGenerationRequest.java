@@ -9,6 +9,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.gis.StyleGenerationRequest.ClusterScaleType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
@@ -47,9 +48,9 @@ public class PredictionLayerGenerationRequest extends LayerGenerationRequest {
 	 */
 	public PredictionLayerGenerationRequest(int objectId,String objectName,Species species, Resource hcaf,Resource hspen,
 			Map<String,Perturbation> envelopeCustomization, Map<EnvelopeFields,Field> envelopeWeights,
-			Set<Area> areaSelection, BoundingBox bb, String csvFile, boolean isNative) throws Exception{
+			Set<Area> areaSelection, BoundingBox bb, String csvFile,AlgorithmType algorithm) throws Exception{
 		super(csvFile,HSPECFields.probability+"","real",objectName);
-		this.setMapType(isNative?LayersType.NativeRange:LayersType.SuitableRange);
+		this.setMapType(LayersType.valueOf(algorithm+""));
 		this.getSpeciesCoverage().add(species.getId());
 		if(envelopeCustomization!=null)
 			this.getEnvelopeCustomization().put(species.getId(), envelopeCustomization);

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
@@ -19,16 +20,19 @@ public class DistributionObjectExecutionRequest extends
 	private Set<Species> selectedSpecies=new HashSet<Species>();
 	private Map<String,Perturbation> envelopeCustomization;
 	private Map<EnvelopeFields,Field> envelopeWeights;
+	private AlgorithmType algorithm=AlgorithmType.SuitableRange;
+	
 	
 	public DistributionObjectExecutionRequest(Submitted object,
 			Set<Area> selectedArea, BoundingBox bb,
 			Set<Species> selectedSpecies,
 			Map<String, Perturbation> envelopeCustomization,
-			Map<EnvelopeFields, Field> envelopeWeights) {
+			Map<EnvelopeFields, Field> envelopeWeights,AlgorithmType algorithm) {
 		super(object, selectedArea, bb);
 		this.selectedSpecies = selectedSpecies;
 		this.envelopeCustomization = envelopeCustomization;
 		this.envelopeWeights = envelopeWeights;
+		this.algorithm=algorithm;
 	}
 
 	public Set<Species> getSelectedSpecies() {
@@ -54,6 +58,14 @@ public class DistributionObjectExecutionRequest extends
 
 	public void setEnvelopeWeights(Map<EnvelopeFields, Field> envelopeWeights) {
 		this.envelopeWeights = envelopeWeights;
+	}
+
+	public void setAlgorithm(AlgorithmType algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	public AlgorithmType getAlgorithm() {
+		return algorithm;
 	}
 	
 	

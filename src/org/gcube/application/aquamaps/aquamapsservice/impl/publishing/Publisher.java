@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.dataModel.enhanced.Area;
 import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
@@ -53,10 +54,10 @@ public interface Publisher {
 			Resource hcaf,Resource hspen, Set<Area> areaSelection,
 			Map<String, Map<String, Perturbation>> envelopeCustomization,
 			Map<String, Map<EnvelopeFields, Field>> envelopeWeights,
-			BoundingBox bounds,boolean getNative)throws Exception;
+			BoundingBox bounds,AlgorithmType algorithm)throws Exception;
 	public LayerInfo getPointMapLayer(String speciesId)throws Exception;
 	public LayerInfo getEnvironmentalLayer(EnvelopeFields parameter,Resource hcaf)throws Exception;
-	
+	public LayerInfo getLayerById(String id)throws Exception;
 	public WMSContextInfo getWMSContextById(String id) throws Exception;
 	
 	//********* REMOVE

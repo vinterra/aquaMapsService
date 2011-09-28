@@ -1,13 +1,22 @@
 package testClient;
 
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.dataModel.Types.FieldType;
+import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
+import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
 import org.gcube.application.aquamaps.dataModel.enhanced.Job;
 import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
 import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.scope.GCUBEScope;
 
@@ -16,8 +25,8 @@ public class AquaMapsServiceTester {
 
 //	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
-	static final String AQ_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
-	static final String DM_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
+	static final String AQ_SERVICE_URI="http://aquamaps.ifm-geomar.de:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
+	static final String DM_SERVICE_URI="http://aquamaps.ifm-geomar.de:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
 	static final String RS_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/common/searchservice/ResultSet";
 	
 	
@@ -27,7 +36,7 @@ public class AquaMapsServiceTester {
 		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AQ_SERVICE_URI);
 //		Species spec=new Species("Fis-29501");
 //		System.out.println("Occurrence cells for ");
-//		System.out.println(wrapper.getJSONOccurrenceCells(spec.getId(), new PagedRequestSettings(10, 0, Cell.ID, "ASC")));
+////		System.out.println(wrapper.getJSONOccurrenceCells(spec.getId(), new PagedRequestSettings(10, 0, Cell.ID, "ASC")));
 //		System.out.println("Getting envelope");
 //		System.out.println(wrapper.loadEnvelope(spec.getId()));
 //		System.out.println("Getting resources HCAF");
