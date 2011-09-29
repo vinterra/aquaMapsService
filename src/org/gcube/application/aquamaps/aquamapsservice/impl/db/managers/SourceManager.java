@@ -244,6 +244,7 @@ public class SourceManager {
 			value.add(toUpdate.getField(MetaSourceFields.defaultsource));
 			value.add(toUpdate.getField(MetaSourceFields.status));
 			value.add(toUpdate.getField(MetaSourceFields.rowcount));
+			value.add(toUpdate.getField(MetaSourceFields.provenience));
 			values.add(value);
 			List<List<Field>> keys=new ArrayList<List<Field>>();
 			List<Field> key=new ArrayList<Field>();
