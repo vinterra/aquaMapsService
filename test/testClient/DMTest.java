@@ -14,6 +14,7 @@ import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
 import org.gcube.application.aquamaps.dataModel.Types.LogicType;
 import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
 import org.gcube.application.aquamaps.dataModel.enhanced.Field;
+import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -32,7 +33,7 @@ public class DMTest {
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/d4science.research-infrastructures.eu/FARM"), AquaMapsServiceTester.DM_SERVICE_URI);
+		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
@@ -81,11 +82,14 @@ public class DMTest {
 //		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
 	
 		
+		EnvironmentalExecutionReportItem report=dmInterface.getReport(0);
+		System.out.println("");
 		
 		
-		for(Field f:dmInterface.getDefaultSources())
-			System.out.println(f);
-		
+//		
+//		for(Field f:dmInterface.getDefaultSources())
+//			System.out.println(f);
+//		
 ////		System.out.println("Done");
 //		
 		

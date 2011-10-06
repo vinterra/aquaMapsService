@@ -25,12 +25,15 @@ import org.gcube.common.core.scope.GCUBEScope;
 public class WrapperTest {
 
 	static String specId="Fis-22836";
+	static String DEVSEC="/gcube/devsec";
+	static String ECOSYSTEM="/d4science.research-infrastructures.eu/Ecosystem";
+	
 	
 	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
-		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(ECOSYSTEM),AquaMapsServiceTester.AQ_SERVICE_URI);
+//		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		
 //		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(
@@ -56,17 +59,17 @@ public class WrapperTest {
 //		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
 		
 		
-		System.out.println("Checking default sources");
-		for(Field f:dmInterface.getDefaultSources()){
-			try{
-				ResourceType type=ResourceType.valueOf(f.getName());
-				int id=f.getValueAsInteger();
-				System.out.println(wrapper.loadResource(id, type));
-			}catch(Exception e){
-				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
-				e.printStackTrace();
-			}
-		}
+//		System.out.println("Checking default sources");
+//		for(Field f:dmInterface.getDefaultSources()){
+//			try{
+//				ResourceType type=ResourceType.valueOf(f.getName());
+//				int id=f.getValueAsInteger();
+//				System.out.println(wrapper.loadResource(id, type));
+//			}catch(Exception e){
+//				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
+//				e.printStackTrace();
+//			}
+//		}
 			
 //		System.out.println(wrapper.loadResource(113, ResourceType.OCCURRENCECELLS));
 		
@@ -86,7 +89,7 @@ public class WrapperTest {
 
 //		wrapper.getJSONSubmitted(String userName,boolean showObjects,String date,Integer jobId,SubmittedStatus status,ObjectType objType, PagedRequestSettings settings)throws Exception;
 
-		System.out.println(wrapper.getJSONOccurrenceCells(DummyObjects.getSpeciesBasket().iterator().next().getId(), new PagedRequestSettings(1,0,HCAF_SFields.csquarecode+"",OrderDirection.ASC)));
+//		System.out.println(wrapper.getJSONOccurrenceCells(DummyObjects.getSpeciesBasket().iterator().next().getId(), new PagedRequestSettings(1,0,HCAF_SFields.csquarecode+"",OrderDirection.ASC)));
 
 //		public AquaMapsObject loadObject(int objectId)throws Exception;
 
@@ -102,7 +105,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(397625)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(335025)));
 		
 		
 		
