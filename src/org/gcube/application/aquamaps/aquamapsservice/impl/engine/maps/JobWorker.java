@@ -1,6 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
-import java.io.File;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +11,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorI;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
@@ -157,17 +157,21 @@ public class JobWorker extends Thread{
 			Log.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
 			String filteredHcaf=filterByArea(jobId, area, ResourceType.HCAF, JobManager.getHCAFTableId(jobId));
 			JobManager.setWorkingHCAF(jobId,filteredHcaf);
-			String generatedHSPEC=generateHSPEC(jobId, weights, true,toExecute.getAquaMapsObjectList().get(0).getAlgorithmType());
+			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getAquaMapsObjectList().get(0).getAlgorithmType(),weights);
 			String toUseHSPEC=filterByArea(jobId,area,ResourceType.HSPEC,generatedHSPEC);
 			JobManager.setWorkingHSPEC(jobId,toUseHSPEC);	
-
+			JobManager.addToDropTableList(jobId, generatedHSPEC);
+			JobManager.addToDropTableList(jobId, toUseHSPEC);
 		}else if (filteredArea){
 			Log.debug(" jobId "+jobId+" : Filter By Area");
-			JobManager.setWorkingHSPEC(jobId,filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId)));
+			String table=filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId));
+			JobManager.setWorkingHSPEC(jobId,table);
+			JobManager.addToDropTableList(jobId, table);
 		}else if (needToGenerate){				
 			Log.debug(" jobId "+jobId+" : Re-generate");
-			String generatedHSPEC=generateHSPEC(jobId,  weights,true,toExecute.getAquaMapsObjectList().get(0).getAlgorithmType());
-			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);		
+			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getAquaMapsObjectList().get(0).getAlgorithmType(),weights);
+			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);
+			JobManager.addToDropTableList(jobId, generatedHSPEC);
 		}else{
 			Log.debug(" jobId "+jobId+" no needs");
 			JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(JobManager.getHSPECTableId(jobId)));
@@ -238,20 +242,17 @@ public class JobWorker extends Thread{
 	 * @return
 	 * @throws Exception
 	 */
-	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp,AlgorithmType algorithm)throws Exception{
+	private static String generateHSPEC(int jobId, Set<Species> selection,String sourceHspen,AlgorithmType algorithm, Map<String,Map<EnvelopeFields,Field>> weights)throws Exception{
 		if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.USE_ENVIRONMENT_MODELLING_LIB)){
 			logger.trace("HSPEC Generation with Environmental Modeling..");
-			//************ fine processing
-			//			// TODO implement for less then (config param) species
-			//			//copy species from hspec
-			//			//for every species
-			//				//load species
-			//					//load cell
-			//					//insert probability
-			//			
-			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getEcoligicalConfigDir().getAbsolutePath()+File.separator,
-					DBSession.getInternalCredentials());
-			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), algorithm, false, null, 1);
+			String filteredHSPEN=SpeciesManager.getFilteredHSPEN(JobManager.getWorkingHSPEN(jobId), selection);
+			JobManager.setWorkingHSPEN(jobId, filteredHSPEN);
+			JobManager.addToDropTableList(jobId, filteredHSPEN);
+			BatchGeneratorI generator=EnvironmentalLogicManager.getBatch();
+						return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId),
+					JobManager.getWorkingHSPEN(jobId), "maxminlat_"+sourceHspen, algorithm,false, "");
+			
+//			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), algorithm, false, null, 1);
 		}else{
 			logger.trace("Embedded HSPEC Generation");
 			String HCAF_DName=JobManager.getWorkingHCAF(jobId);		
@@ -260,7 +261,7 @@ public class JobWorker extends Thread{
 			generator.generate();
 			String generatedHspecName=generator.getNativeTable();
 			System.out.println("table generated:"+generatedHspecName);
-			if (makeTemp)JobManager.addToDropTableList(jobId,generatedHspecName);
+			JobManager.addToDropTableList(jobId,generatedHspecName);
 			return generatedHspecName;
 		}
 	}

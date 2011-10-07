@@ -79,7 +79,8 @@ public class HSPECGroupWorker extends Thread {
 								new TableGenerationConfiguration(
 										request.getLogic(), 
 										AlgorithmType.valueOf(algorithmString), 
-										sources, 
+										sources,
+										"maxminlat_"+sources.get(ResourceType.HSPEN).getTableName(),
 										request.getSubmissionBackend(), 
 										request.getExecutionEnvironment(), 
 										request.getBackendURL(), 

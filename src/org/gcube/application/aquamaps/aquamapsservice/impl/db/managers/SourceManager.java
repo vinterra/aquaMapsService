@@ -292,15 +292,20 @@ public class SourceManager {
 				//check table Existance
 				logger.trace("Checking "+r);
 				boolean existing=true;
+				
 				try{
-					logger.trace("Updateing row count");
-					r.setRowCount(session.getCount(r.getTableName(), new ArrayList<Field>()));					
+					session.executeQuery("SELECT * FROM "+r.getTableName()+" LIMIT 1 OFFSET 0");
 				}catch(Exception e){
-					logger.warn("Unable to detect row count, going to delete resource");
+					logger.trace("Unable to detect table "+r.getTableName()+", going to delete resource");
 					deleteSource(r.getSearchId(), false);
 					existing=false;
 				}
+				
 				if(existing){
+					if(r.getRowCount()==0){
+						logger.trace("Updateing row count");
+						r.setRowCount(session.getCount(r.getTableName(), new ArrayList<Field>()));
+					}
 					if(r.getSourceHCAFId()!=0){
 						Resource HCAF=getById(r.getSourceHCAFId());
 						if(HCAF!=null) r.setSourceHCAFTable(HCAF.getTableName());

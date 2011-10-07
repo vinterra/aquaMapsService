@@ -22,6 +22,8 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -36,7 +38,7 @@ public class RSWrapper {
 			List<PortRange> ports=new ArrayList<PortRange>(); //The ports that the TCPConnection manager should use
 			ports.add(new PortRange(3000, 3050));             //Any in the range between 3000 and 3050
 			TCPConnectionManager.Init(
-					new TCPConnectionManagerConfig(InetAddress.getLocalHost().getHostName(), //The hostname by which the machine is reachable 
+					new TCPConnectionManagerConfig(GHNContext.getContext().getHostname(), //The hostname by which the machine is reachable 
 							ports,                                    //The ports that can be used by the connection manager
 							true                                      //If no port ranges were provided, or none of them could be used, use a random available port
 					));
