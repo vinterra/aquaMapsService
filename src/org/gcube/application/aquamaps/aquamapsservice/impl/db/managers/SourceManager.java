@@ -257,12 +257,12 @@ public class SourceManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-	public static Integer importFromCSVFile(final File csvFile,final String author,final ResourceType type)throws Exception{
+	public static Integer importFromCSVFile(final String csvFile,final String author,final ResourceType type)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
 			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();
-			logger.debug("Importing "+csvFile.getAbsolutePath()+" to TABLE "+tableName+" [ "+type+" ]");
+			logger.debug("Importing "+csvFile+" to TABLE "+tableName+" [ "+type+" ]");
 			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());
 			
 			Resource toRegister=new Resource(type, 0);

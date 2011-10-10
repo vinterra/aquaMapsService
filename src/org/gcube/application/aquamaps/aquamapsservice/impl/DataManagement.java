@@ -475,9 +475,8 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		try{
 			logger.trace("Importing resource , user : "+arg0);
 			File csv=File.createTempFile("import", ".csv");
-			FileUtils.getFileUtils().copyFile(RSWrapper.getStreamFromLocator(new URI(arg0.getLocator())), csv);
-			
-			return SourceManager.importFromCSVFile(csv, arg0.getUser(), ResourceType.valueOf(arg0.getResourceType()));
+			FileUtils.getFileUtils().copyFile(RSWrapper.getStreamFromLocator(new URI(arg0.getLocator())), csv);		
+			return SourceManager.importFromCSVFile(csv.getAbsolutePath(), arg0.getUser(), ResourceType.valueOf(arg0.getResourceType()));
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

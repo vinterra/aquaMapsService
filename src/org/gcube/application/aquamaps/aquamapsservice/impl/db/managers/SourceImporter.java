@@ -1,6 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -20,13 +19,13 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public class SourceImporter extends Thread {
 	private static final GCUBELog logger=new GCUBELog(SourceImporter.class);	
 	
-	private File csv;
+	private String csv;
 	private Resource importing;
 	private Integer metaId;
 
 	
 	
-	public SourceImporter(File csv, Integer metaId) {
+	public SourceImporter(String csv, Integer metaId) {
 		super();
 		this.csv = csv;
 		this.metaId = metaId;
@@ -39,7 +38,7 @@ public class SourceImporter extends Thread {
 		DBSession session=null;
 		try{
 			importing=SourceManager.getById(metaId);
-			logger.debug("Started importing operation from "+csv.getAbsolutePath()+" TO "+importing.getTableName());
+			logger.debug("Started importing operation from "+csv+" TO "+importing.getTableName());
 			Resource defaultResource=SourceManager.getById(SourceManager.getDefaultId(importing.getType()));
 			session=DBSession.getInternalDBSession();
 			
@@ -54,7 +53,7 @@ public class SourceImporter extends Thread {
 			processor.setDelimiter(',');					
 			Reader reader= new InputStreamReader(new FileInputStream(csv), Charset.defaultCharset());
 			
-			StatefullCSVLineProcessor lineProcessor=new StatefullCSVLineProcessor(model, importing.getTableName(),CSVUtils.countCSVRows(csv.getAbsolutePath(), ',', true),metaId);
+			StatefullCSVLineProcessor lineProcessor=new StatefullCSVLineProcessor(model, importing.getTableName(),CSVUtils.countCSVRows(csv, ',', true),metaId);
 			logger.debug("Starting file processing");
 			processor.processStream(reader , lineProcessor);
 			logger.debug("Complete processing");

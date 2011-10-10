@@ -32,7 +32,7 @@ public class WrapperTest {
 	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(ECOSYSTEM),AquaMapsServiceTester.AQ_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(DEVSEC),AquaMapsServiceTester.AQ_SERVICE_URI);
 //		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		
@@ -71,7 +71,7 @@ public class WrapperTest {
 //			}
 //		}
 			
-//		System.out.println(wrapper.loadResource(113, ResourceType.OCCURRENCECELLS));
+		System.out.println(wrapper.loadResource(141, ResourceType.OCCURRENCECELLS));
 		
 		
 //		Envelope env=new Envelope();
@@ -105,7 +105,7 @@ public class WrapperTest {
 
 //		public void submitJob(Job toSubmit) throws Exception;
 
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(335025)));
+//		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(346282)));
 		
 		
 		
