@@ -7,23 +7,24 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.QueryConstructurThread.Operation;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.QueryConstructurThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.QueryConstructurThread.Operation;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CustomQueryManager {
 
-	static final String userQueryTable="userqueries";
-	static final String userQueryUser="userid";
-	static final String userQueryResultTable="resulttable";
-	static final String userQueryCreationTime="creationtime";
-	static final String userQueryCount="count";
-	static final String userQuerySQL="query";
-	static final String userQueryReady="isready";
+	public static final String userQueryTable="userqueries";
+	public static final String userQueryUser="userid";
+	public static final String userQueryResultTable="resulttable";
+	public static final String userQueryCreationTime="creationtime";
+	public static final String userQueryCount="count";
+	public static final String userQuerySQL="query";
+	public static final String userQueryReady="isready";
 	
 	private static final GCUBELog logger=new GCUBELog(CustomQueryManager.class);
 	

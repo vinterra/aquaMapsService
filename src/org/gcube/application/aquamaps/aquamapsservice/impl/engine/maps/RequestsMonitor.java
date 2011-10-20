@@ -1,6 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
-import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class RequestsMonitor extends Thread {

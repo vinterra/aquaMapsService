@@ -1,22 +1,19 @@
 package testClient;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
-import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.MalformedScopeExpressionException;
 
@@ -33,7 +30,7 @@ public class DMTest {
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem"), AquaMapsServiceTester.DM_SERVICE_URI);
+		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
@@ -72,7 +69,7 @@ public class DMTest {
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Holothuroidea",FieldType.STRING)); // 21 species
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Mammalia",FieldType.STRING)); // 53 species (NB  pelagic hspen)
 //		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species
-//		System.out.println("JOB ID IS "+dmInterface.generateMaps("fabio.sinibaldi", true, 92, filter));
+//		System.out.println("JOB ID IS "+dmInterface.generateMaps("fabio.sinibaldi", true, 135, filter));
 
 		
 		
@@ -82,16 +79,16 @@ public class DMTest {
 //		System.out.println("ID IS "+fromRequestToGeneralEnvironment());
 	
 		
-		EnvironmentalExecutionReportItem report=dmInterface.getReport(0);
-		System.out.println("");
+//		EnvironmentalExecutionReportItem report=dmInterface.getReport(0);
+//		System.out.println("");
+//		
 		
+//		
+		for(Field f:dmInterface.getDefaultSources())
+			System.out.println(f);
 		
-//		
-//		for(Field f:dmInterface.getDefaultSources())
-//			System.out.println(f);
-//		
-////		System.out.println("Done");
-//		
+//		System.out.println("Done");
+		
 		
 		
 		

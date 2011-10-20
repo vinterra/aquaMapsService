@@ -2,20 +2,22 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
 public class AquaMapsObjectData {
 
+	private int submittedId;
 	
+	private String path;
 	//********* PERL
-	private StringBuilder[] csq_str;
+	private String csq_str;
 	private int min;
 	private int max;
 	
 	//********* GIS
 	private String csvFile;
 
-	public StringBuilder[] getCsq_str() {
+	public String getCsq_str() {
 		return csq_str;
 	}
 
-	public void setCsq_str(StringBuilder[] csq_str) {
+	public void setCsq_str(String csq_str) {
 		this.csq_str = csq_str;
 	}
 
@@ -41,6 +43,28 @@ public class AquaMapsObjectData {
 
 	public void setCsvFile(String csvFile) {
 		this.csvFile = csvFile;
+	}
+public int getSubmittedId() {
+	return submittedId;
+}
+public void setSubmittedId(int submittedId) {
+	this.submittedId = submittedId;
+}
+public void setPath(String path) {
+	this.path = path;
+}
+public String getPath() {
+	return path;
+}
+	public AquaMapsObjectData(int submittedId,String csq_str, int min, int max,
+			String csvFile,String path) {
+		super();
+		this.submittedId=submittedId;
+		this.csq_str = csq_str;
+		this.min = min;
+		this.max = max;
+		this.csvFile = csvFile;
+		this.path=path;
 	}
 	
 	

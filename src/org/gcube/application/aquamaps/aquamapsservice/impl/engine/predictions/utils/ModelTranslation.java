@@ -2,15 +2,15 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.u
 
 import java.util.ArrayList;
 
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
-import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
-import org.gcube.application.aquamaps.dataModel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Envelope;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Hcaf;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Hspen;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.subconnectors.Coordinates;

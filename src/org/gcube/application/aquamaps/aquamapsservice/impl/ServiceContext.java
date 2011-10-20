@@ -6,12 +6,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.ConnectedPublisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.DummyPublisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.EmbeddedPublisher;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Publisher;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesReader;
+import org.gcube.application.aquamaps.publisher.Publisher;
+import org.gcube.application.aquamaps.publisher.PublisherConfiguration;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 
 
@@ -44,7 +42,7 @@ public class ServiceContext extends GCUBEServiceContext {
 	protected void onReady() throws Exception{
 		
 		
-		
+//		
 //		//Monitoring
 		StatusMonitorThread t=new StatusMonitorThread(getPropertyAsInteger(PropertiesConstants.MONITOR_INTERVAL),
 				getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
@@ -70,20 +68,16 @@ public class ServiceContext extends GCUBEServiceContext {
 		
 		
 		try{
-			if(getPropertyAsBoolean(PropertiesConstants.USE_DUMMY_PUBLISHER)){
-				logger.trace("Publisher is DummyPublisher");			
-				setPublisher(new DummyPublisher());
-			}else if(getPropertyAsBoolean(PropertiesConstants.STANDALONE_MODE)){
-				logger.trace("Publisher is Embedded");
-				setPublisher(new EmbeddedPublisher(
-						getPersistenceRoot().getAbsolutePath(),
-						getPublisherConfigDir().getAbsolutePath()+File.separator,						
-						(String) this.getProperty("httpServerBasePath", true),
-						Integer.parseInt((String)this.getProperty("httpServerPort",true))));
-				}else {
-					logger.trace("Pubilsher is connected");
-					setPublisher(ConnectedPublisher.getPublisher());
-				}
+			publisher=Publisher.getPublisher();
+			PublisherConfiguration config= new PublisherConfiguration(
+					"//localhost/apublisherdb",
+					"utente",
+					"d4science",
+					getPersistenceRoot(),
+					(String) this.getProperty("httpServerBasePath", true),
+					Integer.parseInt((String)this.getProperty("httpServerPort",true))
+					);			
+			publisher.initialize(config);
 			
 		}catch(Exception e){
 			logger.fatal("Unable to initiate Publisher library ",e);
@@ -96,17 +90,19 @@ public class ServiceContext extends GCUBEServiceContext {
 	
 	@Override
     protected void onShutdown() throws Exception {
-        // TODO Auto-generated method stub
+        try{
+        	publisher.shutdown();
+        }catch(Exception e){
+        	logger.fatal("Unable to shutdown publisher ",e);
+        }
         super.onShutdown();
-        if(!getPropertyAsBoolean(PropertiesConstants.USE_DUMMY_PUBLISHER)&&getPropertyAsBoolean(PropertiesConstants.STANDALONE_MODE))
-        	EmbeddedPublisher.stop();
+        
     }
     @Override
     protected void onFailure() throws Exception {
         // TODO Auto-generated method stub
         super.onFailure();
-        if(!getPropertyAsBoolean(PropertiesConstants.USE_DUMMY_PUBLISHER)&&getPropertyAsBoolean(PropertiesConstants.STANDALONE_MODE))
-        	EmbeddedPublisher.stop();
+        
     }
     
     public String getProperty(String paramName)throws Exception{
@@ -124,18 +120,26 @@ public class ServiceContext extends GCUBEServiceContext {
     	return Double.parseDouble(getProperty(propertyName));
     }
     
-    public void setPublisher(Publisher publisher) {
-		this.publisher = publisher;
-	}
-
-	public Publisher getPublisher() {
-		return publisher;
-	}
+   public Publisher getPublisher() {
+	return publisher;
+   }
     
-	public File getPublisherConfigDir(){
-		return ServiceContext.getContext().getFile("publisher", false);
-	}
+	
 	public File getEcoligicalConfigDir(){
-		return ServiceContext.getContext().getFile("generator", false);
-	} 
+		return this.getFile("generator", false);
+	}
+	
+	
+	public String getSerializationPath(){
+		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"Serialized";
+		File f=new File(persistencePath);
+		if(!f.exists())f.mkdirs();
+		return persistencePath;
+	}
+	public String getClusterDir(){
+		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"clusters";
+		File f=new File(persistencePath);
+		if(!f.exists())f.mkdirs();
+		return persistencePath;
+	}
 }

@@ -1,8 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescriptor;
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 
 public interface BatchGeneratorI {
 	

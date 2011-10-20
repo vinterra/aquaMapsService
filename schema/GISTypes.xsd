@@ -27,7 +27,6 @@
 			
   			<xsd:complexType name="layerInfoType">
 				<xsd:sequence>
-					<xsd:element name="id" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="title" type="xsd:string" />
 					<xsd:element name="abstract" type="xsd:string" />
@@ -58,17 +57,13 @@
 				<xsd:restriction base="xsd:string">
 		   	 		<xsd:enumeration  value="Environment"/>
 		   	 		<xsd:enumeration  value="PointMap"/>
-		   	 		<xsd:enumeration  value="NativeRange"/>
-		   	 		<xsd:enumeration  value="SuitableRange"/>
-		   	 		<xsd:enumeration  value="Biodiversity"/>
-		   	 		<xsd:enumeration  value="NativeRange2050"/>
-		   	 		<xsd:enumeration  value="SuitableRange2050"/>
+		   	 		<xsd:enumeration  value="Prediction"/>
+		   	 		<xsd:enumeration  value="Biodiversity"/>		   	 		
 		     	</xsd:restriction>
 			</xsd:simpleType>
 			
 			<xsd:complexType name="WMSContextInfoType">
 				<xsd:sequence>
-					<xsd:element name="id" type="xsd:string" />
 					<xsd:element name="width" type="xsd:int" />
 					<xsd:element name="height" type="xsd:int" />
 					<xsd:element name="displayProjection" type="xsd:string" />
@@ -82,7 +77,7 @@
 					<xsd:element name="title" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="maxResolution" type="xsd:double" />
-					<xsd:element name="layers" type="tns:layerArray" />
+					<xsd:element name="layers" type="coretypes:stringArray" />
 					<xsd:element name="keywords" type="coretypes:stringArray" />
 					<xsd:element name="abstract" type="xsd:string" />
 					<xsd:element name="logoFormat" type="xsd:string" />
@@ -93,20 +88,7 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
-			<xsd:complexType name="layer_type_id">
-				<xsd:sequence>
-					<xsd:element name="id" type="xsd:string" />
-					<xsd:element name="type" type="tns:layerType" />
-				</xsd:sequence>
-			</xsd:complexType>
 			
-			<xsd:complexType name="layer_type_query">
-				<xsd:sequence>
-					<xsd:element name="query" type="xsd:string" />
-					<xsd:element name="type" type="tns:layerType" />
-				</xsd:sequence>
-			</xsd:complexType>
-  
   
   		<!-- Arrays -->
 
@@ -117,10 +99,4 @@
 				</xsd:sequence>
 			</xsd:complexType>
   
-  			<xsd:complexType name="layerTypeIdArray">
-				<xsd:sequence>
-					<xsd:element name="name" type="tns:layer_type_id" 
-							minOccurs="0" maxOccurs="unbounded"/>
-				</xsd:sequence>
-			</xsd:complexType>
-</xsd:schema>
+ </xsd:schema>

@@ -7,21 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.HSPECGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Envelope;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.EnvelopeConverter;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
-import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.HCAF_DFields;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
-import org.gcube.application.aquamaps.dataModel.xstream.EnvelopeConverter;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 
@@ -78,14 +77,14 @@ public class HSPECGeneratorTest {
 		defaultWeights.put(EnvelopeFields.Salinity,Boolean.parseBoolean(prop.getProperty("evaluateSalinity","true").trim()));
 		defaultWeights.put(EnvelopeFields.Temperature, Boolean.parseBoolean(prop.getProperty("evaluateTemperature","true").trim()));
 		
-		List<Field> result= HSPECGenerator.getProbability(s, c, defaultWeights);
+//		List<Field> result= HSPECGenerator.getProbability(s, c, defaultWeights);
 		XStream stream = new XStream();
 		stream.processAnnotations(Envelope.class);
 		stream.processAnnotations(Field.class);
 		stream.registerConverter(new EnvelopeConverter());
 		
-		for(Field f:result)
-			System.out.println(stream.toXML(f));
+//		for(Field f:result)
+//			System.out.println(stream.toXML(f));
 	}
 
 	private static void fromCSVList()throws Exception{

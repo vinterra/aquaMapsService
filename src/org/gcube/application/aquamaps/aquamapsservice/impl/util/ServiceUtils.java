@@ -9,17 +9,14 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-
-import org.apache.axis.components.uuid.UUIDGen;
-import org.apache.axis.components.uuid.UUIDGenFactory;
+import org.apache.commons.io.FileUtils;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class ServiceUtils {
 
-	private static final UUIDGen uuidGen = UUIDGenFactory.getUUIDGen();
-
 	private static DateFormat dateFormatter= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
 	private static DateFormat shortDateFormatter=new SimpleDateFormat("yyyy_MM_dd");
-
+	private static final GCUBELog logger = new GCUBELog(ServiceUtils.class);
 
 	public static String fileToString(String path) throws IOException {
 
@@ -57,11 +54,24 @@ public class ServiceUtils {
 	}
 
 
-	public static void deleteFile(String path) throws IOException {
+	public static void deleteFile(String path) throws IOException {		
 		File f=new File(path);
-		File dir = f.getParentFile();
-		f.delete();
-		if(dir.list().length==0)dir.delete(); 
+		if(f.exists()){
+			if(f.isDirectory()){
+				logger.info("Deleting directory "+path);
+				FileUtils.cleanDirectory(f);
+				FileUtils.deleteDirectory(f);
+			}else{
+				logger.info("Deleting file "+path);
+				File dir = f.getParentFile();
+				FileUtils.forceDelete(f);
+				if(dir.list().length==0){
+					logger.info("Deleting empty parent "+dir.getAbsolutePath());
+					FileUtils.deleteDirectory(dir);
+				}
+			}		 
+		}else logger.info("Path not found "+path);
+
 	}
 
 	public static String generateId(String prefix,String suffix){

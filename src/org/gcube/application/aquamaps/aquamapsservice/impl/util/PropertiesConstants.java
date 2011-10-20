@@ -4,10 +4,8 @@ public class PropertiesConstants {
 	
 	//********************** PROPERTIES
 	//*********	GENERAL
-//	public static final String GIS_MODE="GIS_MODE";
-	public static final String STANDALONE_MODE="STANDALONE_MODE";
-	public static final String USE_DUMMY_PUBLISHER="USE_DUMMY_PUBLISHER";
-	public static final String USE_ENVIRONMENT_MODELLING_LIB="USE_ENVIRONMENT_MODELLING_LIB";
+
+	
 	public static final String ENABLE_SCRIPT_LOGGING="ENABLE_SCRIPT_LOGGING";
 //	public static final String POSTPONE_SUBMISSION="POSTPONE_SUBMISSION";
 	public static final String DEFAULT_PUBLISHER_URL="DEFAULT_PUBLISHER_URL";
@@ -31,7 +29,7 @@ public class PropertiesConstants {
 	public static final String INTERNAL_DB_PORT="INTERNAL_DB_PORT";
 	
 	public static final String INTERNAL_DB_MAX_CONNECTION="INTERNAL_DB_MAX_CONNECTION"; 
-//	public static final String INTERNAL_DB_MAX_IDLE="INTERNAL_DB_MAX_IDLE";
+
 	
 	//********	INTERNAL WEB SERVER
 	
@@ -64,8 +62,8 @@ public class PropertiesConstants {
 	public static final String GEOSERVER_PASSWORD="GEOSERVER_PASSWORD";
 	public static final String GEOSERVER_TEMPLATE_GROUP="GEOSERVER_TEMPLATE_GROUP";
 	public static final String GEOSERVER_DEFAULT_DISTRIBUTION_STYLE="GEOSERVER_DEFAULT_DISTRIBUTION_STYLE";
-	
-	
+	public static final String GEOSERVER_WAIT_FOR_DB_MS="GEOSERVER_WAIT_FOR_DB_MS";
+	public static final String GEOSERVER_WAIT_FOR_FT="GEOSERVER_WAIT_FOR_FT";
 	//********* WORKERS CONFIGURATION
 	
 	public static final String JOB_MAX_WORKERS="JOB_MAX_WORKERS";
@@ -84,10 +82,7 @@ public class PropertiesConstants {
 	public static final String HSPEC_GROUP_PRIORITY="HSPEC_GROUP_PRIORITY";
 	
 	//********* SOURCES
-//	
-//	public static final String DEFAULT_HSPEC_ID="DEFAULT_HSPEC_ID";
-//	public static final String DEFAULT_HCAF_ID="DEFAULT_HCAF_ID";
-//	public static final String DEFAULT_HSPEN_ID="DEFAULT_HSPEN_ID";
+
 	
 	//********* DEFAULT DB VALUES
 	

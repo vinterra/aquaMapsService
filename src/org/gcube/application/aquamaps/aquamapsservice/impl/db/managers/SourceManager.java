@@ -1,6 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,15 +8,16 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.SourceImporter;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceStatus;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceManager {
@@ -25,19 +25,6 @@ public class SourceManager {
 	private static final GCUBELog logger=new GCUBELog(SourceManager.class);	
 	
 	private static final String sourcesTable="meta_sources";
-	
-	
-	
-//	public static int getDefaultId(ResourceType type)throws Exception{
-//		switch(type){
-//		case HCAF: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HCAF_ID);
-//		case HSPEC: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEC_ID);
-//		case HSPEN: return ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.DEFAULT_HSPEN_ID);
-//		}		
-//		return 0;
-//		
-////		return 1;
-//	}
 	
 	
 	public static int getDefaultId(ResourceType type)throws Exception{
@@ -59,12 +46,6 @@ public class SourceManager {
 	public static Resource registerSource(Resource toRegister)throws Exception{
 		DBSession session=null;
 		logger.trace("registering source "+toRegister);
-//		String toSetSourceName=null;
-//		try{
-//			toRegister.setSgetSourceName(sourceType, toSetSourceId);
-//		}catch(Exception e){
-//			logger.trace("source not found, skipping..");			
-//		}
 		try{
 			session=DBSession.getInternalDBSession();
 			List<List<Field>> rows= new ArrayList<List<Field>>();

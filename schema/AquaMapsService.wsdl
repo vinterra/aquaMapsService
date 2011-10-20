@@ -21,8 +21,8 @@
 				schemaLocation="../gcube/common/core/types/GCUBETypes.xsd" />
 		<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/types"
 		 schemaLocation="AquaMapsTypes.xsd"/>
-		 <xsd:import namespace="http://gcube-system.org/namespaces/common/gis/types"
-		 schemaLocation="GISTypes.xsd" />
+		- 		<xsd:import namespace="http://gcube-system.org/namespaces/common/gis/types"
+				schemaLocation="GISTypes.xsd" />
 		
 
 			<!-- Request / Response Types-->

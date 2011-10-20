@@ -3,7 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 import java.util.ArrayList;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{

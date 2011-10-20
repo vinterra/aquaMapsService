@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
@@ -22,24 +23,25 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetPhylogenyRequestT
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AreaType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
-import org.gcube.application.aquamaps.dataModel.AquaMap;
-import org.gcube.application.aquamaps.dataModel.FieldArray;
-import org.gcube.application.aquamaps.dataModel.Types.AreaType;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
-import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
-import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
+import org.gcube.application.aquamaps.datamodel.AquaMap;
+import org.gcube.application.aquamaps.datamodel.FieldArray;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -170,7 +172,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
-	public String submitJob(org.gcube.application.aquamaps.dataModel.Job req)throws GCUBEFault{
+	public String submitJob(org.gcube.application.aquamaps.datamodel.Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
 			logger.trace("Forcing group enabling if layers requested");
@@ -239,7 +241,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 
 
-	public org.gcube.application.aquamaps.dataModel.Resource getResourceInfo(org.gcube.application.aquamaps.dataModel.Resource myResource) throws GCUBEFault{
+	public org.gcube.application.aquamaps.datamodel.Resource getResourceInfo(org.gcube.application.aquamaps.datamodel.Resource myResource) throws GCUBEFault{
 		Resource toReturn=new Resource(myResource);		
 		
 		try{
@@ -312,7 +314,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		
 	}
 
-	public org.gcube.application.aquamaps.dataModel.Submitted loadSubmittedById(int arg0) throws RemoteException,
+	public org.gcube.application.aquamaps.datamodel.Submitted loadSubmittedById(int arg0) throws RemoteException,
 			GCUBEFault {
 		try{
 			logger.trace("Loading submitted id : "+arg0);
@@ -327,12 +329,9 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 	public AquaMap getObject(int arg0) throws RemoteException, GCUBEFault {
 		try{
-			AquaMapsObject toReturn=ServiceContext.getContext().getPublisher().getAquaMapsObjectById(arg0);
-			if(toReturn==null){
-				logger.trace("Object with id "+arg0+" not found");
-				return null;
-			}
-			else return toReturn.toStubsVersion();
+			AquaMapsObject obj=AquaMapsManager.loadObject(arg0,true,true);
+//			logger.info("Object IS "+AquaMapsXStream.getXMLInstance().toXML(obj));
+			return obj.toStubsVersion();
 			
 		}catch(Exception e){
 			logger.error("",e);
