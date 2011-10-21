@@ -83,13 +83,16 @@ public class DeletionMonitor extends Thread {
 						if(!toDeleteSubmitted.getIsCustomized()){
 							ArrayList<Field> fileSetFilter=new ArrayList<Field>();
 							fileSetFilter.add(new Field(SubmittedFields.filesetid+"",toDeleteSubmitted.getFileSetId(),FieldType.STRING));
-							if(SubmittedManager.getList(fileSetFilter).size()>0) deleteFileSet=false;
-								publisher.deleteById(FileSet.class, fileSetDestroyer, toDeleteSubmitted.getFileSetId());
+							for(Submitted found:SubmittedManager.getList(fileSetFilter)){
+								if(!found.getSearchId().equals(toDeleteSubmitted.getSearchId())) {
+									deleteFileSet=false;
+									break;
+								}
+							}
 							ArrayList<Field> gisFilter=new ArrayList<Field>();
-							gisFilter.add(new Field(SubmittedFields.iscustomized+"",false+"",FieldType.BOOLEAN));
-							gisFilter.add(new Field(SubmittedFields.speciescoverage+"",toDeleteSubmitted.getSpeciesCoverage(),FieldType.STRING));
+							gisFilter.add(new Field(SubmittedFields.gispublishedid+"",toDeleteSubmitted.getGisPublishedId(),FieldType.STRING));							
 							for(Submitted found:SubmittedManager.getList(gisFilter)){
-								if(!found.getSearchId().equals(toDeleteSubmitted.getSearchId())&&found.getGisPublishedId().equals(toDeleteSubmitted.getGisPublishedId())) {
+								if(!found.getSearchId().equals(toDeleteSubmitted.getSearchId())) {
 									deleteLayer=false;
 									break;
 								}
