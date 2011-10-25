@@ -436,8 +436,8 @@ public class JobManager extends SubmittedManager{
 						if(obj.getGis())							
 							row.add(toUse.getField(SubmittedFields.gispublishedid));
 						
-						row.add(toUse.getField(SubmittedFields.starttime));
-						row.add(toUse.getField(SubmittedFields.endtime));
+						row.add(new Field(SubmittedFields.starttime+"",System.currentTimeMillis()+"",FieldType.LONG));
+						row.add(new Field(SubmittedFields.endtime+"",System.currentTimeMillis()+"",FieldType.LONG));
 						row.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));
 						obj.setStatus(SubmittedStatus.Completed);
 					}else{
@@ -471,6 +471,7 @@ public class JobManager extends SubmittedManager{
 			session.commit();
 			
 			if(isJobComplete(toPerform.getId())){
+				setStartTime(toPerform.getId());				
 				toPerform.setStatus(SubmittedStatus.Completed);
 				logger.debug("All objects completed");
 				if(toPerform.getIsGis()){

@@ -1,6 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class RequestsMonitor extends Thread {
@@ -20,7 +22,14 @@ public class RequestsMonitor extends Thread {
 			try{
 				for(Submitted found:JobExecutionManager.getAvailableRequests(object)){
 						logger.trace("Found pending "+(object?"OBJ ":"JOB ")+found.getTitle()+", ID : "+found.getSearchId());
-						JobExecutionManager.start(found);
+						try{
+							JobExecutionManager.start(found);
+						}catch(Exception e){
+							logger.error("Unable to execute "+found,e);
+							if(found!=null){
+								SubmittedManager.updateStatus(found.getSearchId(),SubmittedStatus.Error);
+							}
+						}
 				}
 			}catch(Exception e){
 				logger.error("Unexpected exception", e);

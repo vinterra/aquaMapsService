@@ -57,6 +57,7 @@ public class AquaMapsManager extends SubmittedManager{
 			filter.add(new Field(SubmittedFields.speciescoverage+"",md5SpeciesCoverage,FieldType.STRING));
 			filter.add(new Field(SubmittedFields.iscustomized+"",includeCustomized+"",FieldType.BOOLEAN));
 			filter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));
+			filter.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
 			return Submitted.loadResultSet(session.executeFilteredQuery(filter, submittedTable, SubmittedFields.searchid+"", OrderDirection.ASC));
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}

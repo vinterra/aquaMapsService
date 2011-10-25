@@ -31,6 +31,15 @@ public class PropertiesConstants {
 	public static final String INTERNAL_DB_MAX_CONNECTION="INTERNAL_DB_MAX_CONNECTION"; 
 
 	
+	//********** PUBLISHER DB ACCESS
+	
+	public static final String PUBLISHER_DB_USERNAME="PUBLISHER_DB_USERNAME";
+	public static final String PUBLISHER_DB_PASSWORD="PUBLISHER_DB_PASSWORD";
+//	public static final String PUBLISHER_DB_TYPE="PUBLISHER_DB_TYPE";
+	public static final String PUBLISHER_DB_NAME="PUBLISHER_DB_NAME";
+	public static final String PUBLISHER_DB_HOST="PUBLISHER_DB_HOST";
+	public static final String PUBLISHER_DB_PORT="PUBLISHER_DB_PORT";
+	
 	//********	INTERNAL WEB SERVER
 	
 	public static final String HTTP_SERVER_BASE_PORT="HTTP_SERVER_BASE_PORT";

@@ -275,6 +275,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			
 			parameters.add(new Field(SubmittedFields.author+"",arg0.getUserID(),FieldType.STRING));
 			parameters.add(new Field(SubmittedFields.isaquamap+"",arg0.isAquamaps()+"",FieldType.BOOLEAN));
+			parameters.add(new Field(SubmittedFields.todelete+"",false+"",FieldType.BOOLEAN));
 			if(arg0.isJobIdEnabled()) {
 				parameters.add(new Field(SubmittedFields.jobid+"",arg0.getJobIdValue()+"",FieldType.INTEGER));
 			}

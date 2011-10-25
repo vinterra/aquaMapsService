@@ -78,7 +78,7 @@ public class DeletionMonitor extends Thread {
 					long start=System.currentTimeMillis();
 					logger.debug("Deleting submitted "+toDeleteSubmitted);
 					if(toDeleteSubmitted.getIsAquaMap()){
-						boolean deleteLayer=true;
+						boolean deleteLayer=toDeleteSubmitted.getGisEnabled();
 						boolean deleteFileSet=true;
 						if(!toDeleteSubmitted.getIsCustomized()){
 							ArrayList<Field> fileSetFilter=new ArrayList<Field>();
@@ -98,13 +98,13 @@ public class DeletionMonitor extends Thread {
 								}
 							}
 						}
-						if(deleteFileSet)
+						if(deleteFileSet&&toDeleteSubmitted.getFileSetId()!=null&&!toDeleteSubmitted.getFileSetId().equalsIgnoreCase("null"))
 							try{								
 								publisher.deleteById(FileSet.class, fileSetDestroyer, toDeleteSubmitted.getFileSetId());
 							}catch(Exception e){
 								logger.warn("Unable to delete FileSet "+toDeleteSubmitted.getFileSetId(),e);
 							}
-						if(deleteLayer)
+						if(deleteLayer&&toDeleteSubmitted.getGisPublishedId()!=null&&!toDeleteSubmitted.getGisPublishedId().equalsIgnoreCase("null"))
 							try{ 
 								publisher.deleteById(Layer.class,layerDestroyer,toDeleteSubmitted.getGisPublishedId());
 							}catch(Exception e){

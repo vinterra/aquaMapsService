@@ -113,6 +113,9 @@ public class JobWorker extends Thread{
 				if(toSubmitRequests.size()>0)
 					JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
 
+				if(!JobManager.isJobComplete(tableReference.getSearchId())) throw new Exception("JOB RELEASED BEFORE OBJECT WORKERS COMPLETED!!!");
+				
+				
 				if(tableReference.getGisEnabled()){
 					String wmsID=ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(tableReference.getSearchId())){
 						@Override

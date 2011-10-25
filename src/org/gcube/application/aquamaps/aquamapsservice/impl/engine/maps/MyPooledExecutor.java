@@ -56,7 +56,7 @@ public class MyPooledExecutor extends ThreadPoolExecutor {
 	
 	
 	public MyPooledExecutor(String threadLabel,int threadPriority,int maxThread,int minThread,int keepalive) {
-		super(minThread,maxThread,keepalive,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(maxThread),new BlockingRejectionHandler());
+		super(minThread,maxThread,Long.MAX_VALUE,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(maxThread),new BlockingRejectionHandler());
 		setThreadFactory(new MyThreadFactory(threadLabel, threadPriority));
 		
 //		super(new BoundedBuffer(maxThread));
@@ -68,7 +68,7 @@ public class MyPooledExecutor extends ThreadPoolExecutor {
 	}
 	
 	public MyPooledExecutor(String threadLabel,int maxThread,int minThread,int keepalive) {
-		super(minThread,maxThread,keepalive,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(maxThread), new BlockingRejectionHandler());
+		super(minThread,maxThread,Long.MAX_VALUE,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(maxThread), new BlockingRejectionHandler());
 		setThreadFactory(new MyThreadFactory(threadLabel));
 		
 //		

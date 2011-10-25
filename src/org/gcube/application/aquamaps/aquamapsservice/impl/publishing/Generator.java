@@ -187,7 +187,7 @@ public abstract class Generator<T> implements ObjectManager<T> {
 			if (rs.next()) {
 				return new AquaMapsObjectData(rs.getInt(GENERATION_ID),
 						rs.getString(GENERATION_csq),
-						rs.getInt(GENERATION_max), rs.getInt(GENERATION_min),
+						rs.getInt(GENERATION_min), rs.getInt(GENERATION_max),
 						rs.getString(GENERATION_csv),
 						rs.getString(GENERATION_path));
 			} else {
@@ -289,10 +289,13 @@ public abstract class Generator<T> implements ObjectManager<T> {
 						objectDescriptor.getTitle());
 
 				rs.first();
-				Integer min = rs.getInt(2);
+				Integer max = rs.getInt(AquaMapsManager.maxSpeciesCountInACell);
 				rs.last();
-				Integer max = rs.getInt(2);
+				Integer min = rs.getInt(AquaMapsManager.maxSpeciesCountInACell);
 
+				logger.info("Biodiversity query for object ID "+objectDescriptor.getSearchId()+" FOUND min : "+min+" max : "+max);
+				
+				
 				String csvFile = ServiceContext.getContext()
 				.getPersistenceRoot()
 				+ File.separator

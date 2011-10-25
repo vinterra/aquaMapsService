@@ -70,9 +70,9 @@ public class ServiceContext extends GCUBEServiceContext {
 		try{
 			publisher=Publisher.getPublisher();
 			PublisherConfiguration config= new PublisherConfiguration(
-					"//localhost/apublisherdb",
-					"utente",
-					"d4science",
+					"//"+getProperty(PropertiesConstants.PUBLISHER_DB_HOST)+":"+getProperty(PropertiesConstants.PUBLISHER_DB_PORT)+"/"+getProperty(PropertiesConstants.PUBLISHER_DB_NAME),
+					getProperty(PropertiesConstants.PUBLISHER_DB_USERNAME),
+					getProperty(PropertiesConstants.PUBLISHER_DB_PASSWORD),
 					getPersistenceRoot(),
 					(String) this.getProperty("httpServerBasePath", true),
 					Integer.parseInt((String)this.getProperty("httpServerPort",true))
