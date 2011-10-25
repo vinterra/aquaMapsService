@@ -27,12 +27,12 @@ public class WrapperTest {
 	static String specId="Fis-22836";
 	static String DEVSEC="/gcube/devsec";
 	static String ECOSYSTEM="/d4science.research-infrastructures.eu/Ecosystem";
-	
-	
+	static String FARM="/d4science.research-infrastructures.eu/FARM";
+	static String gCubeApps="/d4science.research-infrastructures.eu/gCubeApps";
 	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(DEVSEC),AquaMapsServiceTester.AQ_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(gCubeApps),AquaMapsServiceTester.AQ_SERVICE_URI);
 //		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		
@@ -105,7 +105,7 @@ public class WrapperTest {
 
 //		wrapper.submitJob(DummyObjects.createDummyJob(false, false, false, true));
 		
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(412133)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(359496)));
 		
 		
 		

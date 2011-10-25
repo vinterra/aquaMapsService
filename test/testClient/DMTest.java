@@ -30,7 +30,7 @@ public class DMTest {
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
+		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope(WrapperTest.ECOSYSTEM), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
