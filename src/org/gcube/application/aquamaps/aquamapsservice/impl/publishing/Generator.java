@@ -279,7 +279,7 @@ public abstract class Generator<T> implements ObjectManager<T> {
 
 			if (rs.first()) {
 
-				String path = SpeciesManager.getCommonTaxonomy(selectedSpecies);
+				String path = SpeciesManager.getCommonTaxonomy(selectedSpecies)+File.separator+ServiceUtils.generateId(objectDescriptor.getTitle(), "");
 
 				// ******PERL
 				String clusterFile = FileSetUtils.createClusteringFile(
@@ -338,9 +338,9 @@ public abstract class Generator<T> implements ObjectManager<T> {
 				s.getFieldbyName(SpeciesOccursumFields.classcolumn+"").getValue()+File.separator+
 				s.getFieldbyName(SpeciesOccursumFields.ordercolumn+"").getValue()+File.separator+
 				s.getFieldbyName(SpeciesOccursumFields.familycolumn+"").getValue()+File.separator+
-				s.getId();
+				s.getId()+(objectDescriptor.getIsCustomized()?ServiceUtils.generateId(objectDescriptor.getAuthor(), ""):"");
 				String clusterFile=FileSetUtils.createClusteringFile(objectDescriptor.getSearchId(),objectDescriptor.getJobId()
-						,FileSetUtils.clusterize(rs, 2, 1, 2,true),objectDescriptor.getTitle());
+						,FileSetUtils.clusterize(rs, 2, 1, 2,false),objectDescriptor.getTitle());
 
 				String csvFile=ServiceContext.getContext().getPersistenceRoot()+File.separator+
 				objectDescriptor.getJobId()+File.separator+objectDescriptor.getTitle()+".csv";

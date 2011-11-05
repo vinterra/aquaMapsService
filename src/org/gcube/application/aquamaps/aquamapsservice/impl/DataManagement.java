@@ -350,33 +350,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		
 	}
 	
-//	@Override
-//	public String queryResource(QueryResourceRequestType arg0)
-//			throws RemoteException, GCUBEFault {
-//		DBSession session=null;
-//		try{
-//			logger.trace("Direct Query request : ");
-//			logger.trace("Query : "+arg0.getQueryString());
-//			logger.trace("Sort "+arg0.getSortColumn()+" "+arg0.getSortDirection());
-//			logger.trace("LIMIT "+arg0.getLimit()+" OFFSET "+arg0.getOffset());
-//			session=DBSession.getInternalDBSession();
-//			String query=arg0.getQueryString()+
-//				((arg0.getSortColumn()!=null&&!arg0.getSortDirection().equalsIgnoreCase("null"))?" ORDER BY "+arg0.getSortColumn()+" "+arg0.getSortDirection():" ");
-//			session.disableAutoCommit();
-//			logger.trace("Gonna execute direct query : "+query);
-//			return DBUtils.toJSon(session.executeQuery(query),arg0.getOffset(),arg0.getOffset()+arg0.getLimit());
-//		}catch(Exception e){
-//			logger.error("Unable to execute request ",e);
-//			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-//		}finally{
-//			if(session!=null)
-//				try {
-//					session.close();
-//				} catch (Exception e) {
-//					logger.error("Unexpected error while closing session ",e);
-//				}
-//		}
-//	}
+
 	
 	
 	@Override

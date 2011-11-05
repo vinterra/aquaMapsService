@@ -422,6 +422,7 @@ public class JobManager extends SubmittedManager{
 				row.add(new Field(SubmittedFields.iscustomized+"",customized+"",FieldType.BOOLEAN));
 				row.add(new Field(SubmittedFields.speciescoverage+"",speciesCoverage,FieldType.STRING));
 				row.add(new Field(SubmittedFields.serializedobject+"",serializedObjectPath,FieldType.STRING));
+				row.add(new Field(SubmittedFields.todelete+"",false+"",FieldType.BOOLEAN));
 				if(!customized){
 					
 					//***************CHECK IF EXISTING LAYERS / IMG

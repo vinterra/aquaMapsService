@@ -32,6 +32,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Algo
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.publisher.StoreConfiguration;
 import org.gcube.application.aquamaps.publisher.UpdateConfiguration;
 import org.gcube.application.aquamaps.publisher.StoreConfiguration.StoreMode;
@@ -112,8 +113,19 @@ public class JobWorker extends Thread{
 				logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
 				if(toSubmitRequests.size()>0)
 					JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
-
-				if(!JobManager.isJobComplete(tableReference.getSearchId())) throw new Exception("JOB RELEASED BEFORE OBJECT WORKERS COMPLETED!!!");
+				while(!JobManager.isJobComplete(tableReference.getSearchId())){
+					logger.trace("Job [ID : "+tableReference.getSearchId()+"] was not finished, forcing generation for skipped objects..");
+					toSubmitRequests=new ArrayList<AquaMapsObjectExecutionRequest>();
+					for(Submitted submitted:JobManager.getObjects(tableReference.getSearchId())){
+						if(!submitted.getStatus().equals(SubmittedStatus.Error)&&!submitted.getStatus().equals(SubmittedStatus.Completed));
+						toSubmitRequests.add((AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submitted.getSerializedRequest()));
+					}
+					logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
+					if(toSubmitRequests.size()>0)
+						JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
+					else throw new Exception("No object to resubmit for Job [ID : "+tableReference.getSearchId()+"]");
+				}
+				
 				
 				
 				if(tableReference.getGisEnabled()){

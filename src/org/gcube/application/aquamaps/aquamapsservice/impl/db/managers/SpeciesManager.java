@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -272,7 +273,35 @@ public class SpeciesManager {
 	}
 	
 	public static String getCommonTaxonomy(Set<Species> species)throws Exception{
-		//TODO
-		return "";
+		logger.info("Chcking common taxonomy, to analyze species count : "+species.size());
+		logger.info("loading species static info..");		
+		long start=System.currentTimeMillis();		
+		Set<Species> enrichedSpecies=new HashSet<Species>();
+		for(Species s: species)enrichedSpecies.add(getSpeciesById(true, false, s.getId(), 0));
+		logger.info("Loaded in "+(System.currentTimeMillis()-start)+" ms");		
+		HashMap<SpeciesOccursumFields,String> commonLevels=new HashMap<SpeciesOccursumFields, String>();
+		SpeciesOccursumFields[] toCheckValues=new SpeciesOccursumFields[]{
+			SpeciesOccursumFields.kingdom,
+			SpeciesOccursumFields.phylum,
+			SpeciesOccursumFields.classcolumn,
+			SpeciesOccursumFields.ordercolumn,
+			SpeciesOccursumFields.familycolumn
+		};
+		boolean continueCheck=true;
+		for(SpeciesOccursumFields toCheck:toCheckValues){
+			if(continueCheck)for(Species s: enrichedSpecies){
+				if(!commonLevels.containsKey(toCheck))commonLevels.put(toCheck, s.getFieldbyName(toCheck+"").getValue());
+				else if(!s.getFieldbyName(toCheck+"").getValue().equalsIgnoreCase(commonLevels.get(toCheck))){
+					continueCheck=false;
+					commonLevels.remove(toCheck);
+				}
+			}
+		}
+		StringBuilder toReturn=new StringBuilder();
+		for(SpeciesOccursumFields level:toCheckValues)
+			if(commonLevels.containsKey(level))toReturn.append(commonLevels.get(level)+File.separator);
+		if(toReturn.length()>0)toReturn.deleteCharAt(toReturn.lastIndexOf(File.separator));
+		logger.info("Found common taxonomy in "+(System.currentTimeMillis()-start)+" ms");
+		return toReturn.toString();
 	}
 }

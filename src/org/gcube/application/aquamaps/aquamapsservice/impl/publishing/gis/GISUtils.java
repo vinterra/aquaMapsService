@@ -303,7 +303,7 @@ public class GISUtils {
 	 private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex) throws Exception{		
 		GeoserverCaller caller= getCaller();
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();
-		featureTypeRest.setDatastore(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME));
+		featureTypeRest.setDatastore(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DATASTORE));
 		featureTypeRest.setEnabled(true);
 		featureTypeRest.setLatLonBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
 		featureTypeRest.setNativeBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));

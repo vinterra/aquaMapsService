@@ -62,7 +62,7 @@ public class CustomQueryManager {
 			if(rs.next()) {
 				String tableName=rs.getString(userQueryResultTable);
 				Long count=rs.getLong(userQueryCount);
-				String query= "SELECT * from "+tableName+" LIMIT "+settings.getLimit()+" OFFSET "+settings.getOffset();
+				String query="SELECT * from "+tableName+" ORDER BY "+settings.getOrderColumn()+" "+settings.getOrderDirection()+" LIMIT "+settings.getLimit()+" OFFSET "+settings.getOffset();
 				return DBUtils.toJSon(session.executeQuery(query),count);
 			}else return null;
 		}catch(Exception e){throw e;}

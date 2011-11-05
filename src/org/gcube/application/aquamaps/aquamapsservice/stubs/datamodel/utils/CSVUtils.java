@@ -30,7 +30,7 @@ public class CSVUtils {
 		ArrayList<String> toReturn= new ArrayList<String>();
 		if(theString!=null)
 			for(String s:theString.split(","))
-				toReturn.add(s.trim());
+				if(s!=null&&!s.equals("")&&!s.equals(" "))toReturn.add(s.trim());
 		return toReturn;
 	}
 
@@ -38,8 +38,8 @@ public class CSVUtils {
 		StringBuilder toReturn=new StringBuilder();
 		if((values!=null)&&(values.size()>0)){
 			for(String v:values)
-				toReturn.append(v.trim()+",");
-			toReturn.deleteCharAt(toReturn.lastIndexOf(","));
+				if(v!=null&&!v.equals("")&&!v.equals(" "))toReturn.append(v.trim()+",");
+			if(toReturn.lastIndexOf(",")>-1)toReturn.deleteCharAt(toReturn.lastIndexOf(","));
 		}
 		return toReturn.toString();
 	}

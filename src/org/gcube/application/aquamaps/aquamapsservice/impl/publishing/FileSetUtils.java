@@ -132,6 +132,8 @@ public class FileSetUtils {
 	static int  generateImages(String file) throws Exception{
 		BufferedReader  input=null;
 		try{
+			File tmpImgFolder=new File(GENERATED_IMAGES);
+			tmpImgFolder.mkdirs();
 		logger.trace("Checking perl...");
 		String perlFileLocation=System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid"+
 		File.separator+"bin"+File.separator+"cs_mapMod.pl";

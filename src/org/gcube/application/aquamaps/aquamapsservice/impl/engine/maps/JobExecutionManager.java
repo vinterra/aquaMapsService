@@ -100,9 +100,9 @@ public class JobExecutionManager {
 
 
 
-		RequestsMonitor jobMonitor=new RequestsMonitor(false);
+		RequestsMonitor jobMonitor=RequestsMonitor.get(false);
 		jobMonitor.start();
-		RequestsMonitor objMonitor=new RequestsMonitor(true);
+		RequestsMonitor objMonitor=RequestsMonitor.get(true);
 		objMonitor.start();
 
 
@@ -153,6 +153,7 @@ public class JobExecutionManager {
 			request.getObject().setSerializedRequest(file);
 			request.getObject().setStatus(SubmittedStatus.Generating);
 			AquaMapsXStream.serialize(file, request);
+			SubmittedManager.update(request.getObject());
 		}
 		int jobId=requests.get(0).getObject().getJobId();
 		logger.trace("Creating "+requests.size()+" requests for objects execution for job "+jobId);
@@ -164,7 +165,7 @@ public class JobExecutionManager {
 		insertedObjects.release(requests.size());
 
 		//************* BLOCKS current job
-		((Semaphore)blockedJobs.get(jobId)).acquire();
+		((Semaphore)blockedJobs.get(jobId)).acquireUninterruptibly();
 		blockedJobs.remove(jobId);
 	}
 
@@ -221,14 +222,14 @@ public class JobExecutionManager {
 
 	
 
-	public static List<Submitted> getAvailableRequests(boolean object)throws Exception {
-		if(object) insertedObjects.acquire();
-		else insertedJobs.acquire();
+	public static List<Submitted> getAvailableRequests(boolean object,int maxSize)throws Exception {
+		if(object) insertedObjects.acquireUninterruptibly();
+		else insertedJobs.acquireUninterruptibly();
 
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.isaquamap+"",object+"",FieldType.BOOLEAN));
 		filter.add(new Field(SubmittedFields.status+"",(object?SubmittedStatus.Generating:SubmittedStatus.Pending)+"",FieldType.STRING));
-		PagedRequestSettings settings= new PagedRequestSettings(1,0,SubmittedFields.submissiontime+"",PagedRequestSettings.OrderDirection.DESC);
+		PagedRequestSettings settings= new PagedRequestSettings(maxSize,0,SubmittedFields.submissiontime+"",PagedRequestSettings.OrderDirection.ASC);
 		return SubmittedManager.getList(filter, settings);
 	}
 

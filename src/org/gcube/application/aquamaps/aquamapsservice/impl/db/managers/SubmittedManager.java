@@ -57,7 +57,7 @@ public class SubmittedManager {
 	protected static int updateField(int id,SubmittedFields field,FieldType type,Object value)throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.getInternalDBSession();
+			session=DBSession.getInternalDBSession();			
 			List<List<Field>> keys=new ArrayList<List<Field>>();
 			List<Field> filter= new ArrayList<Field>();
 			filter.add(new Field(SubmittedFields.searchid+"",id+"",FieldType.INTEGER));

@@ -62,6 +62,7 @@ public class PropertiesConstants {
 	public static final String GEOSERVER_DB_MAX_CONNECTION="GEOSERVER_DB_MAX_CONNECTION"; 
 //	public static final String GEOSERVER_DB_MAX_IDLE="GEOSERVER_DB_MAX_IDLE";
 	
+	public static final String GEOSERVER_DATASTORE="GEOSERVER_DATASTORE";
 	
 	
 	public static final String GEOSERVER_WORKSPACE="GEOSERVER_WORKSPACE";

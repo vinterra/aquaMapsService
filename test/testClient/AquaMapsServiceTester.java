@@ -26,11 +26,11 @@ public class AquaMapsServiceTester {
 //	private static final String SERVICE_URI="http://localhost:9000/wsrf/services/gcube/application/aquamaps/AquaMaps";
 	
 //	static final String AQ_SERVICE_URI="http://aquamaps.ifm-geomar.de:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
-//	static final String AQ_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
+	static final String AQ_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 //	static final String DM_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
 	
 	
-	static final String AQ_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
+//	static final String AQ_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	static final String DM_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
 	static final String RS_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/common/searchservice/ResultSet";
 	

@@ -31,6 +31,7 @@ public class AquaMapsObjectWorker extends Thread {
 		try{
 			logger.debug("Started OBJECT "+request.getObject().getSearchId()+"Execution");
 			SubmittedManager.setStartTime(request.getObject().getSearchId());
+			request.setObject(SubmittedManager.getSubmittedById(request.getObject().getSearchId()));			
 			Publisher publisher=ServiceContext.getContext().getPublisher();
 			CoverageDescriptor descriptor=new CoverageDescriptor(request.getObject().getSourceHSPEC()+"", request.getObject().getSpeciesCoverage());
 			String fileSetID=null;

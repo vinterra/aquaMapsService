@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
+import java.util.List;
+
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
@@ -10,7 +12,21 @@ public class RequestsMonitor extends Thread {
 	
 	private boolean object;
 	
-	public RequestsMonitor(boolean object) {
+	private static RequestsMonitor jobInstance=null;
+	private static RequestsMonitor objInstance=null;
+	
+	
+	public static RequestsMonitor get(boolean object){
+		if(object){
+			if(objInstance==null) objInstance=new RequestsMonitor(object);
+			return objInstance;
+		}else{
+			if(jobInstance==null) jobInstance=new RequestsMonitor(object);
+			return jobInstance;
+		}
+	}
+	
+	private RequestsMonitor(boolean object) {
 		super((object?"OBJ":"JOB")+"_REQUESTS_MONITOR");
 		this.object=object;
 	}
@@ -20,8 +36,10 @@ public class RequestsMonitor extends Thread {
 	public void run() {
 		while(true){
 			try{
-				for(Submitted found:JobExecutionManager.getAvailableRequests(object)){
-						logger.trace("Found pending "+(object?"OBJ ":"JOB ")+found.getTitle()+", ID : "+found.getSearchId());
+				List<Submitted> foundList=JobExecutionManager.getAvailableRequests(object,20);
+				if(foundList.size()>0)logger.info("FOUND "+foundList.size()+" PENDING "+(object?"OBJ":"JOB")+" REQUESTS ");
+				for(Submitted found:foundList){
+						logger.trace("handling pending "+(object?"OBJ ":"JOB ")+found.getTitle()+", ID : "+found.getSearchId());
 						try{
 							JobExecutionManager.start(found);
 						}catch(Exception e){

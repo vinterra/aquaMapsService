@@ -315,6 +315,6 @@ public class Job extends DataModel{
 		this.wmsContextId = wmsContextId;
 	}
 	public String getCompressedCoverage(){
-		return AquaMapsObject.generateMD5(selectedSpecies);
+		return AquaMapsObject.generateMD5(selectedSpecies,"");
 	}
 }

@@ -198,13 +198,13 @@ public class AquaMapsObject extends DataModel{
 	}
 	
 	public String getCompressedSpeciesCoverage(){
-		return generateMD5(selectedSpecies);
+		return generateMD5(selectedSpecies,(type.equals(ObjectType.Biodiversity)?threshold+"":""));
 	}
 	
-	public static String generateMD5(Set<Species> set){
+	public static String generateMD5(Set<Species> set,String toIncludeParameterList){
 		StringBuilder concatSpeciesIds=new StringBuilder();
 		for(Species s : set) concatSpeciesIds.append(s.getId()+",");
 		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
-		return DigestUtils.md5Hex(concatSpeciesIds.toString());
+		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
 	}
 }

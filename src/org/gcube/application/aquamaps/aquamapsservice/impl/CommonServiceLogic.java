@@ -28,21 +28,21 @@ public class CommonServiceLogic {
 	public static int generateMaps_Logic(int hspecId,List<Field> speciesFilter, String author, boolean enableGIS)throws Exception{
 		logger.trace("Gnerating job for maps generation :");
 		logger.trace("HSPEC id :" +hspecId);
-		
-		if(speciesFilter.size()==0){
-			Submitted existing=getAlreadySubmitted(hspecId, author, enableGIS);
-			if(existing!=null) {
-				logger.trace("Found existing job "+existing.getSearchId()+", submitted by "+existing.getAuthor());
-				return existing.getSearchId();
-			}
-		}
-		
 		Job job=new Job();
 		Resource hspec=SourceManager.getById(hspecId);
 		job.setSourceHSPEC(hspec);
 		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFId()));
 		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENId()));
 		job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
+		
+		if(speciesFilter.size()==0){
+			Submitted existing=getAlreadySubmitted(hspecId, enableGIS,job.getCompressedCoverage());
+			if(existing!=null) {
+				logger.trace("Found existing job "+existing.getSearchId()+", submitted by "+existing.getAuthor());
+				return existing.getSearchId();
+			}
+		}
+		
 		if(job.getSelectedSpecies().size()==0) throw new Exception("NO SPECIES SELECTED");
 		
 		
@@ -70,15 +70,17 @@ public class CommonServiceLogic {
 	}
 
 	
-	private static Submitted getAlreadySubmitted(int hspecId, String author, boolean GIS)throws Exception{
+	private static Submitted getAlreadySubmitted(int hspecId, boolean GIS,String speciesCoverage)throws Exception{
 		logger.trace("Looking for submitted job for hspecID : "+hspecId+", GIS :"+GIS);
 		ArrayList<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.sourcehspec+"",hspecId+"",FieldType.INTEGER));		
 		filter.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));		
-		if(GIS) filter.add(new Field(SubmittedFields.gisenabled+"",true+"",FieldType.BOOLEAN));
+		if(GIS) filter.add(new Field(SubmittedFields.gisenabled+"",GIS+"",FieldType.BOOLEAN));
+		filter.add(new Field(SubmittedFields.iscustomized+"",false+"",FieldType.BOOLEAN));
+		filter.add(new Field(SubmittedFields.speciescoverage+"",speciesCoverage,FieldType.STRING));
 		List<Submitted> existing=SubmittedManager.getList(filter);
 		for(Submitted job:existing)
-			if(!job.getStatus().equals(SubmittedStatus.Error))return existing.get(0);
+			if(!job.getStatus().equals(SubmittedStatus.Error))return job;
 		return null;
 	}	
 }
