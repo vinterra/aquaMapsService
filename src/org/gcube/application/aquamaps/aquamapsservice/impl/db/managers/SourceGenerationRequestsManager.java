@@ -8,14 +8,14 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.SourceGenerationPhase;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.dataModel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.dataModel.utils.CSVUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceGenerationRequestsManager {
@@ -32,7 +32,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -47,7 +47,7 @@ public class SourceGenerationRequestsManager {
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");
 			for(Field f:toInsert.toRow())
-				if(!f.getValue().equalsIgnoreCase("null")){
+				if(f.getValue()!=null&&!f.getValue().equalsIgnoreCase("null")){
 					toInsertRow.add(f);
 					logger.debug(f.toXML());
 				}
@@ -57,7 +57,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -75,7 +75,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -97,7 +97,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -115,7 +115,7 @@ public class SourceGenerationRequestsManager {
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -137,17 +137,18 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
 	public static void setPhase(SourceGenerationPhase phase, String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
 		fields.add(new Field(SourceGenerationRequestFields.phase+"",phase+"",FieldType.STRING));
-		if(phase.equals(SourceGenerationPhase.completed)){
-			fields.add(new Field(SourceGenerationRequestFields.endtime+"",System.currentTimeMillis()+"",FieldType.INTEGER));
+		if(phase.equals(SourceGenerationPhase.completed)||phase.equals(SourceGenerationPhase.error)){
+			fields.add(new Field(SourceGenerationRequestFields.endtime+"",System.currentTimeMillis()+"",FieldType.LONG));
 			fields.add(new Field(SourceGenerationRequestFields.currentphasepercent+"",100+"",FieldType.DOUBLE));
 		}
+		
 		updateField(id, fields);
 	}
 	public static void setReportId(int reportId, String id)throws Exception{
@@ -177,7 +178,7 @@ public class SourceGenerationRequestsManager {
 
 	public static void setStartTime(String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
-		fields.add(new Field(SourceGenerationRequestFields.starttime+"",System.currentTimeMillis()+"",FieldType.INTEGER));
+		fields.add(new Field(SourceGenerationRequestFields.starttime+"",System.currentTimeMillis()+"",FieldType.LONG));
 		updateField(id,fields);
 	}
 
@@ -191,7 +192,7 @@ public class SourceGenerationRequestsManager {
 		}catch (Exception e){
 			throw e;
 		}finally {
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -205,7 +206,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 
@@ -216,7 +217,7 @@ public class SourceGenerationRequestsManager {
 		return delete(filter);
 	}
 	
-	public static int getCount(List<Field> filter)throws Exception{
+	public static Long getCount(List<Field> filter)throws Exception{
 		DBSession session=null;
 		if(filter==null) filter=new ArrayList<Field>();
 		try{
@@ -225,7 +226,7 @@ public class SourceGenerationRequestsManager {
 		}catch(Exception e){
 			throw e;
 		}finally{
-			session.close();
+			if(session!=null) session.close();
 		}
 	}
 	

@@ -9,28 +9,35 @@ import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGenerator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorI;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.HSPECGenerator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.WMSGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
-import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.publisher.StoreConfiguration;
+import org.gcube.application.aquamaps.publisher.UpdateConfiguration;
+import org.gcube.application.aquamaps.publisher.StoreConfiguration.StoreMode;
+import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
+import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.mortbay.log.Log;
 
@@ -57,7 +64,7 @@ public class JobWorker extends Thread{
 			current.setId(tableReference.getSearchId());
 
 
-			current=JobManager.insertNewJob(current,tableReference.getPostponePublishing());
+			current=JobManager.insertNewJob(current);
 			
 			if(current.getStatus().equals(SubmittedStatus.Completed)){
 				logger.debug("No need to generate for job "+tableReference.getSearchId()+", publisher returned Complete.");
@@ -98,7 +105,7 @@ public class JobWorker extends Thread{
 									(current.getEnvelopeWeights().containsKey(selected.getId()))? current.getEnvelopeWeights().get(selected.getId()):new HashMap<EnvelopeFields,Field>();
 
 									toSubmitRequests.add(new DistributionObjectExecutionRequest(SubmittedManager.getSubmittedById(object.getId()), 
-											current.getSelectedAreas(), object.getBoundingBox(), object.getSelectedSpecies(), envelopeCustomization	, envelopeWeights));
+											current.getSelectedAreas(), object.getBoundingBox(), object.getSelectedSpecies(), envelopeCustomization	, envelopeWeights,object.getAlgorithmType()));
 						}
 				}
 
@@ -106,9 +113,31 @@ public class JobWorker extends Thread{
 				logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
 				if(toSubmitRequests.size()>0)
 					JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
-
-				if(tableReference.getGisEnabled())JobManager.createGroup(tableReference.getSearchId());
+				while(!JobManager.isJobComplete(tableReference.getSearchId())){
+					logger.trace("Job [ID : "+tableReference.getSearchId()+"] was not finished, forcing generation for skipped objects..");
+					toSubmitRequests=new ArrayList<AquaMapsObjectExecutionRequest>();
+					for(Submitted submitted:JobManager.getObjects(tableReference.getSearchId())){
+						if(!submitted.getStatus().equals(SubmittedStatus.Error)&&!submitted.getStatus().equals(SubmittedStatus.Completed));
+						toSubmitRequests.add((AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submitted.getSerializedRequest()));
+					}
+					logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
+					if(toSubmitRequests.size()>0)
+						JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
+					else throw new Exception("No object to resubmit for Job [ID : "+tableReference.getSearchId()+"]");
+				}
 				
+				
+				
+				if(tableReference.getGisEnabled()){
+					String wmsID=ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(tableReference.getSearchId())){
+						@Override
+						public WMSContext generate() throws Exception {
+							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
+						}
+					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
+							new UpdateConfiguration(true, true, true))).getStoredId().getId();
+					SubmittedManager.setGisPublishedId(tableReference.getSearchId(), wmsID);
+				}
 				SubmittedManager.updateStatus(tableReference.getSearchId(), SubmittedStatus.Completed);
 				
 			}
@@ -157,17 +186,21 @@ public class JobWorker extends Thread{
 			Log.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
 			String filteredHcaf=filterByArea(jobId, area, ResourceType.HCAF, JobManager.getHCAFTableId(jobId));
 			JobManager.setWorkingHCAF(jobId,filteredHcaf);
-			String generatedHSPEC=generateHSPEC(jobId, weights, true);
+			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getAquaMapsObjectList().get(0).getAlgorithmType(),weights);
 			String toUseHSPEC=filterByArea(jobId,area,ResourceType.HSPEC,generatedHSPEC);
 			JobManager.setWorkingHSPEC(jobId,toUseHSPEC);	
-
+			JobManager.addToDropTableList(jobId, generatedHSPEC);
+			JobManager.addToDropTableList(jobId, toUseHSPEC);
 		}else if (filteredArea){
 			Log.debug(" jobId "+jobId+" : Filter By Area");
-			JobManager.setWorkingHSPEC(jobId,filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId)));
+			String table=filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId));
+			JobManager.setWorkingHSPEC(jobId,table);
+			JobManager.addToDropTableList(jobId, table);
 		}else if (needToGenerate){				
 			Log.debug(" jobId "+jobId+" : Re-generate");
-			String generatedHSPEC=generateHSPEC(jobId,  weights,true);
-			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);		
+			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getAquaMapsObjectList().get(0).getAlgorithmType(),weights);
+			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);
+			JobManager.addToDropTableList(jobId, generatedHSPEC);
 		}else{
 			Log.debug(" jobId "+jobId+" no needs");
 			JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(JobManager.getHSPECTableId(jobId)));
@@ -238,31 +271,15 @@ public class JobWorker extends Thread{
 	 * @return
 	 * @throws Exception
 	 */
-	private static String generateHSPEC(int jobId,Map<String,Map<EnvelopeFields,Field>> weights,boolean makeTemp)throws Exception{
-		if(ServiceContext.getContext().getPropertyAsBoolean(PropertiesConstants.USE_ENVIRONMENT_MODELLING_LIB)){
-			logger.trace("HSPEC Generation with Environmental Modeling..");
-			//************ fine processing
-			//			// TODO implement for less then (config param) species
-			//			//copy species from hspec
-			//			//for every species
-			//				//load species
-			//					//load cell
-			//					//insert probability
-			//			
-			BatchGeneratorI generator=new BatchGenerator(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator,
-					DBSession.getInternalCredentials());
-			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId), JobManager.getWorkingHSPEN(jobId), AlgorithmType.NativeRange, false, null, 1);
-		}else{
-			logger.trace("Embedded HSPEC Generation");
-			String HCAF_DName=JobManager.getWorkingHCAF(jobId);		
-			String HSPENName=JobManager.getWorkingHSPEN(jobId);
-			HSPECGenerator generator= new HSPECGenerator(jobId,HCAF_DName,CellManager.HCAF_S,HSPENName,weights);
-			generator.generate();
-			String generatedHspecName=generator.getNativeTable();
-			System.out.println("table generated:"+generatedHspecName);
-			if (makeTemp)JobManager.addToDropTableList(jobId,generatedHspecName);
-			return generatedHspecName;
-		}
+	private static String generateHSPEC(int jobId, Set<Species> selection,String sourceHspen,AlgorithmType algorithm, Map<String,Map<EnvelopeFields,Field>> weights)throws Exception{
+		
+			String filteredHSPEN=SpeciesManager.getFilteredHSPEN(JobManager.getWorkingHSPEN(jobId), selection);
+			JobManager.setWorkingHSPEN(jobId, filteredHSPEN);
+			JobManager.addToDropTableList(jobId, filteredHSPEN);
+			BatchGeneratorI generator=EnvironmentalLogicManager.getBatch();
+			generator.setConfiguration(ServiceContext.getContext().getEcoligicalConfigDir()+File.separator, DBSession.getInternalCredentials());
+						return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId),
+					JobManager.getWorkingHSPEN(jobId), "maxminlat_"+sourceHspen, algorithm,false, "");
 	}
 
 

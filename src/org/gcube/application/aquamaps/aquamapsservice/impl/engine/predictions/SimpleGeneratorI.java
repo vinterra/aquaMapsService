@@ -1,12 +1,13 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
 import java.util.List;
+import java.util.Set;
 
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
-import org.gcube.application.aquamaps.dataModel.enhanced.Cell;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 
 public interface SimpleGeneratorI {
 		
@@ -22,6 +23,6 @@ public interface SimpleGeneratorI {
 	public List<Field> getProbability(Species species,Cell cells,Boolean useBoundingBox, Boolean useFao)throws Exception;
  	public List<Field>  isAreaConstraints(BoundingBox bb,List<Area> areas)throws Exception; 	
 	
- 	
+ 	public List<Field> getEnvelope(Species species,Set<Cell> cells)throws Exception;
  	
 }

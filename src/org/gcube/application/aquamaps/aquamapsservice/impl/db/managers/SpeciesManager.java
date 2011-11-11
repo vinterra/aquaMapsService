@@ -1,9 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
+import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,15 +15,16 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
-import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {
@@ -49,7 +52,7 @@ public class SpeciesManager {
 			}
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	public static Set<Species> getList(List<Field> filters)throws Exception{
@@ -58,7 +61,7 @@ public class SpeciesManager {
 			session=DBSession.getInternalDBSession();
 			return loadRS(session.executeFilteredQuery(filters, speciesOccurSum,null,null));
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -74,7 +77,7 @@ public class SpeciesManager {
 			session.dropTable(app);
 			return toReturn;
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
 	
@@ -96,11 +99,32 @@ public class SpeciesManager {
 			
 			ResultSet rs=psCount.executeQuery();
 			rs.next();
-			int totalCount=rs.getInt(1);
+			Long totalCount=rs.getLong(1);
 			return DBUtils.toJSon(psSelection.executeQuery(), totalCount);
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
+	
+	public static File getCSVList(List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
+		String[] queries;
+		String selHspen=SourceManager.getSourceName(HSPENId);
+		queries=formfilterQueries(characteristics, names, codes, selHspen);
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			PreparedStatement psSelection=session.preparedStatement(queries[0]);
+			if(characteristics.size()>0){				
+				psSelection=session.fillParameters(characteristics, 0, psSelection);
+			}
+			File out=File.createTempFile("speciesSelection", ".csv");
+			
+			CSVUtils.resultSetToCSVFile(psSelection.executeQuery(),out.getAbsolutePath(),true);
+			return out;
+		}catch(Exception e){throw e;}
+		finally{if(session!=null) session.close();}
+	}
+	
+	
 	
 	/**
 	 * Creates a query string to filter species against characteristic OR names OR codes filtering
@@ -196,7 +220,7 @@ public class SpeciesManager {
 			if(tmpHspen!=null) session.dropTable(tmpHspen);
 			throw e;
 		}finally{
-			session.close();			
+			if(session!=null) session.close();			
 		}
 	}
 	
@@ -241,10 +265,43 @@ public class SpeciesManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
+			
 			return DBUtils.toJSon(session.getDistinct(toSelect, filters, speciesOccurSum, 
 					settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
-		finally{session.close();}
+		finally{if(session!=null) session.close();}
 	}
 	
+	public static String getCommonTaxonomy(Set<Species> species)throws Exception{
+		logger.info("Chcking common taxonomy, to analyze species count : "+species.size());
+		logger.info("loading species static info..");		
+		long start=System.currentTimeMillis();		
+		Set<Species> enrichedSpecies=new HashSet<Species>();
+		for(Species s: species)enrichedSpecies.add(getSpeciesById(true, false, s.getId(), 0));
+		logger.info("Loaded in "+(System.currentTimeMillis()-start)+" ms");		
+		HashMap<SpeciesOccursumFields,String> commonLevels=new HashMap<SpeciesOccursumFields, String>();
+		SpeciesOccursumFields[] toCheckValues=new SpeciesOccursumFields[]{
+			SpeciesOccursumFields.kingdom,
+			SpeciesOccursumFields.phylum,
+			SpeciesOccursumFields.classcolumn,
+			SpeciesOccursumFields.ordercolumn,
+			SpeciesOccursumFields.familycolumn
+		};
+		boolean continueCheck=true;
+		for(SpeciesOccursumFields toCheck:toCheckValues){
+			if(continueCheck)for(Species s: enrichedSpecies){
+				if(!commonLevels.containsKey(toCheck))commonLevels.put(toCheck, s.getFieldbyName(toCheck+"").getValue());
+				else if(!s.getFieldbyName(toCheck+"").getValue().equalsIgnoreCase(commonLevels.get(toCheck))){
+					continueCheck=false;
+					commonLevels.remove(toCheck);
+				}
+			}
+		}
+		StringBuilder toReturn=new StringBuilder();
+		for(SpeciesOccursumFields level:toCheckValues)
+			if(commonLevels.containsKey(level))toReturn.append(commonLevels.get(level)+File.separator);
+		if(toReturn.length()>0)toReturn.deleteCharAt(toReturn.lastIndexOf(File.separator));
+		logger.info("Found common taxonomy in "+(System.currentTimeMillis()-start)+" ms");
+		return toReturn.toString();
+	}
 }

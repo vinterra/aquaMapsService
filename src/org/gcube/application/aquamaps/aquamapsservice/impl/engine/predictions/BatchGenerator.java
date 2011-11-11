@@ -7,10 +7,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBConnectionParame
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.ecomodelling.generators.aquamapsorg.MaxMinGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.EnvelopeModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
@@ -38,13 +39,13 @@ public class BatchGenerator implements BatchGeneratorI {
 	
 	
 	@Override
-	public String generateHSPECTable(String hcaf, String hspen,
-			AlgorithmType type,Boolean iscloud,String endpoint,Integer resourceNumber) throws Exception {
+	public String generateHSPECTable(String hcaf, String hspen,String filteredHSPEN,
+			AlgorithmType type,Boolean iscloud,String endpoint) throws Exception {
 		
-		return generateHSPEC(hcaf, hspen, 
+		return generateHSPEC(hcaf, hspen, filteredHSPEN,
 				type.equals(AlgorithmType.NativeRange)||type.equals(AlgorithmType.NativeRange2050),
 				type.equals(AlgorithmType.SuitableRange2050)||type.equals(AlgorithmType.NativeRange2050), 
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.BATCH_POOL_SIZE),
+				NUM_OF_THREADS,
 				"", "", "", new HashMap<String, String>(), GenerationModel.AQUAMAPS);
 	}
 	@Override
@@ -121,6 +122,7 @@ public class BatchGenerator implements BatchGeneratorI {
 		if(configuration.getLogic().equals(LogicType.HSPEC))
 		return generateHSPEC(configuration.getSources().get(ResourceType.HCAF).getTableName(),
 				configuration.getSources().get(ResourceType.HSPEN).getTableName(),
+				configuration.getMaxMinHspenTable(),
 				configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
 				configuration.getAlgorithm().equals(AlgorithmType.SuitableRange2050)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
 				configuration.getPartitionsNumber(),
@@ -141,7 +143,7 @@ public class BatchGenerator implements BatchGeneratorI {
 	}
 	
 	
-	private String generateHSPEC(String hcafTable, String hspenTable,boolean isNative,boolean is2050,int threadNum,
+	private String generateHSPEC(String hcafTable, String hspenTable,String maxMinHspen,boolean isNative,boolean is2050,int threadNum,
 			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,GenerationModel model)throws Exception{
 		
 		String toGenerate=ServiceUtils.generateId("hspec", "");
@@ -172,6 +174,9 @@ public class BatchGenerator implements BatchGeneratorI {
 		e.setNativeGeneration(isNative);
 		//2050 generation flag set to false - default value
 		e.setType2050(is2050);
+		
+		
+		e.setMaxminLatTable(maxMinHspen);
 		
 		e.setGenerator(model);
 		e.setRemoteCalculator(calculatorUrl);
@@ -234,6 +239,12 @@ public class BatchGenerator implements BatchGeneratorI {
 		eg=new EnvelopeGenerator(e);
 		
 		eg.reGenerateEnvelopes();
+		
+		logger.trace("Generating Max Min table..");
+		
+		MaxMinGenerator maxmin = new MaxMinGenerator(e);
+		maxmin.populatemaxminlat(toGenerate);
+		
 		return toGenerate;
 	}
 	

@@ -14,18 +14,19 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.TableGenerationConfiguration;
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.Types.SourceGenerationPhase;
-import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
-import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.dataModel.fields.MetaSourceFields;
-import org.gcube.application.aquamaps.dataModel.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class HSPECGroupWorker extends Thread {
@@ -50,8 +51,10 @@ public class HSPECGroupWorker extends Thread {
 			if(sources.get(ResourceType.HCAF)==null) throw new Exception ("Unable to find hcaf with id "+request.getHcafId());
 			sources.put(ResourceType.HSPEN, SourceManager.getById(request.getHspenId()));
 			if(sources.get(ResourceType.HSPEN)==null) throw new Exception ("Unable to find hspen with id "+request.getHspenId());
-			sources.put(ResourceType.OCCURRENCECELLS, SourceManager.getById(request.getOccurrenceCellId()));
-			if(sources.get(ResourceType.OCCURRENCECELLS)==null) throw new Exception ("Unable to find occurrence cells  with id "+request.getOccurrenceCellId());
+			if(request.getLogic().equals(LogicType.HSPEN)){
+				sources.put(ResourceType.OCCURRENCECELLS, SourceManager.getById(request.getOccurrenceCellId()));
+				if(sources.get(ResourceType.OCCURRENCECELLS)==null) throw new Exception ("Unable to find occurrence cells  with id "+request.getOccurrenceCellId());
+			}
 
 
 			batch=EnvironmentalLogicManager.getBatch();
@@ -76,7 +79,8 @@ public class HSPECGroupWorker extends Thread {
 								new TableGenerationConfiguration(
 										request.getLogic(), 
 										AlgorithmType.valueOf(algorithmString), 
-										sources, 
+										sources,
+										"maxminlat_"+sources.get(ResourceType.HSPEN).getTableName(),
 										request.getSubmissionBackend(), 
 										request.getExecutionEnvironment(), 
 										request.getBackendURL(), 
@@ -94,17 +98,28 @@ public class HSPECGroupWorker extends Thread {
 						toRegister.setSourceHCAFTable(sources.get(ResourceType.HCAF).getTableName());
 						toRegister.setSourceHSPENId(sources.get(ResourceType.HSPEN).getSearchId());
 						toRegister.setSourceHSPENTable(sources.get(ResourceType.HSPEN).getTableName());
-						toRegister.setSourceOccurrenceCellsId(sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
-						toRegister.setSourceOccurrenceCellsTable(sources.get(ResourceType.OCCURRENCECELLS).getTableName());
-						toRegister.setStatus("Completed");
+						if(request.getLogic().equals(LogicType.HSPEN)){
+							toRegister.setSourceOccurrenceCellsId(sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
+							toRegister.setSourceOccurrenceCellsTable(sources.get(ResourceType.OCCURRENCECELLS).getTableName());
+						}
+						toRegister.setStatus(ResourceStatus.Completed);
 						toRegister.setTableName(generatedTable);
 						toRegister.setTitle(request.getGenerationname()+"_"+algorithmType);
+						Long count=0l;
+						DBSession session=null;
+						try{
+							session=DBSession.getInternalDBSession();
+							count=session.getTableCount(generatedTable);
+						}catch(Exception e){
+							logger.warn("Unable to evaluate generated table "+generatedTable+" row count",e);
+						}finally{if (session!=null) session.close();}
+						toRegister.setRowCount(count);
 						toRegister=SourceManager.registerSource(toRegister);
 						logger.trace("Registered Resource with id "+toRegister.getSearchId());
 						SourceGenerationRequestsManager.addGeneratedResource(toRegister.getSearchId(), request.getId());
 						generatedSources.add(toRegister);
 						TableGenerationExecutionManager.notifyGeneration(algorithmType,request.getLogic(),sources.get(ResourceType.HSPEN).getSearchId(),
-								sources.get(ResourceType.HCAF).getSearchId(),sources.get(ResourceType.OCCURRENCECELLS).getSearchId());
+								sources.get(ResourceType.HCAF).getSearchId(),request.getLogic().equals(LogicType.HSPEN)?sources.get(ResourceType.OCCURRENCECELLS).getSearchId():0);
 					}else{
 						logger.trace("Found Resource "+existing.toXML());
 						generatedSources.add(existing);

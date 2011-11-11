@@ -9,17 +9,19 @@ import java.util.concurrent.Semaphore;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
-import org.gcube.application.aquamaps.dataModel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.dataModel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobExecutionManager {
@@ -30,7 +32,6 @@ public class JobExecutionManager {
 	private static MyPooledExecutor jobPool=null;
 	private static MyPooledExecutor aqPool=null;
 
-	private static String persistencePath=null;
 
 	private static final ConcurrentHashMap<Integer, Semaphore> blockedJobs=new ConcurrentHashMap<Integer, Semaphore>();
 
@@ -55,11 +56,7 @@ public class JobExecutionManager {
 
 
 
-
-		persistencePath=ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"Serialized";
-		File file=new File(persistencePath);
-		file.mkdirs();
-		logger.trace("Storing into "+persistencePath);
+		logger.trace("Storing into "+ServiceContext.getContext().getSerializationPath());
 
 
 		List<Field> pendingObjFilter=new ArrayList<Field>();
@@ -85,7 +82,7 @@ public class JobExecutionManager {
 
 
 		logger.trace("Looking for existing obj requests...");			
-		int objCount=SubmittedManager.getCount(pendingObjFilter);
+		Integer objCount=SubmittedManager.getCount(pendingObjFilter).intValue();
 		insertedObjects=new Semaphore(objCount);
 		logger.trace("Found "+objCount+" requests");
 
@@ -94,7 +91,7 @@ public class JobExecutionManager {
 		List<Field> jobfilter=new ArrayList<Field>();
 		jobfilter.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
 		jobfilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Pending+"",FieldType.STRING));
-		int jobCount=SubmittedManager.getCount(jobfilter);
+		int jobCount=SubmittedManager.getCount(jobfilter).intValue();
 		insertedJobs=new Semaphore(jobCount);
 		logger.trace("Found "+jobCount+" requests");
 
@@ -103,9 +100,9 @@ public class JobExecutionManager {
 
 
 
-		RequestsMonitor jobMonitor=new RequestsMonitor(false);
+		RequestsMonitor jobMonitor=RequestsMonitor.get(false);
 		jobMonitor.start();
-		RequestsMonitor objMonitor=new RequestsMonitor(true);
+		RequestsMonitor objMonitor=RequestsMonitor.get(true);
 		objMonitor.start();
 
 
@@ -114,7 +111,15 @@ public class JobExecutionManager {
 
 
 	public static int insertJobExecutionRequest(Job toExecute,boolean postponePublishing)throws Exception{
-		String file=persistencePath+File.separator+ServiceUtils.generateId("Job", ".xml");
+		try{
+			SourceManager.getById(toExecute.getSourceHSPEC().getSearchId());
+		}catch(Exception e){
+			logger.error("Unable to load selected HSPEC "+toExecute.getSourceHSPEC().getSearchId(),e);
+			throw new Exception("Unable to load HSPEC "+toExecute.getSourceHSPEC().getSearchId());
+			
+		}
+		
+		String file=ServiceContext.getContext().getSerializationPath()+File.separator+ServiceUtils.generateId("Job", ".xml");
 		logger.debug("Serializing job "+toExecute.getName()+" to "+file);
 		AquaMapsXStream.serialize(file, toExecute);
 		Submitted toInsert=new Submitted(0);
@@ -125,13 +130,13 @@ public class JobExecutionManager {
 		toInsert.setJobId(0);
 		toInsert.setSaved(false);
 		toInsert.setSelectionCriteria("");
-		toInsert.setSerializedPath(file);
+		toInsert.setSerializedRequest(file);
 		toInsert.setSourceHCAF(toExecute.getSourceHCAF().getSearchId());
 		toInsert.setSourceHSPEC(toExecute.getSourceHSPEC().getSearchId());
 		toInsert.setSourceHSPEN(toExecute.getSourceHSPEN().getSearchId());
 		toInsert.setStatus(SubmittedStatus.Pending);
-		toInsert.setTitle(toExecute.getName());
-		toInsert.setPostponePublishing(postponePublishing);
+		toInsert.setTitle(toExecute.getName());	
+		toInsert.setSpeciesCoverage(toExecute.getCompressedCoverage());
 		toInsert=SubmittedManager.insertInTable(toInsert);
 		logger.trace("Assigned id "+toInsert.getSearchId()+" to Job "+toInsert.getTitle()+" [ "+toInsert.getAuthor()+" ]");
 
@@ -143,11 +148,12 @@ public class JobExecutionManager {
 
 	public static void insertAquaMapsObjectExecutionRequest(List<AquaMapsObjectExecutionRequest> requests)throws Exception{
 		for(AquaMapsObjectExecutionRequest request:requests){
-			String file=persistencePath+File.separator+ServiceUtils.generateId("AQ", ".xml");
+			String file=ServiceContext.getContext().getSerializationPath()+File.separator+ServiceUtils.generateId("AQ", ".xml");
 			logger.debug("Serializing object "+request.getObject().getTitle()+" to "+file);
-			request.getObject().setSerializedPath(file);
+			request.getObject().setSerializedRequest(file);
 			request.getObject().setStatus(SubmittedStatus.Generating);
 			AquaMapsXStream.serialize(file, request);
+			SubmittedManager.update(request.getObject());
 		}
 		int jobId=requests.get(0).getObject().getJobId();
 		logger.trace("Creating "+requests.size()+" requests for objects execution for job "+jobId);
@@ -159,14 +165,14 @@ public class JobExecutionManager {
 		insertedObjects.release(requests.size());
 
 		//************* BLOCKS current job
-		((Semaphore)blockedJobs.get(jobId)).acquire();
+		((Semaphore)blockedJobs.get(jobId)).acquireUninterruptibly();
 		blockedJobs.remove(jobId);
 	}
 
 	private static void startJob(Submitted job)throws Exception{
 		SubmittedManager.updateStatus(job.getSearchId(), SubmittedStatus.Simulating);
 		Submitted submittedJob=SubmittedManager.getSubmittedById(job.getSearchId());
-		Job toExecute=(Job) AquaMapsXStream.deSerialize(submittedJob.getSerializedPath());
+		Job toExecute=(Job) AquaMapsXStream.deSerialize(submittedJob.getSerializedRequest());
 		JobWorker worker=new JobWorker(toExecute,submittedJob);
 		jobPool.execute(worker);
 	}
@@ -174,7 +180,7 @@ public class JobExecutionManager {
 	private static void startAquaMapsObject(Submitted object)throws Exception{
 		SubmittedManager.updateStatus(object.getSearchId(), SubmittedStatus.Publishing);
 		Submitted submittedObject=SubmittedManager.getSubmittedById(object.getSearchId());		
-		AquaMapsObjectExecutionRequest toExecute=(AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submittedObject.getSerializedPath());
+		AquaMapsObjectExecutionRequest toExecute=(AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submittedObject.getSerializedRequest());
 		AquaMapsObjectWorker worker=new AquaMapsObjectWorker(toExecute);
 		aqPool.execute(worker);
 	}
@@ -216,16 +222,16 @@ public class JobExecutionManager {
 
 	
 
-	public static List<Submitted> getAvailableRequests(boolean object)throws Exception {
-		if(object) insertedObjects.acquire();
-		else insertedJobs.acquire();
+	public static List<Submitted> getAvailableRequests(boolean object,int maxSize)throws Exception {
+		if(object) insertedObjects.acquireUninterruptibly();
+		else insertedJobs.acquireUninterruptibly();
 
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.isaquamap+"",object+"",FieldType.BOOLEAN));
 		filter.add(new Field(SubmittedFields.status+"",(object?SubmittedStatus.Generating:SubmittedStatus.Pending)+"",FieldType.STRING));
-		PagedRequestSettings settings= new PagedRequestSettings(1,0,SubmittedFields.submissiontime+"",PagedRequestSettings.OrderDirection.DESC);
+		PagedRequestSettings settings= new PagedRequestSettings(maxSize,0,SubmittedFields.submissiontime+"",PagedRequestSettings.OrderDirection.ASC);
 		return SubmittedManager.getList(filter, settings);
 	}
 
-
+	
 }

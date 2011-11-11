@@ -3,7 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 import java.util.ArrayList;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
-import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
@@ -41,6 +41,7 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 	
 	public static EnvironmentalExecutionReportItem getReport(int batchId,boolean getResourceInfo)throws Exception{
 		try{
+			if(batchId<0||batchId>batchGenerators.size()-1) return null;
 			return batchGenerators.get(batchId).getReport(getResourceInfo);
 		}catch (IndexOutOfBoundsException e){
 			return null;

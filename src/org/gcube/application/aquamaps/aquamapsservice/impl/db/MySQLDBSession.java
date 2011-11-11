@@ -8,9 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 
 public class MySQLDBSession extends DBSession {
 
@@ -34,16 +34,25 @@ public class MySQLDBSession extends DBSession {
 		for(int i=0;i<fields.size();i++){
 			Field f=fields.get(i);
 			switch(f.getType()){
-			case BOOLEAN: ps.setBoolean(i+1, Boolean.parseBoolean(f.getValue()));
-			break;
-			case DOUBLE: ps.setDouble(i+1, Double.parseDouble(f.getValue()));
-			break;
-			case INTEGER: ps.setInt(i+1, Integer.parseInt(f.getValue()));
+			case BOOLEAN:{ 
+							Integer value=f.getValueAsBoolean(DEFAULT_BOOLEAN_VALUE)?1:0;
+							ps.setInt(i+1+parameterOffset, value);
+							break;
+							}
+			case DOUBLE: ps.setDouble(i+1+parameterOffset, f.getValueAsDouble(DEFAULT_DOUBLE_VALUE));
+							break;
+			case INTEGER: try{
+				ps.setInt(i+1+parameterOffset, f.getValueAsInteger(DEFAULT_INTEGER_VALUE));
+			}catch(NumberFormatException e){
+				//trying long
+				ps.setLong(i+1+parameterOffset, Long.parseLong(f.getValue()));
+			}
 			break;				
-			case STRING: ps.setString(i+1,f.getValue());
+			case STRING: ps.setString(i+1+parameterOffset,f.getValue());
 			break;
-
-			}			
+			case LONG: ps.setLong(i+1+parameterOffset, f.getValueAsLong(DEFAULT_LONG_VALUE));
+			break;
+			}					
 		}
 		return ps;
 	}
@@ -66,11 +75,11 @@ public class MySQLDBSession extends DBSession {
 
 
 	@Override
-	public int getCount(String tableName, List<Field> filters) throws Exception {
+	public Long getCount(String tableName, List<Field> filters) throws Exception {
 		PreparedStatement ps=getPreparedStatementForCount(filters, tableName);
 		ResultSet rs=fillParameters(filters,0, ps).executeQuery();
-		if(rs.next()) return rs.getInt(1);
-		else return 0;
+		if(rs.next()) return rs.getLong(1);
+		else return 0l;
 	}
 
 

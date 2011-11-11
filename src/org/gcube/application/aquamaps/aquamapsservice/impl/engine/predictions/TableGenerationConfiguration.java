@@ -2,17 +2,17 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
 import java.util.HashMap;
 
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 
 public class TableGenerationConfiguration {
 
 	private LogicType logic;
 	private AlgorithmType algorithm;
 	private HashMap<ResourceType,Resource> sources; 
-	
+	private String maxMinHspenTable;
 	
 	private String submissionBackend;
 	private String executionEnvironment;
@@ -23,7 +23,7 @@ public class TableGenerationConfiguration {
 	
 	
 	public TableGenerationConfiguration(LogicType logic,
-			AlgorithmType algorithm,HashMap<ResourceType, Resource> sources, String submissionBackend,
+			AlgorithmType algorithm,HashMap<ResourceType, Resource> sources,String maxMinHspenTable, String submissionBackend,
 			String executionEnvironment, String backendUrl,
 			HashMap<String, String> configuration, int partitionsNumber,String author) {
 		super();
@@ -36,6 +36,7 @@ public class TableGenerationConfiguration {
 		this.configuration = configuration;
 		this.partitionsNumber = partitionsNumber;
 		this.author=author;
+		this.maxMinHspenTable=maxMinHspenTable;
 	}
 
 	public LogicType getLogic() {
@@ -74,6 +75,8 @@ public class TableGenerationConfiguration {
 	public String getAuthor() {
 		return author;
 	}
-	
+	public String getMaxMinHspenTable() {
+		return maxMinHspenTable;
+	}
 	
 }

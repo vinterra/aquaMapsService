@@ -5,20 +5,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.dataModel.Types.AreaType;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.dataModel.Types.PerturbationType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.dataModel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AreaType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.PerturbationType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 
 public class DummyObjects {
 	public static List<Area> getAreaSelection(){
@@ -66,9 +66,9 @@ public class DummyObjects {
 			toReturn.setWeights(basket.iterator().next(), settedWeights);
 		}
 		
-		toReturn.setSourceHCAF(new Resource(ResourceType.HCAF, 1));
-		toReturn.setSourceHSPEC(new Resource(ResourceType.HSPEC, 2));
-		toReturn.setSourceHSPEN(new Resource(ResourceType.HSPEN, 3));
+		toReturn.setSourceHCAF(new Resource(ResourceType.HCAF, 121));
+		toReturn.setSourceHSPEC(new Resource(ResourceType.HSPEC, 136));
+		toReturn.setSourceHSPEN(new Resource(ResourceType.HSPEN, 125));
 		
 		toReturn.getAquaMapsObjectList().addAll(getObject(ObjectType.Biodiversity,GIS,getSpeciesBasket()));
 		

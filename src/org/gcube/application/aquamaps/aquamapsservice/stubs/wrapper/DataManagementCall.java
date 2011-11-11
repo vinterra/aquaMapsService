@@ -8,13 +8,16 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortTy
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.QueryResourceRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewCustomQueryRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.environments.EnvironmentalExecutionReportItem;
-import org.gcube.application.aquamaps.dataModel.environments.SourceGenerationRequest;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -220,10 +223,80 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	}
 
 	@Override
-	public String queryResource(String query, PagedRequestSettings settings)
+	public Boolean deleteCustomQuery(String userId) throws Exception {
+		try{									
+			return pt.deleteCustomQuery(userId);			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	@Override
+	public void setCustomQuery(String userId, String queryString)
 			throws Exception {
 		try{
-			return pt.queryResource(new QueryResourceRequestType(settings.getLimit(), settings.getOffset(), query, settings.getOrderColumn(), settings.getOrderDirection()+""));
+			pt.setCustomQuery(new SetUserCustomQueryRequestType(queryString, userId));
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	@Override
+	public String viewCustomQuery(String userId, PagedRequestSettings settings)
+			throws Exception {
+		try{									
+			return pt.viewCustomQuery(new ViewCustomQueryRequestType(settings.getLimit(), 
+					settings.getOffset(), settings.getOrderColumn(), settings.getOrderDirection()+"", userId));			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	
+	@Override
+	public Integer getImportStatus(Integer resourceId) throws Exception {
+		try{									
+			return pt.getImportStatus(resourceId);
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	@Override
+	public Integer importResource(File toImport, String userId,
+			ResourceType type) throws Exception {
+		try{
+			logger.trace("Caller scope is "+scope);
+			RSWrapper wrapper=new RSWrapper(scope);
+			wrapper.add(toImport);
+			String locator = wrapper.getLocator().toString();
+			logger.trace("Added file to locator "+locator);
+			return pt.importResource(new ImportResourceRequestType(locator, type+"", userId));
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	@Override
+	public List<Field> getCustomQueryFields(String userId) throws Exception {
+		try{									
+			return Field.load(pt.isCustomQueryReady(userId));
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	@Override
+	public File exportTableAsCSV(String table) throws Exception {
+		try{
+			String locator=pt.exportTableAsCSV(table);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));			
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

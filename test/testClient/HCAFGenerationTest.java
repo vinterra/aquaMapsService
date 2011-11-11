@@ -8,10 +8,10 @@ import org.apache.axis.message.addressing.EndpointReferenceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
@@ -37,7 +37,7 @@ public class HCAFGenerationTest {
 
 		//Maps Generation
 		List<Field> filter=new ArrayList<Field>();
-		filter.add(new Field(SpeciesOccursumFields.family+"","Gadidae",FieldType.STRING));
+		filter.add(new Field(SpeciesOccursumFields.familycolumn+"","Gadidae",FieldType.STRING));
 		GenerateMapsRequestType req=new GenerateMapsRequestType(2, "Fabio.Sinibaldi", true,Field.toStubsVersion(filter));
 		
 		pt.generateMaps(req);

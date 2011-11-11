@@ -11,7 +11,7 @@
 			<Main>
 				<Description>Aquamaps Stateless Service</Description>
 				<Name>AquaMapsService</Name>
-				<Version>2.8.0</Version>
+				<Version>3.0.0</Version>
 				<GHNRequirements>
 					<Requirement category="Site" requirement="string"
 						value="java1.6" operator="le" />
@@ -34,10 +34,10 @@
 					<Dependency>
 						<Service>
 							<Class>Application</Class>
-							<Name>AquaMapsPublisher</Name>
-							<Version>1.0.0</Version>
+							<Name>PublisherLibrary</Name>
+							<Version>2.0.0</Version>
 						</Service>
-						<Package>AquaMapsPublisher-stubs</Package>
+						<Package>PublisherLibrary</Package>
 						<Version>[1.0.0,2.0.0)</Version>
 						<Scope level="GHN" />
 						<Optional>false</Optional>

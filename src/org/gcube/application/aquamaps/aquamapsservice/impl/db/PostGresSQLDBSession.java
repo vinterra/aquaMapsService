@@ -8,9 +8,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.fields.HSPECFields;
 
 public class PostGresSQLDBSession extends DBSession {
 
@@ -38,14 +39,14 @@ public class PostGresSQLDBSession extends DBSession {
 //			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
 			switch(f.getType()){
 			case BOOLEAN:{ 
-							Integer value=Boolean.parseBoolean(f.getValue())?1:0;
+							Integer value=f.getValueAsBoolean(DEFAULT_BOOLEAN_VALUE)?1:0;
 							ps.setInt(i+1+parameterOffset, value);
 							break;
 							}
-			case DOUBLE: ps.setDouble(i+1+parameterOffset, Double.parseDouble(f.getValue()));
+			case DOUBLE: ps.setDouble(i+1+parameterOffset, f.getValueAsDouble(DEFAULT_DOUBLE_VALUE));
 							break;
 			case INTEGER: try{
-				ps.setInt(i+1+parameterOffset, Integer.parseInt(f.getValue()));
+				ps.setInt(i+1+parameterOffset, f.getValueAsInteger(DEFAULT_INTEGER_VALUE));
 			}catch(NumberFormatException e){
 				//trying long
 				ps.setLong(i+1+parameterOffset, Long.parseLong(f.getValue()));
@@ -53,7 +54,8 @@ public class PostGresSQLDBSession extends DBSession {
 			break;				
 			case STRING: ps.setString(i+1+parameterOffset,f.getValue());
 			break;
-			
+			case LONG: ps.setLong(i+1+parameterOffset, f.getValueAsLong(DEFAULT_LONG_VALUE));
+			break;
 			}			
 		}
 		return ps;
@@ -78,11 +80,11 @@ public class PostGresSQLDBSession extends DBSession {
 
 
 	@Override
-	public int getCount(String tableName, List<Field> filters) throws Exception {
+	public Long getCount(String tableName, List<Field> filters) throws Exception {
 		PreparedStatement ps=getPreparedStatementForCount(filters, tableName);
 		ResultSet rs=fillParameters(filters,0, ps).executeQuery();
-		if(rs.next()) return rs.getInt(1);
-		else return 0;
+		if(rs.next()) return rs.getLong(1);
+		else return 0l;
 	}
 
 

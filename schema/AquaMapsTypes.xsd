@@ -74,6 +74,7 @@
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="algorithm" type="xsd:string" />
 				 	<xsd:element name="defaultSource" type="xsd:boolean"/>
+				 	<xsd:element name="percent" type="xsd:long"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -163,6 +164,9 @@
 				<xsd:element name="status" type="xsd:string"/>
 				<xsd:element name="title" type="xsd:string"/>
 				<xsd:element name="type" type="xsd:string"/>
+				<xsd:element name="speciesCoverage" type="xsd:string"/>
+				<xsd:element name="Customized" type="xsd:boolean"/>
+				<xsd:element name="fileSetId"	type="xsd:string"/>			
 			</xsd:sequence>
 			</xsd:complexType>
 			

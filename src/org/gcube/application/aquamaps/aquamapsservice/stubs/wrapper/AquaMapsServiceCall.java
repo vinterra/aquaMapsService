@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,22 +14,24 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetPhylogenyRequestT
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Envelope;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.AquaMapsServiceAddressingLocator;
-import org.gcube.application.aquamaps.dataModel.Types.FieldType;
-import org.gcube.application.aquamaps.dataModel.Types.ObjectType;
-import org.gcube.application.aquamaps.dataModel.Types.ResourceType;
-import org.gcube.application.aquamaps.dataModel.Types.SubmittedStatus;
-import org.gcube.application.aquamaps.dataModel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.dataModel.enhanced.Area;
-import org.gcube.application.aquamaps.dataModel.enhanced.BoundingBox;
-import org.gcube.application.aquamaps.dataModel.enhanced.Envelope;
-import org.gcube.application.aquamaps.dataModel.enhanced.Field;
-import org.gcube.application.aquamaps.dataModel.enhanced.Filter;
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Resource;
-import org.gcube.application.aquamaps.dataModel.enhanced.Species;
-import org.gcube.application.aquamaps.dataModel.enhanced.Submitted;
-import org.gcube.application.aquamaps.dataModel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.datamodel.AquaMap;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -188,7 +192,9 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	@Override
 	public AquaMapsObject loadObject(int objectId)throws Exception{
 		try{
-			return new AquaMapsObject(pt.getObject(objectId));
+			AquaMap returned=pt.getObject(objectId);
+//			logger.info("STUBS VERSION IS "+AquaMapsXStream.getXMLInstance().toXML(returned));
+			return new AquaMapsObject(returned);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
@@ -307,6 +313,25 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
 		}	
+	}
+
+	@Override
+	public File getCSVSpecies(int hspenId, List<Field> characteristcs,
+			List<Filter> names, List<Filter> codes) throws Exception {
+		try{
+			GetSpeciesByFiltersRequestType request=new GetSpeciesByFiltersRequestType();
+			request.setCharacteristicFilters(Field.toStubsVersion(characteristcs));
+			request.setCodeFilters(Filter.toStubsVersion(codes));
+			request.setHspen(hspenId);
+			request.setNameFilters(Filter.toStubsVersion(names));			
+					
+			String locator=pt.getSpeciesByFiltersASCSV(request);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));
+			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
 	}
 
 }

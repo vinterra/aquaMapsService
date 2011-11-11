@@ -1,7 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 
-import org.gcube.application.aquamaps.dataModel.Types.AlgorithmType;
-import org.gcube.application.aquamaps.dataModel.Types.LogicType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 
 class Execution{
 	private AlgorithmType algorithm;

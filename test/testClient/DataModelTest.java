@@ -2,8 +2,8 @@ package testClient;
 
 import java.util.Map.Entry;
 
-import org.gcube.application.aquamaps.dataModel.enhanced.Job;
-import org.gcube.application.aquamaps.dataModel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
 
 public class DataModelTest {
 
