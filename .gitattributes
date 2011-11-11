@@ -177,6 +177,7 @@ test/testClient/HSPECGeneratorTest.java -text
 test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
 test/testClient/MD5Test.java -text
+test/testClient/ModelTest.java -text
 test/testClient/ProfileRetrievalTest.java -text
 test/testClient/StyleGeneration.java -text
 test/testClient/WrapperTest.java -text

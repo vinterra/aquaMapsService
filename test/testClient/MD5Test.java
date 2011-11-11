@@ -14,14 +14,14 @@ public class MD5Test {
 		set.add(new Species("ABS"));
 		for(Species s:set)
 			System.out.println(s.getId());
-		System.out.println(AquaMapsObject.generateMD5(set));
+		System.out.println(AquaMapsObject.generateMD5(set,""));
 		Set<Species> setReplica= new TreeSet<Species>();
 		setReplica.add(new Species("Fis-10"));
 		setReplica.add(new Species("Fis-1"));
 		setReplica.add(new Species("ABS"));
 		for(Species s:setReplica)
 			System.out.println(s.getId());
-		System.out.println(AquaMapsObject.generateMD5(setReplica));
+		System.out.println(AquaMapsObject.generateMD5(setReplica,""));
 		
 	}
 }
