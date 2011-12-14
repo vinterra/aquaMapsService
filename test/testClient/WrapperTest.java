@@ -32,7 +32,7 @@ public class WrapperTest {
 	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(DEVSEC),AquaMapsServiceTester.AQ_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(DEVSEC),AquaMapsServiceTester.AQ_SERVICE_URI,false);
 //		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope("/gcube/devsec"), AquaMapsServiceTester.DM_SERVICE_URI);
 		
 		
@@ -105,7 +105,7 @@ public class WrapperTest {
 
 //		wrapper.submitJob(DummyObjects.createDummyJob(false, false, false, true));
 		
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(412141)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(416596)));
 		
 		
 		

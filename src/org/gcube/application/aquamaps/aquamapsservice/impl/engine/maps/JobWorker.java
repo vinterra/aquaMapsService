@@ -186,7 +186,7 @@ public class JobWorker extends Thread{
 			Log.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
 			String filteredHcaf=filterByArea(jobId, area, ResourceType.HCAF, JobManager.getHCAFTableId(jobId));
 			JobManager.setWorkingHCAF(jobId,filteredHcaf);
-			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getAquaMapsObjectList().get(0).getAlgorithmType(),weights);
+			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getSourceHSPEC().getAlgorithm(),weights);
 			String toUseHSPEC=filterByArea(jobId,area,ResourceType.HSPEC,generatedHSPEC);
 			JobManager.setWorkingHSPEC(jobId,toUseHSPEC);	
 			JobManager.addToDropTableList(jobId, generatedHSPEC);
@@ -198,7 +198,7 @@ public class JobWorker extends Thread{
 			JobManager.addToDropTableList(jobId, table);
 		}else if (needToGenerate){				
 			Log.debug(" jobId "+jobId+" : Re-generate");
-			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getAquaMapsObjectList().get(0).getAlgorithmType(),weights);
+			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getSourceHSPEC().getAlgorithm(),weights);
 			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);
 			JobManager.addToDropTableList(jobId, generatedHSPEC);
 		}else{

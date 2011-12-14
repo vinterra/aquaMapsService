@@ -8,6 +8,14 @@
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	
+	<xsd:simpleType name="character">
+      <xsd:restriction base="xsd:string">
+        <xsd:maxLength value="1"/>
+        <xsd:minLength value="1"/>
+      </xsd:restriction>
+    </xsd:simpleType>
+	
+	
 		<xsd:complexType name="perturbation">
 				<xsd:sequence>
 					<xsd:element name="type" type="xsd:string" />

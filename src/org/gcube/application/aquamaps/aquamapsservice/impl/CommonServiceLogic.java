@@ -59,6 +59,7 @@ public class CommonServiceLogic {
 			object.setAuthor(job.getAuthor());
 			object.getSelectedSpecies().add(s);
 			object.setGis(enableGIS);
+			object.setAlgorithmType(job.getSourceHSPEC().getAlgorithm());
 			job.getAquaMapsObjectList().add(object);
 		}
 		

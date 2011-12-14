@@ -25,7 +25,7 @@ public interface DataManagementInterface {
 	public void setCustomQuery(String userId,String queryString)throws Exception;
 	public Boolean deleteCustomQuery(String userId)throws Exception;
 	public String viewCustomQuery(String userId,PagedRequestSettings settings)throws Exception;
-	public Integer importResource(File toImport,String userId, ResourceType type) throws Exception;
+	public Integer importResource(File toImport, String userId,ResourceType type,String encoding, boolean[] fieldsMask, boolean hasHeader,char delimiter) throws Exception;
 	public Integer getImportStatus(Integer resourceId)throws Exception;
 	public List<Field> getCustomQueryFields(String userId)throws Exception;
 	public File exportTableAsCSV(String table)throws Exception;

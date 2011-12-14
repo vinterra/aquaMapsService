@@ -5,39 +5,41 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.csv4j.CSVLineProcessor;
+
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
-
-import net.sf.csv4j.CSVLineProcessor;
 
 public class StatefullCSVLineProcessor implements CSVLineProcessor {
 	
 	private static final GCUBELog logger=new GCUBELog(StatefullCSVLineProcessor.class);	
 	boolean continueProcess=true;
-	PreparedStatement ps=null;
-	DBSession session=null;
-	Long count=0l;
+	private PreparedStatement ps=null;
+	private DBSession session=null;
+	private Long count=0l;
 	private ResourceStatus status=ResourceStatus.Completed;
-	List<Field> model;
-	int[] modelCSVFieldsMapping;
-	String tableName;
-	Long totalCount;
-	Integer metaId;
-	
-	public ResourceStatus getStatus() {
-		return status;
-	}
+	private List<Field> model;
+	private int[] modelCSVFieldsMapping;	
+	private Long totalCount;
+	private boolean[] fieldsMask;
+	private long updateStep;
+	private Resource toFillResource; 
 	
 	
-	public StatefullCSVLineProcessor(List<Field> model,String tablename,Long totalCount,Integer metaId) {
+	public StatefullCSVLineProcessor(List<Field> model,Resource tofillResource,Long totalCount,boolean[] fieldsmask) {
 		 this.model=model;
 		 modelCSVFieldsMapping= new int[model.size()];
-		 this.totalCount=totalCount;
-		 this.metaId=metaId;
-		 this.tableName=tablename;
+		 this.totalCount=totalCount;		
+		 this.toFillResource=tofillResource;
+		 this.fieldsMask=fieldsmask;
+		 updateStep=totalCount>1000?1000:totalCount/5;
+		 logger.info("Instatiated Line Processor");
+		 logger.info("csv parsed row count : "+totalCount);
+		 logger.info("to Fill Resource : "+toFillResource);
 	}
 	
 	
@@ -53,9 +55,9 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 			line.add(new Field(modelField.getName(),arg1.get(modelCSVFieldsMapping[i]),modelField.getType()));
 		}
 		count+=(session.fillParameters(line, 0, ps)).executeUpdate();
-		if(count % 1000==0) {
+		if(count % updateStep==0) {
 			logger.debug("Updateing "+count+" / "+totalCount);
-			SourceManager.setCountRow(metaId, count);
+			SourceManager.setCountRow(toFillResource.getSearchId(), count);
 		}
 		}catch(Exception e){
 			logger.error("Unable to insert row",e);
@@ -80,14 +82,16 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 			continueProcess=arg1.size()==model.size();
 			if(continueProcess){
 				for(int i=0;i<arg1.size();i++){
-					boolean found=false;
-					for(int j=0;j<model.size();j++)
-						if(arg1.get(i).equalsIgnoreCase(model.get(j).getName())){
-							modelCSVFieldsMapping[j]=i;
-							found=true;
-							break;
-						}
-					if(!found) throw new Exception("Found field "+arg1.get(i)+" has no match in table");
+					if(fieldsMask[i]){
+						boolean found=false;
+						for(int j=0;j<model.size();j++)
+							if(arg1.get(i).equalsIgnoreCase(model.get(j).getName())){
+								modelCSVFieldsMapping[j]=i;
+								found=true;
+								break;
+							}
+						if(!found) throw new Exception("Found field "+arg1.get(i)+" has no match in table");
+					}
 				}
 				logger.trace("Matched "+arg1.size()+" fields : ");
 				for(int i=0;i<model.size();i++){
@@ -96,7 +100,7 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 				}
 				session=DBSession.getInternalDBSession();
 				session.disableAutoCommit();
-				ps=session.getPreparedStatementForInsert(model, tableName);
+				ps=session.getPreparedStatementForInsert(model, toFillResource.getTableName());
 			}else throw new Exception("Selected Type and csv fields count are not compatible");
 		}catch(Exception e){
 			logger.error("Unable to initialize reading",e);
@@ -108,9 +112,14 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 	public void close(){
 		if (session!=null){
 			try{
-				SourceManager.setCountRow(metaId, count);
+				logger.info("finalizing csv process...");								
 				session.commit();
 				session.close();
+				
+				toFillResource.setRowCount(count);
+				toFillResource.setStatus(status);
+				logger.info("Updateing resource "+toFillResource);
+				SourceManager.update(toFillResource);
 			}catch(Exception e){
 				logger.warn("Unable to close session", e);
 			}

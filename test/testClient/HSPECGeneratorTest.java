@@ -43,7 +43,7 @@ public class HSPECGeneratorTest {
 	
 	private static void fromSpeciesAndCell()throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AquaMapsServiceTester.AQ_SERVICE_URI,false);
 		
 		Species s=wrapper.loadEnvelope("Fis-22836",1);
 //		Envelope env=wrapper.loadEnvelope(s.getId(), 1);

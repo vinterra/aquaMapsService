@@ -28,6 +28,24 @@
 				schemaLocation="GISTypes.xsd" />
 
 			<!-- DataManagement portType request types -->
+
+	
+		<xsd:complexType name="importResourceRequestType">
+			<xsd:sequence>
+				<xsd:element name="rsLocator" type="xsd:string"	minOccurs="1" maxOccurs="1" />
+				<xsd:element name="encoding" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="delimiter" type="aqtypes:character"  minOccurs="1" maxOccurs="1" />
+				<xsd:element name="hasHeader" type="xsd:boolean" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="fieldsMask" type="xsd:boolean" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element name="user" type="xsd:string"/>
+				<xsd:element name="resourceType" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		
+			
+			
+			
+			
 			<xsd:complexType name="generateHCAFRequestType">
 				<xsd:sequence>
 					<xsd:element name="userId" type="xsd:string" />
@@ -144,13 +162,7 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
-			<xsd:complexType name="importResourceRequestType">
-				<xsd:sequence>
-					<xsd:element name="user" type="xsd:string"/>
-					<xsd:element name="resourceType" type="xsd:string"/>					
-					<xsd:element name="locator" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
+			
 
 			<!-- Data management request elements -->
 

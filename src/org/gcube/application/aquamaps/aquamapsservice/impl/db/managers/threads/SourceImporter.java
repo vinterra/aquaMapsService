@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -9,6 +10,7 @@ import java.util.List;
 
 import net.sf.csv4j.CSVReaderProcessor;
 
+import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -23,23 +25,39 @@ public class SourceImporter extends Thread {
 	private String csv;
 	private Resource importing;
 	private Integer metaId;
+	private char delimiter;
+	private boolean[] fieldSelection;
+	private boolean hasHeaders;
+	
+	
 
-	
-	
-	public SourceImporter(String csv, Integer metaId) {
+
+
+
+	public SourceImporter(String csv, Resource i, Integer metaId,
+			char delimiter, boolean[] fieldSelection, boolean hasHeaders,String encoding) {
 		super();
 		this.csv = csv;
+		this.importing = i;
 		this.metaId = metaId;
+		this.delimiter = delimiter;
+		this.fieldSelection = fieldSelection;
+		this.hasHeaders = hasHeaders;
 	}
+
+
 
 
 
 
 	public void run() {
 		DBSession session=null;
-		try{
-			importing=SourceManager.getById(metaId);
+		StatefullCSVLineProcessor lineProcessor=null;
+		try{			
 			logger.debug("Started importing operation from "+csv+" TO "+importing.getTableName());
+			long toInsertCount=CSVUtils.countCSVRows(csv, delimiter, hasHeaders);
+			if(toInsertCount==0) throw new Exception("No rows to insert from csv file "+csv);
+			logger.info("Found "+toInsertCount+" rows in csv file");
 			Resource defaultResource=SourceManager.getById(SourceManager.getDefaultId(importing.getType()));
 			session=DBSession.getInternalDBSession();
 			
@@ -47,20 +65,18 @@ public class SourceImporter extends Thread {
 			ResultSet templateRs=session.executeQuery("SELECT * FROM "+defaultResource.getTableName()+" LIMIT 1 OFFSET 0");
 			templateRs.next();
 			final List<Field> model=Field.loadRow(templateRs); 
-			
+			session.close();
 			
 			
 			CSVReaderProcessor processor=new CSVReaderProcessor();
-			processor.setDelimiter(',');					
+			processor.setDelimiter(delimiter);
+			processor.setHasHeader(hasHeaders);
 			Reader reader= new InputStreamReader(new FileInputStream(csv), Charset.defaultCharset());
 			
-			StatefullCSVLineProcessor lineProcessor=new StatefullCSVLineProcessor(model, importing.getTableName(),CSVUtils.countCSVRows(csv, ',', true),metaId);
+			lineProcessor=new StatefullCSVLineProcessor(model, importing,toInsertCount,fieldSelection);
 			logger.debug("Starting file processing");
 			processor.processStream(reader , lineProcessor);
-			logger.debug("Complete processing");
-			importing.setStatus(lineProcessor.getStatus());
-			
-			SourceManager.update(importing);
+			logger.debug("Complete processing");			
 			logger.debug("Completed import of source ID "+importing.getSearchId());
 		}catch(Exception e){
 			logger.error("Unexpected Exception ", e);
@@ -77,6 +93,8 @@ public class SourceImporter extends Thread {
 				}catch(Exception e){
 					logger.fatal("Unable to close session ",e);
 				}
+				if(lineProcessor!=null)lineProcessor.close();
+				FileUtils.delete(new File(csv));
 		}
 	};
 }

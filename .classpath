@@ -4,10 +4,10 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AquaMapsService"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gCore"/>
 	<classpathentry kind="lib" path="/StatisticalLibSupportLibraries/lib/StatisticsExtractor.jar"/>
 	<classpathentry kind="lib" path="/StatisticalLibSupportLibraries/lib/ecologicalModelling1.0.jar"/>
 	<classpathentry kind="lib" path="/StatisticalLibSupportLibraries/lib/lexicalMatcher1.2.jar"/>
 	<classpathentry kind="lib" path="/home/fabio/workspace/Dependencies/AquaMaps/org.gcube.common.dbinterface.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gCore"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

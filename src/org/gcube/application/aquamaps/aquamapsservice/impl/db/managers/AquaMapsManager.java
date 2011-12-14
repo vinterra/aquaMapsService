@@ -71,6 +71,7 @@ public class AquaMapsManager extends SubmittedManager{
 		logger.info("Loading object "+submittedObj);
 		AquaMapsObject toReturn=(AquaMapsObject) AquaMapsXStream.deSerialize(submittedObj.getSerializedObject());
 		toReturn.setId(objId);
+		toReturn.setAlgorithmType(SourceManager.getById(submittedObj.getSourceHSPEC()).getAlgorithm());
 //		toReturn.setAuthor(submittedObj.getAuthor());
 //		toReturn.setDate(submittedObj.getSubmissionTime());
 //		toReturn.setGis(submittedObj.getGisEnabled());

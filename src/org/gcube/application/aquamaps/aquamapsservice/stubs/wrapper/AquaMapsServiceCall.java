@@ -29,7 +29,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.AquaMapsServiceAddressingLocator;
 import org.gcube.application.aquamaps.datamodel.AquaMap;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
@@ -42,8 +41,8 @@ import org.gcube.common.core.types.StringArray;
 public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsServiceInterface{
 
 
-	public static AquaMapsServiceInterface getCall(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI)throws Exception{
-		return new AquaMapsServiceCall(scope, securityManager,defaultURI);
+	public static AquaMapsServiceInterface getCall(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI,boolean queryIS)throws Exception{
+		return new AquaMapsServiceCall(scope, securityManager,defaultURI,queryIS);
 	}
 
 	/**
@@ -54,7 +53,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	 * @return
 	 * @throws Exception
 	 */
-	public static AquaMapsServiceInterface getCall(GCUBEScope scope, String defaultURI)throws Exception{
+	public static AquaMapsServiceInterface getCall(GCUBEScope scope, String defaultURI,boolean queryIS)throws Exception{
 		GCUBESecurityManager secMan= new GCUBESecurityManagerImpl(){
 
 			@Override
@@ -63,12 +62,12 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			}
 
 		};
-		return new AquaMapsServiceCall(scope, new GCUBESecurityManager[]{secMan},defaultURI);
+		return new AquaMapsServiceCall(scope, new GCUBESecurityManager[]{secMan},defaultURI,queryIS);
 	}
 
 	private AquaMapsServiceCall(GCUBEScope scope,
-			GCUBESecurityManager[] securityManager,String defaultURI) throws Exception {
-		super(scope, securityManager,defaultURI);
+			GCUBESecurityManager[] securityManager,String defaultURI,boolean queryIS) throws Exception {
+		super(scope, securityManager,defaultURI,queryIS);
 		pt=GCUBERemotePortTypeContext.getProxy(new AquaMapsServiceAddressingLocator().getAquaMapsServicePortTypePort(epr), scope, 120000, securityManager);
 	}
 

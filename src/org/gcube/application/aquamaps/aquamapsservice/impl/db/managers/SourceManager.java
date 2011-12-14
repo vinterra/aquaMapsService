@@ -10,6 +10,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.SourceImporter;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
@@ -238,25 +239,26 @@ public class SourceManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-	public static Integer importFromCSVFile(final String csvFile,final String author,final ResourceType type)throws Exception{
+	public static Integer importFromCSVFile(final String csvFile,ImportResourceRequestType request)throws Exception{
 		DBSession session=null;
 		try{
+			ResourceType type=ResourceType.valueOf(request.getResourceType());
 			session=DBSession.getInternalDBSession();
 			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();
 			logger.debug("Importing "+csvFile+" to TABLE "+tableName+" [ "+type+" ]");
 			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());
 			
 			Resource toRegister=new Resource(type, 0);
-			toRegister.setAuthor(author);
+			toRegister.setAuthor(request.getUser());
 			toRegister.setDefaultSource(false);
 			toRegister.setGenerationTime(System.currentTimeMillis());
 			toRegister.setDescription("Imported csv file ");
 			toRegister.setTableName(tableName);
-			toRegister.setTitle("Import_"+author);
+			toRegister.setTitle("Import_"+request.getUser());
 			toRegister.setStatus(ResourceStatus.Importing);
 			toRegister.setRowCount(0l);
 			toRegister=registerSource(toRegister);
-			SourceImporter t=new SourceImporter(csvFile, toRegister.getSearchId());
+			SourceImporter t=new SourceImporter(csvFile, toRegister,getDefaultId(type),request.getDelimiter().charAt(0),request.getFieldsMask(),request.isHasHeader(),request.getEncoding());
 			t.start();
 			return toRegister.getSearchId();
 		}catch(Exception e){throw e;}

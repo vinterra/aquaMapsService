@@ -27,8 +27,8 @@ import org.gcube.common.core.types.VOID;
 
 public class DataManagementCall extends AquaMapsCall implements DataManagementInterface {
 
-	public static DataManagementInterface getWrapper(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI)throws Exception{
-		return new DataManagementCall(scope, securityManager,defaultURI);
+	public static DataManagementInterface getWrapper(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI,boolean queryIS)throws Exception{
+		return new DataManagementCall(scope, securityManager,defaultURI,queryIS);
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	 * @return
 	 * @throws Exception
 	 */
-	public static DataManagementInterface getCall(GCUBEScope scope, String defaultURI)throws Exception{
+	public static DataManagementInterface getCall(GCUBEScope scope, String defaultURI,boolean queryIS)throws Exception{
 		GCUBESecurityManager secMan= new GCUBESecurityManagerImpl(){
 
 			@Override
@@ -48,15 +48,15 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			}
 			
 		};
-		return new DataManagementCall(scope, new GCUBESecurityManager[]{secMan},defaultURI);
+		return new DataManagementCall(scope, new GCUBESecurityManager[]{secMan},defaultURI,queryIS);
 	}
 	
 
 
 	private DataManagementPortType pt;
 
-	private DataManagementCall(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI)throws Exception {
-		super(scope,securityManager,defaultURI);
+	private DataManagementCall(GCUBEScope scope, GCUBESecurityManager[] securityManager,String defaultURI,boolean queryIS)throws Exception {
+		super(scope,securityManager,defaultURI,queryIS);
 		pt=GCUBERemotePortTypeContext.getProxy(new DataManagementServiceAddressingLocator().getDataManagementPortTypePort(epr), scope, 120000, securityManager);
 	}
 
@@ -268,14 +268,14 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	
 	@Override
 	public Integer importResource(File toImport, String userId,
-			ResourceType type) throws Exception {
+			ResourceType type,String encoding, boolean[] fieldsMask, boolean hasHeader,char delimiter) throws Exception {
 		try{
 			logger.trace("Caller scope is "+scope);
 			RSWrapper wrapper=new RSWrapper(scope);
 			wrapper.add(toImport);
 			String locator = wrapper.getLocator().toString();
 			logger.trace("Added file to locator "+locator);
-			return pt.importResource(new ImportResourceRequestType(locator, type+"", userId));
+			return pt.importResource(new ImportResourceRequestType(delimiter+"", encoding, fieldsMask, hasHeader, type+"", locator, userId));
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

@@ -1,16 +1,14 @@
 package testClient;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
@@ -30,7 +28,7 @@ public class DMTest {
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
 		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope(WrapperTest.ECOSYSTEM), AquaMapsServiceTester.DM_SERVICE_URI);
+		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope(WrapperTest.DEVSEC), AquaMapsServiceTester.DM_SERVICE_URI,false);
 		
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
@@ -51,9 +49,10 @@ public class DMTest {
 //		System.out.println("Exported to exported_mini.csv"); 
 		
 		
-//		System.out.println("Import Resource :");
-//
-//		System.out.println("ID IS "+dmInterface.importResource(new File("exported.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS));
+		System.out.println("Import Resource :");
+
+		System.out.println("ID IS "+dmInterface.importResource(new File("/home/fabio/Desktop/MiniOccurrence.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS,
+				"UTF-8",new boolean[]{true,true,true,true,true,true,true,true,true,true},true,'\t'));
 		
 		
 		

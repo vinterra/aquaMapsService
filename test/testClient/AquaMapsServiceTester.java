@@ -27,18 +27,18 @@ public class AquaMapsServiceTester {
 	
 //	static final String AQ_SERVICE_URI="http://aquamaps.ifm-geomar.de:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	static final String AQ_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
-//	static final String DM_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
+	static final String DM_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
 	
 	
 //	static final String AQ_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
-	static final String DM_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
+//	static final String DM_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
 	static final String RS_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/common/searchservice/ResultSet";
 	
 	
 	public static void main(String[] args){
 		try{
 //		AquaMapsServiceWrapper wrapper=new AquaMapsServiceWrapper(GCUBEScope.getScope("/gcube/devsec"), SERVICE_URI);
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AQ_SERVICE_URI);
+		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope("/gcube/devsec"),AQ_SERVICE_URI,false);
 //		Species spec=new Species("Fis-29501");
 //		System.out.println("Occurrence cells for ");
 ////		System.out.println(wrapper.getJSONOccurrenceCells(spec.getId(), new PagedRequestSettings(10, 0, Cell.ID, "ASC")));

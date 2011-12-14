@@ -142,4 +142,11 @@ public class ServiceContext extends GCUBEServiceContext {
 		if(!f.exists())f.mkdirs();
 		return persistencePath;
 	}
+	public String getImportedDir(){
+		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"imports";
+		File f=new File(persistencePath);
+		if(!f.exists())f.mkdirs();
+		return persistencePath;
+	}
+	
 }

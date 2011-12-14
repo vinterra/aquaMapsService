@@ -1,11 +1,14 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
@@ -387,10 +390,16 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public int importResource(ImportResourceRequestType arg0)
 			throws RemoteException, GCUBEFault {
 		try{
-			logger.trace("Importing resource , user : "+arg0);
-			File csv=File.createTempFile("import", ".csv");
-			FileUtils.getFileUtils().copyFile(RSWrapper.getStreamFromLocator(new URI(arg0.getLocator())), csv);		
-			return SourceManager.importFromCSVFile(csv.getAbsolutePath(), arg0.getUser(), ResourceType.valueOf(arg0.getResourceType()));
+			logger.trace("Importing resource , user : "+arg0.getUser()+", locator :"+arg0.getRsLocator());
+			String csvLocation=ServiceContext.getContext().getImportedDir()+File.separator+ServiceUtils.generateId("import", ".csv");
+			
+			FileWriter writer=new FileWriter(csvLocation);
+			FileInputStream is=new FileInputStream(RSWrapper.getStreamFromLocator(new URI(arg0.getRsLocator())));
+			IOUtils.copy(is, writer, arg0.getEncoding());
+			IOUtils.closeQuietly(writer);
+			IOUtils.closeQuietly(is);
+			logger.trace("CSV imported into "+csvLocation);
+			return SourceManager.importFromCSVFile(csvLocation, arg0);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

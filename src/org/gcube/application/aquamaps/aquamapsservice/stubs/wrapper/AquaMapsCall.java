@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.axis.message.addressing.AttributedURI;
@@ -35,24 +36,28 @@ public abstract class AquaMapsCall extends RICall{
 	
 	
 	protected AquaMapsCall(GCUBEScope scope,
-			GCUBESecurityManager[] securityManager,String defaultURI) throws Exception {
+			GCUBESecurityManager[] securityManager,String defaultURI, boolean queryIS) throws Exception {
 		super(scope, securityManager);
 		// looking for service epr
 		this.scope=scope;
-		GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
-		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass",getServiceClass()));
-		query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName",getServiceName()));
-		List<GCUBERunningInstance> toReturn= isClient.execute(query, scope);
-		if(toReturn.isEmpty()) {				
-			System.out.println("No runnning instance found, using default service @ : "+defaultURI);
+		List<GCUBERunningInstance> list=new ArrayList<GCUBERunningInstance>();
+		if(queryIS){
+			GCUBERIQuery query = isClient.getQuery(GCUBERIQuery.class);		
+			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceClass",getServiceClass()));
+			query.addAtomicConditions(new AtomicCondition("//Profile/ServiceName",getServiceName()));
+			list= isClient.execute(query, scope);
+		}
+		if(list.isEmpty()) {				
+			System.out.println("Using default service @ : "+defaultURI);
 			epr=new EndpointReferenceType();
 			epr.setAddress(new AttributedURI(defaultURI));
 		}else{
-			epr= toReturn.get(0).getAccessPoint().getEndpoint(getPortTypeName());
+			epr= list.get(0).getAccessPoint().getEndpoint(getPortTypeName());
 			System.out.println("Found RI @ : "+epr.getAddress().getHost());
 		}
 	}
 
+		
 	@Override
 	protected String getServiceClass() {
 		return Constant.SERVICE_CLASS;
