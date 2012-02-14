@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
@@ -44,8 +43,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Reso
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
 import org.gcube.application.aquamaps.datamodel.Resource;
@@ -140,9 +137,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			GetJSONSubmittedHSPECRequestType arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection()));
-			return SourceGenerationRequestsManager.getJSONList(new ArrayList<Field>(), settings);
-
+			return SourceGenerationRequestsManager.getJSONList(new ArrayList<Field>(), arg0.getPagedRequestSettings());
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -411,8 +406,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			throws RemoteException, GCUBEFault {
 		try{			
 			
-			return CustomQueryManager.getPagedResult(arg0.getUser(), 
-					new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), OrderDirection.valueOf(arg0.getSortDirection())));
+			return CustomQueryManager.getPagedResult(arg0.getUser(),arg0.getPagedRequestSettings());
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

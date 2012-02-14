@@ -98,11 +98,7 @@ public class Field extends DataModel{
 	}
 
 
-	public String getOperator(){
-		if(name.contains("min")) return ">=";
-		else if(name.contains("max")) return "<=";
-		else return "=";
-	}
+	
 
 
 

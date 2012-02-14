@@ -56,10 +56,7 @@
 			</xsd:complexType>
 			<xsd:complexType name="getHCAFgenerationReportRequestType">
 				<xsd:sequence>
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -79,10 +76,7 @@
 
 			<xsd:complexType name="getGenerationReportByTypeRequestType">
 				<xsd:sequence>
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 					<xsd:element name="resourceType" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
@@ -120,10 +114,7 @@
 
 			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
 				<xsd:sequence>
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 			
@@ -148,10 +139,7 @@
 			<xsd:complexType name="viewCustomQueryRequestType">
 				<xsd:sequence>
 					<xsd:element name="user" type="xsd:string"/>
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 			

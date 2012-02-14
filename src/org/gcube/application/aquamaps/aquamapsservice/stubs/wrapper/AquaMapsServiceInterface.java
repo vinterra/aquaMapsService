@@ -18,7 +18,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Spe
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 public interface AquaMapsServiceInterface {
 
 	
@@ -45,9 +45,9 @@ public interface AquaMapsServiceInterface {
 
 	public String getJSONResources(PagedRequestSettings settings, List<Field> filter)throws Exception;
 
-	public String getJSONSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception;
+	public String getJSONSpecies(int hspenId, List<Filter> genericSearch, List<Filter> advancedFilters, PagedRequestSettings settings)throws Exception;
 
-	public File getCSVSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes)throws Exception;
+	public File getCSVSpecies(int hspenId, List<Filter> genericSearch, List<Filter> advancedFilters)throws Exception;
 	
 	public Species loadEnvelope(String speciesId, int hspenId)throws Exception;
 

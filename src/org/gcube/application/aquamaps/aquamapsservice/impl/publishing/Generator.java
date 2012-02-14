@@ -36,7 +36,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
 import org.gcube.application.aquamaps.publisher.MetaInformations;
 import org.gcube.application.aquamaps.publisher.impl.datageneration.ObjectManager;
 import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;

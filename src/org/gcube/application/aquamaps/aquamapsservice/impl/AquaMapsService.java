@@ -37,8 +37,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AreaType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.AquaMap;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
@@ -63,9 +61,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 	public String getPhylogeny(GetPhylogenyRequestType req) throws GCUBEFault{
 		try{
-			Field toSelect= new Field(req.getToSelect());
-			PagedRequestSettings settings= new PagedRequestSettings(req.getLimit(), req.getOffset(), req.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(req.getSortDirection()));
-			return SpeciesManager.getJSONTaxonomy(toSelect, Field.load(req.getFieldList()), settings);
+			Field toSelect= new Field(req.getToSelect());		
+			return SpeciesManager.getJSONTaxonomy(toSelect, Field.load(req.getFieldList()), req.getPagedRequestSettings());
 		}catch(Exception e){
 			logger.error("Unable to get Taxonomy ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -162,10 +159,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
 		try{
-			return CellManager.getJSONOccurrenceCells(request.getSpeciesID(), 
-					new PagedRequestSettings(request.getLimit(), request.getOffset(), request.getSortColumn(), 
-							PagedRequestSettings.OrderDirection.valueOf(request.getSortDirection())));
-			
+			return CellManager.getJSONOccurrenceCells(request.getSpeciesID(),request.getPagedRequestSettings());
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -229,8 +223,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		
 		try{
 			
-			return SpeciesManager.getJsonList(req.getSortColumn(), req.getSortDirection(), req.getLimit(), req.getOffset(),
-					Field.load(req.getCharacteristicFilters()), Filter.load(req.getNameFilters()), Filter.load(req.getCodeFilters()), req.getHspen());
+			return SpeciesManager.getJSONList(req.getPagedRequestSettings(),
+					Filter.load(req.getGenericSearchFilters()), Filter.load(req.getSpecieficFilters()), req.getHspen());
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
@@ -257,8 +251,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.debug("entroin getResourceList");
 		try{
 			
-			return SourceManager.getJsonList(Field.load(req.getFilters()),
-					 new PagedRequestSettings(req.getLimit(), req.getOffset(), req.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(req.getSortDirection())));
+			return SourceManager.getJsonList(Field.load(req.getFilters()),req.getPagedRequestSettings());
 		}catch(Exception e){
 			logger.error("Errors while performing getResourceList operation",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -295,8 +288,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			for(Field f:parameters)
 				logger.trace(f.getName()+" = "+f.getValue()+" ("+f.getType()+")");
 			
-			return SubmittedManager.getJsonList(parameters,  
-					new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection()))); 			
+			return SubmittedManager.getJsonList(parameters,arg0.getPagedRequestSettings()); 			
 		}catch(Exception e ){
 			logger.error("Exception while trying to serve -getAquaMapsPerUser : user = "+arg0.getUserID(),e);
 			throw new GCUBEFault("ServerSide Msg: "+e.getMessage());
@@ -346,7 +338,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("Serving getSpecies by filters");
 		
 		try{
-			File toExport=SpeciesManager.getCSVList(Field.load(arg0.getCharacteristicFilters()), Filter.load(arg0.getNameFilters()), Filter.load(arg0.getCodeFilters()), arg0.getHspen());
+			File toExport=SpeciesManager.getCSVList(Filter.load(arg0.getGenericSearchFilters()), Filter.load(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
 			RSWrapper wrapper=new RSWrapper(scope);

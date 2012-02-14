@@ -8,12 +8,20 @@
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	
-	<xsd:simpleType name="character">
-      <xsd:restriction base="xsd:string">
-        <xsd:maxLength value="1"/>
-        <xsd:minLength value="1"/>
-      </xsd:restriction>
-    </xsd:simpleType>
+		<xsd:simpleType name="character">
+	      <xsd:restriction base="xsd:string">
+	        <xsd:maxLength value="1"/>
+	        <xsd:minLength value="1"/>
+	      </xsd:restriction>
+	    </xsd:simpleType>
+	
+		<xsd:simpleType name="orderDirection">
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration  value="ASC"/>
+				<xsd:enumeration  value="DESC"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	
 	
 	
 		<xsd:complexType name="perturbation">
@@ -56,6 +64,7 @@
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="value" type="xsd:string" />
+					<xsd:element name="fieldType" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -178,6 +187,15 @@
 			</xsd:sequence>
 			</xsd:complexType>
 			
+			<xsd:complexType name="pagedRequestSettings">
+				<xsd:sequence>
+					<xsd:element name="limit"	type="xsd:int"/>
+					<xsd:element name="offset"	type="xsd:int"/>
+					<xsd:element name="orderField"	type="xsd:string"/>
+					<xsd:element name="orderDirection"	type="tns:orderDirection"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
 
 			<!-- Arrays -->
 

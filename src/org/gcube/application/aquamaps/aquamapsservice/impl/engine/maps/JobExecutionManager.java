@@ -21,7 +21,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobExecutionManager {
@@ -229,7 +230,7 @@ public class JobExecutionManager {
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.isaquamap+"",object+"",FieldType.BOOLEAN));
 		filter.add(new Field(SubmittedFields.status+"",(object?SubmittedStatus.Generating:SubmittedStatus.Pending)+"",FieldType.STRING));
-		PagedRequestSettings settings= new PagedRequestSettings(maxSize,0,SubmittedFields.submissiontime+"",PagedRequestSettings.OrderDirection.ASC);
+		PagedRequestSettings settings= new PagedRequestSettings(maxSize,0,OrderDirection.ASC,SubmittedFields.submissiontime+"");
 		return SubmittedManager.getList(filter, settings);
 	}
 

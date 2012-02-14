@@ -163,7 +163,6 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsService
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/Constant.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementCall.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementInterface.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PublisherInterface.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/RSWrapper.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text

@@ -37,6 +37,7 @@ import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.security.GCUBESecurityManager;
 import org.gcube.common.core.security.GCUBESecurityManagerImpl;
 import org.gcube.common.core.types.StringArray;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 
 public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsServiceInterface{
 
@@ -149,12 +150,9 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			if(jobId!=null)request.setJobIdValue(jobId);
 			request.setJobStatusEnabled(false);
 			request.setJobStatusValue(null);
-			request.setLimit(settings.getLimit());
 			request.setObjectStatusEnabled(status!=null);
 			if(status!=null)request.setObjectStatusValue(status.toString());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
+			request.setPagedRequestSettings(settings);
 			request.setTypeEnabled(objType!=null);
 			if(objType!=null)request.setTypeValue(objType.toString());
 			return pt.getAquaMapsPerUser(request);
@@ -169,10 +167,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			GetOccurrenceCellsRequestType request= new GetOccurrenceCellsRequestType();
 			request.setSpeciesID(speciesId);
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			request.setLimit(settings.getLimit());
+			request.setPagedRequestSettings(settings);
 			return pt.getOccurrenceCells(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -192,7 +187,6 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	public AquaMapsObject loadObject(int objectId)throws Exception{
 		try{
 			AquaMap returned=pt.getObject(objectId);
-//			logger.info("STUBS VERSION IS "+AquaMapsXStream.getXMLInstance().toXML(returned));
 			return new AquaMapsObject(returned);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -216,10 +210,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			GetResourceListRequestType request=new GetResourceListRequestType();
 			request.setFilters(Field.toStubsVersion(filter));
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			request.setLimit(settings.getLimit());
+			request.setPagedRequestSettings(settings);
 			return pt.getResourceList(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -228,17 +219,18 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	}
 
 	@Override
-	public String getJSONSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception{
+	public String getJSONSpecies(int hspenId, List<Filter> genericSearch, List<Filter> advancedFilters, PagedRequestSettings settings)throws Exception{
 		try{
 			GetSpeciesByFiltersRequestType request=new GetSpeciesByFiltersRequestType();
-			request.setCharacteristicFilters(Field.toStubsVersion(characteristcs));
-			request.setCodeFilters(Filter.toStubsVersion(codes));
+			request.setGenericSearchFilters(Filter.toStubsVersion(genericSearch));
+			request.setSpecieficFilters(Filter.toStubsVersion(advancedFilters));
 			request.setHspen(hspenId);
-			request.setNameFilters(Filter.toStubsVersion(names));
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			request.setLimit(settings.getLimit());
+			request.setPagedRequestSettings(settings);
+			logger.debug("Serving request, page settings : ");
+			logger.debug("OFFSET "+settings.getOffset());
+			logger.debug("LIMIT "+settings.getLimit());
+			logger.debug("ORDER BY "+settings.getOrderField());
+			logger.debug("DIRECTION "+settings.getOrderDirection());
 			return	pt.getSpeciesByFilters(request);			
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -252,10 +244,6 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			Species spec=new Species(speciesId);
 			GetSpeciesEnvelopeRequestType req=new GetSpeciesEnvelopeRequestType(hspenId, speciesId);
 			spec.getAttributesList().addAll(Field.load(pt.getSpeciesEnvelop(req)));
-			//			System.out.println("Loaded Fields : ");
-			//			for(Field f:spec.attributesList)
-			//				System.out.println(f.getName()+" : "+f.getValue());
-			//			return spec.extractEnvelope();
 			return spec;
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -302,10 +290,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			GetPhylogenyRequestType request=new GetPhylogenyRequestType();
 			request.setFieldList(Field.toStubsVersion(filters));
-			request.setLimit(settings.getLimit());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
+			request.setPagedRequestSettings(settings);
 			request.setToSelect(new Field(level+"","",FieldType.STRING).toStubsVersion());
 			return pt.getPhylogeny(request);
 		}catch(GCUBEFault f){
@@ -315,14 +300,12 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	}
 
 	@Override
-	public File getCSVSpecies(int hspenId, List<Field> characteristcs,
-			List<Filter> names, List<Filter> codes) throws Exception {
+	public File getCSVSpecies(int hspenId, List<Filter> genericSearch, List<Filter> advancedFilters) throws Exception {
 		try{
 			GetSpeciesByFiltersRequestType request=new GetSpeciesByFiltersRequestType();
-			request.setCharacteristicFilters(Field.toStubsVersion(characteristcs));
-			request.setCodeFilters(Filter.toStubsVersion(codes));
+			request.setGenericSearchFilters(Filter.toStubsVersion(genericSearch));
+			request.setSpecieficFilters(Filter.toStubsVersion(advancedFilters));
 			request.setHspen(hspenId);
-			request.setNameFilters(Filter.toStubsVersion(names));			
 					
 			String locator=pt.getSpeciesByFiltersASCSV(request);						
 			return RSWrapper.getStreamFromLocator(new URI(locator));

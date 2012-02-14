@@ -24,6 +24,7 @@ import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.security.GCUBESecurityManager;
 import org.gcube.common.core.security.GCUBESecurityManagerImpl;
 import org.gcube.common.core.types.VOID;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 
 public class DataManagementCall extends AquaMapsCall implements DataManagementInterface {
 
@@ -73,24 +74,6 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public String submitRequest(SourceGenerationRequest request)
 			throws Exception {
 		try{
-//			SourceGenerationRequestType stubRequest=new SourceGenerationRequestType();
-//			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-//			stubRequest.setAuthor(request.getAuthor());
-//			stubRequest.setGenerationName(request.getGenerationname());
-//			stubRequest.setDescription(request.getDescription());
-//			
-//			stubRequest.setHcafSearchId(request.getHcafsearchid());
-//			stubRequest.setHspenSearchId(request.getHspensearchid());
-//			stubRequest.setSubmissionBackend(request.getSubmissionBackend());
-//			stubRequest.setExecutionEnvironment(request.getExecutionEnvironment());
-//			stubRequest.setBackendUrl(request.getBackendURL());
-//			stubRequest.setEnvironmentConfiguration(AquaMapsXStream.getXMLInstance().toXML(request.getEnvironmentConfiguration()));
-//			stubRequest.setLogic(request.getLogic()+"");
-//			stubRequest.setNumPartitions(request.getNumPartitions());
-//			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-//			
-//			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
-//			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
 			return pt.generateHSPECGroup(request.toStubsVersion());
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -117,10 +100,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			PagedRequestSettings settings) throws Exception {
 		try{
 			GetJSONSubmittedHSPECRequestType request=new GetJSONSubmittedHSPECRequestType();
-			request.setLimit(settings.getLimit());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
+			request.setPagedRequestSettings(settings);
 			return pt.getJSONSubmittedHSPECGroup(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -174,7 +154,6 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			throws Exception {
 		try{
 			throw new GCUBEFault("Not Ymplemented");
-//			pt.editHSPECGroupDetails(stubRequest);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
@@ -246,9 +225,11 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	@Override
 	public String viewCustomQuery(String userId, PagedRequestSettings settings)
 			throws Exception {
-		try{									
-			return pt.viewCustomQuery(new ViewCustomQueryRequestType(settings.getLimit(), 
-					settings.getOffset(), settings.getOrderColumn(), settings.getOrderDirection()+"", userId));			
+		try{
+			ViewCustomQueryRequestType request=new ViewCustomQueryRequestType();
+			request.setPagedRequestSettings(settings);
+			request.setUser(userId);
+			return pt.viewCustomQuery(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

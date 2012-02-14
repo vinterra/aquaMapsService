@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli2.validation.InvalidArgumentException;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FilterType;
 
 public class Filter extends DataModel{
@@ -38,6 +39,7 @@ public class Filter extends DataModel{
 		Field field= new Field();
 		field.setName(toLoad.getName());
 		field.setValue(toLoad.getValue());
+		field.setType(FieldType.valueOf(toLoad.getFieldType()));
 		this.setField(field);
 		this.setType(FilterType.valueOf(toLoad.getType()));
 	}
@@ -62,6 +64,7 @@ public class Filter extends DataModel{
 		toReturn.setName(this.getField().getName());
 		toReturn.setType(this.getType().toString());
 		toReturn.setValue(this.getField().getValue());
+		toReturn.setFieldType(this.getField().getType()+"");
 		return toReturn;
 	}
 
@@ -70,7 +73,17 @@ public class Filter extends DataModel{
 		case begins: return " like '"+field.getValue()+"%'";
 		case contains: return " like '%"+field.getValue()+"%'";
 		case ends: return " like '%"+field.getValue()+"'";
-		case is: return " = '"+field.getValue()+"'";
+		case is: {
+					switch(field.getType()){
+					case STRING : return " = '"+field.getValue()+"'";
+					case INTEGER : return " = "+field.getValueAsInteger();
+					case DOUBLE : return " = "+field.getValueAsDouble();
+					case LONG : return " = "+field.getValueAsLong();
+					default : return " = "+(field.getValueAsBoolean()?"1":"0");
+					}
+				}
+		case greater_then : return " >= "+field.getValue();
+		case smaller_then : return " <= "+field.getValue();
 		default : throw new InvalidArgumentException("invalid filter type");
 		}
 	}

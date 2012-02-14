@@ -14,7 +14,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConsta
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -207,20 +207,7 @@ public abstract class DBSession {
 	}
 	
 	
-//	public List<List<String>> showTableMetadata(String tableName, String... whereClause) throws Exception{
-//		String query="SHOW COLUMNS FROM "+tableName+" "+((whereClause!=null && whereClause.length>0)?"WHERE "+whereClause[0]:"")+";";
-//		logger.debug("executing query: "+query);
-//		ResultSet rs=this.executeQuery(query);
-//		int columns=rs.getMetaData().getColumnCount();
-//		List<List<String>> table=  new ArrayList<List<String>>();
-//		while (rs.next()){
-//			List<String> row= new ArrayList<String>();
-//			for (int i=1; i<=columns; i++)
-//				row.add(rs.getString(i));
-//			table.add(row);
-//		}
-//		return table;
-//	}
+
 
 
 	//*********************** DATA MANIPULATION
