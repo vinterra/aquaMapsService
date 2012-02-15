@@ -65,6 +65,7 @@ public class PropertiesConstants {
 	public static final String GEOSERVER_DATASTORE="GEOSERVER_DATASTORE";
 	
 	
+	
 	public static final String GEOSERVER_WORKSPACE="GEOSERVER_WORKSPACE";
 	public static final String GEOSERVER_WORLD_TABLE="GEOSERVER_WORLD_TABLE";
 	public static final String GEOSERVER_URL="GEOSERVER_URL";
@@ -74,6 +75,12 @@ public class PropertiesConstants {
 	public static final String GEOSERVER_DEFAULT_DISTRIBUTION_STYLE="GEOSERVER_DEFAULT_DISTRIBUTION_STYLE";
 	public static final String GEOSERVER_WAIT_FOR_DB_MS="GEOSERVER_WAIT_FOR_DB_MS";
 	public static final String GEOSERVER_WAIT_FOR_FT="GEOSERVER_WAIT_FOR_FT";
+	
+	
+	public static final String GEONETWORK_URL="GEONETWORK_URL";
+	public static final String GEONETWORK_USERNAME="GEONETWORK_USERNAME";
+	public static final String GEONETWORK_PASSWORD="GEONETWORK_PASSWORD";
+	
 	//********* WORKERS CONFIGURATION
 	
 	public static final String JOB_MAX_WORKERS="JOB_MAX_WORKERS";

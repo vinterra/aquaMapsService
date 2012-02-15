@@ -128,16 +128,16 @@ public class JobWorker extends Thread{
 				
 				
 				
-				if(tableReference.getGisEnabled()){
-					String wmsID=ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(tableReference.getSearchId())){
-						@Override
-						public WMSContext generate() throws Exception {
-							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
-						}
-					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
-							new UpdateConfiguration(true, true, true))).getStoredId().getId();
-					SubmittedManager.setGisPublishedId(tableReference.getSearchId(), wmsID);
-				}
+//				if(tableReference.getGisEnabled()){
+//					String wmsID=ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(tableReference.getSearchId())){
+//						@Override
+//						public WMSContext generate() throws Exception {
+//							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
+//						}
+//					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
+//							new UpdateConfiguration(true, true, true))).getStoredId().getId();
+//					SubmittedManager.setGisPublishedId(tableReference.getSearchId(), wmsID);
+//				}
 				SubmittedManager.updateStatus(tableReference.getSearchId(), SubmittedStatus.Completed);
 				
 			}
