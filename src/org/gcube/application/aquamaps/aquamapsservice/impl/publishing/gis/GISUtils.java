@@ -1,11 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis;
 
-import it.cnr.isti.geoserverInteraction.GeoserverCaller;
-import it.cnr.isti.geoserverInteraction.bean.BoundsRest;
-import it.cnr.isti.geoserverInteraction.bean.FeatureTypeRest;
-import it.cnr.isti.geoserverInteraction.bean.GroupRest;
-import it.cnr.isti.geoserverInteraction.engine.MakeStyle;
-
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -28,6 +22,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.F
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube.common.geoserverinterface.GeoCaller;
+import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeonetworkCategory;
+import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeoserverMethodResearch;
+import org.gcube.common.geoserverinterface.bean.BoundsRest;
+import org.gcube.common.geoserverinterface.bean.FeatureTypeRest;
+import org.gcube.common.geoserverinterface.bean.GroupRest;
+import org.gcube.common.geoserverinterface.engine.MakeStyle;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.datamodel.types.LayersType;
@@ -88,11 +89,11 @@ public class GISUtils {
 			//***** update GeoServerBox
 
 			//****** Styles generation
-
+			GeoCaller caller=getCaller();
 			for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
 				//					String linearStyle=layerTable+"_linearStyle";
 				//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
-				if(GISUtils.generateStyle(styleReq))request.getToAssociateStyles().add(styleReq.getNameStyle());
+				if(GISUtils.generateStyle(styleReq,caller))request.getToAssociateStyles().add(styleReq.getNameStyle());
 				else logger.warn("Style "+styleReq.getNameStyle()+" was not generated!!");
 
 			//**** Layer Generation
@@ -100,7 +101,7 @@ public class GISUtils {
 			if(request.getToAssociateStyles().size()==0)
 				throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
 
-			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle());
+			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),caller);
 			if(!generatedLayer)	throw new Exception("Unable to generate Layer "+request.getMapName());
 
 			String url = ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL)+"/wms/"+layerTable;
@@ -132,7 +133,7 @@ public class GISUtils {
 	public static WMSContextInfo generateWMSContext(GroupGenerationRequest request)throws Exception{
 		logger.trace("Generating group "+request.getToGenerateGroupName());		
 		if(request.getGeoLayersAndStyles()==null||request.getGeoLayersAndStyles().size()==0) throw new Exception("Unable to generate group "+request.getToGenerateGroupName()+", No Layer selected");
-		GroupRest group=GISUtils.createGroupOnGeoServer(request.getGeoLayersAndStyles().keySet(), request.getGeoLayersAndStyles(), request.getToGenerateGroupName());
+		GroupRest group=GISUtils.createGroupOnGeoServer(request.getGeoLayersAndStyles().keySet(), request.getGeoLayersAndStyles(), request.getToGenerateGroupName(),getCaller());
 		WMSContextInfo wms=ReadTemplate.getWMSContextTemplate();
 		wms.getLayers().addAll(request.getPublishedLayersId());
 		wms.setName(request.getToGenerateGroupName());
@@ -141,9 +142,10 @@ public class GISUtils {
 	
 	public static void deleteLayer(LayerInfo toDelete)throws Exception{
 		logger.trace("Deleting layer "+toDelete.getName());
-		if(deleteLayer(toDelete.getName()))
+		GeoCaller caller=getCaller();
+		if(deleteLayer(toDelete.getName(),caller))
 			if(deleteFeatureType(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_WORKSPACE),
-					ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME), toDelete.getName()))
+					ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME), toDelete.getName(),caller))
 				deleteLayerTable(toDelete.getName());
 			else throw new Exception("Unable to delete Feature Type "+toDelete.getName());
 		else throw new Exception("Unable to delete layer "+toDelete.getName());
@@ -151,7 +153,7 @@ public class GISUtils {
 	
 	public static void deleteWMSContext(WMSContextInfo toDelete)throws Exception{
 		logger.trace("DELETING wms context "+toDelete.getName());
-		if(!deleteGroup(toDelete.getName()))throw new Exception("Unable to delete group "+toDelete.getName());
+		if(!deleteGroup(toDelete.getName(),getCaller()))throw new Exception("Unable to delete group "+toDelete.getName());
 	}
 	
 	
@@ -169,10 +171,20 @@ public class GISUtils {
 	
 	
 	//************************** ROUTINES 
-	private static GeoserverCaller getCaller()throws Exception{
-		return new GeoserverCaller(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
+	private static GeoCaller getCaller()throws Exception{
+		String geoNetworkUrl=ServiceContext.getContext().getProperty(PropertiesConstants.GEONETWORK_URL);
+		String geoNetworkUser=ServiceContext.getContext().getProperty(PropertiesConstants.GEONETWORK_USERNAME);
+		String geoNetworkPWD=ServiceContext.getContext().getProperty(PropertiesConstants.GEONETWORK_PASSWORD);
+		return new GeoCaller(geoNetworkUrl, geoNetworkUser, geoNetworkPWD, 
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
 				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
+				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD)
+				, GeoserverMethodResearch.MOSTUNLOAD);
+		
+		
+//		return new GeoserverCaller(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
+//				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER),
+//				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
 	}
 	
 	
@@ -260,9 +272,9 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean generateStyle(StyleGenerationRequest req)throws Exception{
+	private static boolean generateStyle(StyleGenerationRequest req,GeoCaller caller)throws Exception{
 		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
-		GeoserverCaller caller= getCaller();
+		
 		String style;
 		if(req.getTypeValue()==Integer.class){
 			switch(req.getClusterScaleType()){
@@ -300,8 +312,7 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 	
-	 private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex) throws Exception{		
-		GeoserverCaller caller= getCaller();
+	 private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,GeoCaller caller) throws Exception{		
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();
 		featureTypeRest.setDatastore(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DATASTORE));
 		featureTypeRest.setEnabled(true);
@@ -312,12 +323,12 @@ public class GISUtils {
 		featureTypeRest.setProjectionPolicy("FORCE_DECLARED");
 		featureTypeRest.setSrs("EPSG:4326");
 		featureTypeRest.setNativeCRS(crs);
-		featureTypeRest.setTitle(featureTable);
+		featureTypeRest.setTitle(layerName);
 		featureTypeRest.setWorkspace(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_WORKSPACE)); 
 		logger.debug("Invoking Caller for registering layer : ");
 		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
 		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());
-		if (caller.addFeatureType(featureTypeRest)){
+		if (caller.addFeatureType(featureTypeRest,GeonetworkCategory.DATASETS)){
 			logger.debug("Add feature type returned true .. waiting 6 secs..");
 			try {
 				Thread.sleep(GEO_SERVER_WAIT_TIME);
@@ -339,11 +350,9 @@ public class GISUtils {
 	  * @return
 	  * @throws Exception
 	  */
-	private static GroupRest createGroupOnGeoServer(Set<String> layers,Map<String,String> styles, String groupName)throws Exception{	 
+	private static GroupRest createGroupOnGeoServer(Set<String> layers,Map<String,String> styles, String groupName,GeoCaller caller)throws Exception{	 
 		logger.trace("Creating group on geo server...");
-		GeoserverCaller caller= new GeoserverCaller(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_URL),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_USER),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_PASSWORD));
+		
 		logger.trace("Getting template group : "+ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_TEMPLATE_GROUP));
 		GroupRest g=caller.getLayerGroup(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_TEMPLATE_GROUP));
 		//		g.setBounds(new BoundsRest(-180.0,180.0,-90.0,90.0,"EPSG:4326"));
@@ -357,7 +366,7 @@ public class GISUtils {
 		}
 		g.setName(groupName);
 		logger.trace("Setted group name "+groupName);
-		if(!caller.addLayersGroup(g)) throw new Exception ("GEOSERVER REST CALL RETURNED FALSE FOR GROUP ID : "+groupName);
+		if(!caller.addLayersGroup(g,GeonetworkCategory.DATASETS)) throw new Exception ("GEOSERVER REST CALL RETURNED FALSE FOR GROUP ID : "+groupName);
 		
 		return g;
 	}
@@ -406,13 +415,13 @@ public class GISUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	private static boolean deleteLayer(String layerName)throws Exception{
-		GeoserverCaller caller=getCaller();
+	private static boolean deleteLayer(String layerName,GeoCaller caller)throws Exception{
+		
 		return caller.deleteLayer(layerName);
 	}
 	
-	private static boolean deleteFeatureType(String workspaceName,String dataStore,String featureType)throws Exception{
-		GeoserverCaller caller=getCaller();
+	private static boolean deleteFeatureType(String workspaceName,String dataStore,String featureType,GeoCaller caller)throws Exception{
+		
 		return caller.deleteFeatureTypes(workspaceName, dataStore, featureType);
 	}
 	
@@ -430,8 +439,8 @@ public class GISUtils {
 		}
 	}
 	
-	private static boolean deleteGroup(String groupName)throws Exception{
-		GeoserverCaller caller=getCaller();
+	private static boolean deleteGroup(String groupName,GeoCaller caller)throws Exception{
+		
 		return caller.deleteLayersGroup(groupName);
 	}
 }
