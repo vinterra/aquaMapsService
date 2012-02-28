@@ -8,16 +8,25 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.DataModel;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONArray;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.common.core.utils.logging.GCUBELog;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 
 public class SourceGenerationRequest extends DataModel{
 
+	static GCUBELog logger= new GCUBELog(SourceGenerationRequest.class);
+	
 	private String author;
 	private String generationname;
 	private String id;
@@ -30,10 +39,10 @@ public class SourceGenerationRequest extends DataModel{
 	private Double currentphasepercent=0d;
 
 
-	private Integer hcafId=0;
-	private Integer hspenId=0;
-	private Integer occurrenceCellId=0;
-	
+	private ArrayList<Integer> hcafIds=new ArrayList<Integer>();
+	private ArrayList<Integer> hspenIds=new ArrayList<Integer>();
+	private ArrayList<Integer> occurrenceCellIds=new ArrayList<Integer>();
+	private ArrayList<Field> parameters=new ArrayList<Field>();
 	
 
 	private ArrayList<Integer> generatedSources=new ArrayList<Integer>();
@@ -46,36 +55,22 @@ public class SourceGenerationRequest extends DataModel{
 	private HashMap<String, String> environmentConfiguration=new HashMap<String, String>();
 	private LogicType logic;
 	private Integer numPartitions=0;
-	private ArrayList<String> algorithms=new ArrayList<String>();
+	private ArrayList<AlgorithmType> algorithms=new ArrayList<AlgorithmType>();
 	private Boolean enablelayergeneration=false;
 	private Boolean enableimagegeneration=false;
 
-
-
+	public static final String FIRST_HCAF_ID="FIRST_HCAF_ID";
+	public static final String SECOND_HCAF_ID="SECOND_HCAF_ID";
+	public static final String NUM_INTERPOLATIONS="NUM_INTERPOLATIONS";
+	public static final String FIRST_HCAF_TIME="FIRST_HCAF_TIME";
+	public static final String SECOND_HCAF_TIME="SECOND_HCAF_TIME";
 	
-	public Integer getHcafId() {
-		return hcafId;
-	}
-	public void setHcafId(Integer hcafId) {
-		this.hcafId = hcafId;
-	}
-	public Integer getHspenId() {
-		return hspenId;
-	}
-	public void setHspenId(Integer hspenId) {
-		this.hspenId = hspenId;
-	}
-	public Integer getOccurrenceCellId() {
-		return occurrenceCellId;
-	}
-	public void setOccurrenceCellId(Integer occurrenceCellId) {
-		this.occurrenceCellId = occurrenceCellId;
-	}
 	public ArrayList<Integer> getGeneratedSources() {
 		return generatedSources;
 	}
 	public void setGeneratedSources(ArrayList<Integer> generatedSources) {
 		this.generatedSources = generatedSources;
+		Collections.sort(this.generatedSources);
 	}
 	public Long getEndtime() {
 		return endtime;
@@ -101,11 +96,12 @@ public class SourceGenerationRequest extends DataModel{
 	public void setGenerationname(String generationname) {
 		this.generationname = generationname;
 	}
-	public ArrayList<String> getAlgorithms() {
+	public ArrayList<AlgorithmType> getAlgorithms() {
 		return algorithms;
 	}
-	public void setAlgorithms(ArrayList<String> algorithms) {
+	public void setAlgorithms(ArrayList<AlgorithmType> algorithms) {
 		this.algorithms = algorithms;
+		Collections.sort(this.algorithms);
 	}
 	public Boolean getEnablelayergeneration() {
 		return enablelayergeneration;
@@ -176,6 +172,7 @@ public class SourceGenerationRequest extends DataModel{
 	}
 	public void setJobIds(ArrayList<Integer> jobIds) {
 		this.jobIds = jobIds;
+		Collections.sort(this.jobIds);
 	}
 	public ArrayList<Integer> getJobIds() {
 		return jobIds;
@@ -221,63 +218,69 @@ public class SourceGenerationRequest extends DataModel{
 			}
 	}
 
-	public boolean setField(Field f){
+	public boolean setField(Field f) throws JSONException{
+		try{
 		switch(SourceGenerationRequestFields.valueOf(f.getName().toLowerCase())){
-		case algorithms:this.setAlgorithms(CSVUtils.CSVToList(f.getValue()));
+		case algorithms:{	ArrayList<AlgorithmType> parsed= new ArrayList<AlgorithmType>();
+							for (String s:CSVUtils.CSVToStringList(f.getValue())) parsed.add(AlgorithmType.valueOf(s));
+							setAlgorithms(parsed);
+		break;}
+		case author:setAuthor(f.getValue());
 		break;
-		case author:this.setAuthor(f.getValue());
+		case backendurl:setBackendURL(f.getValue());
 		break;
-		case backendurl:this.setBackendURL(f.getValue());
+		case currentphasepercent:setCurrentphasepercent(f.getValueAsDouble());
 		break;
-		case currentphasepercent:this.setCurrentphasepercent(f.getValueAsDouble());
+		case description:setDescription(f.getValue());
 		break;
-		case description:this.setDescription(f.getValue());
+		case enableimagegeneration:setEnableimagegeneration(f.getValueAsBoolean());
 		break;
-		case enableimagegeneration:this.setEnableimagegeneration(f.getValueAsBoolean());
+		case enablelayergeneration:setEnablelayergeneration(f.getValueAsBoolean());
 		break;
-		case enablelayergeneration:this.setEnablelayergeneration(f.getValueAsBoolean());
+		case endtime:setEndtime(f.getValueAsLong());
 		break;
-		case endtime:this.setEndtime(f.getValueAsLong());
+		case environmentconfiguration:setEnvironmentConfiguration((HashMap<String, String>) AquaMapsXStream.getXMLInstance().fromXML(f.getValue()));
 		break;
-		case environmentconfiguration:this.setEnvironmentConfiguration((HashMap<String, String>) AquaMapsXStream.getXMLInstance().fromXML(f.getValue()));
+		case executionenvironment:setExecutionEnvironment(f.getValue());
 		break;
-		case executionenvironment:this.setExecutionEnvironment(f.getValue());
+		case generatedsourcesid:setGeneratedSources(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
-		case generatedsourcesid:
-			for(String id:CSVUtils.CSVToList(f.getValue()))this.getGeneratedSources().add(Integer.parseInt(id));
-		break;
-		case generationname:this.setGenerationname(f.getValue());
+		case generationname:setGenerationname(f.getValue());
 		break;
 		
-		case jobids:for(String id:CSVUtils.CSVToList(f.getValue()))this.getJobIds().add(Integer.parseInt(id));
+		case jobids:setJobIds(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
-		case logic:this.setLogic(LogicType.valueOf(f.getValue()));
+		case logic:setLogic(LogicType.valueOf(f.getValue()));
 		break;
-		case numpartitions:this.setNumPartitions(f.getValueAsInteger());
+		case numpartitions:setNumPartitions(f.getValueAsInteger());
 		break;
-		case phase:this.setPhase(SourceGenerationPhase.valueOf(f.getValue()));
+		case phase:setPhase(SourceGenerationPhase.valueOf(f.getValue()));
 		break;
-		case reportid:this.setReportID(f.getValueAsInteger());
+		case reportid:setReportID(f.getValueAsInteger());
 		break;
-		case starttime:this.setStarttime(f.getValueAsLong());
+		case starttime:setStarttime(f.getValueAsLong());
 		break;
-		case submissionbackend:this.setSubmissionBackend(f.getValue());
+		case submissionbackend:setSubmissionBackend(f.getValue());
 		break;
-		case submissiontime:this.setSubmissiontime(f.getValueAsLong());
+		case submissiontime:setSubmissiontime(f.getValueAsLong());
 		break;
-		case sourcehcafid : setHcafId(f.getValueAsInteger());
+		case sourcehcafids : setHcafIds(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
-		case sourcehspenid : setHspenId(f.getValueAsInteger());
+		case sourcehspenids : setHspenIds(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
-		case sourceoccurrencecellsid : setOccurrenceCellId(f.getValueAsInteger());
+		case sourceoccurrencecellsids : setOccurrenceCellIds(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
 		case id: setId(f.getValue());
+		break;
+		case additionalparameters : setParameters(Field.fromJSONArray(new JSONArray(f.getValue())));
+		break;
 		default : return false;
 		}
+	}catch(Exception e){logger.warn("Unable to parse field "+f.toJSONObject(),e);}
 		return true;
 	}
 
-	public Field getField(SourceGenerationRequestFields fieldName){
+	public Field getField(SourceGenerationRequestFields fieldName) throws JSONException{
 		switch(fieldName){
 		case algorithms:return new Field(fieldName+"",CSVUtils.listToCSV(getAlgorithms()),FieldType.STRING);
 		case author:return new Field(fieldName+"",getAuthor(),FieldType.STRING);
@@ -289,15 +292,10 @@ public class SourceGenerationRequest extends DataModel{
 		case endtime:return new Field(fieldName+"",getEndtime()+"",FieldType.INTEGER);
 		case environmentconfiguration:return new Field(fieldName+"",AquaMapsXStream.getXMLInstance().toXML(getEnvironmentConfiguration()),FieldType.STRING);
 		case executionenvironment:return new Field(fieldName+"",getExecutionEnvironment(),FieldType.STRING);
-		case generatedsourcesid:ArrayList<String> hspecIds=new ArrayList<String>();
-								for(Integer id:getGeneratedSources())hspecIds.add(id+"");
-								return new Field(fieldName+"",CSVUtils.listToCSV(hspecIds),FieldType.STRING);
+		case generatedsourcesid:return new Field(fieldName+"",CSVUtils.listToCSV(generatedSources),FieldType.STRING);
 		case generationname:return new Field(fieldName+"",getGenerationname(),FieldType.STRING);
-		
 		case id:return new Field(fieldName+"",getId(),FieldType.STRING);
-		case jobids:ArrayList<String> jobIds=new ArrayList<String>();
-								for(Integer id:getJobIds())jobIds.add(id+"");
-								return new Field(fieldName+"",CSVUtils.listToCSV(jobIds),FieldType.STRING);
+		case jobids:return new Field(fieldName+"",CSVUtils.listToCSV(jobIds),FieldType.STRING);
 		case logic:return new Field(fieldName+"",getLogic()+"",FieldType.STRING);
 		case numpartitions:return new Field(fieldName+"",getNumPartitions()+"",FieldType.INTEGER);
 		case phase:return new Field(fieldName+"",getPhase()+"",FieldType.STRING);
@@ -305,15 +303,16 @@ public class SourceGenerationRequest extends DataModel{
 		case starttime:return new Field(fieldName+"",getStarttime()+"",FieldType.LONG);
 		case submissionbackend:return new Field(fieldName+"",getSubmissionBackend(),FieldType.STRING);
 		case submissiontime:return new Field(fieldName+"",getSubmissiontime()+"",FieldType.LONG);
-		case sourcehcafid:return new Field(fieldName+"",getHcafId()+"",FieldType.INTEGER);
-		case sourcehspenid: return new Field(fieldName+"",getHspenId()+"",FieldType.INTEGER);
-		case sourceoccurrencecellsid: return new Field(fieldName+"",getOccurrenceCellId()+"",FieldType.INTEGER);
+		case sourcehcafids:return new Field(fieldName+"",CSVUtils.listToCSV(hcafIds),FieldType.STRING);
+		case sourcehspenids: return new Field(fieldName+"",CSVUtils.listToCSV(hspenIds),FieldType.STRING);
+		case sourceoccurrencecellsids: return new Field(fieldName+"",CSVUtils.listToCSV(occurrenceCellIds),FieldType.STRING);
+		case additionalparameters : return new Field(fieldName+"",Field.toJSONArray(parameters).toString(),FieldType.STRING);
 		default : return null;
-
 		}
+		
 	}
 
-	public List<Field> toRow(){
+	public List<Field> toRow() throws JSONException{
 		List<Field> toReturn= new ArrayList<Field>();
 		for(SourceGenerationRequestFields f : SourceGenerationRequestFields.values())
 			toReturn.add(getField(f));
@@ -325,8 +324,10 @@ public class SourceGenerationRequest extends DataModel{
 		// TODO Auto-generated constructor stub
 	}
 
-	public SourceGenerationRequest(HspecGroupGenerationRequestType request){
-		setAlgorithms(CSVUtils.CSVToList(request.getAlgorithms()));
+	public SourceGenerationRequest(HspecGroupGenerationRequestType request) throws JSONException{
+		ArrayList<AlgorithmType> parsed= new ArrayList<AlgorithmType>();
+		for (String s:CSVUtils.CSVToStringList(request.getAlgorithms())) parsed.add(AlgorithmType.valueOf(s));
+		setAlgorithms(parsed);
 		setAuthor(request.getAuthor());
 		setBackendURL(request.getBackendUrl());
 		setDescription(request.getDescription());
@@ -335,24 +336,86 @@ public class SourceGenerationRequest extends DataModel{
 		setEnvironmentConfiguration((HashMap<String, String>) AquaMapsXStream.getXMLInstance().fromXML(request.getEnvironmentConfiguration()));
 		setExecutionEnvironment(request.getExecutionEnvironment());
 		this.setGenerationname(request.getGenerationName());
-		setHcafId(request.getHcafId());
-		setHspenId(request.getHspenId());
-		setOccurrenceCellId(request.getOccurrenceCellsId());
+		setHcafIds(CSVUtils.CSVTOIntegerList(request.getHcafIds()));
+		setHspenIds(CSVUtils.CSVTOIntegerList(request.getHspenIds()));
+		setOccurrenceCellIds(CSVUtils.CSVTOIntegerList(request.getOccurrenceCellsIds()));
+		setParameters(Field.fromJSONArray(new JSONArray(request.getAdditionalParameters())));
 		this.setLogic(LogicType.valueOf(request.getLogic()));
 		this.setNumPartitions(request.getNumPartitions());
 		this.setSubmissionBackend(request.getSubmissionBackend());
 	}
 	
-	public HspecGroupGenerationRequestType toStubsVersion(){
-//		return new HspecGroupGenerationRequestType(CSVUtils.listToCSV(algorithms), author, backendURL, 
-//				description, enableimagegeneration, enablelayergeneration,
-//				AquaMapsXStream.getXMLInstance().toXML(environmentConfiguration), executionEnvironment, 
-//				generationname, logic+"", numPartitions, submissionBackend);
+	public HspecGroupGenerationRequestType toStubsVersion() throws JSONException{
 		
-		return new HspecGroupGenerationRequestType(CSVUtils.listToCSV(algorithms), author, backendURL,
-				description, enableimagegeneration, enablelayergeneration,
-				AquaMapsXStream.getXMLInstance().toXML(environmentConfiguration), executionEnvironment,
-				generationname, hcafId, hspenId, logic+"", numPartitions, occurrenceCellId, submissionBackend);
+		return new HspecGroupGenerationRequestType(
+				Field.toJSONArray(parameters).toString(),
+				CSVUtils.listToCSV(algorithms), 
+				author, 
+				backendURL,
+				description, 
+				enableimagegeneration, 
+				enablelayergeneration,
+				AquaMapsXStream.getXMLInstance().toXML(environmentConfiguration),
+				executionEnvironment, 
+				generationname,
+				CSVUtils.listToCSV(hcafIds),
+				CSVUtils.listToCSV(hspenIds),
+				logic+"", 
+				numPartitions, 
+				CSVUtils.listToCSV(occurrenceCellIds),
+				submissionBackend);
+		
+//		return new HspecGroupGenerationRequestType(CSVUtils.listToCSV(algorithms), author, backendURL,
+//				description, enableimagegeneration, enablelayergeneration,
+//				AquaMapsXStream.getXMLInstance().toXML(environmentConfiguration), executionEnvironment,
+//				generationname, CSVUtils.listToCSV(hcafIds), CSVUtils.listToCSV(hspenIds), logic+"", 
+//				numPartitions, CSVUtils.listToCSV(occurrenceCellIds), submissionBackend);
 		
 	}
+	
+	public ArrayList<Integer> getHcafIds() {
+		return hcafIds;
+	}
+	public ArrayList<Integer> getHspenIds() {
+		return hspenIds;
+	}
+	public ArrayList<Integer> getOccurrenceCellIds() {
+		return occurrenceCellIds;
+	}
+	public void setHcafIds(ArrayList<Integer> hcafIds) {
+		this.hcafIds = hcafIds;
+		Collections.sort(this.hcafIds);
+	}
+	public void setHspenIds(ArrayList<Integer> hspenIds) {
+		this.hspenIds = hspenIds;
+		Collections.sort(this.hspenIds);
+	}
+	public void setOccurrenceCellIds(ArrayList<Integer> occurrenceCellIds) {
+		this.occurrenceCellIds = occurrenceCellIds;
+		Collections.sort(this.occurrenceCellIds);
+	}
+	public ArrayList<Field> getParameters() {
+		return parameters;
+	}
+	public void setParameters(ArrayList<Field> parameters) {
+		this.parameters = parameters;
+	}
+	
+	public void addSource(Resource toAdd) throws Exception{
+		ArrayList<Integer> toModifyIds=null;
+		switch(toAdd.getType()){
+		case HCAF : 	toModifyIds=hcafIds;
+		break;
+		case HSPEN : 	toModifyIds=hspenIds;
+		break;		
+		case OCCURRENCECELLS : 	toModifyIds=occurrenceCellIds;
+		break;
+		default : throw new Exception("Invalid resource type "+toAdd);
+		}
+		if(!toModifyIds.contains(toAdd.getSearchId())){
+				toModifyIds.add(toAdd.getSearchId());
+				Collections.sort(toModifyIds);
+		}
+	}
+	
 }

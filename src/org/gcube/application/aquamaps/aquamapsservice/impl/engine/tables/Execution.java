@@ -3,36 +3,38 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 class Execution{
 	private AlgorithmType algorithm;
-	private Integer hcafId;
-	private Integer hspenId;
-	private Integer occurrenceCellsId;
+	private int[] sources;
 	private LogicType logic;
+	private String parameters;
 	
-	public Integer getOccurrenceCellsId() {
-		return occurrenceCellsId;
-	}
 	public LogicType getLogic() {
 		return logic;
 	}
 	public AlgorithmType getAlgorithm() {
 		return algorithm;
 	}
-	public Integer getHcafId() {
-		return hcafId;
+	
+	public int[] getSources() {
+		return sources;
 	}
-	public Integer getHspenId() {
-		return hspenId;
+	
+	public String getParameters() {
+		return parameters;
 	}
-	public Execution(AlgorithmType algorithm, Integer hcafId, Integer hspenId,
-			Integer occurrenceCellsId, LogicType logic) {
+	
+	public Execution(AlgorithmType algorithm,  LogicType logic,int[] sources,String parameters) throws Exception {
 		super();
 		this.algorithm = algorithm;
-		this.hcafId = hcafId;
-		this.hspenId = hspenId;
-		this.occurrenceCellsId = occurrenceCellsId;
+		this.sources=sources;
+		if(sources==null||sources.length==0) throw new Exception("Sources cannot be empty");
+		Arrays.sort(this.sources);
 		this.logic = logic;
+		this.parameters=parameters;
 	}
 	@Override
 	public int hashCode() {
@@ -40,13 +42,10 @@ class Execution{
 		int result = 1;
 		result = prime * result
 				+ ((algorithm == null) ? 0 : algorithm.hashCode());
-		result = prime * result + ((hcafId == null) ? 0 : hcafId.hashCode());
-		result = prime * result + ((hspenId == null) ? 0 : hspenId.hashCode());
 		result = prime * result + ((logic == null) ? 0 : logic.hashCode());
-		result = prime
-				* result
-				+ ((occurrenceCellsId == null) ? 0 : occurrenceCellsId
-						.hashCode());
+		result = prime * result
+				+ ((parameters == null) ? 0 : parameters.hashCode());
+		result = prime * result + Arrays.hashCode(sources);
 		return result;
 	}
 	@Override
@@ -60,25 +59,26 @@ class Execution{
 		Execution other = (Execution) obj;
 		if (algorithm != other.algorithm)
 			return false;
-		if (hcafId == null) {
-			if (other.hcafId != null)
-				return false;
-		} else if (!hcafId.equals(other.hcafId))
-			return false;
-		if (hspenId == null) {
-			if (other.hspenId != null)
-				return false;
-		} else if (!hspenId.equals(other.hspenId))
-			return false;
 		if (logic != other.logic)
 			return false;
-		if (occurrenceCellsId == null) {
-			if (other.occurrenceCellsId != null)
+		if (parameters == null) {
+			if (other.parameters != null)
 				return false;
-		} else if (!occurrenceCellsId.equals(other.occurrenceCellsId))
+		} else if (!parameters.equals(other.parameters))
+			return false;
+		if (!Arrays.equals(sources, other.sources))
 			return false;
 		return true;
 	}
+	@Override
+	public String toString() {
+		return "Execution [algorithm=" + algorithm + ", sources="
+				+ Arrays.toString(sources) + ", logic=" + logic
+				+ ", parameters=" + parameters + "]";
+	}
+	
+	
+	
 	
 	
 }

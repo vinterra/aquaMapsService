@@ -5,5 +5,5 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("logic")
 public enum LogicType {
-	HSPEC,HSPEN
+	HSPEC,HSPEN,HCAF
 }

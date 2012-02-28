@@ -31,6 +31,9 @@ public class PropertiesConstants {
 	public static final String INTERNAL_DB_MAX_CONNECTION="INTERNAL_DB_MAX_CONNECTION"; 
 
 	
+	public static final String INTERNAL_DB_TABLESTORE_PATTERN="INTERNAL_DB_TABLESTORE_PATTERN";
+	public static final String INTERNAL_DB_NUM_TABLESTORE="INTERNAL_DB_NUM_TABLESTORE";
+	
 	//********** PUBLISHER DB ACCESS
 	
 	public static final String PUBLISHER_DB_USERNAME="PUBLISHER_DB_USERNAME";

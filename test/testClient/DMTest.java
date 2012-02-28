@@ -1,18 +1,23 @@
 package testClient;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.MalformedScopeExpressionException;
 
 public class DMTest {
@@ -25,11 +30,14 @@ public class DMTest {
 	
 	
 	private static DataManagementInterface dmInterface=null;
+	private static AquaMapsServiceInterface amInterface=null;
+	
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
-		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope(WrapperTest.DEVSEC), AquaMapsServiceTester.DM_SERVICE_URI,false);
 		
+		
+		amInterface =WrapperTest.getAM();
+		dmInterface = WrapperTest.getDM();
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
 //				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
@@ -49,11 +57,11 @@ public class DMTest {
 //		System.out.println("Exported to exported_mini.csv"); 
 		
 		
-		System.out.println("Import Resource :");
-
-		System.out.println("ID IS "+dmInterface.importResource(new File("/home/fabio/Desktop/MiniOccurrence.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS,
-				"UTF-8",new boolean[]{true,true,true,true,true,true,true,true,true,true},true,'\t'));
-		
+//		System.out.println("Import Resource :");
+//
+//		System.out.println("ID IS "+dmInterface.importResource(new File("/home/fabio/Desktop/MiniOccurrence.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS,
+//				"UTF-8",new boolean[]{true,true,true,true,true,true,true,true,true,true},true,'\t'));
+//		
 		
 		
 		
@@ -84,16 +92,53 @@ public class DMTest {
 		
 //		
 		for(Field f:dmInterface.getDefaultSources())
-			System.out.println(f);
+			System.out.println(f.toJSONObject());
 		
 //		System.out.println("Done");
 		
 		
+		//***************** INTERPOLATE HCAFs
+		
+//		SourceGenerationRequest request=new SourceGenerationRequest();
+//		request.getAlgorithms().add(AlgorithmType.PARABOLIC);
+//		request.setAuthor("fabio.sinibaldi");
+//		request.setGenerationname("HCAF_Interpolation");
+//		request.setDescription("Testing");
+//		Resource firstHCAF=amInterface.loadResource(121, ResourceType.HCAF);
+//		Resource secondHCAF=amInterface.loadResource(127, ResourceType.HCAF);
+//		request.addSource(firstHCAF);
+//		request.addSource(secondHCAF);
+//		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_ID,firstHCAF.getSearchId()+"",FieldType.INTEGER));
+//		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_TIME,2010+"",FieldType.INTEGER));
+//		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_ID,secondHCAF.getSearchId()+"",FieldType.INTEGER));
+//		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_TIME,2050+"",FieldType.INTEGER));
+//		request.getParameters().add(new Field(SourceGenerationRequest.NUM_INTERPOLATIONS,4+"",FieldType.INTEGER));
+//		
+//		request.setExecutionEnvironment(Constant.AQUAMAPSSERVICE_PT_NAME);
+//		request.setBackendURL("");
+//		request.setEnvironmentConfiguration(new HashMap<String, String>());
+//		request.setLogic(LogicType.HCAF);
+//		request.setNumPartitions(16);
+//		
+//		request.setEnableimagegeneration(true);
+//		request.setEnablelayergeneration(true);
+//		
+//		System.out.println(dmInterface.submitRequest(request));
+//		
 		
 		
 		
+		//************************* ANALYZE TABLES
 		
-		
+		Analysis toSend=new Analysis();
+		toSend.setAuthor("fabio.sinibaldi");
+		toSend.setDescription("Just a simple execution");
+		toSend.setSources(Arrays.asList(new Integer[]{
+			121,173,174,127
+		}));
+		toSend.setTitle("Ordered HCAF analysis");
+		toSend.setType(AnalysisType.HCAF);
+		System.out.println(dmInterface.analyzeTables(toSend));
 		
 		
 		
@@ -109,25 +154,18 @@ public class DMTest {
 	}
 
 	
-	private static String fromRequestToGeneralEnvironment()throws Exception{
+	private static String fromRequestToGeneralEnvironment(List<Resource> selection)throws Exception{
 		SourceGenerationRequest request=new SourceGenerationRequest();
 		request.setAuthor("fabio.sinibaldi");
 		request.setGenerationname("Initial execution");
 		request.setDescription("First execution for suitable default hspec data");
-		request.setHcafId(1);
-		request.setHspenId(3);
-		request.setOccurrenceCellId(93);
+		for(Resource r:selection)request.addSource(r);
 		request.setSubmissionBackend(Constant.SERVICE_NAME);
 //		request.setSubmissionBackend("RainyCloud");
-		request.setExecutionEnvironment("AquaMaps VRE");
-		request.setBackendURL("http://node16.d.d4science.research-infrastructures.eu:9000/RainyCloud-web-0.00.01");
-		request.setEnvironmentConfiguration(new HashMap<String, String>());
-		request.setLogic(LogicType.HSPEN);
-		request.setNumPartitions(16);
-		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.HSPENRegeneration+""}));
-		request.setEnableimagegeneration(true);
-		request.setEnablelayergeneration(true);
+		
 		return dmInterface.submitRequest(request);
 	}
+	
+	
 	
 }

@@ -41,6 +41,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/MySQLDBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/PostGresSQLDBSession.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AnalysisTableManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CellManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CustomQueryManager.java -text
@@ -54,6 +55,14 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/threads/Dele
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/threads/QueryConstructurThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/threads/SourceImporter.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/threads/StatefullCSVLineProcessor.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisMonitor.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisUpdaterThread.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisWorker.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/Analyzer.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalyzerFactory.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalyzerManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/AquaMapsObjectData.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/AquaMapsObjectWorker.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/BiodiversityObjectExecutionRequest.java -text
@@ -93,6 +102,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/WMSGenera
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesConstants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesReader.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/Analysis.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/AquaMapsObject.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/Area.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/BoundingBox.java -text
@@ -112,6 +122,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/environments/
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/environments/ExecutionEnvironment.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/environments/Parameters.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/environments/SourceGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/fields/AnalysisFields.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/fields/EnvelopeFields.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/fields/ExecutionEnvironmentFields.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/fields/FilesFields.java -text
@@ -141,6 +152,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/Test.jav
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/XML.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/XMLTokener.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/types/AlgorithmType.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/types/AnalysisType.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/types/AreaType.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/types/FieldType.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/types/FileFields.java -text
@@ -165,8 +177,9 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementC
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementInterface.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PublisherInterface.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/RSWrapper.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/ArchiveManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/RSWrapper.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text

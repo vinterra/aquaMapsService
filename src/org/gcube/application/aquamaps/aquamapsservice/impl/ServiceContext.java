@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 import java.io.File;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.AnalysisManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
@@ -16,7 +17,9 @@ import org.gcube.common.core.contexts.GCUBEServiceContext;
 
 public class ServiceContext extends GCUBEServiceContext {
 
-	
+	public enum FOLDERS{
+		SERIALIZED,CLUSTERS,IMPORTS,TABLES,ANALYSIS
+	}
 	
 	/** Single context instance, created eagerly */
 	private static ServiceContext cache = new ServiceContext();
@@ -58,6 +61,8 @@ public class ServiceContext extends GCUBEServiceContext {
 		
 		JobExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_OBJECTS));
 		TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS),getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
+		AnalysisManager.init(false,getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
+		
 		SourceManager.checkTables();
 	}
 	
@@ -130,20 +135,10 @@ public class ServiceContext extends GCUBEServiceContext {
 	}
 	
 	
-	public String getSerializationPath(){
-		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"Serialized";
-		File f=new File(persistencePath);
-		if(!f.exists())f.mkdirs();
-		return persistencePath;
-	}
-	public String getClusterDir(){
-		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"clusters";
-		File f=new File(persistencePath);
-		if(!f.exists())f.mkdirs();
-		return persistencePath;
-	}
-	public String getImportedDir(){
-		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+"imports";
+	
+	
+	public String getFolderPath(FOLDERS folderName){
+		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+folderName;
 		File f=new File(persistencePath);
 		if(!f.exists())f.mkdirs();
 		return persistencePath;

@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 import java.io.File;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
@@ -29,4 +30,7 @@ public interface DataManagementInterface {
 	public Integer getImportStatus(Integer resourceId)throws Exception;
 	public List<Field> getCustomQueryFields(String userId)throws Exception;
 	public File exportTableAsCSV(String table)throws Exception;
+	public String analyzeTables(Analysis request)throws Exception;
+	public String getJsonSubmittedAnalysis(PagedRequestSettings settings)throws Exception;
+	public File loadAnalysisResults(String id)throws Exception;
 }

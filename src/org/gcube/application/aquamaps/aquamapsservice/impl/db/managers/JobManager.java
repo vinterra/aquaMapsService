@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.WMSGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
@@ -404,7 +404,7 @@ public class JobManager extends SubmittedManager{
 						break;
 					}
 				}
-				String serializedObjectPath=ServiceContext.getContext().getSerializationPath()+File.separator+ServiceUtils.generateId("OBJ", ".xml");
+				String serializedObjectPath=ServiceContext.getContext().getFolderPath(FOLDERS.SERIALIZED)+File.separator+ServiceUtils.generateId("OBJ", ".xml");
 				AquaMapsXStream.serialize(serializedObjectPath, obj);
 				String speciesCoverage=obj.getCompressedSpeciesCoverage();
 				row=new ArrayList<Field>();

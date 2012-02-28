@@ -31,8 +31,8 @@ public class CommonServiceLogic {
 		Job job=new Job();
 		Resource hspec=SourceManager.getById(hspecId);
 		job.setSourceHSPEC(hspec);
-		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFId()));
-		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENId()));
+		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFIds().get(0)));
+		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENIds().get(0)));
 		job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
 		
 		if(speciesFilter.size()==0){

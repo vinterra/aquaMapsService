@@ -103,9 +103,10 @@
 					<xsd:element name="author" type="xsd:string" />
 					<xsd:element name="generationName" type="xsd:string" />
 					<xsd:element name="description" type="xsd:string" />
-					<xsd:element name="hspenId" type="xsd:int"/>
-					<xsd:element name="hcafId" type="xsd:int"/>
-					<xsd:element name="occurrenceCellsId" type="xsd:int"/>
+					<xsd:element name="hspenIds" type="xsd:string"/>
+					<xsd:element name="hcafIds" type="xsd:string"/>
+					<xsd:element name="additionalParameters" type="xsd:string"/>
+					<xsd:element name="occurrenceCellsIds" type="xsd:string"/>
 					<xsd:element name="submissionBackend" type="xsd:string" />
 					<xsd:element name="executionEnvironment" type="xsd:string" />
 					<xsd:element name="backendUrl" type="xsd:string"/>
@@ -162,7 +163,14 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
-			
+			<xsd:complexType name="getJSONSubmittedAnalysisRequestType">
+				<xsd:sequence>
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
 
 			<!-- Data management request elements -->
 
@@ -233,6 +241,15 @@
 			
 			<xsd:element name="exportTableAsCSVRequest" type="xsd:string"/>
 			<xsd:element name="exportTableAsCSVResponse" type="xsd:string" />
+			
+			<xsd:element name="analyzeTablesRequest" type="aqtypes:analysis"/>
+			<xsd:element name="analyzeTablesResponse" type="xsd:string" />
+			
+			<xsd:element name="getJSONSubmittedAnalysisRequest" type="tns:getJSONSubmittedAnalysisRequestType" />
+			<xsd:element name="getJSONSubmittedAnalysisResponse" type="xsd:string" />
+			
+			<xsd:element name="loadAnalysisRequest" type="xsd:string"/>
+			<xsd:element name="loadAnalysisResponse" type="xsd:string"/>
 			
 		</xsd:schema>
 	</types>
@@ -387,6 +404,29 @@
 	</message>
 
 
+
+	<message name="AnalyzeTablesRequest">
+		<part name="request" element="tns:analyzeTablesRequest" />
+	</message>
+	<message name="AnalyzeTablesResponse">
+		<part name="response" element="tns:analyzeTablesResponse" />
+	</message>
+
+	<message name="GetJSONSubmittedAnalysisRequest">
+		<part name="request" element="tns:getJSONSubmittedAnalysisRequest" />
+	</message>
+	<message name="GetJSONSubmittedAnalysisResponse">
+		<part name="response" element="tns:getJSONSubmittedAnalysisResponse" />
+	</message>
+	
+	<message name="LoadAnalysisRequest">
+		<part name="request" element="tns:loadAnalysisRequest" />
+	</message>
+	<message name="LoadAnalysisResponse">
+		<part name="response" element="tns:loadAnalysisResponse" />
+	</message>
+
+
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
 			<wsdl:input message="tns:GenerateHCAFRequest" />
@@ -492,6 +532,22 @@
 		<wsdl:operation name="ExportTableAsCSV">
 			<wsdl:input message="tns:ExportTableAsCSVRequest" />
 			<wsdl:output message="tns:ExportTableAsCSVResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="AnalyzeTables">
+			<wsdl:input message="tns:AnalyzeTablesRequest" />
+			<wsdl:output message="tns:AnalyzeTablesResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetJSONSubmittedAnalysis">
+			<wsdl:input message="tns:GetJSONSubmittedAnalysisRequest" />
+			<wsdl:output message="tns:GetJSONSubmittedAnalysisResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="LoadAnalysis">
+			<wsdl:input message="tns:LoadAnalysisRequest" />
+			<wsdl:output message="tns:LoadAnalysisResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

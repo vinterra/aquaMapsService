@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
+import java.util.List;
+
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
@@ -12,5 +14,5 @@ public interface BatchGeneratorI {
 	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo);
 	public int getReportId();
 	
-	public String generateTable(TableGenerationConfiguration config)throws Exception;
+	public List<String> generateTable(TableGenerationConfiguration config)throws Exception;
 }

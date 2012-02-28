@@ -14,12 +14,15 @@ public enum SourceGenerationRequestFields {
 	endtime,
 	currentphasepercent,
 	
-	sourcehcafid,
-	sourcehspenid,
-	sourceoccurrencecellsid,
+	sourcehcafids,
+	sourcehspenids,
+	sourceoccurrencecellsids,
 	generatedsourcesid,
 	reportid,
 	jobids,
+	
+	
+	additionalparameters,
 	
 	submissionbackend,
 	executionenvironment, 

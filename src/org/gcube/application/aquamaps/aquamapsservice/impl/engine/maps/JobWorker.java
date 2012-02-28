@@ -39,7 +39,6 @@ import org.gcube.application.aquamaps.publisher.StoreConfiguration.StoreMode;
 import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
 import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.mortbay.log.Log;
 
 public class JobWorker extends Thread{
 
@@ -183,7 +182,7 @@ public class JobWorker extends Thread{
 		boolean filteredArea=(area.size()>0);
 
 		if(filteredArea&&needToGenerate){
-			Log.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
+			logger.debug(" jobId "+jobId+" : Filter By Area and Re-generate");
 			String filteredHcaf=filterByArea(jobId, area, ResourceType.HCAF, JobManager.getHCAFTableId(jobId));
 			JobManager.setWorkingHCAF(jobId,filteredHcaf);
 			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getSourceHSPEC().getAlgorithm(),weights);
@@ -192,17 +191,17 @@ public class JobWorker extends Thread{
 			JobManager.addToDropTableList(jobId, generatedHSPEC);
 			JobManager.addToDropTableList(jobId, toUseHSPEC);
 		}else if (filteredArea){
-			Log.debug(" jobId "+jobId+" : Filter By Area");
+			logger.debug(" jobId "+jobId+" : Filter By Area");
 			String table=filterByArea(jobId, area, ResourceType.HSPEC, SubmittedManager.getHSPECTableId(jobId));
 			JobManager.setWorkingHSPEC(jobId,table);
 			JobManager.addToDropTableList(jobId, table);
 		}else if (needToGenerate){				
-			Log.debug(" jobId "+jobId+" : Re-generate");
+			logger.debug(" jobId "+jobId+" : Re-generate");
 			String generatedHSPEC=generateHSPEC(jobId,toExecute.getSelectedSpecies(),toExecute.getSourceHSPEN().getTableName(),toExecute.getSourceHSPEC().getAlgorithm(),weights);
 			JobManager.setWorkingHSPEC(jobId,generatedHSPEC);
 			JobManager.addToDropTableList(jobId, generatedHSPEC);
 		}else{
-			Log.debug(" jobId "+jobId+" no needs");
+			logger.debug(" jobId "+jobId+" no needs");
 			JobManager.setWorkingHSPEC(jobId, SourceManager.getSourceName(JobManager.getHSPECTableId(jobId)));
 		}
 

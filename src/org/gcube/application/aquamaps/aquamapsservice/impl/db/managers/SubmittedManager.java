@@ -138,7 +138,7 @@ public class SubmittedManager {
 	}
 	
 	public static List<String> getGisId(int submittedId)throws Exception{
-		return CSVUtils.CSVToList((String) getField(submittedId,SubmittedFields.gispublishedid));
+		return CSVUtils.CSVToStringList((String) getField(submittedId,SubmittedFields.gispublishedid));
 	}
 
 	public static SubmittedStatus getStatus(int submittedId)throws Exception{

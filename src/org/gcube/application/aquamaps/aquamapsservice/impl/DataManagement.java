@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tools.ant.util.FileUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.AnalysisManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
@@ -26,12 +28,14 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestT
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportByTypeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedAnalysisRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewCustomQueryRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
@@ -46,7 +50,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Subm
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
 import org.gcube.application.aquamaps.datamodel.Resource;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
@@ -123,9 +127,18 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			logger.trace("Checking settings..");
 			SourceGenerationRequest request=new SourceGenerationRequest(arg0);
 			request.setSubmissiontime(System.currentTimeMillis());
-			if(SourceManager.getById(request.getHcafId())==null)throw new Exception("Invalid HCAF id "+request.getHcafId());
-			if(SourceManager.getById(request.getHspenId())==null)throw new Exception("Invalid HSPEN id "+request.getHspenId());
-			if(request.getLogic().equals(LogicType.HSPEN))if(SourceManager.getById(request.getOccurrenceCellId())==null)throw new Exception("Invalid Occurrence Cells  id "+request.getOccurrenceCellId());
+			for(Integer resId:request.getHcafIds()){
+				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
+				if(r==null||!r.getType().equals(ResourceType.HCAF))throw new Exception("Invalid HCAF id "+resId);
+			}
+			for(Integer resId:request.getHspenIds()){
+				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
+				if(r==null||!r.getType().equals(ResourceType.HSPEN))throw new Exception("Invalid HSPEN id "+resId);
+			}
+			for(Integer resId:request.getOccurrenceCellIds()){
+				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
+				if(r==null||!r.getType().equals(ResourceType.OCCURRENCECELLS))throw new Exception("Invalid Occurrence Cells id "+resId);
+			}			
 			logger.debug("Received request "+request.toXML());
 			return TableGenerationExecutionManager.insertRequest(request);
 		}catch(Exception e){
@@ -297,14 +310,18 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 					
 					ArrayList<Field> generationFilter=new ArrayList<Field>();
 					
+					SourceGenerationRequest sourceReq=new SourceGenerationRequest();
+					sourceReq.addSource(resource);
+					
 					if(resource.getType().equals(ResourceType.HCAF))
-						generationFilter.add(new Field(SourceGenerationRequestFields.sourcehcafid+"",resource.getSearchId()+"",FieldType.INTEGER));
+						generationFilter.add(sourceReq.getField(SourceGenerationRequestFields.sourcehcafids));
 					else if(resource.getType().equals(ResourceType.HSPEN)){
-						generationFilter.add(new Field(SourceGenerationRequestFields.sourcehspenid+"",resource.getSearchId()+"",FieldType.INTEGER));
+						generationFilter.add(sourceReq.getField(SourceGenerationRequestFields.sourcehspenids));
 					}
 					else if(resource.getType().equals(ResourceType.OCCURRENCECELLS)){
-						generationFilter.add(new Field(SourceGenerationRequestFields.logic+"",LogicType.HSPEN+"",FieldType.STRING));
-						generationFilter.add(new Field(SourceGenerationRequestFields.sourceoccurrencecellsid+"",resource.getSearchId()+"",FieldType.INTEGER));
+						sourceReq.setLogic(LogicType.HSPEN);
+						generationFilter.add(sourceReq.getField(SourceGenerationRequestFields.logic));
+						generationFilter.add(sourceReq.getField(SourceGenerationRequestFields.sourceoccurrencecellsids));
 					}
 					relatedGenerations=SourceGenerationRequestsManager.getList(generationFilter);
 
@@ -391,7 +408,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			throws RemoteException, GCUBEFault {
 		try{
 			logger.trace("Importing resource , user : "+arg0.getUser()+", locator :"+arg0.getRsLocator());
-			String csvLocation=ServiceContext.getContext().getImportedDir()+File.separator+ServiceUtils.generateId("import", ".csv");
+			String csvLocation=ServiceContext.getContext().getFolderPath(FOLDERS.IMPORTS)+File.separator+ServiceUtils.generateId("import", ".csv");
 			
 			FileWriter writer=new FileWriter(csvLocation);
 			FileInputStream is=new FileInputStream(RSWrapper.getStreamFromLocator(new URI(arg0.getRsLocator())));
@@ -460,4 +477,46 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				}
 		}
 	}
+	
+	@Override
+	public String analyzeTables(org.gcube.application.aquamaps.datamodel.Analysis arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			return AnalysisManager.insertRequest(new Analysis(arg0));
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+
+	@Override
+	public String getJSONSubmittedAnalysis(
+			GetJSONSubmittedAnalysisRequestType arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection()));
+			return AnalysisTableManager.getJSONList(new ArrayList<Field>(), settings);
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+
+	@Override
+	public String loadAnalysis(String arg0) throws RemoteException, GCUBEFault {
+		try{
+			Analysis analysis=AnalysisTableManager.getById(arg0);
+			GCUBEScope scope=ServiceContext.getContext().getScope();
+			logger.trace("Caller scope is "+scope);
+			RSWrapper wrapper=new RSWrapper(scope);
+			wrapper.add(new File(analysis.getArchiveLocation()));
+			String locator = wrapper.getLocator().toString();
+			logger.trace("Added file to locator "+locator);
+			return locator;
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	
 }

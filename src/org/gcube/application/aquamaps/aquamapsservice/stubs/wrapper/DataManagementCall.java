@@ -7,17 +7,20 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedAnalysisRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewCustomQueryRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -73,24 +76,6 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public String submitRequest(SourceGenerationRequest request)
 			throws Exception {
 		try{
-//			SourceGenerationRequestType stubRequest=new SourceGenerationRequestType();
-//			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-//			stubRequest.setAuthor(request.getAuthor());
-//			stubRequest.setGenerationName(request.getGenerationname());
-//			stubRequest.setDescription(request.getDescription());
-//			
-//			stubRequest.setHcafSearchId(request.getHcafsearchid());
-//			stubRequest.setHspenSearchId(request.getHspensearchid());
-//			stubRequest.setSubmissionBackend(request.getSubmissionBackend());
-//			stubRequest.setExecutionEnvironment(request.getExecutionEnvironment());
-//			stubRequest.setBackendUrl(request.getBackendURL());
-//			stubRequest.setEnvironmentConfiguration(AquaMapsXStream.getXMLInstance().toXML(request.getEnvironmentConfiguration()));
-//			stubRequest.setLogic(request.getLogic()+"");
-//			stubRequest.setNumPartitions(request.getNumPartitions());
-//			stubRequest.setAlgorithms(CSVUtils.listToCSV(request.getAlgorithms()));
-//			
-//			stubRequest.setEnableImageGeneration(request.getEnableimagegeneration());
-//			stubRequest.setEnableLayerGeneration(request.getEnablelayergeneration());
 			return pt.generateHSPECGroup(request.toStubsVersion());
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -296,6 +281,42 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public File exportTableAsCSV(String table) throws Exception {
 		try{
 			String locator=pt.exportTableAsCSV(table);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	@Override
+	public String analyzeTables(Analysis request) throws Exception {
+		try{						
+			return pt.analyzeTables(request.toStubsVersion());			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public String getJsonSubmittedAnalysis(PagedRequestSettings settings)
+			throws Exception {
+		try{
+			GetJSONSubmittedAnalysisRequestType request=new GetJSONSubmittedAnalysisRequestType();
+			request.setLimit(settings.getLimit());
+			request.setOffset(settings.getOffset());
+			request.setSortColumn(settings.getOrderColumn());
+			request.setSortDirection(settings.getOrderDirection()+"");
+			return pt.getJSONSubmittedAnalysis(request);
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+
+	@Override
+	public File loadAnalysisResults(String id) throws Exception {
+		try{
+			String locator=pt.loadAnalysis(id);						
 			return RSWrapper.getStreamFromLocator(new URI(locator));			
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);

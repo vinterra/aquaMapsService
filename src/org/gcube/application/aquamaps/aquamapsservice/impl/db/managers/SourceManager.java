@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.SourceImporter;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -58,14 +60,14 @@ public class SourceManager {
 			row.add(toRegister.getField(MetaSourceFields.disclaimer));
 			row.add(toRegister.getField(MetaSourceFields.parameters));
 			row.add(toRegister.getField(MetaSourceFields.provenience));
-			row.add(toRegister.getField(MetaSourceFields.sourcehcaf));
-			row.add(toRegister.getField(MetaSourceFields.sourcehcaftable));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspec));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspectable));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspen));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspentable));
-			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecells));
-			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecellstable));
+			row.add(toRegister.getField(MetaSourceFields.sourcehcafids));
+			row.add(toRegister.getField(MetaSourceFields.sourcehcaftables));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspecids));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspectables));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspenids));
+			row.add(toRegister.getField(MetaSourceFields.sourcehspentables));
+			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecellsids));
+			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecellstables));
 			row.add(toRegister.getField(MetaSourceFields.status));
 			row.add(toRegister.getField(MetaSourceFields.tablename));
 			row.add(toRegister.getField(MetaSourceFields.title));
@@ -111,9 +113,9 @@ public class SourceManager {
 	
 	public static int getSourceId(ResourceType type,int id)throws Exception{
 		switch(type){
-		case HCAF : return (Integer) getField(id, MetaSourceFields.sourcehcaf);
-		case HSPEC: return (Integer) getField(id, MetaSourceFields.sourcehspec);
-		case HSPEN : return (Integer) getField(id, MetaSourceFields.sourcehspen);
+		case HCAF : return (Integer) getField(id, MetaSourceFields.sourcehcafids);
+		case HSPEC: return (Integer) getField(id, MetaSourceFields.sourcehspecids);
+		case HSPEN : return (Integer) getField(id, MetaSourceFields.sourcehspenids);
 		default : throw new Exception("INVALID TYPE");
 		}
 		
@@ -289,34 +291,26 @@ public class SourceManager {
 						logger.trace("Updateing row count");
 						r.setRowCount(session.getCount(r.getTableName(), new ArrayList<Field>()));
 					}
-					if(r.getSourceHCAFId()!=0){
-						Resource HCAF=getById(r.getSourceHCAFId());
-						if(HCAF!=null) r.setSourceHCAFTable(HCAF.getTableName());
-						else{
-							logger.trace("Unable to find source HCAF, id was "+r.getSourceHCAFId());
-						}
-					}else r.setSourceHCAFTable("");
-					if(r.getSourceHSPENId()!=0){
-						Resource HSPEN=getById(r.getSourceHSPENId());
-						if(HSPEN!=null) r.setSourceHSPENTable(HSPEN.getTableName());
-						else{
-							logger.trace("Unable to find source HSPEN, id was "+r.getSourceHSPENId());
-						}
-					}else r.setSourceHSPENTable("");
-					if(r.getSourceHSPECId()!=0){
-						Resource HSPEC=getById(r.getSourceHSPECId());
-						if(HSPEC!=null) r.setSourceHSPECTable(HSPEC.getTableName());
-						else{
-							logger.trace("Unable to find source HSPEC, id was "+r.getSourceHSPECId());
-						}
-					}else r.setSourceHSPECTable("");
-					if(r.getSourceOccurrenceCellsId()!=0){
-						Resource OCCURRENCE=getById(r.getSourceOccurrenceCellsId());
-						if(OCCURRENCE!=null) r.setSourceOccurrenceCellsTable(OCCURRENCE.getTableName());
-						else{
-							logger.trace("Unable to find source OCCURRENCE CELLS, id was "+r.getSourceOccurrenceCellsId());
-						}
-					}else r.setSourceOccurrenceCellsTable("");
+					for(Integer id:r.getSourceHCAFIds()){
+						Resource HCAF=getById(id);
+						if(HCAF!=null) r.addSource(HCAF);
+						else logger.trace("Unable to find source , id was "+id);
+					}
+					for(Integer id:r.getSourceHSPENIds()){
+						Resource HCAF=getById(id);
+						if(HCAF!=null) r.addSource(HCAF);
+						else logger.trace("Unable to find source , id was "+id);
+					}
+					for(Integer id:r.getSourceHSPECIds()){
+						Resource HCAF=getById(id);
+						if(HCAF!=null) r.addSource(HCAF);
+						else logger.trace("Unable to find source , id was "+id);
+					}
+					for(Integer id:r.getSourceOccurrenceCellsIds()){
+						Resource HCAF=getById(id);
+						if(HCAF!=null) r.addSource(HCAF);
+						else logger.trace("Unable to find source , id was "+id);
+					}					
 					update(r);
 				}
 			}catch (Exception e){
@@ -325,6 +319,25 @@ public class SourceManager {
 		}
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}
+	}
+	
+	public static final String getToUseTableStore()throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();			
+			ResultSet rs=session.executeFilteredQuery(new ArrayList<Field>(), sourcesTable, MetaSourceFields.searchid+"", OrderDirection.DESC);
+			int lastId=0;
+			if(rs.next()){
+				lastId=rs.getInt(MetaSourceFields.searchid+"");
+				rs.close();
+			}
+			int numTableSpaces=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.INTERNAL_DB_NUM_TABLESTORE);
+			int toUseTableSpace=((lastId+1) % numTableSpaces)+1;
+			String toReturn=ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TABLESTORE_PATTERN)+toUseTableSpace;
+			logger.debug("TableSpace to use : "+toReturn);
+			return toReturn;
+		}catch(Exception e){throw e;}
+		finally{if(session!=null) session.close();}
 	}
 }
 

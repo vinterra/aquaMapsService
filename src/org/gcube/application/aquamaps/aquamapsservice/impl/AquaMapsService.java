@@ -39,7 +39,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.RSWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.AquaMap;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
