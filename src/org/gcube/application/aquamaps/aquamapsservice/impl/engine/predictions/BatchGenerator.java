@@ -320,7 +320,7 @@ public class BatchGenerator implements BatchGeneratorI {
 		ArrayList<String> toReturn=new ArrayList<String>();
 		interpolator=new InterpolateTables(e.getConfigPath(), ServiceContext.getContext().getFolderPath(FOLDERS.TABLES), e.getDatabaseURL(), e.getDatabaseUserName(), e.getDatabasePassword());
 		
-		interpolator.interpolate(startingHCAF, endHCAF, numIntervals, INTERPOLATIONFUNCTIONS.PARABOLIC,startingTime,endTime);
+		interpolator.interpolate(startingHCAF, endHCAF, numIntervals, function,startingTime,endTime);
 		toReturn.addAll(Arrays.asList(interpolator.getInterpolatedTables()));
 		
 		//Removing first and last because are passed source tables

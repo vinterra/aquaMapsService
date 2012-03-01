@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -95,10 +96,10 @@ public class ArchiveManager {
 	 * @param sourceArchive source archive
 	 * @throws Exception if the uncompress operation fails
 	 */
-	public static void unTarGz(final File sourceArchive) throws Exception {
+	public static List<File> unTarGz(final File sourceArchive) throws Exception {
 
 		logger.debug("Uncompressing TAR GZ archive : " + sourceArchive.getAbsolutePath());
-
+		ArrayList<File> extracted=new ArrayList<File>();
 		try {
 
 			final GZIPInputStream in = new GZIPInputStream(new FileInputStream(sourceArchive));
@@ -129,6 +130,7 @@ public class ArchiveManager {
 			while((te = tis.getNextEntry()) != null) {
 				logger.debug("Processing " + (te.isDirectory()?"directory : ":"file : ") + te.getName());
 				File file = new File(sourceArchive.getParent(),te.getName());
+				extracted.add(file);
 				if (te.isDirectory()) {
 					file.mkdirs();
 				} else {
@@ -144,7 +146,7 @@ public class ArchiveManager {
 		}
 
 		logger.debug("TAR GZ file uncompressed successfully");
-
+		return extracted;
 				
 	}
 

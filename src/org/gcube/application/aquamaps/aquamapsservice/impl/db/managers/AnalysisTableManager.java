@@ -191,7 +191,7 @@ public class AnalysisTableManager {
 		try{
 			session=DBSession.getInternalDBSession();
 			List<Field> filters=new ArrayList<Field>();
-			filters.add(new Field(AnalysisFields.id+"",id+"",FieldType.INTEGER));
+			filters.add(new Field(AnalysisFields.id+"",id+"",FieldType.STRING));
 			return loadRS(session.executeFilteredQuery(filters, analysisTable, AnalysisFields.id+"", OrderDirection.ASC)).iterator().next();
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}

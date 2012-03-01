@@ -1,24 +1,22 @@
 package testClient;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
+import org.apache.commons.io.IOUtils;
+import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.ArchiveManager;
 import org.gcube.common.core.scope.GCUBEScope.MalformedScopeExpressionException;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class DMTest {
 
@@ -109,9 +107,9 @@ public class DMTest {
 //		request.addSource(firstHCAF);
 //		request.addSource(secondHCAF);
 //		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_ID,firstHCAF.getSearchId()+"",FieldType.INTEGER));
-//		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_TIME,2010+"",FieldType.INTEGER));
+//		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_TIME,2005+"",FieldType.INTEGER));
 //		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_ID,secondHCAF.getSearchId()+"",FieldType.INTEGER));
-//		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_TIME,2050+"",FieldType.INTEGER));
+//		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_TIME,2010+"",FieldType.INTEGER));
 //		request.getParameters().add(new Field(SourceGenerationRequest.NUM_INTERPOLATIONS,4+"",FieldType.INTEGER));
 //		
 //		request.setExecutionEnvironment(Constant.AQUAMAPSSERVICE_PT_NAME);
@@ -130,17 +128,36 @@ public class DMTest {
 		
 		//************************* ANALYZE TABLES
 		
-		Analysis toSend=new Analysis();
-		toSend.setAuthor("fabio.sinibaldi");
-		toSend.setDescription("Just a simple execution");
-		toSend.setSources(Arrays.asList(new Integer[]{
-			121,173,174,127
-		}));
-		toSend.setTitle("Ordered HCAF analysis");
-		toSend.setType(AnalysisType.HCAF);
-		System.out.println(dmInterface.analyzeTables(toSend));
+//		Analysis toSend=new Analysis();
+//		toSend.setAuthor("fabio.sinibaldi");
+//		toSend.setDescription("Just a simple execution");
+//		toSend.setSources(Arrays.asList(new Integer[]{
+//			121,173,174,127
+//		}));
+//		toSend.setTitle("Ordered HCAF analysis");
+//		toSend.setType(AnalysisType.HCAF);
+//		System.out.println(dmInterface.analyzeTables(toSend));
 		
 		
+		//************************** Retrieve tar
+		FileInputStream fis=new FileInputStream(dmInterface.loadAnalysisResults("An2012_02_29_18_27_09_341"));
+		File temp=File.createTempFile("analysis", ".tar.gz");
+		
+		
+		System.out.println("File is "+temp.getAbsolutePath());
+		FileOutputStream fos=new FileOutputStream( temp);
+		
+		IOUtils.copy(fis, fos);
+		IOUtils.closeQuietly(fis);
+		IOUtils.closeQuietly(fos);
+		
+		
+		List<File> files=ArchiveManager.unTarGz(temp);
+		
+		FileUtils.delete(temp);
+		
+		System.out.println("Done");
+		System.out.println("Extracted Files : "+Arrays.toString(files.toArray()));
 		
 		
 		

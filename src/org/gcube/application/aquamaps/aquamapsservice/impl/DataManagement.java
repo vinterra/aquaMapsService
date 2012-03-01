@@ -1,5 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
+import gr.uoa.di.madgik.commons.utils.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -509,7 +511,10 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
 			RSWrapper wrapper=new RSWrapper(scope);
-			wrapper.add(new File(analysis.getArchiveLocation()));
+			File temp=File.createTempFile("analysis",".tar.gz");
+			FileUtils.Copy(new File(analysis.getArchiveLocation()), temp);
+			temp.deleteOnExit();
+			wrapper.add(temp);
 			String locator = wrapper.getLocator().toString();
 			logger.trace("Added file to locator "+locator);
 			return locator;
