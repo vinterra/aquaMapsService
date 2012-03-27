@@ -39,6 +39,20 @@ private static final GCUBELog logger=new GCUBELog(AnalysisManager.class);
 		
 		logger.trace("Storing into "+ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS));
 		
+		if(purgeInvalid){
+			int count=0;
+			for(Analysis a:AnalysisTableManager.getList(new ArrayList<Field>())){
+				if(!a.getStatus().equals(SubmittedStatus.Completed)&&
+						!a.getStatus().equals(SubmittedStatus.Error)&&
+						!a.getStatus().equals(SubmittedStatus.Pending)){
+					AnalysisTableManager.setStatus(SubmittedStatus.Error, a.getId());
+					count++;
+				}
+			}
+			logger.trace("Purged "+count+" requests");
+		}
+		
+		
 		logger.trace("Looking for existing obj requests...");	
 		
 		List<Field> pendingObjFilter=new ArrayList<Field>();		

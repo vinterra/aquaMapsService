@@ -192,8 +192,9 @@
 				
 				<xsd:element name="currentPhasePercent" type="xsd:double"/>
 				
-				<xsd:element name="reportId" type="xsd:int"/>
+				<xsd:element name="reportIds" type="xsd:string"/>
 				<xsd:element name="type" type="xsd:string"/>
+				<xsd:element name="performedAnalysis" type="xsd:string"/>
 				<xsd:element name="archiveLocation" type="xsd:string"/>
 				<xsd:element name="sources" type="xsd:string"/>
 											

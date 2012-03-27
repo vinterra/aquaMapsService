@@ -3,10 +3,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis;
 import java.util.ArrayList;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.AnalysisFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
@@ -32,10 +30,11 @@ public class AnalysisUpdaterThread extends Thread{
 				filter.add(new Field(AnalysisFields.status+"",SubmittedStatus.Generating+"",FieldType.STRING));
 				for(Analysis reference : AnalysisTableManager.getList(filter)){
 					try{
-						if(reference.getReportID()!=-1){
-							EnvironmentalExecutionReportItem report=AnalyzerFactory.getReport(reference.getReportID(),false);
-							AnalysisTableManager.setPhasePercent(report.getPercent(), reference.getId());
+						Double percent=(double)reference.getPerformedAnalysis().size()/reference.getType().size();
+						for(Integer reportId:reference.getReportID()){
+							percent=percent+AnalyzerFactory.getReport(reportId,false).getPercent();
 						}
+						AnalysisTableManager.setPhasePercent(percent, reference.getId());
 					}catch(Exception e){logger.warn("Skipping percent update for analysis id "+reference.getId()+", report id was "+reference.getReportID(),e);}
 				}				
 			}catch(Exception e){

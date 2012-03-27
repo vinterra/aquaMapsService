@@ -26,6 +26,7 @@ public class WrapperTest {
 
 	static String specId="Fis-22836";
 	static String DEVSEC="/gcube/devsec";
+	static String DEVVRE="/gcube/devsec/devVRE";
 	static String ECOSYSTEM="/d4science.research-infrastructures.eu/Ecosystem";
 	static String FARM="/d4science.research-infrastructures.eu/FARM";
 	static String gCubeApps="/d4science.research-infrastructures.eu/gCubeApps";
@@ -69,10 +70,9 @@ public class WrapperTest {
 		
 		System.out.println("Checking default sources");
 		for(Field f:dmInterface.getDefaultSources()){
-			try{
-				ResourceType type=ResourceType.valueOf(f.getName());
+			try{				
 				int id=f.getValueAsInteger();
-				System.out.println(wrapper.loadResource(id, type));
+				System.out.println(wrapper.loadResource(id));
 			}catch(Exception e){
 				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
 				e.printStackTrace();

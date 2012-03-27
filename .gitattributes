@@ -59,11 +59,13 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/threads/Stat
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisMonitor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisResponseDescriptor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisUpdaterThread.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalysisWorker.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/Analyzer.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalyzerFactory.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/AnalyzerManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/analysis/ImageDescriptor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/AquaMapsObjectData.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/AquaMapsObjectWorker.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/BiodiversityObjectExecutionRequest.java -text
@@ -179,7 +181,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementI
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PublisherInterface.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/ArchiveManager.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/AppZip.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/RSWrapper.java -text
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
@@ -194,6 +196,7 @@ test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
 test/testClient/MD5Test.java -text
 test/testClient/ModelTest.java -text
+test/testClient/PercentUpdateTest.java -text
 test/testClient/ProfileRetrievalTest.java -text
 test/testClient/StyleGeneration.java -text
 test/testClient/WrapperTest.java -text

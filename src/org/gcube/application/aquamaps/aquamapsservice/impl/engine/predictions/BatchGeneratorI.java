@@ -14,5 +14,5 @@ public interface BatchGeneratorI {
 	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo);
 	public int getReportId();
 	
-	public List<String> generateTable(TableGenerationConfiguration config)throws Exception;
+	public void generateTable(TableGenerationConfiguration config)throws Exception;
 }

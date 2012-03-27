@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import gr.uoa.di.madgik.commons.utils.FileUtils;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRe
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewCustomQueryRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
@@ -54,7 +56,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequest
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
-import org.gcube.application.aquamaps.datamodel.Resource;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -124,11 +125,9 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			if(availableSpace<threshold)throw new Exception("NOT ENOUGH SPACE, REMAINING : "+availableSpace+", THRESHOLD : "+threshold);
 
 			logger.trace("Received hspec group generation request, title : "+arg0.getGenerationName());
-			String id=ServiceUtils.generateId("HGGR", "");
-			logger.trace("Id will be "+id);
-			logger.trace("Checking settings..");
+			
 			SourceGenerationRequest request=new SourceGenerationRequest(arg0);
-			request.setSubmissiontime(System.currentTimeMillis());
+			
 			for(Integer resId:request.getHcafIds()){
 				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
 				if(r==null||!r.getType().equals(ResourceType.HCAF))throw new Exception("Invalid HCAF id "+resId);
@@ -141,7 +140,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
 				if(r==null||!r.getType().equals(ResourceType.OCCURRENCECELLS))throw new Exception("Invalid Occurrence Cells id "+resId);
 			}			
-			logger.debug("Received request "+request.toXML());
+			
 			return TableGenerationExecutionManager.insertRequest(request);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
@@ -218,12 +217,18 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	}
 
 	@Override
-	public Resource editResource(Resource arg0) throws RemoteException,
+	public org.gcube.application.aquamaps.datamodel.Resource editResource(org.gcube.application.aquamaps.datamodel.Resource arg0) throws RemoteException,
 	GCUBEFault {
 		try{
 			logger.trace("Editing resource "+arg0.getSearchId());
-			org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource resource=new org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource(arg0);
-			SourceManager.update(resource);
+			Resource request=new Resource(arg0);
+			Resource toEdit=SourceManager.getById(request.getSearchId());
+			toEdit.setTitle(request.getTitle());
+			toEdit.setDescription(request.getDescription());
+			toEdit.setDefaultSource(request.getDefaultSource());
+			toEdit.setDisclaimer(request.getDisclaimer());
+			toEdit.setProvenance(request.getProvenance());
+			SourceManager.update(toEdit);
 			return arg0;
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
@@ -523,5 +528,65 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
+
+	@Override
+	public String resubmitGeneration(String arg0) throws RemoteException,
+			GCUBEFault {
+		try{//Inserting request into db
+			long availableSpace=GHNContext.getContext().getFreeSpace(GHNContext.getContext().getLocation());
+			long threshold=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD);
+			if(availableSpace<threshold)throw new Exception("NOT ENOUGH SPACE, REMAINING : "+availableSpace+", THRESHOLD : "+threshold);
+
+			
+			logger.debug("Resubmitting request "+arg0);
+
+			SourceGenerationRequest request=new SourceGenerationRequest();
+			request.setId(arg0);
+			request=SourceGenerationRequestsManager.getList(
+					Arrays.asList(new Field[]{request.getField(SourceGenerationRequestFields.id)}),
+					new PagedRequestSettings(1, 0, SourceGenerationRequestFields.id+"", OrderDirection.ASC)).get(0);
+			
+			for(Integer resId:request.getHcafIds()){
+				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
+				if(r==null||!r.getType().equals(ResourceType.HCAF))throw new Exception("Invalid HCAF id "+resId);
+			}
+			for(Integer resId:request.getHspenIds()){
+				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
+				if(r==null||!r.getType().equals(ResourceType.HSPEN))throw new Exception("Invalid HSPEN id "+resId);
+			}
+			for(Integer resId:request.getOccurrenceCellIds()){
+				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
+				if(r==null||!r.getType().equals(ResourceType.OCCURRENCECELLS))throw new Exception("Invalid Occurrence Cells id "+resId);
+			}			
+			return TableGenerationExecutionManager.insertRequest(request);
+		}catch(Exception e){
+			logger.error("Unable to execute request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
 	
+	@Override
+	public VOID deleteAnalysis(String arg0) throws RemoteException, GCUBEFault {
+		try{
+			AnalysisTableManager.delete(arg0);
+			return new VOID();
+		}catch(Exception e){
+			logger.error("Unable to delete Analysis "+arg0,e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	
+	@Override
+	public String exportCustomQuery(String arg0) throws RemoteException,
+			GCUBEFault {
+		try{
+			if(CustomQueryManager.isCustomQueryReady(arg0)!=null){
+				String table=CustomQueryManager.getUsersTableName(arg0);
+				return exportTableAsCSV(table);
+			}else throw new Exception("No query setted for user "+arg0+" or query not ready");
+		}catch(Exception e){
+			logger.error("Unable to export custom query for user "+arg0,e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
 }

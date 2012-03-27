@@ -41,7 +41,7 @@ public interface AquaMapsServiceInterface {
 	 */
 	public AquaMapsObject loadObject(int objectId)throws Exception;
 
-	public Resource loadResource(int resId,ResourceType type)throws Exception;
+	public Resource loadResource(int resId)throws Exception;
 
 	public String getJSONResources(PagedRequestSettings settings, List<Field> filter)throws Exception;
 

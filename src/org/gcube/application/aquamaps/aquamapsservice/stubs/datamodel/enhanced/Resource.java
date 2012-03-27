@@ -756,14 +756,14 @@ public class Resource extends DataModel{
 		case HCAF : 	toModifyNames=sourceHCAFTables;
 						toModifyIds=sourceHCAFIds;
 		break;
-		case HSPEN : 	toModifyNames=sourceHCAFTables;
-						toModifyIds=sourceHCAFIds;
+		case HSPEN : 	toModifyNames=sourceHSPENTables;
+						toModifyIds=sourceHSPENIds;
 		break;
-		case HSPEC : 	toModifyNames=sourceHCAFTables;
-						toModifyIds=sourceHCAFIds;
+		case HSPEC : 	toModifyNames=sourceHSPECTables;
+						toModifyIds=sourceHSPECIds;
 		break;
-		case OCCURRENCECELLS : 	toModifyNames=sourceHCAFTables;
-								toModifyIds=sourceHCAFIds;
+		case OCCURRENCECELLS : 	toModifyNames=sourceOccurrenceCellsTables;
+								toModifyIds=sourceOccurrenceCellsIds;
 		break;
 		}
 		if(!toModifyIds.contains(toAdd.getSearchId())){
@@ -772,6 +772,51 @@ public class Resource extends DataModel{
 				toModifyNames.add(toAdd.getTableName());
 				Collections.sort(toModifyNames);
 		}
+	}
+
+	public void removeSource(Resource toRemove){
+		removeSourceId(toRemove.getSearchId());
+		removeSourceTableName(toRemove.getTableName());
+	}
+	
+	
+	public void removeSourceId(Integer id){
+		if(sourceHCAFIds.contains(id)){
+			sourceHCAFIds.remove(id);
+			Collections.sort(sourceHCAFIds);
+		}else if(sourceHSPECIds.contains(id)){
+			sourceHSPECIds.remove(id);
+			Collections.sort(sourceHSPECIds);
+		} if(sourceHSPENIds.contains(id)){
+			sourceHSPENIds.remove(id);
+			Collections.sort(sourceHSPENIds);
+		} if(sourceOccurrenceCellsIds.contains(id)){
+			sourceOccurrenceCellsIds.remove(id);
+			Collections.sort(sourceOccurrenceCellsIds);
+		}
+	}
+
+	public void removeSourceTableName(String tableName){
+		if(sourceHCAFTables.contains(tableName)){
+			sourceHCAFTables.remove(tableName);
+			Collections.sort(sourceHCAFTables);
+		}else if(sourceHSPECTables.contains(tableName)){
+			sourceHSPECTables.remove(tableName);
+			Collections.sort(sourceHSPECTables);
+		} if(sourceHSPENTables.contains(tableName)){
+			sourceHSPENTables.remove(tableName);
+			Collections.sort(sourceHSPENTables);
+		} if(sourceOccurrenceCellsTables.contains(tableName)){
+			sourceOccurrenceCellsTables.remove(tableName);
+			Collections.sort(sourceOccurrenceCellsTables);
+		}
+	}
+	
+
+	@Override
+	public String toString() {
+		return "Resource [type=" + type + ", searchId=" + searchId + ", title="
+				+ title + ", tableName=" + tableName + "]";
 	}
 	
 	

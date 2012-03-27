@@ -20,5 +20,5 @@ public enum AnalysisFields {
 	archivelocation,
 	
 	sources,
-	
+	performedanalysis
 }

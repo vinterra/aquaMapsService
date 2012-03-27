@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.HSPECGroupWorker;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 
-public class TableGenerationConfiguration {
+public abstract class TableGenerationConfiguration {
 
 	private LogicType logic;
 	private AlgorithmType algorithm;
@@ -24,12 +26,13 @@ public class TableGenerationConfiguration {
 	private HashMap<String,String> configuration;
 	private int partitionsNumber;
 	private String author;
-	private List<Field> additionalParameters;
+	private ArrayList<Field> additionalParameters;
+	private HSPECGroupWorker worker;
 	
 	public TableGenerationConfiguration(LogicType logic,
 			AlgorithmType algorithm,List<Resource> sources, String submissionBackend,
 			String executionEnvironment, String backendUrl,
-			HashMap<String, String> configuration, int partitionsNumber,String author,List<Field> additionalParams) {
+			HashMap<String, String> configuration, int partitionsNumber,String author,ArrayList<Field> additionalParams,HSPECGroupWorker worker) throws Exception {
 		super();
 		this.logic = logic;
 		this.algorithm = algorithm;
@@ -43,11 +46,13 @@ public class TableGenerationConfiguration {
 		this.configuration = configuration;
 		this.partitionsNumber = partitionsNumber;
 		this.author=author;
-		if(this.sources.containsKey(ResourceType.HSPEN))maxMinHspenTable="maxminlat_"+this.sources.get(ResourceType.HSPEN).get(0).getTableName();
+		if(this.sources.containsKey(ResourceType.HSPEN))maxMinHspenTable=SourceManager.getMaxMinTable(this.sources.get(ResourceType.HSPEN).get(0));
+		
 		this.additionalParameters=additionalParams;
+		this.worker=worker;
 	}
 	
-	public List<Field> getAdditionalParameters() {
+	public ArrayList<Field> getAdditionalParameters() {
 		return additionalParameters;
 	}
 	public LogicType getLogic() {
@@ -89,5 +94,20 @@ public class TableGenerationConfiguration {
 	public String getMaxMinHspenTable() {
 		return maxMinHspenTable;
 	}
+
+	@Override
+	public String toString() {
+		return "TableGenerationConfiguration [logic=" + logic + ", algorithm="
+				+ algorithm + ", sources=" + sources + ", maxMinHspenTable="
+				+ maxMinHspenTable + ", submissionBackend=" + submissionBackend
+				+ ", executionEnvironment=" + executionEnvironment
+				+ ", backendUrl=" + backendUrl + ", configuration="
+				+ configuration + ", partitionsNumber=" + partitionsNumber
+				+ ", author=" + author + ", additionalParameters="
+				+ additionalParameters + "]";
+	}
 	
+	public abstract void registerGeneratedSourcesCallback(List<String> toRegisterTables)throws Exception;
+	public abstract void notifyError(Exception e);
+	public abstract void release(BatchGeneratorI batch);
 }

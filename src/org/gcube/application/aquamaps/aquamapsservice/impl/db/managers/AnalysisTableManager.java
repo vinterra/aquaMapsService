@@ -13,6 +13,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.AnalysisFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
@@ -22,6 +23,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Subm
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.utils.logging.GCUBELog;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class AnalysisTableManager {
 
@@ -47,6 +50,7 @@ public class AnalysisTableManager {
 			session=DBSession.getInternalDBSession();
 			toInsert.setId(ServiceUtils.generateId("An", ""));
 			toInsert.setStatus(SubmittedStatus.Pending);
+			toInsert.setSubmissiontime(System.currentTimeMillis());
 			List<List<Field>> rows=new ArrayList<List<Field>>();
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");
@@ -128,10 +132,19 @@ public class AnalysisTableManager {
 			if(session!=null) session.close();
 		}
 	}
-	public static void setReportId(int reportId, String id)throws Exception{
-		ArrayList<Field> fields=new ArrayList<Field>();		
-		fields.add(new Field(AnalysisFields.reportid+"",reportId+"",FieldType.INTEGER));
-		updateField(id, fields);
+	public static void addReportId(int reportId, String id)throws Exception{
+		Analysis req=getById(id);		
+		req.addReportId(reportId);
+		updateField(id, new ArrayList<Field>(Arrays.asList(new Field[]{
+				req.getField(AnalysisFields.reportid)
+		})));
+	}
+	public static void removeReportId(int reportId, String id)throws Exception{
+		Analysis req=getById(id);		
+		req.removeReportId(reportId);
+		updateField(id, new ArrayList<Field>(Arrays.asList(new Field[]{
+				req.getField(AnalysisFields.reportid)
+		})));
 	}
 	public static void setPhasePercent(double percent,String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
@@ -153,7 +166,7 @@ public class AnalysisTableManager {
 		fields.add(new Field(AnalysisFields.status+"",status+"",FieldType.STRING));
 		if(status.equals(SubmittedStatus.Completed)||status.equals(SubmittedStatus.Error)){
 			fields.add(new Field(AnalysisFields.endtime+"",System.currentTimeMillis()+"",FieldType.LONG));
-			fields.add(new Field(AnalysisFields.currentphasepercent+"",100+"",FieldType.DOUBLE));
+			fields.add(new Field(AnalysisFields.currentphasepercent+"",1+"",FieldType.DOUBLE));
 		}
 		updateField(id, fields);
 	}

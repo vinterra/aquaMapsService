@@ -323,4 +323,34 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 			throw new ServiceException(f.getFaultMessage());
 		}
 	}
+
+	@Override
+	public String resubmitGeneration(String id) throws Exception {
+		try{									
+			return pt.resubmitGeneration(id);			
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	@Override
+	public File exportCurrentCustomQuery(String userId) throws Exception {
+		try{
+			String locator=pt.exportCustomQuery(userId);						
+			return RSWrapper.getStreamFromLocator(new URI(locator));		
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
+	
+	@Override
+	public void deleteAnalysis(String id) throws Exception {
+		try{
+			pt.deleteAnalysis(id);
+		}catch(GCUBEFault f){
+			logger.error("Service thrown Fault ",f);
+			throw new ServiceException(f.getFaultMessage());
+		}
+	}
 }

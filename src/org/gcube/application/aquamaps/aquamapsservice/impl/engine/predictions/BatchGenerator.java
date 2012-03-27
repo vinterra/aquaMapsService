@@ -138,75 +138,84 @@ public class BatchGenerator implements BatchGeneratorI {
 	
 	
 	@Override
-	public List<String> generateTable(TableGenerationConfiguration configuration)
-			throws Exception {
-		ArrayList<String> toReturn=new ArrayList<String>();
-		switch(configuration.getLogic()){
-		case HSPEC :
-				
-				toReturn.add(generateHSPEC(configuration.getSources().get(ResourceType.HCAF).get(0).getTableName(),
-				configuration.getSources().get(ResourceType.HSPEN).get(0).getTableName(),
-				configuration.getMaxMinHspenTable(),
-				configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
-				configuration.getAlgorithm().equals(AlgorithmType.SuitableRange2050)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
-				configuration.getPartitionsNumber(),
-				configuration.getBackendUrl(),
-				configuration.getAuthor(),
-				configuration.getExecutionEnvironment(),
-				configuration.getConfiguration(),
-				configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getName())?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS,
-				SourceManager.getToUseTableStore())); 
-				break;
-		case HSPEN : toReturn.add(generateHSPEN(configuration.getSources().get(ResourceType.HCAF).get(0).getTableName(),
-				configuration.getSources().get(ResourceType.HSPEN).get(0).getTableName(),
-				configuration.getSources().get(ResourceType.OCCURRENCECELLS).get(0).getTableName(),
-				configuration.getPartitionsNumber(),
-				configuration.getBackendUrl(),
-				configuration.getAuthor(),
-				configuration.getExecutionEnvironment(),
-				configuration.getConfiguration(),
-				EnvelopeModel.AQUAMAPS,
-				SourceManager.getToUseTableStore()));
-				break;
-				
-		case HCAF :
-			int firstHcaf=0;
-			int secondHcaf=0;
-			int firstHcafTime=0;
-			int secondHcafTime=0;
-			int numInterpolations=0;
-			for(Field f:configuration.getAdditionalParameters()){
-				if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_ID)) firstHcaf=f.getValueAsInteger();
-				else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_ID)) secondHcaf=f.getValueAsInteger();
-				else if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_TIME)) firstHcafTime=f.getValueAsInteger();
-				else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_TIME)) secondHcafTime=f.getValueAsInteger();
-				else if(f.getName().equals(SourceGenerationRequest.NUM_INTERPOLATIONS)) numInterpolations=f.getValueAsInteger();
-			}
-			if(firstHcaf==0) throw new Exception("Unable to select first HCAF");
-			if(secondHcaf==0) throw new Exception("Unable to select second HCAF");
-			if(firstHcafTime==0) throw new Exception("Unable to detect first HCAF time");
-			if(secondHcafTime==0) throw new Exception("Unable to detect second HCAF time");
-			if(numInterpolations==0) throw new Exception("Unable to detect num Interpolations");
-			Resource first=null;
-			Resource second=null;
-			for(Resource hcaf:configuration.getSources().get(ResourceType.HCAF)){
-				if(hcaf.getSearchId()==firstHcaf) first=hcaf;
-				else if(hcaf.getSearchId()==secondHcaf) second=hcaf;
-			}
-			if(first==null)throw new Exception("First hcaf not found, passed id : "+firstHcaf);
-			if(second==null)throw new Exception("Second hcaf not found, passed id : "+secondHcaf);
-			
-			
-			toReturn.addAll(generateHCAF(
-					first.getTableName(),second.getTableName(),
-					numInterpolations,INTERPOLATIONFUNCTIONS.valueOf(configuration.getAlgorithm()+""),
-					firstHcafTime,secondHcafTime,SourceManager.getToUseTableStore()));
+	public void generateTable(final TableGenerationConfiguration configuration)
+	throws Exception {
+		final BatchGeneratorI instance=this;
+		Thread t=new Thread (){ 
+			public void run() {
+				ArrayList<String> toReturn=new ArrayList<String>();
+				try{
+					switch(configuration.getLogic()){
+					case HSPEC :
+
+						toReturn.add(generateHSPEC(configuration.getSources().get(ResourceType.HCAF).get(0).getTableName(),
+								configuration.getSources().get(ResourceType.HSPEN).get(0).getTableName(),
+								configuration.getMaxMinHspenTable(),
+								configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
+								configuration.getAlgorithm().equals(AlgorithmType.SuitableRange2050)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
+								configuration.getPartitionsNumber(),
+								configuration.getBackendUrl(),
+								configuration.getAuthor(),
+								configuration.getExecutionEnvironment(),
+								configuration.getConfiguration(),
+								configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getName())?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS,
+										SourceManager.getToUseTableStore())); 
+						break;
+					case HSPEN : toReturn.add(generateHSPEN(configuration.getSources().get(ResourceType.HCAF).get(0).getTableName(),
+							configuration.getSources().get(ResourceType.HSPEN).get(0).getTableName(),
+							configuration.getSources().get(ResourceType.OCCURRENCECELLS).get(0).getTableName(),
+							configuration.getPartitionsNumber(),
+							configuration.getBackendUrl(),
+							configuration.getAuthor(),
+							configuration.getExecutionEnvironment(),
+							configuration.getConfiguration(),
+							EnvelopeModel.AQUAMAPS,
+							SourceManager.getToUseTableStore()));
 					break;
-		}
-		Collections.sort(toReturn);
-		return toReturn;
-		
-		
+
+					case HCAF :
+						int firstHcaf=0;
+						int secondHcaf=0;
+						int firstHcafTime=0;
+						int secondHcafTime=0;
+						int numInterpolations=0;
+						for(Field f:configuration.getAdditionalParameters()){
+							if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_ID)) firstHcaf=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_ID)) secondHcaf=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_TIME)) firstHcafTime=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_TIME)) secondHcafTime=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.NUM_INTERPOLATIONS)) numInterpolations=f.getValueAsInteger();
+						}
+						if(firstHcaf==0) throw new Exception("Unable to select first HCAF");
+						if(secondHcaf==0) throw new Exception("Unable to select second HCAF");
+						if(firstHcafTime==0) throw new Exception("Unable to detect first HCAF time");
+						if(secondHcafTime==0) throw new Exception("Unable to detect second HCAF time");
+						if(numInterpolations==0) throw new Exception("Unable to detect num Interpolations");
+						Resource first=null;
+						Resource second=null;
+						for(Resource hcaf:configuration.getSources().get(ResourceType.HCAF)){
+							if(hcaf.getSearchId()==firstHcaf) first=hcaf;
+							else if(hcaf.getSearchId()==secondHcaf) second=hcaf;
+						}
+						if(first==null)throw new Exception("First hcaf not found, passed id : "+firstHcaf);
+						if(second==null)throw new Exception("Second hcaf not found, passed id : "+secondHcaf);
+
+
+						toReturn.addAll(generateHCAF(
+								first.getTableName(),second.getTableName(),
+								numInterpolations,INTERPOLATIONFUNCTIONS.valueOf(configuration.getAlgorithm()+""),
+								firstHcafTime,secondHcafTime,SourceManager.getToUseTableStore()));
+						break;
+					}
+					Collections.sort(toReturn);
+					configuration.registerGeneratedSourcesCallback(toReturn);
+				}catch(Exception e){
+					logger.error("Unexpected error, request was "+configuration);
+					configuration.notifyError(e);
+				}finally{configuration.release(instance);}		
+			}
+		};
+		t.start();
 	}
 	
 	
@@ -215,6 +224,8 @@ public class BatchGenerator implements BatchGeneratorI {
 		
 		String toGenerate=ServiceUtils.generateId("hspec", "");
 
+		logger.debug("Current generator instance is "+this.toString());
+		logger.debug("Using Engine "+e.toString());
 		logger.trace("generating hspec : "+toGenerate);
 		
 		logger.trace("hspen : "+hspenTable);
@@ -267,7 +278,10 @@ public class BatchGenerator implements BatchGeneratorI {
 		
 		
 		String toGenerate=ServiceUtils.generateId("hspen", "");
-
+		
+		
+		logger.debug("Current generator instance is "+this.toString());
+		logger.debug("Using Engine "+e.toString());
 		logger.trace("generating hspen : "+toGenerate);
 		
 		logger.trace("hspen : "+hspenTable);
@@ -317,6 +331,8 @@ public class BatchGenerator implements BatchGeneratorI {
 	}
 	
 	private List<String> generateHCAF(String startingHCAF,String endHCAF,int numIntervals,INTERPOLATIONFUNCTIONS function,int startingTime,int endTime,String tableStore)throws Exception{
+		logger.debug("Current generator instance is "+this.toString());
+		logger.debug("Using Engine "+e.toString());
 		ArrayList<String> toReturn=new ArrayList<String>();
 		interpolator=new InterpolateTables(e.getConfigPath(), ServiceContext.getContext().getFolderPath(FOLDERS.TABLES), e.getDatabaseURL(), e.getDatabaseUserName(), e.getDatabasePassword());
 		

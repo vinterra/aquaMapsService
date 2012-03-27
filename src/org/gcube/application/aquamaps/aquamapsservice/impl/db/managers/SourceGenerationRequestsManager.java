@@ -18,6 +18,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequest
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class SourceGenerationRequestsManager {
 
 	private static final GCUBELog logger=new GCUBELog(SourceGenerationRequestsManager.class);
@@ -31,6 +33,8 @@ public class SourceGenerationRequestsManager {
 			session=DBSession.getInternalDBSession();
 			toInsert.setId(ServiceUtils.generateId("HGGR", ""));
 			toInsert.setPhase(SourceGenerationPhase.pending);
+			toInsert.setSubmissiontime(System.currentTimeMillis());	
+			toInsert.setGeneratedSources(new ArrayList<Integer>());
 			List<List<Field>> rows=new ArrayList<List<Field>>();
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");
@@ -129,15 +133,24 @@ public class SourceGenerationRequestsManager {
 		fields.add(new Field(SourceGenerationRequestFields.phase+"",phase+"",FieldType.STRING));
 		if(phase.equals(SourceGenerationPhase.completed)||phase.equals(SourceGenerationPhase.error)){
 			fields.add(new Field(SourceGenerationRequestFields.endtime+"",System.currentTimeMillis()+"",FieldType.LONG));
-			fields.add(new Field(SourceGenerationRequestFields.currentphasepercent+"",100+"",FieldType.DOUBLE));
+			fields.add(new Field(SourceGenerationRequestFields.currentphasepercent+"",1+"",FieldType.DOUBLE));
 		}
 		
 		updateField(id, fields);
 	}
-	public static void setReportId(int reportId, String id)throws Exception{
-		ArrayList<Field> fields=new ArrayList<Field>();
-		fields.add(new Field(SourceGenerationRequestFields.reportid+"",reportId+"",FieldType.INTEGER));
-		updateField(id, fields);
+	public static void addReportId(int reportId, String id)throws Exception{
+		SourceGenerationRequest req=getById(id);		
+		req.addReportId(reportId);
+		updateField(id, new ArrayList<Field>(Arrays.asList(new Field[]{
+				req.getField(SourceGenerationRequestFields.reportid)
+		})));
+	}
+	public static void removeReportId(int reportId, String id)throws Exception{
+		SourceGenerationRequest req=getById(id);		
+		req.removeReportId(reportId);
+		updateField(id, new ArrayList<Field>(Arrays.asList(new Field[]{
+				req.getField(SourceGenerationRequestFields.reportid)
+		})));
 	}
 	public static void setPhasePercent(double percent,String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
@@ -159,6 +172,17 @@ public class SourceGenerationRequestsManager {
 		updateField(id, fields);
 	}
 
+	public static void setToGenerateTableCount(int count,String id)throws Exception{
+		ArrayList<Field> fields=new ArrayList<Field>();
+		fields.add(new Field(SourceGenerationRequestFields.togeneratetablescount+"",count+"",FieldType.INTEGER));
+		updateField(id, fields);
+	}
+	public static void setEvaluatedComputationCount(int count,String id)throws Exception{
+		ArrayList<Field> fields=new ArrayList<Field>();
+		fields.add(new Field(SourceGenerationRequestFields.evaluatedcomputationcount+"",count+"",FieldType.INTEGER));
+		updateField(id, fields);
+	}
+	
 	public static void setStartTime(String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
 		fields.add(new Field(SourceGenerationRequestFields.starttime+"",System.currentTimeMillis()+"",FieldType.LONG));
@@ -212,5 +236,13 @@ public class SourceGenerationRequestsManager {
 			if(session!=null) session.close();
 		}
 	}
-	
+	public static SourceGenerationRequest getById(String id)throws Exception{
+		SourceGenerationRequest request=new SourceGenerationRequest();
+		request.setId(id);
+		ArrayList<SourceGenerationRequest> found=getList(new ArrayList<Field>(Arrays.asList(new Field[]{
+				request.getField(SourceGenerationRequestFields.id)
+		})));
+		if(found.size()>0) return found.get(0);
+		else return null;
+	}
 }

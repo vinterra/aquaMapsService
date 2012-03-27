@@ -1,7 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis;
 
 import java.awt.Image;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
@@ -10,12 +11,16 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescri
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.BioClimateAnalysis;
 
 public class Analyzer {
 
 	private static final GCUBELog logger=new GCUBELog(Analyzer.class);
+	
+	
 	
 	
 	private BioClimateAnalysis bioClimate=null;
@@ -54,16 +59,60 @@ public class Analyzer {
 		
 	}
 	
-	public List<Image> produceImages(AnalysisRequest toPerform) throws Exception{
-		switch(toPerform.getType()){
-			case HCAF : bioClimate.hcafEvolutionAnalysis(toPerform.getHcafTables());
-						break;
-			case HSPEC : bioClimate.hspecEvolutionAnalysis(toPerform.getHspecTables(), HSPECFields.probability+"", HCAF_SFields.csquarecode+"");
-							break;
-			case MIXED : bioClimate.evolutionAnalysis(toPerform.getHcafTables(), toPerform.getHspecTables(), HSPECFields.probability+"", HCAF_SFields.csquarecode+"");
-							break;
+	public void produceImages(final AnalysisRequest toPerform) throws Exception{
+		final Analyzer instance=this; 
+		Thread t=new Thread(){
+			@Override
+			public void run() {
+				AnalysisResponseDescriptor toReturn=new AnalysisResponseDescriptor();		
+				try{
+					String groupLabel=getLabel(toPerform.getToPerformAnalysis());
+				
+					switch(toPerform.getToPerformAnalysis()){
+						case HCAF : bioClimate.hcafEvolutionAnalysis(toPerform.getTables(ResourceType.HCAF),toPerform.getLabels(ResourceType.HCAF));
+									break;
+						case HSPEC : bioClimate.hspecEvolutionAnalysis(toPerform.getTables(ResourceType.HSPEC),toPerform.getLabels(ResourceType.HSPEC),
+								HSPECFields.probability+"", HCAF_SFields.csquarecode+"",toPerform.getHspecThreshold());
+										break;
+						case MIXED : bioClimate.globalEvolutionAnalysis(toPerform.getTables(ResourceType.HCAF), toPerform.getTables(ResourceType.HSPEC), 
+								toPerform.getLabels(ResourceType.HCAF), toPerform.getLabels(ResourceType.HSPEC), HSPECFields.probability+"", HCAF_SFields.csquarecode+"",toPerform.getHspecThreshold());
+										break;
+						case GEOGRAPHIC_HCAF : bioClimate.geographicEvolutionAnalysis(toPerform.getTables(ResourceType.HCAF),toPerform.getLabels(ResourceType.HCAF));
+										break;
+						case GEOGRAPHIC_HSPEC : bioClimate.speciesGeographicEvolutionAnalysis(toPerform.getTables(ResourceType.HSPEC),toPerform.getLabels(ResourceType.HSPEC),toPerform.getHspecThreshold());
+												break;
+						case HSPEN : bioClimate.speciesEvolutionAnalysis(toPerform.getTables(ResourceType.HSPEN), toPerform.getLabels(ResourceType.HSPEN), BioClimateAnalysis.salinityMinFeature, BioClimateAnalysis.salinityDefaultRange);
+						break;									
+					}
+					ArrayList<ImageDescriptor> generated=new ArrayList<ImageDescriptor>();
+					for(Entry<String,Image> entry:bioClimate.getProducedImages().entrySet()){
+						logger.debug("Adding image "+entry.getKey());
+						generated.add(new ImageDescriptor(entry.getKey(),entry.getValue()));					
+					}
+					
+				toReturn.getCategorizedImages().put(groupLabel, generated);
+				}catch(Exception e){
+				toReturn.getResults().put(toPerform.getToPerformAnalysis(), false);
+				toReturn.getMessages().put(toPerform.getToPerformAnalysis(), "CAUSE : "+e.getMessage());
+				}finally{
+					toPerform.notify(toReturn, instance);
+				}
+			}
+		};
+		t.start();
+	}
+	
+	
+	private static final String getLabel(AnalysisType type){
+		switch(type){
+			case GEOGRAPHIC_HCAF	: return "Environment_Analysis_By_Area";
+			case GEOGRAPHIC_HSPEC 	: return "Prediction_Analysis_By_Area";
+			case HCAF 				: return "Overall_Environment_Analysis";
+			case HSPEC				: return "Overall_Prediction_Analysis";
+			case HSPEN 				: return "Envelope_Analysis";
+			default : throw new IllegalArgumentException();
 		}
-		return bioClimate.getProducedImages();
+		
 	}
 	
 	

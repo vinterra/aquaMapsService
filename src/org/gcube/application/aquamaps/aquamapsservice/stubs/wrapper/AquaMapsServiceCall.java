@@ -202,9 +202,9 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	}
 
 	@Override
-	public Resource loadResource(int resId,ResourceType type)throws Exception{
+	public Resource loadResource(int resId)throws Exception{
 		try{
-			Resource request=new Resource(type,resId);
+			Resource request=new Resource(ResourceType.HCAF,resId);
 			return	new Resource(pt.getResourceInfo(request.toStubsVersion()));
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);

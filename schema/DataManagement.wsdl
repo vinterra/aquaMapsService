@@ -251,6 +251,15 @@
 			<xsd:element name="loadAnalysisRequest" type="xsd:string"/>
 			<xsd:element name="loadAnalysisResponse" type="xsd:string"/>
 			
+			<xsd:element name="resubmitGenerationRequest" type="xsd:string"/>
+			<xsd:element name="resubmitGenerationResponse" type="xsd:string"/>
+			
+			<xsd:element name="exportCustomQueryRequest" type="xsd:string"/>
+			<xsd:element name="exportCustomQueryResponse" type="xsd:string"/>
+			
+			<xsd:element name="deleteAnalysisRequest" type="xsd:string"/>
+			<xsd:element name="deleteAnalysisResponse" type="coretypes:VOID"/>
+			
 		</xsd:schema>
 	</types>
 
@@ -425,6 +434,26 @@
 	<message name="LoadAnalysisResponse">
 		<part name="response" element="tns:loadAnalysisResponse" />
 	</message>
+	
+	<message name="ResubmitGenerationRequest">
+		<part name="request" element="tns:resubmitGenerationRequest" />
+	</message>
+	<message name="ResubmitGenerationResponse">
+		<part name="response" element="tns:resubmitGenerationResponse" />
+	</message>
+
+<message name="ExportCustomQueryRequest">
+		<part name="request" element="tns:exportCustomQueryRequest" />
+	</message>
+	<message name="ExportCustomQueryResponse">
+		<part name="response" element="tns:exportCustomQueryResponse" />
+	</message>
+	<message name="DeleteAnalysisRequest">
+		<part name="request" element="tns:deleteAnalysisRequest" />
+	</message>
+	<message name="DeleteAnalysisResponse">
+		<part name="response" element="tns:deleteAnalysisResponse" />
+	</message>
 
 
 	<portType name="DataManagementPortType">
@@ -548,6 +577,21 @@
 		<wsdl:operation name="LoadAnalysis">
 			<wsdl:input message="tns:LoadAnalysisRequest" />
 			<wsdl:output message="tns:LoadAnalysisResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ResubmitGeneration">
+			<wsdl:input message="tns:ResubmitGenerationRequest" />
+			<wsdl:output message="tns:ResubmitGenerationResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ExportCustomQuery">
+			<wsdl:input message="tns:ExportCustomQueryRequest" />
+			<wsdl:output message="tns:ExportCustomQueryResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalysis">
+			<wsdl:input message="tns:DeleteAnalysisRequest" />
+			<wsdl:output message="tns:DeleteAnalysisResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

@@ -46,7 +46,7 @@ public class SourceGenerationRequest extends DataModel{
 	
 
 	private ArrayList<Integer> generatedSources=new ArrayList<Integer>();
-	private Integer reportID=0;
+	private ArrayList<Integer> reportID=new ArrayList<Integer>();
 	private ArrayList<Integer> jobIds=new ArrayList<Integer>();
 
 	private String submissionBackend;
@@ -59,11 +59,19 @@ public class SourceGenerationRequest extends DataModel{
 	private Boolean enablelayergeneration=false;
 	private Boolean enableimagegeneration=false;
 
+	private Integer toGenerateTableCount=0;
+	private Integer evaluatedComputationCount=0;
+	
+	
+	//*************ADDITIONAL PARAMETER FIELDS NAMES 
+	
 	public static final String FIRST_HCAF_ID="FIRST_HCAF_ID";
 	public static final String SECOND_HCAF_ID="SECOND_HCAF_ID";
 	public static final String NUM_INTERPOLATIONS="NUM_INTERPOLATIONS";
 	public static final String FIRST_HCAF_TIME="FIRST_HCAF_TIME";
 	public static final String SECOND_HCAF_TIME="SECOND_HCAF_TIME";
+	public static final String COMBINE_MATCHING="COMBINE_MATCHING";
+	
 	
 	public ArrayList<Integer> getGeneratedSources() {
 		return generatedSources;
@@ -142,8 +150,28 @@ public class SourceGenerationRequest extends DataModel{
 	public void setCurrentphasepercent(Double currentphasepercent) {
 		this.currentphasepercent = currentphasepercent;
 	}
+	
+public void setEvaluatedComputationCount(Integer evaluatedComputationCount) {
+	this.evaluatedComputationCount = evaluatedComputationCount;
+}
+public void setToGenerateTableCount(Integer toGenerateTableCount) {
+	this.toGenerateTableCount = toGenerateTableCount;
+}
+public Integer getEvaluatedComputationCount() {
+	return evaluatedComputationCount;
+}
+public Integer getToGenerateTableCount() {
+	return toGenerateTableCount;
+}
 
-
+public void addReportId(Integer id){
+	this.reportID.add(id);
+	Collections.sort(reportID);
+}
+public void removeReportId(Integer id){
+	reportID.remove(id);
+	Collections.sort(reportID);
+}
 
 	public static ArrayList<SourceGenerationRequest> loadResultSet(ResultSet rs)throws Exception{
 		ArrayList<SourceGenerationRequest> toReturn= new ArrayList<SourceGenerationRequest>();
@@ -164,10 +192,12 @@ public class SourceGenerationRequest extends DataModel{
 	public void setLogic(LogicType logic) {
 		this.logic = logic;
 	}
-	public void setReportID(Integer reportID) {
-		this.reportID = reportID;
+	public void setReportID(List<Integer> reportID) {
+		this.reportID.clear();
+		this.reportID.addAll(reportID);
+		Collections.sort(this.reportID);
 	}
-	public Integer getReportID() {
+	public ArrayList<Integer> getReportID() {
 		return reportID;
 	}
 	public void setJobIds(ArrayList<Integer> jobIds) {
@@ -256,7 +286,7 @@ public class SourceGenerationRequest extends DataModel{
 		break;
 		case phase:setPhase(SourceGenerationPhase.valueOf(f.getValue()));
 		break;
-		case reportid:setReportID(f.getValueAsInteger());
+		case reportid:setReportID(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
 		case starttime:setStarttime(f.getValueAsLong());
 		break;
@@ -273,6 +303,10 @@ public class SourceGenerationRequest extends DataModel{
 		case id: setId(f.getValue());
 		break;
 		case additionalparameters : setParameters(Field.fromJSONArray(new JSONArray(f.getValue())));
+		break;
+		case evaluatedcomputationcount:setEvaluatedComputationCount(f.getValueAsInteger());
+		break;
+		case togeneratetablescount:setToGenerateTableCount(f.getValueAsInteger());
 		break;
 		default : return false;
 		}
@@ -299,7 +333,7 @@ public class SourceGenerationRequest extends DataModel{
 		case logic:return new Field(fieldName+"",getLogic()+"",FieldType.STRING);
 		case numpartitions:return new Field(fieldName+"",getNumPartitions()+"",FieldType.INTEGER);
 		case phase:return new Field(fieldName+"",getPhase()+"",FieldType.STRING);
-		case reportid:return new Field(fieldName+"",getReportID()+"",FieldType.INTEGER);
+		case reportid:return new Field(fieldName+"",CSVUtils.listToCSV(reportID),FieldType.STRING);
 		case starttime:return new Field(fieldName+"",getStarttime()+"",FieldType.LONG);
 		case submissionbackend:return new Field(fieldName+"",getSubmissionBackend(),FieldType.STRING);
 		case submissiontime:return new Field(fieldName+"",getSubmissiontime()+"",FieldType.LONG);
@@ -307,7 +341,9 @@ public class SourceGenerationRequest extends DataModel{
 		case sourcehspenids: return new Field(fieldName+"",CSVUtils.listToCSV(hspenIds),FieldType.STRING);
 		case sourceoccurrencecellsids: return new Field(fieldName+"",CSVUtils.listToCSV(occurrenceCellIds),FieldType.STRING);
 		case additionalparameters : return new Field(fieldName+"",Field.toJSONArray(parameters).toString(),FieldType.STRING);
-		default : return null;
+		case evaluatedcomputationcount : return new Field(fieldName+"",getEvaluatedComputationCount()+"",FieldType.INTEGER);
+		case togeneratetablescount : return new Field(fieldName+"",getToGenerateTableCount()+"",FieldType.INTEGER);
+		default : return null; 
 		}
 		
 	}

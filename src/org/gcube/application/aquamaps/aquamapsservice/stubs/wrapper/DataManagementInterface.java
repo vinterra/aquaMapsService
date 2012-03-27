@@ -33,4 +33,9 @@ public interface DataManagementInterface {
 	public String analyzeTables(Analysis request)throws Exception;
 	public String getJsonSubmittedAnalysis(PagedRequestSettings settings)throws Exception;
 	public File loadAnalysisResults(String id)throws Exception;
+	public String resubmitGeneration(String id) throws Exception;
+	
+	
+	public File exportCurrentCustomQuery(String userId)throws Exception;
+	public void deleteAnalysis(String id)throws Exception;
 }

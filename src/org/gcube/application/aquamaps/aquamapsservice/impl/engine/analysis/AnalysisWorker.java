@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
@@ -14,13 +16,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.ArchiveManager;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.AppZip;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class AnalysisWorker extends Thread{
@@ -28,6 +27,9 @@ public class AnalysisWorker extends Thread{
 	private static final GCUBELog logger=new GCUBELog(AnalysisWorker.class);
 
 	private Analysis toPerform;
+	private AnalysisResponseDescriptor produced=new AnalysisResponseDescriptor();
+	final Semaphore blocking=new Semaphore(0);
+	
 	
 	public AnalysisWorker(Analysis analysis) {
 		toPerform=analysis;
@@ -40,22 +42,28 @@ public class AnalysisWorker extends Thread{
 		logger.trace("Anaylisis to Perform : "+toPerform.toXML());
 		try{
 		AnalysisTableManager.setStartTime(toPerform.getId());
-		
-		AnalysisRequest request=checkAnalysisParameters(toPerform);
-		//********** RETRIEVE BATCH GENERATION
-		
-		analyzer=AnalyzerManager.getBatch();
-		logger.debug("Got batch Id "+analyzer.getReportId());
-		analyzer.setConfiguration(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator, 
-				DBSession.getInternalCredentials());
-		
-		//********** START PROCESS INIT
-		AnalysisTableManager.setReportId(analyzer.getReportId(),toPerform.getId());		 
 		AnalysisTableManager.setPhasePercent(0d, toPerform.getId());
 		
-		List<Image> produced=analyzer.produceImages(request);
-		AnalyzerManager.leaveBatch(analyzer);
-		logger.trace("Produced "+produced.size()+" image for Analysis "+toPerform.getId());
+		List<AnalysisRequest> requests=AnalysisRequest.getRequests(toPerform, this);
+		
+		//********** RETRIEVE BATCH GENERATION
+		for(AnalysisRequest request:requests){
+			try{
+				analyzer=AnalyzerManager.getBatch();
+				logger.debug("Got batch Id "+analyzer.getReportId());
+				analyzer.setConfiguration(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator, 
+						DBSession.getInternalCredentials());
+
+				//********** START PROCESS INIT
+				AnalysisTableManager.addReportId(analyzer.getReportId(),toPerform.getId());		 
+				analyzer.produceImages(request);
+			}catch(Exception e){throw e;}
+		}
+		
+		logger.debug("Going to wait for "+requests.size()+" analyzers");
+		blocking.acquire(requests.size());
+		
+		logger.debug("Woken up");
 		
 		String path=archiveImages(produced,toPerform.getTitle()).getAbsolutePath();
 		logger.trace("Generated archive file "+path);
@@ -69,55 +77,42 @@ public class AnalysisWorker extends Thread{
 			} catch (Exception e1) {
 				logger.fatal("Unable to update reference status for analysis",e1);
 			}
-		}finally{
-			if(analyzer!=null)
-				try {
-					AnalyzerManager.leaveBatch(analyzer);
-				} catch (Exception e) {
-					logger.fatal("Unable to leave analyzer",e);
-				}
 		}
 	}
 	
 	
-	private static AnalysisRequest checkAnalysisParameters(Analysis toCheck) throws Exception{
-		ArrayList<ResourceType> toAvoidTypes=new ArrayList<ResourceType>();
-		toAvoidTypes.add(ResourceType.HSPEN);
-		toAvoidTypes.add(ResourceType.OCCURRENCECELLS);
-		switch(toCheck.getType()){
-		case HCAF: toAvoidTypes.add(ResourceType.HSPEN);
-					break;
-		case HSPEC : toAvoidTypes.add(ResourceType.HCAF);
-		}
-		ArrayList<String> foundHSPECTables=new ArrayList<String>();
-		ArrayList<String> foundHCAFTables=new ArrayList<String>();
-		for(Integer sourceId:toCheck.getSources()){
-			Resource r=SourceManager.getById(sourceId);
-			if(toAvoidTypes.contains(r.getType())) throw new Exception ("Invalid resource [ID = "+r.getSearchId()+" , Type = "+r.getType()+"]selected for current analysis type "+toCheck.getType());
-			if(r.getType().equals(ResourceType.HCAF)) foundHCAFTables.add(r.getTableName());
-			else if(r.getType().equals(ResourceType.HSPEC)) foundHSPECTables.add(r.getTableName());
-		}
-		return new AnalysisRequest(toCheck.getType(),
-				foundHCAFTables.toArray(new String[foundHCAFTables.size()]),
-				foundHSPECTables.toArray(new String[foundHSPECTables.size()]));
-			
-	}
-	private static File archiveImages(List<Image> images, String name)throws Exception{
-		ArrayList<File> toZipFiles=new ArrayList<File>();
-		File directory=new File(ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS),name);
+	private static File archiveImages(AnalysisResponseDescriptor produced, String name)throws Exception{
+		File directory=new File(ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS),ServiceUtils.generateId(name, ""));
 		directory.mkdirs();
-		
-		for(int i=0;i<images.size();i++){
-			Image image=images.get(i);
-			BufferedImage bi = ImageTools.makeBuffered(image);
-
-			File outputfile = new File(directory,name+"_"+i+".png");
-			ImageIO.write(bi, "png", outputfile);
-			toZipFiles.add(outputfile);
+		for(Entry<String,ArrayList<ImageDescriptor>> entry :produced.getCategorizedImages().entrySet()){
+			File subDir=new File(directory,entry.getKey());
+			subDir.mkdirs();
+			for(int i=0;i<entry.getValue().size();i++){
+				Image image=entry.getValue().get(i).getImage();
+				BufferedImage bi = ImageTools.makeBuffered(image);
+				File outputfile = new File(subDir,entry.getValue().get(i).getName()+".png");
+				ImageIO.write(bi, "png", outputfile);
+			}
 		}
-		File toReturn=new File(ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS),ServiceUtils.generateId("Analysis", ".tar.gz"));
-		ArchiveManager.createTarGz(toReturn, toZipFiles);
-		for(File f: toZipFiles) ServiceUtils.deleteFile(f.getAbsolutePath());
+		
+		File toReturn=new File(ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS),ServiceUtils.generateId("Analysis", ".zip"));
+		AppZip zip=new AppZip(directory.getAbsolutePath());
+		logger.trace("Zipped "+zip.zipIt(toReturn.getAbsolutePath())+" files to "+toReturn.getAbsolutePath());		
+		ServiceUtils.deleteFile(directory.getAbsolutePath());
 		return toReturn;		
+	}
+	
+	
+	public void notifyGenerated(AnalysisResponseDescriptor result, Analyzer analyzer){
+		logger.debug("Releasing... analyzerId is "+analyzer.getReportId());
+		produced.append(result);
+		blocking.release();
+		if(analyzer!=null)
+			try {
+				AnalyzerManager.leaveBatch(analyzer);
+				AnalysisTableManager.removeReportId(analyzer.getReportId(),toPerform.getId());
+			} catch (Exception e) {
+				logger.fatal("Unable to leave analyzer",e);
+			}
 	}
 }

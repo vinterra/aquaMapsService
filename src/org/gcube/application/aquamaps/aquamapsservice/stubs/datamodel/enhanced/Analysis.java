@@ -32,15 +32,15 @@ public class Analysis extends DataModel{
 	
 	
 	
-	private Integer reportID=0;
+	private ArrayList<Integer> reportID=new ArrayList<Integer>();
 	
-	private AnalysisType type=AnalysisType.MIXED;
+	private ArrayList<AnalysisType> type=new ArrayList<AnalysisType>();
 	
 	private String archiveLocation;
 	private ArrayList<Integer> sources=new ArrayList<Integer>();
 	
 	
-	
+	private ArrayList<AnalysisType> performedAnalysis=new ArrayList<AnalysisType>();
 	
 	public Analysis() {
 		// TODO Auto-generated constructor stub
@@ -79,7 +79,7 @@ public class Analysis extends DataModel{
 		case endtime:setEndtime(f.getValueAsLong());
 		break;
 
-		case reportid:setReportID(f.getValueAsInteger());
+		case reportid:setReportID(CSVUtils.CSVTOIntegerList(f.getValue()));
 		break;
 		case starttime:setStarttime(f.getValueAsLong());
 		break;
@@ -96,7 +96,9 @@ public class Analysis extends DataModel{
 		break;
 		case title : setTitle(f.getValue());
 		break;
-		case type : setType(AnalysisType.valueOf(f.getValue()));
+		case type : setType(CSVUtils.CSVToStringList((f.getValue())));
+		break;
+		case performedanalysis : setPerformedAnalysis(CSVUtils.CSVToStringList((f.getValue())));
 		break;
 		default : return false;
 		}
@@ -110,7 +112,7 @@ public class Analysis extends DataModel{
 		case currentphasepercent:return new Field(fieldName+"",getCurrentphasepercent()+"",FieldType.DOUBLE);
 		case description:return new Field(fieldName+"",getDescription(),FieldType.STRING);
 		case id:return new Field(fieldName+"",getId(),FieldType.STRING);
-		case reportid:return new Field(fieldName+"",getReportID()+"",FieldType.INTEGER);
+		case reportid:return new Field(fieldName+"",CSVUtils.listToCSV(reportID),FieldType.STRING);
 		case starttime:return new Field(fieldName+"",getStarttime()+"",FieldType.LONG);
 		case submissiontime:return new Field(fieldName+"",getSubmissiontime()+"",FieldType.LONG);
 		case archivelocation : return new Field(fieldName+"",getArchiveLocation(),FieldType.STRING);
@@ -118,7 +120,8 @@ public class Analysis extends DataModel{
 		case sources : return new Field(fieldName+"",CSVUtils.listToCSV(sources),FieldType.STRING);
 		case status : return new Field(fieldName+"",getStatus()+"",FieldType.STRING);
 		case title : return new Field(fieldName+"",getTitle(),FieldType.STRING);
-		case type : return new Field(fieldName+"",getType()+"",FieldType.STRING);
+		case type : return new Field(fieldName+"",CSVUtils.listToCSV(getType()),FieldType.STRING);
+		case performedanalysis: return new Field(fieldName+"",CSVUtils.listToCSV(getPerformedAnalysis()),FieldType.STRING);
 		default : return null;
 		}
 		
@@ -241,29 +244,48 @@ public class Analysis extends DataModel{
 
 
 
-	public Integer getReportID() {
+	public ArrayList<Integer> getReportID() {
 		return reportID;
 	}
 
 
 
-	public void setReportID(Integer reportID) {
-		this.reportID = reportID;
+	public void setReportID(List<Integer> reportID) {
+		this.reportID.clear();
+		this.reportID.addAll(reportID);
+		Collections.sort(this.reportID);
 	}
 
 
 
-	public AnalysisType getType() {
+	public ArrayList<AnalysisType> getType() {
 		return type;
 	}
 
 
 
-	public void setType(AnalysisType type) {
-		this.type = type;
+	public void addReportId(Integer id){
+		this.reportID.add(id);
+		Collections.sort(reportID);
+	}
+	public void removeReportId(Integer id){
+		reportID.remove(id);
+		Collections.sort(reportID);
+	}
+	
+	public void setType(ArrayList<AnalysisType> type) {
+		this.type.clear();
+		this.type.addAll(type);
+		Collections.sort(this.type);
 	}
 
 
+	public void setType(List<String> typeStrings){
+		ArrayList<AnalysisType> types=new ArrayList<AnalysisType>();
+		for(String s:typeStrings)
+			types.add(AnalysisType.valueOf(s));
+		setType(types);
+	}
 
 	public String getArchiveLocation() {
 		return archiveLocation;
@@ -286,8 +308,32 @@ public class Analysis extends DataModel{
 	public void setSources(List<Integer> sources) {
 		this.sources.clear();
 		this.sources.addAll(sources);
-//		Collections.sort(this.sources);
+		Collections.sort(this.sources);
 	}
+	
+	
+	public void setPerformedAnalysis(ArrayList<AnalysisType> performedAnalysis) {
+		this.performedAnalysis.clear();
+		this.performedAnalysis.addAll(performedAnalysis);
+		Collections.sort(this.performedAnalysis);
+	}
+
+	public ArrayList<AnalysisType> getPerformedAnalysis() {
+		return performedAnalysis;
+	}
+
+	public void setPerformedAnalysis(List<String> toSet){
+		ArrayList<AnalysisType> types=new ArrayList<AnalysisType>();
+		for(String s:toSet)
+			types.add(AnalysisType.valueOf(s));
+		setPerformedAnalysis(types);
+	}
+	
+	public void addPerformedAnalysis(AnalysisType toAdd){
+		performedAnalysis.add(toAdd);
+		Collections.sort(performedAnalysis);
+	}
+	
 	
 	public org.gcube.application.aquamaps.datamodel.Analysis toStubsVersion(){
 		org.gcube.application.aquamaps.datamodel.Analysis toReturn=new org.gcube.application.aquamaps.datamodel.Analysis();
@@ -297,13 +343,14 @@ public class Analysis extends DataModel{
 		toReturn.setDescription(description);
 		toReturn.setEndTime(endtime);
 		toReturn.setId(id);
-		toReturn.setReportId(reportID);
+		toReturn.setReportIds(CSVUtils.listToCSV(reportID));
 		toReturn.setSources(CSVUtils.listToCSV(sources));
 		toReturn.setStartTime(starttime);
 		toReturn.setStatus(status+"");
 		toReturn.setSubmissionTime(submissiontime);
 		toReturn.setTitle(title);
-		toReturn.setType(type+"");
+		toReturn.setType(CSVUtils.listToCSV(type));
+		toReturn.setPerformedAnalysis(CSVUtils.listToCSV(performedAnalysis));
 		return toReturn;		
 	}
 	
@@ -314,13 +361,14 @@ public class Analysis extends DataModel{
 		setDescription(stubs.getDescription());
 		setEndtime(stubs.getEndTime());
 		setId(stubs.getId());
-		setReportID(stubs.getReportId());
+		setReportID(CSVUtils.CSVTOIntegerList(stubs.getReportIds()));
 		setSources(CSVUtils.CSVTOIntegerList(stubs.getSources()));
 		setStarttime(stubs.getStartTime());
 		setStatus(SubmittedStatus.valueOf(stubs.getStatus()));
 		setSubmissiontime(stubs.getSubmissionTime());
-		setTitle(stubs.getTitle());
-		setType(AnalysisType.valueOf(stubs.getType()));
+		setTitle(stubs.getTitle());		
+		setType(CSVUtils.CSVToStringList(stubs.getType()));
+		setPerformedAnalysis(CSVUtils.CSVToStringList(stubs.getPerformedAnalysis()));
 	}
 
 
@@ -421,9 +469,19 @@ public class Analysis extends DataModel{
 				return false;
 		} else if (!title.equals(other.title))
 			return false;
-		if (type != other.type)
+		if (type == null) {
+			if (other.type != null)
+				return false;
+		} else if (!type.equals(other.type))
 			return false;
 		return true;
 	}
+
+
+
+	
+
+
+	
 	
 }

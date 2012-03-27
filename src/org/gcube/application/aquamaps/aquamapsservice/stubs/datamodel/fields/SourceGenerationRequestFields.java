@@ -34,5 +34,8 @@ public enum SourceGenerationRequestFields {
 	enablelayergeneration,
 	enableimagegeneration,
 	
+	
+	evaluatedcomputationcount,
+	togeneratetablescount,
 }
 

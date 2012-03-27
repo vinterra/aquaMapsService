@@ -296,7 +296,7 @@ public abstract class DBSession {
 	
 	//************ EXECUTED OPERATIONS
 
-
+	
 	public abstract boolean checkExist(String tableName, List<Field> keys)throws Exception;
 	public abstract List<List<Field>> insertOperation(String tableName, List<List<Field>> rows) throws Exception;
 	public abstract int updateOperation(String tableName, List<List<Field>> keys,List<List<Field>> rows) throws Exception;
@@ -326,7 +326,17 @@ public abstract class DBSession {
 		statement.executeUpdate(query);
 		statement.close();
 	}
-
+	public boolean checkTableExist(String tableName)throws Exception{
+		Statement stmt=connection.createStatement();
+		try{
+			stmt.execute("SELECT * FROM "+tableName+" LIMIT 1 OFFSET 0");
+		}catch(SQLException e){
+			return false;
+		}finally{
+			stmt.close();
+		}
+		return true;
+	}
 
 	protected List<List<Field>> getGeneratedKeys(PreparedStatement ps) throws SQLException{
 		ResultSet rs=ps.getGeneratedKeys();

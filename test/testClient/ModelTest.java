@@ -8,6 +8,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONE
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
 
 public class ModelTest {
 
@@ -15,32 +17,21 @@ public class ModelTest {
 	 * @param args
 	 * @throws JSONException 
 	 */
-	public static void main(String[] args) throws JSONException {
-		ArrayList<String> list=new ArrayList<String>();
-		list.add(null);
-		String csv=CSVUtils.listToCSV(list);
-		System.out.println(csv);
-		list=CSVUtils.CSVToStringList(csv);
-		list.add("");
-		list.add(1+"");
-		list.add(null);
-		list.add(2+"");
-		csv=CSVUtils.listToCSV(list);
-		System.out.println(csv);
-		list=CSVUtils.CSVToStringList(csv);
-		csv=CSVUtils.listToCSV(list);
-		System.out.println(csv);
-		System.out.println("DONE");
+	
+	static int resId=215;
+	
+	static int occurId=124;
+	
+	
+	public static void main(String[] args) throws Exception {
+		DataManagementInterface dmInterface=WrapperTest.getDM();
+		AquaMapsServiceInterface amInterface=WrapperTest.getAM();
 		
-		Resource r=new Resource(ResourceType.HCAF,1);
-		r.setTableName("default");
-		r.addSource(r);
-		Resource r2=new Resource(ResourceType.HCAF,3);
-		r2.setTableName("franco");
-		r.addSource(r2);
-		for(MetaSourceFields f: MetaSourceFields.values())
-			System.out.println(r.getField(f).toJSONObject());
+		Resource r=amInterface.loadResource(resId);
+		System.out.println(r.toXML());
 		
+		r.addSource(amInterface.loadResource(occurId));
+		System.out.println(r.toXML());
 	}
 
 }
