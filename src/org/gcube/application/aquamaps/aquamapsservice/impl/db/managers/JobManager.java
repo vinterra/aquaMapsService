@@ -475,15 +475,15 @@ public class JobManager extends SubmittedManager{
 				setStartTime(toPerform.getId());				
 				toPerform.setStatus(SubmittedStatus.Completed);
 				logger.debug("All objects completed");
-				if(toPerform.getIsGis()){
-					ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(toPerform.getId())){
-						@Override
-						public WMSContext generate() throws Exception {
-							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
-						}
-					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
-							new UpdateConfiguration(true, true, true)));
-				}				
+//				if(toPerform.getIsGis()){
+//					ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(toPerform.getId())){
+//						@Override
+//						public WMSContext generate() throws Exception {
+//							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
+//						}
+//					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
+//							new UpdateConfiguration(true, true, true)));
+//				}				
 				updateStatus(toPerform.getId(), SubmittedStatus.Completed);
 			}else{
 				//Initialize working variables 
