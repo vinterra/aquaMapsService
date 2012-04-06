@@ -3,6 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
@@ -18,7 +19,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequest
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class SourceGenerationRequestsManager {
 

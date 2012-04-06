@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.AnalysisFields;
@@ -12,7 +13,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Subm
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+
 
 public class Analysis extends DataModel{
 

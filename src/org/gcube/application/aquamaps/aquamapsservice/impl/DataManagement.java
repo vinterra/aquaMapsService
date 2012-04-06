@@ -1,6 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
+
 import gr.uoa.di.madgik.commons.utils.FileUtils;
 
 import java.io.File;
@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;

@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
@@ -29,7 +30,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Sour
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class HSPECGroupWorker extends Thread {
 

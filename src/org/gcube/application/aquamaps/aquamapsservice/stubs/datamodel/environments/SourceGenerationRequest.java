@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environme
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,7 +21,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVU
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+
 
 
 public class SourceGenerationRequest extends DataModel{

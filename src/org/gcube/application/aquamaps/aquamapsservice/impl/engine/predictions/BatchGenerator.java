@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables.INTERPOLATIONFUNCTIONS;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+
 
 
 public class BatchGenerator implements BatchGeneratorI {

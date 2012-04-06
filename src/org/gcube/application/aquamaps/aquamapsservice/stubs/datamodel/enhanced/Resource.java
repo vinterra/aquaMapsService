@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
@@ -16,7 +17,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import edu.emory.mathcs.backport.java.util.Collections;
+
 
 
 @XStreamAlias("Resource")
