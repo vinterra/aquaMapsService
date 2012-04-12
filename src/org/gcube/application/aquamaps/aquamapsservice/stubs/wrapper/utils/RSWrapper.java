@@ -1,4 +1,4 @@
-package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
+package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils;
 
 import gr.uoa.di.madgik.commons.server.PortRange;
 import gr.uoa.di.madgik.commons.server.TCPConnectionManager;

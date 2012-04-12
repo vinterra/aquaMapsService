@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
@@ -237,7 +238,7 @@ public class Job extends DataModel{
 		
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Job toStubsVersion(){
+	public org.gcube.application.aquamaps.datamodel.Job toStubsVersion() throws JSONException{
 		org.gcube.application.aquamaps.datamodel.Job toReturn= new org.gcube.application.aquamaps.datamodel.Job();
 		toReturn.setAquaMapList(AquaMapsObject.toStubsVersion(this.getAquaMapsObjectList()));
 		toReturn.setAuthor(this.getAuthor());

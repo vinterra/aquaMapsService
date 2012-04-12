@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,8 +18,9 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Met
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceManager {
@@ -51,26 +53,11 @@ public class SourceManager {
 			session=DBSession.getInternalDBSession();
 			List<List<Field>> rows= new ArrayList<List<Field>>();
 			ArrayList<Field> row= new ArrayList<Field>();
-			row.add(toRegister.getField(MetaSourceFields.algorithm));
-			row.add(toRegister.getField(MetaSourceFields.author));
-			row.add(toRegister.getField(MetaSourceFields.generationtime));
-			row.add(toRegister.getField(MetaSourceFields.description));
-			row.add(toRegister.getField(MetaSourceFields.disclaimer));
-			row.add(toRegister.getField(MetaSourceFields.parameters));
-			row.add(toRegister.getField(MetaSourceFields.provenience));
-			row.add(toRegister.getField(MetaSourceFields.sourcehcaf));
-			row.add(toRegister.getField(MetaSourceFields.sourcehcaftable));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspec));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspectable));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspen));
-			row.add(toRegister.getField(MetaSourceFields.sourcehspentable));
-			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecells));
-			row.add(toRegister.getField(MetaSourceFields.sourceoccurrencecellstable));
-			row.add(toRegister.getField(MetaSourceFields.status));
-			row.add(toRegister.getField(MetaSourceFields.tablename));
-			row.add(toRegister.getField(MetaSourceFields.title));
-			row.add(toRegister.getField(MetaSourceFields.type));
-			row.add(toRegister.getField(MetaSourceFields.rowcount));
+			for(MetaSourceFields field:MetaSourceFields.values())
+				if(!field.equals(MetaSourceFields.searchid))
+					row.add(toRegister.getField(field));
+			
+			
 			rows.add(row);
 			List<List<Field>> ids = session.insertOperation(sourcesTable, rows);
 			for(Field f: ids.get(0)) 
@@ -109,15 +96,7 @@ public class SourceManager {
 		return (String) getField(id,MetaSourceFields.title);
 	}
 	
-	public static int getSourceId(ResourceType type,int id)throws Exception{
-		switch(type){
-		case HCAF : return (Integer) getField(id, MetaSourceFields.sourcehcaf);
-		case HSPEC: return (Integer) getField(id, MetaSourceFields.sourcehspec);
-		case HSPEN : return (Integer) getField(id, MetaSourceFields.sourcehspen);
-		default : throw new Exception("INVALID TYPE");
-		}
-		
-	}
+	
 	
 	private static Object getField(int id, MetaSourceFields field)throws Exception{
 		DBSession session=null;
@@ -174,7 +153,7 @@ public class SourceManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}
@@ -220,13 +199,10 @@ public class SourceManager {
 			}
 			List<List<Field>> values=new ArrayList<List<Field>>();
 			List<Field> value=new ArrayList<Field>();
-			value.add(toUpdate.getField(MetaSourceFields.title));
-			value.add(toUpdate.getField(MetaSourceFields.description));
-			value.add(toUpdate.getField(MetaSourceFields.disclaimer));
-			value.add(toUpdate.getField(MetaSourceFields.defaultsource));
-			value.add(toUpdate.getField(MetaSourceFields.status));
-			value.add(toUpdate.getField(MetaSourceFields.rowcount));
-			value.add(toUpdate.getField(MetaSourceFields.provenience));
+			for(MetaSourceFields field:MetaSourceFields.values())
+				if(!field.equals(MetaSourceFields.searchid))
+					value.add(toUpdate.getField(field));
+			
 			values.add(value);
 			List<List<Field>> keys=new ArrayList<List<Field>>();
 			List<Field> key=new ArrayList<Field>();
@@ -289,42 +265,90 @@ public class SourceManager {
 						logger.trace("Updateing row count");
 						r.setRowCount(session.getCount(r.getTableName(), new ArrayList<Field>()));
 					}
-					if(r.getSourceHCAFId()!=0){
-						Resource HCAF=getById(r.getSourceHCAFId());
-						if(HCAF!=null) r.setSourceHCAFTable(HCAF.getTableName());
-						else{
-							logger.trace("Unable to find source HCAF, id was "+r.getSourceHCAFId());
+					HashMap<ResourceType,ArrayList<Integer>> sourcesLists=new HashMap<ResourceType, ArrayList<Integer>>();
+					sourcesLists.put(ResourceType.HCAF, new ArrayList<Integer>(r.getSourceHCAFIds()));
+					sourcesLists.put(ResourceType.HSPEN, new ArrayList<Integer>(r.getSourceHSPENIds()));
+					sourcesLists.put(ResourceType.HSPEC, new ArrayList<Integer>(r.getSourceHSPECIds()));
+					sourcesLists.put(ResourceType.OCCURRENCECELLS, new ArrayList<Integer>(r.getSourceOccurrenceCellsIds()));
+					
+					boolean checkTableNames=false;
+					for(ResourceType type:ResourceType.values()){
+						for(Integer id:sourcesLists.get(type)){
+							Resource toCheck=getById(id);
+							if(toCheck==null) {
+								logger.trace("Unable to find source , id was "+id);
+								r.removeSourceId(id);
+								checkTableNames=true;
+							}else{
+								r.removeSource(toCheck);
+								r.addSource(toCheck);
+							}							
 						}
-					}else r.setSourceHCAFTable("");
-					if(r.getSourceHSPENId()!=0){
-						Resource HSPEN=getById(r.getSourceHSPENId());
-						if(HSPEN!=null) r.setSourceHSPENTable(HSPEN.getTableName());
-						else{
-							logger.trace("Unable to find source HSPEN, id was "+r.getSourceHSPENId());
+					}
+					
+					if(checkTableNames){
+						HashMap<ResourceType,ArrayList<String>> tableLists=new HashMap<ResourceType, ArrayList<String>>();
+						tableLists.put(ResourceType.HCAF, new ArrayList<String>(r.getSourceHCAFTables()));
+						tableLists.put(ResourceType.HSPEN, new ArrayList<String>(r.getSourceHSPENTables()));
+						tableLists.put(ResourceType.HSPEC, new ArrayList<String>(r.getSourceHSPECTables()));
+						tableLists.put(ResourceType.OCCURRENCECELLS, new ArrayList<String>(r.getSourceOccurrenceCellsTables()));
+						
+						for(ResourceType type:ResourceType.values()){
+							for(String table:tableLists.get(type)){
+								if(!session.checkTableExist(table)){
+									logger.trace("Found non existing table reference : "+table);
+									r.removeSourceTableName(table);
+								}															
+							}
 						}
-					}else r.setSourceHSPENTable("");
-					if(r.getSourceHSPECId()!=0){
-						Resource HSPEC=getById(r.getSourceHSPECId());
-						if(HSPEC!=null) r.setSourceHSPECTable(HSPEC.getTableName());
-						else{
-							logger.trace("Unable to find source HSPEC, id was "+r.getSourceHSPECId());
-						}
-					}else r.setSourceHSPECTable("");
-					if(r.getSourceOccurrenceCellsId()!=0){
-						Resource OCCURRENCE=getById(r.getSourceOccurrenceCellsId());
-						if(OCCURRENCE!=null) r.setSourceOccurrenceCellsTable(OCCURRENCE.getTableName());
-						else{
-							logger.trace("Unable to find source OCCURRENCE CELLS, id was "+r.getSourceOccurrenceCellsId());
-						}
-					}else r.setSourceOccurrenceCellsTable("");
+					}
 					update(r);
 				}
 			}catch (Exception e){
-				logger.warn("Unable to check resource "+r.getSearchId());
+				logger.warn("Unable to check resource "+r.getSearchId(),e);
 			}
 		}
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}
+	}
+	
+	public static final String getToUseTableStore()throws Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();			
+			ResultSet rs=session.executeFilteredQuery(new ArrayList<Field>(), sourcesTable, MetaSourceFields.searchid+"", OrderDirection.DESC);
+			int lastId=0;
+			if(rs.next()){
+				lastId=rs.getInt(MetaSourceFields.searchid+"");
+				rs.close();
+			}
+			DBDescriptor dbDescr=DBSession.getInternalCredentials();
+			int numTableSpaces=Integer.parseInt(dbDescr.getProperty(DBDescriptor.TABLESPACE_COUNT));
+			int toUseTableSpace=((lastId+1) % numTableSpaces)+1;
+			String toReturn=dbDescr.getProperty(DBDescriptor.TABLESPACE_PREFIX)+toUseTableSpace;
+			logger.debug("TableSpace to use : "+toReturn);
+			return toReturn;
+		}catch(Exception e){throw e;}
+		finally{if(session!=null) session.close();}
+	}
+	
+	
+	public static final String getMaxMinTable(Resource Hspen)throws Exception{
+		if(!Hspen.getType().equals(ResourceType.HSPEN)) throw new Exception("Passed Resource is not HSPEN, resource was "+Hspen);
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			String candidateMaxMin="maxminlat_"+Hspen.getTableName();
+			if(session.checkTableExist(candidateMaxMin)) return candidateMaxMin;
+			else {
+				Resource defaultHSPEN=getById(getDefaultId(ResourceType.HSPEN));
+				if(defaultHSPEN==null) throw new Exception("Unable to evaluate default HSPEN Table");
+				candidateMaxMin="maxminlat_"+defaultHSPEN.getTableName();
+				if(session.checkTableExist(candidateMaxMin)) return candidateMaxMin;
+				else throw new Exception("Unable to find default Max Min Hspen Table ");
+			}			
+		}catch(Exception e){throw e;}
+		finally{if(session!=null) session.close();}
 	}
 }
 

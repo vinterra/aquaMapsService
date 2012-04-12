@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.WMSGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -23,11 +23,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.publisher.StoreConfiguration;
-import org.gcube.application.aquamaps.publisher.StoreConfiguration.StoreMode;
-import org.gcube.application.aquamaps.publisher.UpdateConfiguration;
-import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 
 
 public class JobManager extends SubmittedManager{
@@ -403,7 +399,7 @@ public class JobManager extends SubmittedManager{
 						break;
 					}
 				}
-				String serializedObjectPath=ServiceContext.getContext().getSerializationPath()+File.separator+ServiceUtils.generateId("OBJ", ".xml");
+				String serializedObjectPath=ServiceContext.getContext().getFolderPath(FOLDERS.SERIALIZED)+File.separator+ServiceUtils.generateId("OBJ", ".xml");
 				AquaMapsXStream.serialize(serializedObjectPath, obj);
 				String speciesCoverage=obj.getCompressedSpeciesCoverage();
 				row=new ArrayList<Field>();
@@ -422,6 +418,7 @@ public class JobManager extends SubmittedManager{
 				row.add(new Field(SubmittedFields.speciescoverage+"",speciesCoverage,FieldType.STRING));
 				row.add(new Field(SubmittedFields.serializedobject+"",serializedObjectPath,FieldType.STRING));
 				row.add(new Field(SubmittedFields.todelete+"",false+"",FieldType.BOOLEAN));
+				row.add(submittedJob.getField(SubmittedFields.forceregeneration));
 				if(!customized){
 					
 					//***************CHECK IF EXISTING LAYERS / IMG
@@ -475,13 +472,15 @@ public class JobManager extends SubmittedManager{
 				toPerform.setStatus(SubmittedStatus.Completed);
 				logger.debug("All objects completed");
 				if(toPerform.getIsGis()){
-					ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(toPerform.getId())){
-						@Override
-						public WMSContext generate() throws Exception {
-							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
-						}
-					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
-							new UpdateConfiguration(true, true, true)));
+					//NB Groups are not used anymore
+					
+//					ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(toPerform.getId())){
+//						@Override
+//						public WMSContext generate() throws Exception {
+//							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
+//						}
+//					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
+//							new UpdateConfiguration(true, true, true)));
 				}				
 				updateStatus(toPerform.getId(), SubmittedStatus.Completed);
 			}else{

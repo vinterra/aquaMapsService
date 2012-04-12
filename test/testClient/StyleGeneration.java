@@ -1,8 +1,5 @@
 package testClient;
 
-import java.awt.Color;
-
-import it.cnr.isti.geoserverInteraction.engine.MakeStyle;
 
 public class StyleGeneration {
 
@@ -16,7 +13,7 @@ public class StyleGeneration {
 		
 		
 		
-		System.out.println(MakeStyle.createStyle("AppStyle", "attribute", 5, Color.YELLOW, Color.RED, Integer.class, Integer.parseInt("14"), Integer.parseInt("1")));
+//		System.out.println(MakeStyle.createStyle("AppStyle", "attribute", 5, Color.YELLOW, Color.RED, Integer.class, Integer.parseInt("14"), Integer.parseInt("1")));
 
 	}
 

@@ -9,12 +9,12 @@ import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDriver;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.commons.pool.impl.StackKeyedObjectPoolFactory;
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class PoolManager {
 
-
+	protected static GCUBELog logger= new GCUBELog(PoolManager.class);
 
 	private static GenericObjectPool internalDBconnectionPool; 
 	private static ConnectionFactory internalDBconnectionFactory;
@@ -42,35 +42,31 @@ public class PoolManager {
 
 		try{
 
+			DBDescriptor internalDBDescriptor=DBSession.getInternalCredentials();
 		try {
-			internalDBconnectionString=ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_HOST)+
-										":"+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PORT)+
-										"/"+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_NAME);
-			
-			DBType dbType=DBType.valueOf(ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TYPE));
-			switch(dbType){
-			case mySql:	Class.forName("com.mysql.jdbc.Driver");
-						internalDBconnectionString="jdbc:mysql://"+internalDBconnectionString;
+			switch(internalDBDescriptor.getType()){
+			case mysql:	Class.forName("com.mysql.jdbc.Driver");
+						internalDBconnectionString="jdbc:mysql:";
 						break;
-			case postgreSQL:Class.forName("org.postgresql.Driver");
-			internalDBconnectionString="jdbc:postgresql://"+internalDBconnectionString;
+			case postgres:Class.forName("org.postgresql.Driver");
+						internalDBconnectionString="jdbc:postgresql:";
 			break;
-			default : throw new ClassNotFoundException("Not Valid internal DB Type "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TYPE));
+			default : throw new ClassNotFoundException("Not Valid internal DB Type "+internalDBDescriptor.getType());
 			}
 
+			internalDBconnectionString+=internalDBDescriptor.getEntryPoint();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.fatal("Unable to instantiate driver", e);
+			throw e;
 		}
 		internalDBconnectionPool = new GenericObjectPool(null);
-		internalDBconnectionPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.INTERNAL_DB_MAX_CONNECTION));
+		internalDBconnectionPool.setMaxActive(internalDBDescriptor.getMaxConnection());
 //		internalDBconnectionPool.setMaxIdle(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.INTERNAL_DB_MAX_IDLE));
 		internalDBconnectionPool.setTestOnBorrow(true);
 		internalDBconnectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
-		internalDBconnectionFactory = new DriverManagerConnectionFactory(internalDBconnectionString,  ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_USERNAME), 
-				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PASSWORD));
+		internalDBconnectionFactory = new DriverManagerConnectionFactory(internalDBconnectionString,internalDBDescriptor.getUser(), 
+				internalDBDescriptor.getPassword());
 
-		//		mySqlconnectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://wn06.research-infrastructures.eu:3306/aquamaps_DB",  "root", "mybohemian");
 		internalDBpoolableConnectionFactory = new PoolableConnectionFactory(internalDBconnectionFactory,internalDBconnectionPool,
 				new StackKeyedObjectPoolFactory(),validationQUERY,false,true);
 		internalDBdriver = new PoolingDriver();
@@ -78,32 +74,30 @@ public class PoolManager {
 
 		//POSTGIS
 
+		DBDescriptor postgisDBDescriptor=DBSession.getPostGisCredentials();
+		
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.fatal("Unable to instantiate driver", e);
+			throw e;
 		}
 		postGISconnectionPool = new GenericObjectPool(null);
-		postGISconnectionPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_DB_MAX_CONNECTION));
+		postGISconnectionPool.setMaxActive(postgisDBDescriptor.getMaxConnection());
 //		postGISconnectionPool.setMaxIdle(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_DB_MAX_IDLE));
 		postGISconnectionPool.setTestOnBorrow(true);
 		postGISconnectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
-		postGISconnectionFactory = new DriverManagerConnectionFactory("jdbc:"+"postgresql"+"://"+ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_HOST)+":"+
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PORT)+"/"+
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_USERNAME),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PASSWORD));
+		postGISconnectionFactory = new DriverManagerConnectionFactory("jdbc:postgresql:"+postgisDBDescriptor.getEntryPoint(),
+				postgisDBDescriptor.getUser(),
+				postgisDBDescriptor.getPassword());
 
-		//		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/aquamaps_DB",  ServiceContext.getContext().getDbUsername(), ServiceContext.getContext().getDbPassword());
-		//		connectionFactory = new DriverManagerConnectionFactory("jdbc:mysql://localhost:3306/prova",  "root","rootpwd");
 		postGISpoolableConnectionFactory = new PoolableConnectionFactory(postGISconnectionFactory,postGISconnectionPool,
 				new StackKeyedObjectPoolFactory(),validationQUERY,false,true);
 		postGISdriver = new PoolingDriver();
 		postGISdriver.registerPool(postGISPoolName,postGISconnectionPool);
 		
 	}catch(Exception e){
-		e.printStackTrace();
+		logger.fatal(e);
 	}
 }
 

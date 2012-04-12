@@ -14,12 +14,16 @@ public enum SourceGenerationRequestFields {
 	endtime,
 	currentphasepercent,
 	
-	sourcehcafid,
-	sourcehspenid,
-	sourceoccurrencecellsid,
+	sourcehcafids,
+	sourcehspenids,
+	sourceoccurrencecellsids,
 	generatedsourcesid,
 	reportid,
 	jobids,
+	
+	
+	generationparameters,
+	executionparameters,
 	
 	submissionbackend,
 	executionenvironment, 
@@ -28,8 +32,10 @@ public enum SourceGenerationRequestFields {
 	logic,
 	numpartitions, 
 	algorithms,
-	enablelayergeneration,
-	enableimagegeneration,
 	
+	
+	
+	evaluatedcomputationcount,
+	togeneratetablescount,
 }
 

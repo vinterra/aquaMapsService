@@ -4,10 +4,11 @@ import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
 
 public class DataModelTest {
 
-	public static void main(String args[]){
+	public static void main(String args[]) throws JSONException{
 		Job job= DummyObjects.createDummyJob(true,true,true,true);
 		Job copied=new Job(job.toStubsVersion());
 		System.out.println("customization elements");

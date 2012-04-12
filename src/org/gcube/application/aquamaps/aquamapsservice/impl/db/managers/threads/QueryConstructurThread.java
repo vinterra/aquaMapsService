@@ -8,7 +8,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class QueryConstructurThread extends Thread {

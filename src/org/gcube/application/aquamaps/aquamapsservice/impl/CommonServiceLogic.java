@@ -25,17 +25,17 @@ public class CommonServiceLogic {
 	private static final GCUBELog logger=new GCUBELog(CommonServiceLogic.class);
 	
 	
-	public static int generateMaps_Logic(int hspecId,List<Field> speciesFilter, String author, boolean enableGIS)throws Exception{
+	public static int generateMaps_Logic(int hspecId,List<Field> speciesFilter, String author, boolean enableGIS, boolean forceRegeneration)throws Exception{
 		logger.trace("Gnerating job for maps generation :");
 		logger.trace("HSPEC id :" +hspecId);
 		Job job=new Job();
 		Resource hspec=SourceManager.getById(hspecId);
 		job.setSourceHSPEC(hspec);
-		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFId()));
-		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENId()));
+		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFIds().get(0)));
+		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENIds().get(0)));
 		job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
 		
-		if(speciesFilter.size()==0){
+		if(speciesFilter.size()==0&&!forceRegeneration){
 			Submitted existing=getAlreadySubmitted(hspecId, enableGIS,job.getCompressedCoverage());
 			if(existing!=null) {
 				logger.trace("Found existing job "+existing.getSearchId()+", submitted by "+existing.getAuthor());
@@ -66,7 +66,7 @@ public class CommonServiceLogic {
 		
 		logger.trace("Submiting job "+job.getName());
 		
-		return JobExecutionManager.insertJobExecutionRequest(job,true);
+		return JobExecutionManager.insertJobExecutionRequest(job,forceRegeneration);
 		
 	}
 

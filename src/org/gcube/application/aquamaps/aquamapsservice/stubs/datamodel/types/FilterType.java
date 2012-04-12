@@ -6,7 +6,5 @@ public enum FilterType {
 	is,
 	contains,
 	begins,
-	ends,
-	greater_then,
-	smaller_then
+	ends	
 }

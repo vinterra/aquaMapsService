@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONArray;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
@@ -17,7 +18,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("Field")
-public class Field extends DataModel{
+public class Field extends DataModel implements Comparable<Field>{
 
 	public static final String VOID="VOID";
 	
@@ -98,7 +99,11 @@ public class Field extends DataModel{
 	}
 
 
-	
+	public String getOperator(){
+		if(name.contains("min")) return ">=";
+		else if(name.contains("max")) return "<=";
+		else return "=";
+	}
 
 
 
@@ -205,4 +210,22 @@ public class Field extends DataModel{
 		this.setType(FieldType.valueOf(obj.getString("type")));
 		this.setValue(obj.getString("value"));
 	}
+	
+	public static ArrayList<Field> fromJSONArray(JSONArray array)throws JSONException{
+		ArrayList<Field> toReturn=new ArrayList<Field>();
+		for(int i=0;i<array.length();i++)
+			toReturn.add(new Field(array.getJSONObject(i)));
+		return toReturn;
+	}
+	public static JSONArray toJSONArray(List<Field> list) throws JSONException{
+		JSONArray array=new JSONArray();
+		for(Field f:list)array.put(f.toJSONObject());
+		return array;
+	}
+
+	@Override
+	public int compareTo(Field arg0) {
+		return this.getName().compareTo(arg0.getName());
+	}
+	
 }

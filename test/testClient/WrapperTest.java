@@ -2,21 +2,23 @@ package testClient;
 
 import java.util.ArrayList;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Envelope;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FilterType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.scope.GCUBEScope;
 
 
@@ -24,46 +26,29 @@ public class WrapperTest {
 
 	static String specId="Fis-22836";
 	static String DEVSEC="/gcube/devsec";
+	static String DEVVRE="/gcube/devsec/devVRE";
 	static String ECOSYSTEM="/d4science.research-infrastructures.eu/Ecosystem";
 	static String FARM="/d4science.research-infrastructures.eu/FARM";
 	static String gCubeApps="/d4science.research-infrastructures.eu/gCubeApps";
 	
+	
+	static AquaMapsServiceInterface getAM()throws Exception{
+		return AquaMapsServiceCall.getCall(GCUBEScope.getScope(DEVSEC),AquaMapsServiceTester.AQ_SERVICE_URI,false);
+	}
+	static DataManagementInterface getDM()throws Exception{
+		return DataManagementCall.getCall(GCUBEScope.getScope(DEVSEC), AquaMapsServiceTester.DM_SERVICE_URI,false);
+	}
+	
 	public static void main(String[] args) throws Exception{
 		
-		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(GCUBEScope.getScope(DEVSEC),AquaMapsServiceTester.AQ_SERVICE_URI,false);
-		DataManagementInterface dmInterface=DataManagementCall.getCall(GCUBEScope.getScope(DEVSEC), AquaMapsServiceTester.DM_SERVICE_URI,false);
+		AquaMapsServiceInterface wrapper= getAM();
+		DataManagementInterface dmInterface=getDM();
 		
-		System.out.println("Checking default sources");
-		int hspenId=0;
-		for(Field f:dmInterface.getDefaultSources()){
-			try{
-				ResourceType type=ResourceType.valueOf(f.getName());
-				int id=f.getValueAsInteger();
-				Resource r=wrapper.loadResource(id, type);
-				System.out.println(r);
-				if(type.equals(ResourceType.HSPEN)) hspenId=r.getSearchId();
-			}catch(Exception e){
-				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
-				e.printStackTrace();
-			}
-		}
-		
-		if(hspenId==0) throw new Exception ("DEFAULT HSPEN NOT FOUND");
-		ArrayList<Filter> genericFilter=new ArrayList<Filter>();
-		genericFilter.add(new Filter(FilterType.contains, new Field(SpeciesOccursumFields.scientific_name+"","ab",FieldType.STRING)));
-		genericFilter.add(new Filter(FilterType.contains, new Field(SpeciesOccursumFields.english_name+"","ab",FieldType.STRING)));
-		ArrayList<Filter> specificFilter=new ArrayList<Filter>();
-		specificFilter.add(new Filter(FilterType.is, new Field(SpeciesOccursumFields.diving+"","true",FieldType.BOOLEAN)));
-		specificFilter.add(new Filter(FilterType.smaller_then, new Field(HspenFields.depthmin+"","10",FieldType.INTEGER)));
-		System.out.println(wrapper.getJSONSpecies(hspenId, genericFilter, specificFilter, new PagedRequestSettings(3, 1, OrderDirection.ASC, SpeciesOccursumFields.speciesid+"")));
-		
-//		System.out.println(OrderDirection.fromString("ASC"));
-//		System.out.println(OrderDirection.fromValue("ASC"));
-//		
 		
 //		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(
 //				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
 //				"http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement");	
+//		System.out.println(wrapper.getJSONSpecies(1, new ArrayList<Field>(), new ArrayList<Filter>(), new ArrayList<Filter>(), new PagedRequestSettings(3, 0, SpeciesOccursumFields.speciesid+"", OrderDirection.ASC)));
 //		System.out.println(wrapper.getJSONPhilogeny());
 		
 //		ArrayList<Field> filter=new ArrayList<Field>();
@@ -83,6 +68,16 @@ public class WrapperTest {
 //		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
 		
 		
+		System.out.println("Checking default sources");
+		for(Field f:dmInterface.getDefaultSources()){
+			try{				
+				int id=f.getValueAsInteger();
+				System.out.println(wrapper.loadResource(id));
+			}catch(Exception e){
+				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
+				e.printStackTrace();
+			}
+		}
 			
 //		System.out.println(wrapper.loadResource(141, ResourceType.OCCURRENCECELLS));
 		
@@ -118,7 +113,7 @@ public class WrapperTest {
 
 //		wrapper.submitJob(DummyObjects.createDummyJob(false, false, false, true));
 		
-//		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(416596)));
+		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(416596)));
 		
 		
 		

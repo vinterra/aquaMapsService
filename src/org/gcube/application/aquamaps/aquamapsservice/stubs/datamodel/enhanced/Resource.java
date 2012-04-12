@@ -2,13 +2,18 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONArray;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -16,6 +21,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("Resource")
 public class Resource extends DataModel{
 
+	static GCUBELog logger= new GCUBELog(Resource.class);
+	
 	private ResourceType type=ResourceType.HCAF;
 	
 	private static final AlgorithmType DEFAULT_ALGORITHM_TYPE=AlgorithmType.NativeRange;
@@ -30,161 +37,21 @@ public class Resource extends DataModel{
 	private String disclaimer;
 	private String provenance;
 	private Long generationTime=0l;
-	private Integer sourceHCAFId=0;
-	private Integer sourceHSPENId=0;
-	private Integer sourceHSPECId=0;
-	private Integer sourceOccurrenceCellsId=0;
-	private String parameters;
+	private ArrayList<Integer> sourceHCAFIds=new ArrayList<Integer>();
+	private ArrayList<Integer> sourceHSPENIds=new ArrayList<Integer>();
+	private ArrayList<Integer> sourceHSPECIds=new ArrayList<Integer>();
+	private ArrayList<Integer> sourceOccurrenceCellsIds=new ArrayList<Integer>();
+	private ArrayList<Field> parameters=new ArrayList<Field>();
 	private ResourceStatus status=ResourceStatus.Completed;
-	private String sourceHSPECTable;
-	private String sourceHSPENTable;
-	private String sourceHCAFTable;
-	private String sourceOccurrenceCellsTable;
+	private ArrayList<String> sourceHSPECTables=new ArrayList<String>();
+	private ArrayList<String> sourceHSPENTables=new ArrayList<String>();
+	private ArrayList<String> sourceHCAFTables=new ArrayList<String>();
+	private ArrayList<String> sourceOccurrenceCellsTables=new ArrayList<String>();
 	private AlgorithmType algorithm=DEFAULT_ALGORITHM_TYPE;
 	private Boolean defaultSource=false;
 	private Long rowCount=0l;
 
-	public Long getRowCount() {
-		return rowCount;
-	}
-
-	public void setRowCount(Long rowCount) {
-		this.rowCount = rowCount;
-	}
-
-	public Integer getSourceOccurrenceCellsId() {
-		return sourceOccurrenceCellsId;
-	}
-	public void setSourceOccurrenceCellsId(Integer sourceOccurrenceCellsId) {
-		this.sourceOccurrenceCellsId = sourceOccurrenceCellsId;
-	}
-	public String getSourceOccurrenceCellsTable() {
-		return sourceOccurrenceCellsTable;
-	}
-	public void setSourceOccurrenceCellsTable(String sourceOccurrenceCellsTable) {
-		this.sourceOccurrenceCellsTable = sourceOccurrenceCellsTable;
-	}
-	public Boolean getDefaultSource() {
-		return defaultSource;
-	}
-	public void setDefaultSource(Boolean defaultSource) {
-		this.defaultSource = defaultSource;
-	}
-	public Integer getSourceHCAFId() {
-		return sourceHCAFId;
-	}
-	public void setSourceHCAFId(Integer sourceHCAFId) {
-		this.sourceHCAFId = sourceHCAFId;
-	}
-	public Integer getSourceHSPENId() {
-		return sourceHSPENId;
-	}
-	public void setSourceHSPENId(Integer sourceHSPENId) {
-		this.sourceHSPENId = sourceHSPENId;
-	}
-	public Integer getSourceHSPECId() {
-		return sourceHSPECId;
-	}
-	public void setSourceHSPECId(Integer sourceHSPECId) {
-		this.sourceHSPECId = sourceHSPECId;
-	}
-	public String getSourceHSPECTable() {
-		return sourceHSPECTable;
-	}
-	public void setSourceHSPECTable(String sourceHSPECTable) {
-		this.sourceHSPECTable = sourceHSPECTable;
-	}
-	public String getSourceHSPENTable() {
-		return sourceHSPENTable;
-	}
-	public void setSourceHSPENTable(String sourceHSPENTable) {
-		this.sourceHSPENTable = sourceHSPENTable;
-	}
-	public String getSourceHCAFTable() {
-		return sourceHCAFTable;
-	}
-	public void setSourceHCAFTable(String sourceHCAFTable) {
-		this.sourceHCAFTable = sourceHCAFTable;
-	}
-	public AlgorithmType getAlgorithm() {
-		return algorithm;
-	}
-	public void setAlgorithm(AlgorithmType algorithm) {
-		this.algorithm = algorithm;
-	}
-	public String getProvenance() {
-		return provenance;
-	}
-	public int getSearchId() {
-		return searchId;
-	}
-	public void setSearchId(int searchId) {
-		this.searchId = searchId;
-	}
-	public String getTitle() {
-		return title;
-	}
-	public void setTitle(String title) {
-		this.title = title;
-	}
-	public String getTableName() {
-		return tableName;
-	}
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
-	public String getDescription() {
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	public String getAuthor() {
-		return author;
-	}
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-	public String getDisclaimer() {
-		return disclaimer;
-	}
-	public void setDisclaimer(String disclaimer) {
-		this.disclaimer = disclaimer;
-	}
-	public String getProvenience() {
-		return provenance;
-	}
-	public void setProvenance(String provenience) {
-		this.provenance = provenience;
-	}
-	public Long getGenerationTime() {
-		return generationTime;
-	}
-	public void setGenerationTime(Long generationTime) {
-		this.generationTime = generationTime;
-	}
-	public String getParameters() {
-		return parameters;
-	}
-	public void setParameters(String parameters) {
-		this.parameters = parameters;
-	}
-	public ResourceStatus getStatus() {
-		return status;
-	}
-	public void setStatus(ResourceStatus status) {
-		this.status = status;
-	}
-
 	
-
-
-	public void setType(ResourceType type) {
-		this.type = type;
-	}
-	public ResourceType getType() {
-		return type;
-	}
 
 	public Resource(ResourceType type,int searchId) {		
 		this.type=type;
@@ -200,26 +67,71 @@ public class Resource extends DataModel{
 		this.setGenerationTime(toLoad.getDate());
 		this.setDescription(toLoad.getDescription());
 		this.setDisclaimer(toLoad.getDisclaimer());
-		this.setParameters(toLoad.getParameters());
+		try{
+			this.parameters.addAll(Field.fromJSONArray(new JSONArray(toLoad.getParameters())));			
+		}catch(Exception e){
+			logger.warn("Unable to parse parameters",e);
+		}
 		this.setProvenance(toLoad.getProvenance());
 		this.setSearchId(toLoad.getSearchId());
-		this.setSourceHCAFId(toLoad.getSourceHCAFId());
-		this.setSourceHSPENId(toLoad.getSourceHSPENId());
-		this.setSourceHSPECId(toLoad.getSourceHSPECId());
-		this.setSourceHSPENTable(toLoad.getSourceHSPENTable());
-		this.setSourceHCAFTable(toLoad.getSourceHCAFTable());
-		this.setSourceHSPECTable(toLoad.getSourceHSPECTable());
+		try{
+			this.sourceHCAFIds=CSVUtils.CSVTOIntegerList(toLoad.getSourceHCAFIds());
+			Collections.sort(sourceHCAFIds);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceHCAFIds(),e);
+		}
+		try{
+			this.sourceHSPENIds=CSVUtils.CSVTOIntegerList(toLoad.getSourceHSPENIds());
+			Collections.sort(sourceHSPENIds);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceHSPENIds(),e);
+		}
+		try{
+			this.sourceHSPECIds=CSVUtils.CSVTOIntegerList(toLoad.getSourceHSPECIds());
+			Collections.sort(sourceHSPECIds);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceHSPECIds(),e);
+		}
+		try{
+			this.sourceOccurrenceCellsIds=CSVUtils.CSVTOIntegerList(toLoad.getSourceOccurrenceCellsIds());
+			Collections.sort(sourceOccurrenceCellsIds);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceOccurrenceCellsIds(),e);
+		}
+		
+		try{
+			this.sourceHCAFTables=CSVUtils.CSVToStringList(toLoad.getSourceHCAFTables());
+			Collections.sort(sourceHCAFTables);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceHCAFTables(),e);
+		}
+		try{
+			this.sourceHSPECTables=CSVUtils.CSVToStringList(toLoad.getSourceHSPECTables());
+			Collections.sort(sourceHSPECTables);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceHSPECTables(),e);
+		}
+		try{
+			this.sourceHSPENTables=CSVUtils.CSVToStringList(toLoad.getSourceHSPENTables());
+			Collections.sort(sourceHSPENTables);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceHSPENTables(),e);
+		}
+		try{
+			this.sourceOccurrenceCellsTables=CSVUtils.CSVToStringList(toLoad.getSourceOccurrenceCellsTables());
+			Collections.sort(sourceOccurrenceCellsTables);
+		}catch(Exception e){
+			logger.warn("Unable to load CSVLIST "+toLoad.getSourceOccurrenceCellsTables(),e);
+		}
 		this.setStatus(ResourceStatus.valueOf(toLoad.getStatus()));
 		this.setTableName(toLoad.getTableName());
 		this.setTitle(toLoad.getTitle());
 		this.setType(ResourceType.valueOf(toLoad.getType()));
-		this.setDefaultSource(toLoad.isDefaultSource());
-		setSourceOccurrenceCellsId(toLoad.getSourceOccurrenceCellsId());
-		setSourceOccurrenceCellsTable(toLoad.getSourceOccurrenceCellsTable());
+		this.setDefaultSource(toLoad.isDefaultSource());		
 		setRowCount(toLoad.getPercent());
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Resource toStubsVersion(){
+	public org.gcube.application.aquamaps.datamodel.Resource toStubsVersion() throws JSONException{
 		org.gcube.application.aquamaps.datamodel.Resource toReturn=new org.gcube.application.aquamaps.datamodel.Resource();
 		
 		toReturn.setAlgorithm(getAlgorithm()+"");
@@ -227,22 +139,22 @@ public class Resource extends DataModel{
 		toReturn.setDate(generationTime!=null?generationTime:0);
 		toReturn.setDescription(getDescription());
 		toReturn.setDisclaimer(getDisclaimer());
-		toReturn.setParameters(getParameters());
-		toReturn.setProvenance(getProvenience());
+		toReturn.setParameters(Field.toJSONArray(parameters).toString());
+		toReturn.setProvenance(getProvenance());
 		toReturn.setSearchId(getSearchId());
-		toReturn.setSourceHCAFId((getSourceHCAFId()==null)?0:getSourceHCAFId());
-		toReturn.setSourceHSPENId((getSourceHSPENId()==null)?0:getSourceHSPENId());
-		toReturn.setSourceHSPECId((getSourceHSPECId()==null)?0:getSourceHSPECId());
-		toReturn.setSourceHSPENTable(this.getSourceHSPENTable());
-		toReturn.setSourceHCAFTable(this.getSourceHCAFTable());
-		toReturn.setSourceHSPECTable(this.getSourceHSPECTable());
+		toReturn.setSourceHCAFIds(CSVUtils.listToCSV(sourceHCAFIds));
+		toReturn.setSourceHSPENIds(CSVUtils.listToCSV(sourceHSPENIds));
+		toReturn.setSourceHSPECIds(CSVUtils.listToCSV(sourceHSPECIds));
+		toReturn.setSourceHSPENTables(CSVUtils.listToCSV(sourceHSPENTables));
+		toReturn.setSourceHCAFTables(CSVUtils.listToCSV(sourceHCAFTables));
+		toReturn.setSourceHSPECTables(CSVUtils.listToCSV(sourceHSPECTables));
 		toReturn.setStatus(this.getStatus()+"");
 		toReturn.setTableName(this.getTableName());
 		toReturn.setTitle(this.getTitle());
 		toReturn.setType(this.getType().toString());
 		toReturn.setDefaultSource(this.getDefaultSource());
-		toReturn.setSourceOccurrenceCellsId(getSourceOccurrenceCellsId());
-		toReturn.setSourceOccurrenceCellsTable(getSourceOccurrenceCellsTable());
+		toReturn.setSourceOccurrenceCellsIds(CSVUtils.listToCSV(sourceOccurrenceCellsIds));
+		toReturn.setSourceOccurrenceCellsTables(CSVUtils.listToCSV(sourceOccurrenceCellsTables));
 		toReturn.setPercent(getRowCount());
 		return toReturn;
 	}
@@ -255,7 +167,7 @@ public class Resource extends DataModel{
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.ResourceArray toStubsVersion(List<Resource> toConvert){
+	public static org.gcube.application.aquamaps.datamodel.ResourceArray toStubsVersion(List<Resource> toConvert) throws JSONException{
 		List<org.gcube.application.aquamaps.datamodel.Resource> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Resource>();
 		if(toConvert!=null)
 			for(Resource obj:toConvert)
@@ -276,7 +188,8 @@ public class Resource extends DataModel{
 			}
 	}
 	
-	public boolean setField(Field f){
+	public boolean setField(Field f) throws JSONException{
+		try{
 		switch(MetaSourceFields.valueOf(f.getName().toLowerCase())){
 		case searchid: this.setSearchId(f.getValueAsInteger());
 						break;
@@ -292,23 +205,23 @@ public class Resource extends DataModel{
 							break;
 		case provenience : this.setProvenance(f.getValue());
 							break;
-		case generationtime : this.setGenerationTime(Long.valueOf(f.getValueAsInteger()));
+		case generationtime : this.setGenerationTime(f.getValueAsLong());
 					break;
-		case sourcehcaf : this.setSourceHCAFId(f.getValueAsInteger());
+		case sourcehcafids : this.sourceHCAFIds=CSVUtils.CSVTOIntegerList(f.getValue());							
 							break;
-		case sourcehspen: this.setSourceHSPENId(f.getValueAsInteger());
+		case sourcehspenids: this.sourceHSPENIds=CSVUtils.CSVTOIntegerList(f.getValue());
 							break;
-		case sourcehspec: this.setSourceHSPECId(f.getValueAsInteger());
+		case sourcehspecids: this.sourceHSPECIds=CSVUtils.CSVTOIntegerList(f.getValue());
 							break;
-		case parameters : this.setParameters(f.getValue());
+		case parameters : this.parameters=Field.fromJSONArray(new JSONArray(f.getValue()));
 							break;
 		case status : this.setStatus(ResourceStatus.valueOf(f.getValue()));
 							break;
-		case sourcehcaftable: this.setSourceHCAFTable(f.getValue());
+		case sourcehcaftables: this.sourceHCAFTables=CSVUtils.CSVToStringList(f.getValue());
 								break;
-		case sourcehspentable: this.setSourceHSPENTable(f.getValue());
+		case sourcehspentables: this.sourceHSPENTables=CSVUtils.CSVToStringList(f.getValue());
 								break;
-		case sourcehspectable: this.setSourceHSPECTable(f.getValue());
+		case sourcehspectables: this.sourceHSPECTables=CSVUtils.CSVToStringList(f.getValue());
 								break;
 		case type: this.setType(ResourceType.valueOf(f.getValue()));
 							break;
@@ -318,17 +231,18 @@ public class Resource extends DataModel{
 			break;
 		case rowcount : this.setRowCount(f.getValueAsLong());
 		break;
-		case sourceoccurrencecells: this.setSourceOccurrenceCellsId(f.getValueAsInteger());
+		case sourceoccurrencecellsids: this.sourceOccurrenceCellsIds=CSVUtils.CSVTOIntegerList(f.getValue());
 		break;
-		case sourceoccurrencecellstable: this.setSourceOccurrenceCellsTable(f.getValue());
+		case sourceoccurrencecellstables: this.sourceOccurrenceCellsTables=CSVUtils.CSVToStringList(f.getValue());
 		break;
 		default : return false;
 		
 	}
+		}catch(Exception e){logger.warn("Unable to parse field "+f.toJSONObject(),e);}
 		return true;
 	}
 	
-	public Field getField(MetaSourceFields fieldName){
+	public Field getField(MetaSourceFields fieldName) throws JSONException{
 		switch(fieldName){
 		case searchid: return new Field(fieldName+"",getSearchId()+"",FieldType.INTEGER);
 		case title: return new Field(fieldName+"",getTitle(),FieldType.STRING);
@@ -338,19 +252,19 @@ public class Resource extends DataModel{
 		case disclaimer  : return new Field(fieldName+"",getDisclaimer(),FieldType.STRING);
 		case provenience : return new Field(fieldName+"",getProvenance(),FieldType.STRING);
 		case generationtime : return new Field(fieldName+"",getGenerationTime()+"",FieldType.LONG);
-		case sourcehcaf : return new Field(fieldName+"",getSourceHCAFId()+"",FieldType.INTEGER);
-		case sourcehspen: return new Field(fieldName+"",getSourceHSPENId()+"",FieldType.INTEGER);
-		case sourcehspec: return new Field(fieldName+"",getSourceHSPECId()+"",FieldType.INTEGER);
-		case parameters : return new Field(fieldName+"",getParameters(),FieldType.STRING);
+		case sourcehcafids : return new Field(fieldName+"",CSVUtils.listToCSV(sourceHCAFIds)+"",FieldType.STRING);
+		case sourcehspenids: return new Field(fieldName+"",CSVUtils.listToCSV(sourceHSPENIds)+"",FieldType.STRING);
+		case sourcehspecids: return new Field(fieldName+"",CSVUtils.listToCSV(sourceHSPECIds)+"",FieldType.STRING);
+		case parameters : return new Field(fieldName+"",Field.toJSONArray(parameters).toString(),FieldType.STRING);
 		case status : return new Field(fieldName+"",getStatus()+"",FieldType.STRING);
-		case sourcehcaftable: return new Field(fieldName+"",getSourceHCAFTable(),FieldType.STRING);
-		case sourcehspentable: return new Field(fieldName+"",getSourceHSPENTable(),FieldType.STRING);
-		case sourcehspectable: return new Field(fieldName+"",getSourceHSPECTable(),FieldType.STRING);
+		case sourcehcaftables: return new Field(fieldName+"",CSVUtils.listToCSV(sourceHCAFTables),FieldType.STRING);
+		case sourcehspentables: return new Field(fieldName+"",CSVUtils.listToCSV(sourceHSPENTables),FieldType.STRING);
+		case sourcehspectables: return new Field(fieldName+"",CSVUtils.listToCSV(sourceHSPECTables),FieldType.STRING);
 		case type: return new Field(fieldName+"",getType()+"",FieldType.STRING);
 		case algorithm : return new Field(fieldName+"",getAlgorithm()+"",FieldType.STRING);
 		case defaultsource : return new Field(fieldName+"",getDefaultSource()+"",FieldType.BOOLEAN);
-		case sourceoccurrencecells : return new Field(fieldName+"",getSourceOccurrenceCellsId()+"",FieldType.INTEGER);
-		case sourceoccurrencecellstable : return new Field(fieldName+"",getSourceOccurrenceCellsTable(),FieldType.STRING);
+		case sourceoccurrencecellsids : return new Field(fieldName+"",CSVUtils.listToCSV(sourceOccurrenceCellsIds),FieldType.STRING);
+		case sourceoccurrencecellstables : return new Field(fieldName+"",CSVUtils.listToCSV(sourceOccurrenceCellsTables),FieldType.STRING);
 		case rowcount: return new Field(fieldName+"",getRowCount()+"",FieldType.LONG);
 		default : return null;
 		
@@ -358,12 +272,230 @@ public class Resource extends DataModel{
 	}
 	
 	
-	public List<Field> toRow(){
+	public List<Field> toRow() throws JSONException{
 		List<Field> toReturn= new ArrayList<Field>();
 		for(MetaSourceFields f : MetaSourceFields.values())
 				toReturn.add(getField(f));
 		return toReturn;
 	}
+
+
+
+
+
+
+	public ResourceType getType() {
+		return type;
+	}
+
+
+
+	public void setType(ResourceType type) {
+		this.type = type;
+	}
+
+
+
+	public int getSearchId() {
+		return searchId;
+	}
+
+
+
+	public void setSearchId(int searchId) {
+		this.searchId = searchId;
+	}
+
+
+
+	public String getTitle() {
+		return title;
+	}
+
+
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+
+
+	public String getTableName() {
+		return tableName;
+	}
+
+
+
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
+
+
+	public String getDescription() {
+		return description;
+	}
+
+
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+
+
+	public String getAuthor() {
+		return author;
+	}
+
+
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+
+
+	public String getDisclaimer() {
+		return disclaimer;
+	}
+
+
+
+	public void setDisclaimer(String disclaimer) {
+		this.disclaimer = disclaimer;
+	}
+
+
+
+	public String getProvenance() {
+		return provenance;
+	}
+
+
+
+	public void setProvenance(String provenance) {
+		this.provenance = provenance;
+	}
+
+
+
+	public Long getGenerationTime() {
+		return generationTime;
+	}
+
+
+
+	public void setGenerationTime(Long generationTime) {
+		this.generationTime = generationTime;
+	}
+
+
+
+	public ArrayList<Integer> getSourceHCAFIds() {
+		return sourceHCAFIds;
+	}
+
+
+
+	public void setSourceHCAFIds(ArrayList<Integer> sourceHCAFIds) {
+		this.sourceHCAFIds = sourceHCAFIds;
+	}
+
+
+
+	
+
+
+
+	public ArrayList<Integer> getSourceHSPECIds() {
+		return sourceHSPECIds;
+	}
+
+
+
+	public void setSourceHSPECIds(ArrayList<Integer> sourceHSPECIds) {
+		this.sourceHSPECIds = sourceHSPECIds;
+	}
+
+
+
+	
+
+
+
+	public ArrayList<Field> getParameters() {
+		return parameters;
+	}
+
+
+
+	public void setParameters(ArrayList<Field> parameters) {
+		this.parameters = parameters;
+	}
+
+
+
+	public ResourceStatus getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(ResourceStatus status) {
+		this.status = status;
+	}
+
+
+
+	
+
+
+
+	
+
+
+	public AlgorithmType getAlgorithm() {
+		return algorithm;
+	}
+
+
+
+	public void setAlgorithm(AlgorithmType algorithm) {
+		this.algorithm = algorithm;
+	}
+
+
+
+	public Boolean getDefaultSource() {
+		return defaultSource;
+	}
+
+
+
+	public void setDefaultSource(Boolean defaultSource) {
+		this.defaultSource = defaultSource;
+	}
+
+
+
+	public Long getRowCount() {
+		return rowCount;
+	}
+
+
+
+	public void setRowCount(Long rowCount) {
+		this.rowCount = rowCount;
+	}
+
+
+
+	public static AlgorithmType getDefaultAlgorithmType() {
+		return DEFAULT_ALGORITHM_TYPE;
+	}
+
+
 
 	@Override
 	public int hashCode() {
@@ -388,27 +520,30 @@ public class Resource extends DataModel{
 				+ ((rowCount == null) ? 0 : rowCount.hashCode());
 		result = prime * result + searchId;
 		result = prime * result
-				+ ((sourceHCAFId == null) ? 0 : sourceHCAFId.hashCode());
+				+ ((sourceHCAFIds == null) ? 0 : sourceHCAFIds.hashCode());
+		result = prime
+				* result
+				+ ((sourceHCAFTables == null) ? 0 : sourceHCAFTables.hashCode());
 		result = prime * result
-				+ ((sourceHCAFTable == null) ? 0 : sourceHCAFTable.hashCode());
+				+ ((sourceHSPECIds == null) ? 0 : sourceHSPECIds.hashCode());
+		result = prime
+				* result
+				+ ((sourceHSPECTables == null) ? 0 : sourceHSPECTables
+						.hashCode());
 		result = prime * result
-				+ ((sourceHSPECId == null) ? 0 : sourceHSPECId.hashCode());
+				+ ((sourceHSPENIds == null) ? 0 : sourceHSPENIds.hashCode());
 		result = prime
 				* result
-				+ ((sourceHSPECTable == null) ? 0 : sourceHSPECTable.hashCode());
-		result = prime * result
-				+ ((sourceHSPENId == null) ? 0 : sourceHSPENId.hashCode());
+				+ ((sourceHSPENTables == null) ? 0 : sourceHSPENTables
+						.hashCode());
 		result = prime
 				* result
-				+ ((sourceHSPENTable == null) ? 0 : sourceHSPENTable.hashCode());
+				+ ((sourceOccurrenceCellsIds == null) ? 0
+						: sourceOccurrenceCellsIds.hashCode());
 		result = prime
 				* result
-				+ ((sourceOccurrenceCellsId == null) ? 0
-						: sourceOccurrenceCellsId.hashCode());
-		result = prime
-				* result
-				+ ((sourceOccurrenceCellsTable == null) ? 0
-						: sourceOccurrenceCellsTable.hashCode());
+				+ ((sourceOccurrenceCellsTables == null) ? 0
+						: sourceOccurrenceCellsTables.hashCode());
 		result = prime * result + ((status == null) ? 0 : status.hashCode());
 		result = prime * result
 				+ ((tableName == null) ? 0 : tableName.hashCode());
@@ -416,6 +551,8 @@ public class Resource extends DataModel{
 		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -470,47 +607,47 @@ public class Resource extends DataModel{
 			return false;
 		if (searchId != other.searchId)
 			return false;
-		if (sourceHCAFId == null) {
-			if (other.sourceHCAFId != null)
+		if (sourceHCAFIds == null) {
+			if (other.sourceHCAFIds != null)
 				return false;
-		} else if (!sourceHCAFId.equals(other.sourceHCAFId))
+		} else if (!sourceHCAFIds.equals(other.sourceHCAFIds))
 			return false;
-		if (sourceHCAFTable == null) {
-			if (other.sourceHCAFTable != null)
+		if (sourceHCAFTables == null) {
+			if (other.sourceHCAFTables != null)
 				return false;
-		} else if (!sourceHCAFTable.equals(other.sourceHCAFTable))
+		} else if (!sourceHCAFTables.equals(other.sourceHCAFTables))
 			return false;
-		if (sourceHSPECId == null) {
-			if (other.sourceHSPECId != null)
+		if (sourceHSPECIds == null) {
+			if (other.sourceHSPECIds != null)
 				return false;
-		} else if (!sourceHSPECId.equals(other.sourceHSPECId))
+		} else if (!sourceHSPECIds.equals(other.sourceHSPECIds))
 			return false;
-		if (sourceHSPECTable == null) {
-			if (other.sourceHSPECTable != null)
+		if (sourceHSPECTables == null) {
+			if (other.sourceHSPECTables != null)
 				return false;
-		} else if (!sourceHSPECTable.equals(other.sourceHSPECTable))
+		} else if (!sourceHSPECTables.equals(other.sourceHSPECTables))
 			return false;
-		if (sourceHSPENId == null) {
-			if (other.sourceHSPENId != null)
+		if (sourceHSPENIds == null) {
+			if (other.sourceHSPENIds != null)
 				return false;
-		} else if (!sourceHSPENId.equals(other.sourceHSPENId))
+		} else if (!sourceHSPENIds.equals(other.sourceHSPENIds))
 			return false;
-		if (sourceHSPENTable == null) {
-			if (other.sourceHSPENTable != null)
+		if (sourceHSPENTables == null) {
+			if (other.sourceHSPENTables != null)
 				return false;
-		} else if (!sourceHSPENTable.equals(other.sourceHSPENTable))
+		} else if (!sourceHSPENTables.equals(other.sourceHSPENTables))
 			return false;
-		if (sourceOccurrenceCellsId == null) {
-			if (other.sourceOccurrenceCellsId != null)
+		if (sourceOccurrenceCellsIds == null) {
+			if (other.sourceOccurrenceCellsIds != null)
 				return false;
-		} else if (!sourceOccurrenceCellsId
-				.equals(other.sourceOccurrenceCellsId))
+		} else if (!sourceOccurrenceCellsIds
+				.equals(other.sourceOccurrenceCellsIds))
 			return false;
-		if (sourceOccurrenceCellsTable == null) {
-			if (other.sourceOccurrenceCellsTable != null)
+		if (sourceOccurrenceCellsTables == null) {
+			if (other.sourceOccurrenceCellsTables != null)
 				return false;
-		} else if (!sourceOccurrenceCellsTable
-				.equals(other.sourceOccurrenceCellsTable))
+		} else if (!sourceOccurrenceCellsTables
+				.equals(other.sourceOccurrenceCellsTables))
 			return false;
 		if (status != other.status)
 			return false;
@@ -529,27 +666,157 @@ public class Resource extends DataModel{
 		return true;
 	}
 
-	@Override
-	public String toString() {
-		return "Resource [type=" + type + ", searchId=" + searchId + ", title="
-				+ title + ", tableName=" + tableName + ", description="
-				+ description + ", author=" + author + ", disclaimer="
-				+ disclaimer + ", provenance=" + provenance
-				+ ", generationTime=" + generationTime + ", sourceHCAFId="
-				+ sourceHCAFId + ", sourceHSPENId=" + sourceHSPENId
-				+ ", sourceHSPECId=" + sourceHSPECId
-				+ ", sourceOccurrenceCellsId=" + sourceOccurrenceCellsId
-				+ ", parameters=" + parameters + ", status=" + status
-				+ ", sourceHSPECTable=" + sourceHSPECTable
-				+ ", sourceHSPENTable=" + sourceHSPENTable
-				+ ", sourceHCAFTable=" + sourceHCAFTable
-				+ ", sourceOccurrenceCellsTable=" + sourceOccurrenceCellsTable
-				+ ", algorithm=" + algorithm + ", defaultSource="
-				+ defaultSource + ", rowCount=" + rowCount + "]";
+
+
+	public ArrayList<Integer> getSourceHSPENIds() {
+		return sourceHSPENIds;
+	}
+
+
+
+	public void setSourceHSPENIds(ArrayList<Integer> sourceHSPENIds) {
+		this.sourceHSPENIds = sourceHSPENIds;
+		Collections.sort(this.sourceHSPENIds);
+	}
+
+
+
+	public ArrayList<Integer> getSourceOccurrenceCellsIds() {
+		return sourceOccurrenceCellsIds;
+		
+	}
+
+
+
+	public void setSourceOccurrenceCellsIds(
+			ArrayList<Integer> sourceOccurrenceCellsIds) {
+		this.sourceOccurrenceCellsIds = sourceOccurrenceCellsIds;
+		Collections.sort(this.sourceOccurrenceCellsIds);
+	}
+
+
+
+	public ArrayList<String> getSourceHSPECTables() {
+		return sourceHSPECTables;
+	}
+
+
+
+	public void setSourceHSPECTables(ArrayList<String> sourceHSPECTables) {
+		this.sourceHSPECTables = sourceHSPECTables;
+		Collections.sort(this.sourceHSPECTables);
+	}
+
+
+
+	public ArrayList<String> getSourceHSPENTables() {
+		return sourceHSPENTables;
+	}
+
+
+
+	public void setSourceHSPENTables(ArrayList<String> sourceHSPENTables) {
+		this.sourceHSPENTables = sourceHSPENTables;
+		Collections.sort(this.sourceHSPENTables);
+	}
+
+
+
+	public ArrayList<String> getSourceHCAFTables() {
+		return sourceHCAFTables;
+	}
+
+
+
+	public void setSourceHCAFTables(ArrayList<String> sourceHCAFTables) {
+		this.sourceHCAFTables = sourceHCAFTables;
+		Collections.sort(this.sourceHCAFTables);
+	}
+
+
+
+	public ArrayList<String> getSourceOccurrenceCellsTables() {
+		return sourceOccurrenceCellsTables;
+	}
+
+
+
+	public void setSourceOccurrenceCellsTables(
+			ArrayList<String> sourceOccurrenceCellsTables) {
+		this.sourceOccurrenceCellsTables = sourceOccurrenceCellsTables;
+		Collections.sort(this.sourceOccurrenceCellsTables);
 	}
 	
 	
+	public void addSource(Resource toAdd){
+		ArrayList<String> toModifyNames=null;
+		ArrayList<Integer> toModifyIds=null;
+		switch(toAdd.getType()){
+		case HCAF : 	toModifyNames=sourceHCAFTables;
+						toModifyIds=sourceHCAFIds;
+		break;
+		case HSPEN : 	toModifyNames=sourceHSPENTables;
+						toModifyIds=sourceHSPENIds;
+		break;
+		case HSPEC : 	toModifyNames=sourceHSPECTables;
+						toModifyIds=sourceHSPECIds;
+		break;
+		case OCCURRENCECELLS : 	toModifyNames=sourceOccurrenceCellsTables;
+								toModifyIds=sourceOccurrenceCellsIds;
+		break;
+		}
+		if(!toModifyIds.contains(toAdd.getSearchId())){
+				toModifyIds.add(toAdd.getSearchId());
+				Collections.sort(toModifyIds);
+				toModifyNames.add(toAdd.getTableName());
+				Collections.sort(toModifyNames);
+		}
+	}
+
+	public void removeSource(Resource toRemove){
+		removeSourceId(toRemove.getSearchId());
+		removeSourceTableName(toRemove.getTableName());
+	}
 	
+	
+	public void removeSourceId(Integer id){
+		if(sourceHCAFIds.contains(id)){
+			sourceHCAFIds.remove(id);
+			Collections.sort(sourceHCAFIds);
+		}else if(sourceHSPECIds.contains(id)){
+			sourceHSPECIds.remove(id);
+			Collections.sort(sourceHSPECIds);
+		} if(sourceHSPENIds.contains(id)){
+			sourceHSPENIds.remove(id);
+			Collections.sort(sourceHSPENIds);
+		} if(sourceOccurrenceCellsIds.contains(id)){
+			sourceOccurrenceCellsIds.remove(id);
+			Collections.sort(sourceOccurrenceCellsIds);
+		}
+	}
+
+	public void removeSourceTableName(String tableName){
+		if(sourceHCAFTables.contains(tableName)){
+			sourceHCAFTables.remove(tableName);
+			Collections.sort(sourceHCAFTables);
+		}else if(sourceHSPECTables.contains(tableName)){
+			sourceHSPECTables.remove(tableName);
+			Collections.sort(sourceHSPECTables);
+		} if(sourceHSPENTables.contains(tableName)){
+			sourceHSPENTables.remove(tableName);
+			Collections.sort(sourceHSPENTables);
+		} if(sourceOccurrenceCellsTables.contains(tableName)){
+			sourceOccurrenceCellsTables.remove(tableName);
+			Collections.sort(sourceOccurrenceCellsTables);
+		}
+	}
+	
+
+	@Override
+	public String toString() {
+		return "Resource [type=" + type + ", searchId=" + searchId + ", title="
+				+ title + ", tableName=" + tableName + "]";
+	}
 	
 	
 }

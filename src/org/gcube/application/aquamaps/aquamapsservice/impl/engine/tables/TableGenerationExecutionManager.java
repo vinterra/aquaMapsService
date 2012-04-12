@@ -12,12 +12,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConsta
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class TableGenerationExecutionManager {
@@ -72,7 +70,7 @@ public class TableGenerationExecutionManager {
 		insertedRequest.acquire();
 		ArrayList<Field> filter= new ArrayList<Field>();
 		filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.pending+"",FieldType.STRING));
-		PagedRequestSettings settings=new PagedRequestSettings(1,0,OrderDirection.DESC,SourceGenerationRequestFields.submissiontime+"");
+		PagedRequestSettings settings=new PagedRequestSettings(1,0,SourceGenerationRequestFields.submissiontime+"",OrderDirection.DESC);
 		return SourceGenerationRequestsManager.getList(filter,settings);
 	}
 	
@@ -82,16 +80,15 @@ public class TableGenerationExecutionManager {
 		pool.execute(thread);
 	}
 	
-	public static void signForGeneration(AlgorithmType algorithm,LogicType logic, Integer hspenId, Integer hcafId,Integer occurrenceCellsId)throws Exception{
-		logger.trace("Signing up for generation [Algorith : "+algorithm+" ; LOGIC : "+logic+" ; HSPEN ID : "+hspenId+" ; HCAF ID : "+hcafId+" ; OCCURRENCE ID : "+occurrenceCellsId+"]");
-		Execution identifier=new Execution(algorithm,hcafId,hspenId,occurrenceCellsId,logic);
+	
+	public static void signForGeneration(Execution identifier)throws Exception{
+		logger.trace("Signing up for generation "+identifier);
 		if(!subscribedGenerations.containsKey(identifier)) subscribedGenerations.put(identifier, new Semaphore(0));
 		subscribedGenerations.get(identifier).wait();
 	}
 	
-	public static void notifyGeneration(AlgorithmType algorithm,LogicType logic, Integer hspenId, Integer hcafId,Integer occurrenceCellsId) throws Exception{
-		logger.trace("Notifying generation [Algorith : "+algorithm+" ; LOGIC : "+logic+" ; HSPEN ID : "+hspenId+" ; HCAF ID : "+hcafId+" ; OCCURRENCE ID : "+occurrenceCellsId+"]");
-		Execution identifier=new Execution(algorithm,hcafId,hspenId,occurrenceCellsId,logic);
+	public static void notifyGeneration(Execution identifier) throws Exception{
+		logger.trace("Notifying generation "+identifier);
 		if(subscribedGenerations.containsKey(identifier)){
 			Semaphore sem=subscribedGenerations.get(identifier);
 			logger.trace(sem.getQueueLength()+" execution are waiting..");

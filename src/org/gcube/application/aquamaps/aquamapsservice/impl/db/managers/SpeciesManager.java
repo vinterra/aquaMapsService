@@ -24,7 +24,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Hsp
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {
@@ -80,65 +80,45 @@ public class SpeciesManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-//	@Deprecated
-//	public static String getJsonList(PagedRequestSettings settings, List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
-//		String[] queries;
-//		String selHspen=SourceManager.getSourceName(HSPENId);
-//		queries=formfilterQueries(characteristics, names, codes, selHspen);
-//		DBSession session=null;		
-//		try{
-//			logger.debug("Serving request, page settings : ");
-//			logger.debug("OFFSET "+settings.getOffset());
-//			logger.debug("LIMIT "+settings.getLimit());
-//			logger.debug("ORDER BY "+settings.getOrderField());
-//			logger.debug("DIRECTION "+settings.getOrderDirection());
-//			session=DBSession.getInternalDBSession();
-//			PreparedStatement psCount=session.preparedStatement(queries[1]);
-//			PreparedStatement psSelection=session.preparedStatement(queries[0]+
-//					((settings.getOrderField()!=null)?" order by "+getCompleteName(selHspen, settings.getOrderField())+" "+settings.getOrderDirection():"")+" LIMIT "+
-//					settings.getLimit()+" OFFSET "+settings.getOffset());
-//			if(characteristics.size()>0){
-//				psCount=session.fillParameters(characteristics, 0, psCount);
-//				psSelection=session.fillParameters(characteristics, 0, psSelection);
-//			}
-//			
-//			ResultSet rs=psCount.executeQuery();
-//			rs.next();
-//			Long totalCount=rs.getLong(1);
-//			return DBUtils.toJSon(psSelection.executeQuery(), totalCount);
-//		}catch(Exception e){throw e;}
-//		finally{if(session!=null) session.close();}
-//	}
 	
-	public static String getJSONList(PagedRequestSettings settings, List<Filter> genericSearch, List<Filter> specificSearch,int HSPENId)throws Exception{
+	public static String getJsonList(String orderBy, String orderDir, int limit, int offset, List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
 		String[] queries;
 		String selHspen=SourceManager.getSourceName(HSPENId);
-		queries=formFilterQueries(genericSearch, specificSearch, selHspen);
-		DBSession session=null;		
+		queries=formfilterQueries(characteristics, names, codes, selHspen);
+		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
+			PreparedStatement psCount=session.preparedStatement(queries[1]);
+			PreparedStatement psSelection=session.preparedStatement(queries[0]+
+					((orderBy!=null)?" order by "+getCompleteName(selHspen, orderBy)+" "+orderDir:"")+" LIMIT "+
+					limit+" OFFSET "+offset);
+			if(characteristics.size()>0){
+				psCount=session.fillParameters(characteristics, 0, psCount);
+				psSelection=session.fillParameters(characteristics, 0, psSelection);
+			}
 			
-			ResultSet rs=session.executeQuery(queries[1]);
+			ResultSet rs=psCount.executeQuery();
 			rs.next();
 			Long totalCount=rs.getLong(1);
-			
-			return DBUtils.toJSon(session.executeQuery(queries[0]+((settings.getOrderField()!=null)?" order by "+getCompleteName(selHspen, settings.getOrderField())+" "+settings.getOrderDirection():"")+" LIMIT "+
-					settings.getLimit()+" OFFSET "+settings.getOffset()), totalCount);
-			
+			return DBUtils.toJSon(psSelection.executeQuery(), totalCount);
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}
 	
-	public static File getCSVList(List<Filter> genericSearch, List<Filter> specificSearch,int HSPENId)throws Exception{
+	public static File getCSVList(List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
 		String[] queries;
 		String selHspen=SourceManager.getSourceName(HSPENId);
-		queries=formFilterQueries(genericSearch, specificSearch, selHspen);
+		queries=formfilterQueries(characteristics, names, codes, selHspen);
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
+			PreparedStatement psSelection=session.preparedStatement(queries[0]);
+			if(characteristics.size()>0){				
+				psSelection=session.fillParameters(characteristics, 0, psSelection);
+			}
 			File out=File.createTempFile("speciesSelection", ".csv");
 			
-			CSVUtils.resultSetToCSVFile(session.executeQuery(queries[0]),out.getAbsolutePath(),true);
+			CSVUtils.resultSetToCSVFile(psSelection.executeQuery(),out.getAbsolutePath(),true);
 			return out;
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
@@ -146,134 +126,71 @@ public class SpeciesManager {
 	
 	
 	
-//	public static File getCSVList(List<Field> characteristics, List<Filter> names, List<Filter> codes, int HSPENId)throws Exception{
-//		String[] queries;
-//		String selHspen=SourceManager.getSourceName(HSPENId);
-//		queries=formfilterQueries(characteristics, names, codes, selHspen);
-//		DBSession session=null;
-//		try{
-//			session=DBSession.getInternalDBSession();
-//			PreparedStatement psSelection=session.preparedStatement(queries[0]);
-//			if(characteristics.size()>0){				
-//				psSelection=session.fillParameters(characteristics, 0, psSelection);
-//			}
-//			File out=File.createTempFile("speciesSelection", ".csv");
-//			
-//			CSVUtils.resultSetToCSVFile(psSelection.executeQuery(),out.getAbsolutePath(),true);
-//			return out;
-//		}catch(Exception e){throw e;}
-//		finally{if(session!=null) session.close();}
-//	}
-	
-	
-	
-//	/**
-//	 * Creates a query string to filter species against characteristic OR names OR codes filtering
-//	 * 
-//	 * @param req
-//	 * @return
-//	 * 			[0] query to retrieve species information
-//	 * 			[1] query to count retrieved species
-//	 * 
-//	 * @throws Exception
-//	 */
-//	@Deprecated
-//	private static String[] formfilterQueries(List<Field> characteristics, List<Filter> names, List<Filter> codes, String selHspen)throws Exception{
-//		
-//		
-//		StringBuilder characteristicsFilter=new StringBuilder();
-//		StringBuilder namesFilter=new StringBuilder();
-//		StringBuilder codesFilter=new StringBuilder();
-//		
-//		if(characteristics.size()>0){
-//			for(Field field:characteristics){				
-//				String fieldName=field.getName();
-//				characteristicsFilter.append(getCompleteName(selHspen, fieldName));
-//				String value="?";
-////				(field.getType().equals(FieldType.STRING))?"'"+field.getValue()+"'":field.getValue();
-//				characteristicsFilter.append(" "+field.getOperator()+" "+value+" AND ");
-//			}
-////			logger.debug("characteristics filter string : "+characteristicsFilter);
-//			int index=characteristicsFilter.lastIndexOf("AND");
-//			characteristicsFilter.delete(index, index+3);
-//		}
-//		
-//		if((names.size()>0)){
-//			for(Filter filter:names)				
-//				namesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString()+" AND ");
-//			int index=namesFilter.lastIndexOf("AND");
-//			namesFilter.delete(index, index+3);
-//		}
-//		
-//		if((codes.size()>0)){
-//			for(Filter filter:codes)				
-//				codesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString()+" AND ");
-//			int index=codesFilter.lastIndexOf("AND");
-//			codesFilter.delete(index, index+3);
-//		}
-//		
-//		StringBuilder filter=new StringBuilder((characteristicsFilter.length()>0)?"( "+characteristicsFilter.toString()+" )":"");
-//		if(namesFilter.length()>0) {
-//			filter.append((filter.length()>0)?" AND ":"");
-//			filter.append("( "+namesFilter.toString()+")");			
-//		}
-//		if(codesFilter.length()>0) {
-//			filter.append((filter.length()>0)?" AND ":"");
-//			filter.append("( "+codesFilter.toString()+")");			
-//		}
-//		
-//		
-//		String fromString = " from "+speciesOccurSum +((true)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+" = "+selHspen+"."+SpeciesOccursumFields.speciesid:"");
-//		
-//		String query= "Select "+speciesOccurSum+".* , "+
-//				selHspen+"."+HspenFields.pelagic+				
-//				fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
-//		String count= "Select count("+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
-//		logger.trace("filterSpecies: "+query);
-//		logger.trace("filterSpecies: "+count);
-//		return new String[] {query,count};		
-//	}
-	
 	/**
-	 *  Forms queries for species search 
+	 * Creates a query string to filter species against characteristic OR names OR codes filtering
 	 * 
-	 * 
-	 * @param ORGroup
-	 * @param specificFilters
+	 * @param req
 	 * @return
+	 * 			[0] query to retrieve species information
+	 * 			[1] query to count retrieved species
+	 * 
 	 * @throws Exception
 	 */
-	private static String[] formFilterQueries(List<Filter> ORGroup, List<Filter> specificFilters, String selectedHSPEN)throws Exception{
-		StringBuilder orCondition=getCondition(ORGroup,"OR",selectedHSPEN);
-		StringBuilder andCondition=getCondition(specificFilters,"AND",selectedHSPEN);
+	
+	private static String[] formfilterQueries(List<Field> characteristics, List<Filter> names, List<Filter> codes, String selHspen)throws Exception{
 		
-		StringBuilder filter=new StringBuilder((orCondition.length()>0)?"( "+orCondition.toString()+" )":"");
-		if(andCondition.length()>0) {
-			filter.append((filter.length()>0)?" AND ":"");
-			filter.append("( "+andCondition.toString()+")");
+		
+		StringBuilder characteristicsFilter=new StringBuilder();
+		StringBuilder namesFilter=new StringBuilder();
+		StringBuilder codesFilter=new StringBuilder();
+		
+		if(characteristics.size()>0){
+			for(Field field:characteristics){				
+				String fieldName=field.getName();
+				characteristicsFilter.append(getCompleteName(selHspen, fieldName));
+				String value="?";
+//				(field.getType().equals(FieldType.STRING))?"'"+field.getValue()+"'":field.getValue();
+				characteristicsFilter.append(" "+field.getOperator()+" "+value+" AND ");
+			}
+//			logger.debug("characteristics filter string : "+characteristicsFilter);
+			int index=characteristicsFilter.lastIndexOf("AND");
+			characteristicsFilter.delete(index, index+3);
 		}
 		
-		boolean includeHSPEN=(filter.indexOf(selectedHSPEN)>-1);
+		if((names.size()>0)){
+			for(Filter filter:names)				
+				namesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString()+" AND ");
+			int index=namesFilter.lastIndexOf("AND");
+			namesFilter.delete(index, index+3);
+		}
+		
+		if((codes.size()>0)){
+			for(Filter filter:codes)				
+				codesFilter.append(getCompleteName(selHspen, filter.getField().getName())+filter.toSQLString()+" AND ");
+			int index=codesFilter.lastIndexOf("AND");
+			codesFilter.delete(index, index+3);
+		}
+		
+		StringBuilder filter=new StringBuilder((characteristicsFilter.length()>0)?"( "+characteristicsFilter.toString()+" )":"");
+		if(namesFilter.length()>0) {
+			filter.append((filter.length()>0)?" AND ":"");
+			filter.append("( "+namesFilter.toString()+")");			
+		}
+		if(codesFilter.length()>0) {
+			filter.append((filter.length()>0)?" AND ":"");
+			filter.append("( "+codesFilter.toString()+")");			
+		}
 		
 		
-		String fromString = " from "+speciesOccurSum +(includeHSPEN?" INNER JOIN "+selectedHSPEN+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+" = "+selectedHSPEN+"."+SpeciesOccursumFields.speciesid:"");
-		String query= "Select "+speciesOccurSum+".* "+(includeHSPEN?" , "+selectedHSPEN+"."+HspenFields.pelagic:"")+				
-						fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
+		String fromString = " from "+speciesOccurSum +((true)?" INNER JOIN "+selHspen+" ON "+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+" = "+selHspen+"."+SpeciesOccursumFields.speciesid:"");
+		
+		String query= "Select "+speciesOccurSum+".* , "+
+				selHspen+"."+HspenFields.pelagic+				
+				fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		String count= "Select count("+speciesOccurSum+"."+SpeciesOccursumFields.speciesid+") "+fromString+" "+((filter.length()>0)?" where ":"")+filter.toString();
 		logger.trace("filterSpecies: "+query);
 		logger.trace("filterSpecies: "+count);
-		return new String[] {query,count};	
-	}
-	
-	private static StringBuilder getCondition(List<Filter> filters, String operator, String selHSPEN)throws Exception{
-		StringBuilder toReturn=new StringBuilder();
-		if((filters.size()>0)){
-			for(Filter filter:filters)				
-				toReturn.append(getCompleteName(selHSPEN, filter.getField().getName())+filter.toSQLString()+" "+operator+" ");
-			int index=toReturn.lastIndexOf(operator);
-			toReturn.delete(index, index+3);
-		}
-		return toReturn;
+		return new String[] {query,count};		
 	}
 	
 	
@@ -350,7 +267,7 @@ public class SpeciesManager {
 			session=DBSession.getInternalDBSession();
 			
 			return DBUtils.toJSon(session.getDistinct(toSelect, filters, speciesOccurSum, 
-					settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
+					settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}

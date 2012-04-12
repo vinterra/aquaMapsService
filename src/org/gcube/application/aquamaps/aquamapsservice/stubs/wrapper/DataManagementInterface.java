@@ -3,19 +3,19 @@ package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 import java.io.File;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 
 public interface DataManagementInterface {
 
 	public String submitRequest(SourceGenerationRequest request)throws Exception;
 	public EnvironmentalExecutionReportItem getReport(Integer reportId) throws Exception;
 	public String getJSONSPECGroupGenreationRequests(PagedRequestSettings settings) throws Exception;
-	public Integer generateMaps(String author,boolean enableGIS,Integer hspecId,List<Field> speciesFilter)throws Exception;
+	public Integer generateMaps(String author,boolean enableGIS,Integer hspecId,List<Field> speciesFilter,boolean forceRegeneration)throws Exception;
 	public SourceGenerationRequest getRequest(String id) throws Exception;
 	public String removeRequest(String id, boolean deleteData,boolean  deleteJobs)throws Exception;
 	public void editRequest(SourceGenerationRequest requestDetails) throws Exception;
@@ -30,4 +30,12 @@ public interface DataManagementInterface {
 	public Integer getImportStatus(Integer resourceId)throws Exception;
 	public List<Field> getCustomQueryFields(String userId)throws Exception;
 	public File exportTableAsCSV(String table)throws Exception;
+	public String analyzeTables(Analysis request)throws Exception;
+	public String getJsonSubmittedAnalysis(PagedRequestSettings settings)throws Exception;
+	public File loadAnalysisResults(String id)throws Exception;
+	public String resubmitGeneration(String id) throws Exception;
+	
+	
+	public File exportCurrentCustomQuery(String userId)throws Exception;
+	public void deleteAnalysis(String id)throws Exception;
 }

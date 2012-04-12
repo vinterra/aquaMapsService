@@ -1,18 +1,19 @@
 package testClient;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.MalformedScopeExpressionException;
 
 public class DMTest {
@@ -25,10 +26,15 @@ public class DMTest {
 	
 	
 	private static DataManagementInterface dmInterface=null;
+	private static AquaMapsServiceInterface amInterface=null;
+	
 	
 	public static void main(String[] args) throws MalformedScopeExpressionException, Exception {
-		//DEV
-		dmInterface=DataManagementCall.getCall(GCUBEScope.getScope(WrapperTest.DEVSEC), AquaMapsServiceTester.DM_SERVICE_URI,false);
+		
+		
+		amInterface =WrapperTest.getAM();
+		dmInterface = WrapperTest.getDM();
+		
 		
 		//PROD
 //		dmInterface=DataManagementCall.getCall(
@@ -49,11 +55,11 @@ public class DMTest {
 //		System.out.println("Exported to exported_mini.csv"); 
 		
 		
-		System.out.println("Import Resource :");
-
-		System.out.println("ID IS "+dmInterface.importResource(new File("/home/fabio/Desktop/MiniOccurrence.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS,
-				"UTF-8",new boolean[]{true,true,true,true,true,true,true,true,true,true},true,'\t'));
-		
+//		System.out.println("Import Resource :");
+//
+//		System.out.println("ID IS "+dmInterface.importResource(new File("/home/fabio/Desktop/MiniOccurrence.csv"), "fabio.sinibaldi", ResourceType.OCCURRENCECELLS,
+//				"UTF-8",new boolean[]{true,true,true,true,true,true,true,true,true,true},true,'\t'));
+//		
 		
 		
 		
@@ -64,11 +70,12 @@ public class DMTest {
 		
 //		System.out.println("GENERATE MAPS");
 //		ArrayList<Field> filter= new ArrayList<Field>();
-//		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Bivalvia",FieldType.STRING)); // ~ 300 species
+////		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Bivalvia",FieldType.STRING)); // ~ 300 species
 //		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Holothuroidea",FieldType.STRING)); // 21 species
-//		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Mammalia",FieldType.STRING)); // 53 species (NB  pelagic hspen)
-//		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species
-//		System.out.println("JOB ID IS "+dmInterface.generateMaps("fabio.sinibaldi", true, 135, filter));
+////		filter.add(new Field(SpeciesOccursumFields.classcolumn+"","Mammalia",FieldType.STRING)); // 53 species (NB  pelagic hspen)
+////		filter.add(new Field(SpeciesOccursumFields.kingdom+"","Animalia",FieldType.STRING)); // ~ 11500 species
+//		System.out.println("JOB ID IS "+dmInterface.generateMaps("fabio.sinibaldi", true, 262, filter, true));
+		
 
 		
 		
@@ -83,19 +90,145 @@ public class DMTest {
 //		
 		
 //		
-		for(Field f:dmInterface.getDefaultSources())
-			System.out.println(f);
+//		for(Field f:dmInterface.getDefaultSources())
+//			System.out.println(f.toJSONObject());
 		
 //		System.out.println("Done");
 		
 		
+		//***************** INTERPOLATE HCAFs
+		
+//		SourceGenerationRequest request=new SourceGenerationRequest();
+//		request.getAlgorithms().add(AlgorithmType.NativeRange);
+//		request.getAlgorithms().add(AlgorithmType.SuitableRange);
+//		request.setAuthor("fabio.sinibaldi");
+//		request.setGenerationname("Multi HSPEC");
+//		request.setDescription("Testing");
+////		Resource firstHCAF=amInterface.loadResource(126, ResourceType.HSPEN);
+////		Resource secondHCAF=amInterface.loadResource(175, ResourceType.HSPEN);
+//		
+//		request.addSource(amInterface.loadResource(126, ResourceType.HSPEN));
+//		request.addSource(amInterface.loadResource(175, ResourceType.HSPEN));
+//		request.addSource(amInterface.loadResource(173, ResourceType.HCAF));
+//		request.addSource(amInterface.loadResource(174, ResourceType.HCAF));
+////		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_ID,firstHCAF.getSearchId()+"",FieldType.INTEGER));
+////		request.getParameters().add(new Field(SourceGenerationRequest.FIRST_HCAF_TIME,2005+"",FieldType.INTEGER));
+////		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_ID,secondHCAF.getSearchId()+"",FieldType.INTEGER));
+////		request.getParameters().add(new Field(SourceGenerationRequest.SECOND_HCAF_TIME,2010+"",FieldType.INTEGER));
+////		request.getParameters().add(new Field(SourceGenerationRequest.NUM_INTERPOLATIONS,4+"",FieldType.INTEGER));
+//		
+//		request.setExecutionEnvironment(Constant.AQUAMAPSSERVICE_PT_NAME);
+//		request.setBackendURL("");
+//		request.setSubmissionBackend(Constant.SERVICE_NAME);
+//		request.setEnvironmentConfiguration(new HashMap<String, String>());
+//		request.setLogic(LogicType.HSPEC);
+//		request.setNumPartitions(16);
+//		
+//		request.setEnableimagegeneration(false);
+//		request.setEnablelayergeneration(false);
+//		
+//		System.out.println(dmInterface.submitRequest(request));
+		
+		
+		//***************** GENERATE HSPEC
+		
+		SourceGenerationRequest request=new SourceGenerationRequest();		
+		request.getAlgorithms().add(AlgorithmType.SuitableRange);
+		request.setAuthor("fabio.sinibaldi");
+		request.setGenerationname("Test Regeneration");
+		request.setDescription("Testing");
+		
+		int[] resources=new int[]{
+			216,236
+		};
+		
+		for(int id:resources){
+			Resource toAdd=amInterface.loadResource(id);
+			System.out.println("Adding resource "+toAdd);
+			request.addSource(toAdd);
+		}
+			
+		
+		
+//		for (int hcafId=215;hcafId<235;hcafId++){
+//			Resource toAdd=amInterface.loadResource(hcafId);
+//			System.out.println("Adding resource "+toAdd);
+//			request.addSource(toAdd);
+//		}
+//		
+//		for (int hspenId=235;hspenId<255;hspenId++){
+//			Resource toAdd=amInterface.loadResource(hspenId);
+//			System.out.println("Adding resource "+toAdd);
+//			request.addSource(toAdd);
+//		}
+		
+		
+		request.setExecutionEnvironment("AquaMaps VRE");
+		request.setBackendURL("");
+		request.setSubmissionBackend(Constant.AQUAMAPSSERVICE_PT_NAME);
+		request.setEnvironmentConfiguration(new HashMap<String, String>());
+		request.setLogic(LogicType.HSPEC);
+		request.setNumPartitions(20);
+		
+		request.setExecutionParameters(new ArrayList<Field>(Arrays.asList(new Field[]{
+				new Field(SourceGenerationRequest.COMBINE_MATCHING,false+"",FieldType.BOOLEAN),
+				new Field(SourceGenerationRequest.FORCE_MAPS_REGENERATION,false+"",FieldType.BOOLEAN),
+				new Field(SourceGenerationRequest.GENERATE_MAPS,true+"",FieldType.BOOLEAN),
+				new Field(SourceGenerationRequest.GIS_ENABLED,true+"",FieldType.BOOLEAN),
+				})));
+		
+		System.out.println(dmInterface.submitRequest(request));
 		
 		
 		
+		//************************** RESUBMISSION
+		
+//		System.out.println(dmInterface.resubmitGeneration("HGGR2012_03_08_12_35_48_745"));
 		
 		
+		//************************* ANALYZE TABLES
+		
+//		Analysis toSend=new Analysis();
+//		toSend.setAuthor("fabio.sinibaldi");
+//		toSend.setDescription("Just a simple execution");
+//		toSend.setSources(Arrays.asList(new Integer[]{
+//			215,216,217,218,219,220, //HCAFs
+//			235,236,237,238,239,240, //HSPENs
+//			257,258,259,260,261,262  //HSPECs
+//		}));
+//		toSend.setTitle("Complete analysis");
+//		toSend.setType(new ArrayList<AnalysisType>(Arrays.asList(new AnalysisType[]{
+//				AnalysisType.GEOGRAPHIC_HCAF,
+//				AnalysisType.HCAF
+//		})));
+//		System.out.println(dmInterface.analyzeTables(toSend));
 		
 		
+//		//************************** Retrieve tar
+//		File destinationDir=new File(System.getProperty("java.io.tmpdir"),"An2012_03_19_19_03_52_612");
+//		
+//		destinationDir.mkdirs();
+//		int count=AppZip.unzipToDirectory(dmInterface.loadAnalysisResults("An2012_03_19_19_03_52_612").getAbsolutePath(), destinationDir);
+//		System.out.println("Stored "+count+" files into "+destinationDir.getAbsolutePath());
+		
+//		FileInputStream fis=new FileInputStream();
+//		File temp=File.createTempFile("analysis", ".tar.gz");
+//		
+//		
+//		System.out.println("File is "+temp.getAbsolutePath());
+//		FileOutputStream fos=new FileOutputStream( temp);
+//		
+//		IOUtils.copy(fis, fos);
+//		IOUtils.closeQuietly(fis);
+//		IOUtils.closeQuietly(fos);
+//		
+//		
+//		List<File> files=ArchiveManager.unTarGz(temp);
+//		
+//		FileUtils.delete(temp);
+//		
+//		System.out.println("Done");
+//		System.out.println("Extracted Files : "+Arrays.toString(files.toArray()));
 		
 		
 		
@@ -109,25 +242,18 @@ public class DMTest {
 	}
 
 	
-	private static String fromRequestToGeneralEnvironment()throws Exception{
+	private static String fromRequestToGeneralEnvironment(List<Resource> selection)throws Exception{
 		SourceGenerationRequest request=new SourceGenerationRequest();
 		request.setAuthor("fabio.sinibaldi");
 		request.setGenerationname("Initial execution");
 		request.setDescription("First execution for suitable default hspec data");
-		request.setHcafId(1);
-		request.setHspenId(3);
-		request.setOccurrenceCellId(93);
+		for(Resource r:selection)request.addSource(r);
 		request.setSubmissionBackend(Constant.SERVICE_NAME);
 //		request.setSubmissionBackend("RainyCloud");
-		request.setExecutionEnvironment("AquaMaps VRE");
-		request.setBackendURL("http://node16.d.d4science.research-infrastructures.eu:9000/RainyCloud-web-0.00.01");
-		request.setEnvironmentConfiguration(new HashMap<String, String>());
-		request.setLogic(LogicType.HSPEN);
-		request.setNumPartitions(16);
-		request.getAlgorithms().addAll(Arrays.asList(new String[] {AlgorithmType.HSPENRegeneration+""}));
-		request.setEnableimagegeneration(true);
-		request.setEnablelayergeneration(true);
+		
 		return dmInterface.submitRequest(request);
 	}
+	
+	
 	
 }

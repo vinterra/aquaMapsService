@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -87,7 +88,7 @@ public class FileSetUtils {
 		
 		String fileName=objId+"_clustering";
 		try {
-			File d=new File(ServiceContext.getContext().getClusterDir()+File.separator+jobId);
+			File d=new File(ServiceContext.getContext().getFolderPath(FOLDERS.CLUSTERS)+File.separator+jobId);
 			JobManager.addToDeleteTempFolder(jobId, d.getAbsolutePath());
 			d.mkdirs();
 			File f=new File(d,fileName);

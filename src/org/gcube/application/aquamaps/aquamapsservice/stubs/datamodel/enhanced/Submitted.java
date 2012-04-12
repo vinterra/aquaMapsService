@@ -37,6 +37,9 @@ public class Submitted extends DataModel{
 	private Boolean toDelete;
 	private String serializedObject;
 	
+	private Boolean forceRegeneration=false;
+	
+	
 	public String getSerializedObject() {
 		return serializedObject;
 	}
@@ -219,6 +222,7 @@ public class Submitted extends DataModel{
 		this.setSpeciesCoverage(toLoad.getSpeciesCoverage());
 		this.setFileSetId(toLoad.getFileSetId());
 		this.setIsCustomized(toLoad.isCustomized());
+		this.setForceRegeneration(toLoad.isForceRegeneration());
 	}
 
 	public org.gcube.application.aquamaps.datamodel.Submitted toStubsVersion(){
@@ -243,6 +247,7 @@ public class Submitted extends DataModel{
 		toReturn.setSpeciesCoverage(speciesCoverage);
 		toReturn.setFileSetId(fileSetId);
 		toReturn.setCustomized(isCustomized);
+		toReturn.setForceRegeneration(isForceRegeneration());
 		return toReturn;		
 	}
 
@@ -297,8 +302,13 @@ public class Submitted extends DataModel{
 		return serializedRequest;
 	}
 
+	public Boolean isForceRegeneration() {
+		return forceRegeneration;
+	}
 	
-	
+	public void setForceRegeneration(Boolean forceRegeneration) {
+		this.forceRegeneration = forceRegeneration;
+	}
 
 	public Submitted(ResultSet rs)throws Exception{
 		this(Field.loadRow(rs));
@@ -361,6 +371,8 @@ public class Submitted extends DataModel{
 		break;
 		case serializedobject: this.setSerializedObject(f.getValue());
 		break;
+		case forceregeneration: this.setForceRegeneration(f.getValueAsBoolean());
+		break;
 		default : return false;
 		}
 		return true;
@@ -392,6 +404,7 @@ public class Submitted extends DataModel{
 		case speciescoverage:return new Field(fieldName+"",getSpeciesCoverage(),FieldType.STRING);
 		case todelete:return new Field(fieldName+"",isToDelete()+"",FieldType.BOOLEAN);		
 		case serializedobject:return new Field(fieldName+"",getSerializedObject(),FieldType.STRING);
+		case forceregeneration:return new Field(fieldName+"",isForceRegeneration()+"",FieldType.BOOLEAN);
 		default : return null;
 		}
 	}

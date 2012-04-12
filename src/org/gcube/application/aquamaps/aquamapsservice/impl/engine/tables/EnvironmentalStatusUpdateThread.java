@@ -39,13 +39,19 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 				filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.datageneration+"",FieldType.STRING));
 				for(SourceGenerationRequest request : SourceGenerationRequestsManager.getList(filter)){
 					try{
-						if(request.getReportID()!=-1){
-							EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(request.getReportID(),false);
-							Double percent=(100/request.getAlgorithms().size()*request.getGeneratedSources().size())+
-										(report.getPercent()/request.getAlgorithms().size());
-							SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
+						int completedSteps=request.getGeneratedSources().size()/(request.getToGenerateTableCount()/request.getEvaluatedComputationCount());
+						Double percent=((double)completedSteps/request.getEvaluatedComputationCount())*100;
+						for(Integer reportId:request.getReportID())
+							percent+=BatchGeneratorObjectFactory.getReport(reportId,false).getPercent();
+						
+						SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
+					}catch(Exception e){
+						logger.warn("Skipping percent update for execution id "+request.getId()+", report id was "+request.getReportID(),e);
+						logger.debug("Request data were : "
+								+"Generated sources size : "+request.getGeneratedSources().size()
+								+"To generate count : "+request.getToGenerateTableCount()
+								+"Computation count : "+request.getEvaluatedComputationCount());
 						}
-					}catch(Exception e){logger.warn("Skipping percent update for execution id "+request.getId()+", report id was "+request.getReportID(),e);}
 				}
 				//Updating map generation percent
 

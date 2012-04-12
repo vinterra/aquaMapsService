@@ -108,9 +108,8 @@ public class DBUtils {
 		return sb.toString();
 	}
 
-	public static String toJSon(ResultSet resultSet, int start, int pageSize) throws SQLException
+	public static String toJSon(ResultSet resultSet, int start, int end) throws SQLException
 	{
-		int end=start+pageSize;
 		System.out.println("toJSon start: "+start+" end: "+end);
 		StringBuilder json = new StringBuilder();
 

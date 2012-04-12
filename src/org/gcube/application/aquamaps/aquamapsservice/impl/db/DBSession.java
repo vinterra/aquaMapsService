@@ -14,7 +14,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConsta
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
@@ -65,42 +66,24 @@ public abstract class DBSession {
 	 * @throws Exception
 	 */
 
-	public static DBCredentialDescriptor getInternalCredentials()throws Exception{
-		return new DBCredentialDescriptor(
-				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_HOST),
-				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PORT),
-				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_NAME),
-				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_USERNAME),
-				ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PASSWORD));
+	public static DBDescriptor getInternalCredentials()throws Exception{
+		return ServiceContext.getContext().getConfiguration().getInternalDB(ServiceContext.getContext().getConfigurationScope());
 	}
-	public static DBCredentialDescriptor getPostGisCredentials()throws Exception{
-		return new DBCredentialDescriptor(
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_HOST),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PORT),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_NAME),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_USERNAME),
-				ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DB_PASSWORD));
+	public static DBDescriptor getPostGisCredentials()throws Exception{
+		return ServiceContext.getContext().getConfiguration().getGeoServerDb(ServiceContext.getContext().getConfigurationScope());
 	}
 	
 
 	public static DBSession getInternalDBSession()throws Exception{
 		try{
 			Connection conn=PoolManager.getInternalDBConnection();
-			DBType dbType=DBType.valueOf(ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TYPE));
-			switch(dbType){
-			case mySql: return new MySQLDBSession(conn);
+			switch(getInternalCredentials().getType()){
+			case mysql: return new MySQLDBSession(conn);
 			default: return new PostGresSQLDBSession(conn);
 			}
 		}catch(Exception e){
 			logger.fatal("ERROR ON OPENING CONNECTION ",e);
-			logger.fatal("Connection parameters were : ");
-			logger.fatal("USER : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_USERNAME));
-			logger.fatal("PASSWORD : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PASSWORD));
-			logger.fatal("DB NAME : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_NAME));
-			logger.fatal("DB HOST : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_HOST));
-			logger.fatal("DB PORT : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_PORT));
-			logger.fatal("TYPE : "+ServiceContext.getContext().getProperty(PropertiesConstants.INTERNAL_DB_TYPE));
-			logger.fatal("Connection String was : "+PoolManager.getInternalConnectionString());
+			logger.fatal("Connection parameters were : "+getInternalCredentials());
 			throw e;
 		}
 	}
@@ -207,7 +190,20 @@ public abstract class DBSession {
 	}
 	
 	
-
+//	public List<List<String>> showTableMetadata(String tableName, String... whereClause) throws Exception{
+//		String query="SHOW COLUMNS FROM "+tableName+" "+((whereClause!=null && whereClause.length>0)?"WHERE "+whereClause[0]:"")+";";
+//		logger.debug("executing query: "+query);
+//		ResultSet rs=this.executeQuery(query);
+//		int columns=rs.getMetaData().getColumnCount();
+//		List<List<String>> table=  new ArrayList<List<String>>();
+//		while (rs.next()){
+//			List<String> row= new ArrayList<String>();
+//			for (int i=1; i<=columns; i++)
+//				row.add(rs.getString(i));
+//			table.add(row);
+//		}
+//		return table;
+//	}
 
 
 	//*********************** DATA MANIPULATION
@@ -283,7 +279,7 @@ public abstract class DBSession {
 	
 	//************ EXECUTED OPERATIONS
 
-
+	
 	public abstract boolean checkExist(String tableName, List<Field> keys)throws Exception;
 	public abstract List<List<Field>> insertOperation(String tableName, List<List<Field>> rows) throws Exception;
 	public abstract int updateOperation(String tableName, List<List<Field>> keys,List<List<Field>> rows) throws Exception;
@@ -313,7 +309,17 @@ public abstract class DBSession {
 		statement.executeUpdate(query);
 		statement.close();
 	}
-
+	public boolean checkTableExist(String tableName)throws Exception{
+		Statement stmt=connection.createStatement();
+		try{
+			stmt.execute("SELECT * FROM "+tableName+" LIMIT 1 OFFSET 0");
+		}catch(SQLException e){
+			return false;
+		}finally{
+			stmt.close();
+		}
+		return true;
+	}
 
 	protected List<List<Field>> getGeneratedKeys(PreparedStatement ps) throws SQLException{
 		ResultSet rs=ps.getGeneratedKeys();

@@ -1,14 +1,23 @@
 package testClient;
 
+import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.common.core.scope.GCUBEScope;
 
 

@@ -6,14 +6,12 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.GISUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.publisher.Publisher;
-import org.gcube.application.aquamaps.publisher.impl.model.File;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
@@ -27,34 +25,11 @@ public class DeletionMonitor extends Thread {
 	
 	final static Publisher publisher=ServiceContext.getContext().getPublisher();
 	
-	private static Generator<FileSet> fileSetDestroyer=new Generator<FileSet>(null){
-		@Override
-		public void destroy(FileSet toDestroy)
-				throws Exception {
-//			String physicalBasePath=publisher.getServerPathDir().getAbsolutePath();
-//			for(File f:toDestroy.getFiles()){
-//				String path=physicalBasePath+f.getStoredUri();
-//				try{
-//					ServiceUtils.deleteFile(path);
-//				}catch(Exception e){
-//					logger.warn("Unable to delete "+path,e);
-//				}
-//			}
-		}
-	};
+	private static Generator<FileSet> fileSetDestroyer=new Generator<FileSet>(null,FileSet.class);
 	
-	private static Generator<Layer> layerDestroyer=new Generator<Layer>(null){
-		public void destroy(Layer toDestroy) throws Exception {
-			GISUtils.deleteLayer(toDestroy.getLayerInfo());
-		};
-	};
+	private static Generator<Layer> layerDestroyer=new Generator<Layer>(null,Layer.class);
 	
-	private static Generator<WMSContext> wmsContextDestroyer=new Generator<WMSContext>(null){
-		@Override
-		public void destroy(WMSContext toDestroy) throws Exception {
-			GISUtils.deleteWMSContext(toDestroy.getWmsContextInfo());
-		}
-	};
+	private static Generator<WMSContext> wmsContextDestroyer=new Generator<WMSContext>(null,WMSContext.class);
 	
 	
 	

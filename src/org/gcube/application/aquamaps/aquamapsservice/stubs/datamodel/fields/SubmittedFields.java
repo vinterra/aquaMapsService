@@ -26,4 +26,5 @@ public enum SubmittedFields {
 	filesetid,
 	todelete,
 	serializedobject,
+	forceregeneration,
 }

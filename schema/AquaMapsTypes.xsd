@@ -8,20 +8,12 @@
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	
-		<xsd:simpleType name="character">
-	      <xsd:restriction base="xsd:string">
-	        <xsd:maxLength value="1"/>
-	        <xsd:minLength value="1"/>
-	      </xsd:restriction>
-	    </xsd:simpleType>
-	
-		<xsd:simpleType name="orderDirection">
-			<xsd:restriction base="xsd:string">
-				<xsd:enumeration  value="ASC"/>
-				<xsd:enumeration  value="DESC"/>
-			</xsd:restriction>
-		</xsd:simpleType>
-	
+	<xsd:simpleType name="character">
+      <xsd:restriction base="xsd:string">
+        <xsd:maxLength value="1"/>
+        <xsd:minLength value="1"/>
+      </xsd:restriction>
+    </xsd:simpleType>
 	
 	
 		<xsd:complexType name="perturbation">
@@ -64,7 +56,6 @@
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="value" type="xsd:string" />
-					<xsd:element name="fieldType" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -78,16 +69,16 @@
 					<xsd:element name="disclaimer" type="xsd:string" />
 					<xsd:element name="provenance" type="xsd:string" />
 					<xsd:element name="date" type="xsd:long" />
-					<xsd:element name="sourceHCAFId" type="xsd:int" />
-					<xsd:element name="sourceHSPENId" type="xsd:int" />
-					<xsd:element name="sourceHSPECId" type="xsd:int" />
-					<xsd:element name="sourceOccurrenceCellsId" type="xsd:int"/>
+					<xsd:element name="sourceHCAFIds" type="xsd:string" />
+					<xsd:element name="sourceHSPENIds" type="xsd:string" />
+					<xsd:element name="sourceHSPECIds" type="xsd:string" />
+					<xsd:element name="sourceOccurrenceCellsIds" type="xsd:string"/>
 					<xsd:element name="parameters" type="xsd:string" />
 					<xsd:element name="status" type="xsd:string" />
-					<xsd:element name="sourceHCAFTable" type="xsd:string" />
-					<xsd:element name="sourceHSPENTable" type="xsd:string" />
-					<xsd:element name="sourceHSPECTable" type="xsd:string" />
-					<xsd:element name="sourceOccurrenceCellsTable" type="xsd:string" />
+					<xsd:element name="sourceHCAFTables" type="xsd:string" />
+					<xsd:element name="sourceHSPENTables" type="xsd:string" />
+					<xsd:element name="sourceHSPECTables" type="xsd:string" />
+					<xsd:element name="sourceOccurrenceCellsTables" type="xsd:string" />
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="algorithm" type="xsd:string" />
 				 	<xsd:element name="defaultSource" type="xsd:boolean"/>
@@ -183,19 +174,33 @@
 				<xsd:element name="type" type="xsd:string"/>
 				<xsd:element name="speciesCoverage" type="xsd:string"/>
 				<xsd:element name="Customized" type="xsd:boolean"/>
-				<xsd:element name="fileSetId"	type="xsd:string"/>			
+				<xsd:element name="fileSetId"	type="xsd:string"/>		
+				<xsd:element name="forceRegeneration" type="xsd:boolean"/>	
 			</xsd:sequence>
 			</xsd:complexType>
 			
-			<xsd:complexType name="pagedRequestSettings">
-				<xsd:sequence>
-					<xsd:element name="limit"	type="xsd:int"/>
-					<xsd:element name="offset"	type="xsd:int"/>
-					<xsd:element name="orderField"	type="xsd:string"/>
-					<xsd:element name="orderDirection"	type="tns:orderDirection"/>
-				</xsd:sequence>
+			<xsd:complexType name="analysis">
+			<xsd:sequence>
+				<xsd:element name="id" type="xsd:string"/>
+				<xsd:element name="title" type="xsd:string"/>
+				<xsd:element name="author" type="xsd:string"/>
+				<xsd:element name="description" type="xsd:string"/>
+				<xsd:element name="status" type="xsd:string"/>
+				
+				<xsd:element name="startTime" type="xsd:long"/>
+				<xsd:element name="endTime" type="xsd:long"/>
+				<xsd:element name="submissionTime" type="xsd:long"/>
+				
+				<xsd:element name="currentPhasePercent" type="xsd:double"/>
+				
+				<xsd:element name="reportIds" type="xsd:string"/>
+				<xsd:element name="type" type="xsd:string"/>
+				<xsd:element name="performedAnalysis" type="xsd:string"/>
+				<xsd:element name="archiveLocation" type="xsd:string"/>
+				<xsd:element name="sources" type="xsd:string"/>
+											
+			</xsd:sequence>
 			</xsd:complexType>
-
 
 			<!-- Arrays -->
 

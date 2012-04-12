@@ -4,7 +4,6 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -15,16 +14,13 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.AquaMapsObjectData;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.BiodiversityObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.DistributionObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.GISUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.GroupGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest.ClusterScaleType;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
@@ -34,10 +30,10 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSP
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.publisher.MetaInformations;
+import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.datageneration.ObjectManager;
 import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
@@ -46,12 +42,13 @@ import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
-import org.gcube.common.gis.datamodel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.datamodel.types.LayersType;
 
-public abstract class Generator<T> implements ObjectManager<T> {
+public class Generator<T> implements ObjectManager<T> {
 	private static final GCUBELog logger = new GCUBELog(Generator.class);
-
+	
+	final static Publisher publisher=ServiceContext.getContext().getPublisher();
+	
 	private static final String GENERATION_DATA_TABLE = "generationdata";
 	private static final String GENERATION_ID = "id";
 	private static final String GENERATION_csv = "csv";
@@ -62,24 +59,63 @@ public abstract class Generator<T> implements ObjectManager<T> {
 
 	// ***********INSTANCE
 	protected GenerationRequest request;
-
-	public Generator(GenerationRequest request) {
+	protected Class<T> clazz;
+	
+	public Generator(GenerationRequest request, Class<T> toGenerateClazz) {
 		this.request = request;
+		this.clazz=toGenerateClazz;
 	}
 
 	@Override
-	public T generate() throws Exception {
-		return null;
+	public T generate() throws Exception {		
+		if(clazz.equals(FileSet.class)){
+			AquaMapsObjectExecutionRequest req=(AquaMapsObjectExecutionRequest) request;
+			return (T) generateFileSet(getData(req), req.getObject());
+		}else if(clazz.equals(Layer.class)){
+			AquaMapsObjectExecutionRequest req=(AquaMapsObjectExecutionRequest) request;
+			return (T) generateLayer(getData(req), req.getObject());
+		}
+		else if(clazz.equals(WMSContext.class)){
+			throw new Exception("WMS CONTEXT ARE NOT SUPPORTED ANYMORE");
+//			return (T) generateWMSContext(((WMSGenerationRequest)request).getJobId());
+		}
+		else throw new Exception("Invalid class, generator not implemented, class was "+clazz.getClass());
 	}
 	@Override
 	public void destroy(T toDestroy) throws Exception {
-		// TODO Auto-generated method stub		
+		if(clazz.equals(FileSet.class))remove((FileSet) toDestroy);
+		else if(clazz.equals(Layer.class)) remove((Layer)toDestroy);
+		else if(clazz.equals(WMSContext.class))remove((WMSContext)toDestroy);
+		else throw new Exception("Invalid class, destroyer not implemented, class was "+toDestroy.getClass());
 	}
 	@Override
-	public T update() throws Exception {
-		return null;
+	public T update(T toUpdate) throws Exception {
+		destroy(toUpdate);		
+		return generate();
 	}
 
+	
+	// **************** T REMOVE 
+	
+	protected static void remove(FileSet toDestroy)throws Exception{
+		String physicalBasePath=publisher.getServerPathDir().getAbsolutePath();
+		for(org.gcube.application.aquamaps.publisher.impl.model.File f:toDestroy.getFiles()){
+			String path=physicalBasePath+f.getStoredUri();
+			try{
+				ServiceUtils.deleteFile(path);
+			}catch(Exception e){
+				logger.warn("Unable to delete "+path,e);
+				throw e;
+			}
+		}
+	}
+	protected static void remove(Layer toDestroy)throws Exception{
+		GISUtils.deleteLayer(toDestroy.getLayerInfo());
+	}
+	protected static void remove(WMSContext toDestroy)throws Exception{
+		GISUtils.deleteWMSContext(toDestroy.getWmsContextInfo());
+	}
+	
 	// **************** T GENERATION
 
 	protected static Layer generateLayer(AquaMapsObjectData data,
@@ -90,7 +126,7 @@ public abstract class Generator<T> implements ObjectManager<T> {
 			toGenerateStyle.add(StyleGenerationRequest.getBiodiversityStyle(data.getMin(), data.getMax(), ClusterScaleType.linear, object.getTitle()));
 			toGenerateStyle.add(StyleGenerationRequest.getBiodiversityStyle(data.getMin(), data.getMax(), ClusterScaleType.logarithmic, object.getTitle()));
 		}else{
-			toAssociateStyleList.add(ServiceContext.getContext().getProperty(PropertiesConstants.GEOSERVER_DEFAULT_DISTRIBUTION_STYLE));
+			toAssociateStyleList.add(StyleGenerationRequest.getDefaultDistributionStyle());
 		}
 
 
@@ -125,30 +161,30 @@ public abstract class Generator<T> implements ObjectManager<T> {
 		}else throw new Exception ("NO IMAGES WERE GENERATED FOR OBJECT "+object.getSearchId());
 	}
 
-	protected static WMSContext generateWMSContext(int jobId)throws Exception{
-		WMSContext toReturn=null;
-		logger.trace("Creating group for "+jobId);
-		Submitted job= SubmittedManager.getSubmittedById(jobId);
-		ArrayList<String> layerIds=new ArrayList<String>();
-		 
-		for(Submitted obj:JobManager.getObjects(jobId)){
-			if(obj.getGisEnabled()&&obj.getStatus().equals(SubmittedStatus.Completed))
-				layerIds.add(obj.getGisPublishedId());
-		}
-		if(layerIds.isEmpty()){
-			logger.trace("No layer found, skipping group generation for job id : "+jobId);			
-		}else{
-			HashMap<String,String> geoserverLayersAndStyle=new HashMap<String, String>(); 
-			
-			for(String layerId:layerIds){
-				Layer layer=ServiceContext.getContext().getPublisher().getById(Layer.class, layerId);
-				geoserverLayersAndStyle.put(layer.getLayerInfo().getName(), layer.getLayerInfo().getDefaultStyle());
-			}
-			WMSContextInfo wmsContextInfo=GISUtils.generateWMSContext(new GroupGenerationRequest(geoserverLayersAndStyle, ServiceUtils.generateId("WMS_"+job.getTitle(), ""), layerIds));
-			toReturn=new WMSContext(wmsContextInfo, layerIds);
-		}
-		return toReturn;
-	}
+//	protected static WMSContext generateWMSContext(int jobId)throws Exception{
+//		WMSContext toReturn=null;
+//		logger.trace("Creating group for "+jobId);
+//		Submitted job= SubmittedManager.getSubmittedById(jobId);
+//		ArrayList<String> layerIds=new ArrayList<String>();
+//		 
+//		for(Submitted obj:JobManager.getObjects(jobId)){
+//			if(obj.getGisEnabled()&&obj.getStatus().equals(SubmittedStatus.Completed))
+//				layerIds.add(obj.getGisPublishedId());
+//		}
+//		if(layerIds.isEmpty()){
+//			logger.trace("No layer found, skipping group generation for job id : "+jobId);			
+//		}else{
+//			HashMap<String,String> geoserverLayersAndStyle=new HashMap<String, String>(); 
+//			
+//			for(String layerId:layerIds){
+//				Layer layer=ServiceContext.getContext().getPublisher().getById(Layer.class, layerId);
+//				geoserverLayersAndStyle.put(layer.getLayerInfo().getName(), layer.getLayerInfo().getDefaultStyle());
+//			}
+//			WMSContextInfo wmsContextInfo=GISUtils.generateWMSContext(new GroupGenerationRequest(geoserverLayersAndStyle, ServiceUtils.generateId("WMS_"+job.getTitle(), ""), layerIds));
+//			toReturn=new WMSContext(wmsContextInfo, layerIds);
+//		}
+//		return toReturn;
+//	}
 	
 	
 	

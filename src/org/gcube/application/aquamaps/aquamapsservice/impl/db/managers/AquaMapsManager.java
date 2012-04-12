@@ -13,7 +13,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 

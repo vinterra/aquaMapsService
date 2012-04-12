@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
@@ -21,8 +22,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobExecutionManager {
@@ -57,8 +57,8 @@ public class JobExecutionManager {
 
 
 
-		logger.trace("Storing into "+ServiceContext.getContext().getSerializationPath());
-
+		logger.trace("Storing into "+ServiceContext.getContext().getFolderPath(FOLDERS.SERIALIZED));
+		
 
 		List<Field> pendingObjFilter=new ArrayList<Field>();
 		pendingObjFilter.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
@@ -111,7 +111,7 @@ public class JobExecutionManager {
 	}
 
 
-	public static int insertJobExecutionRequest(Job toExecute,boolean postponePublishing)throws Exception{
+	public static int insertJobExecutionRequest(Job toExecute,boolean forceRegeneration)throws Exception{
 		try{
 			SourceManager.getById(toExecute.getSourceHSPEC().getSearchId());
 		}catch(Exception e){
@@ -120,7 +120,7 @@ public class JobExecutionManager {
 			
 		}
 		
-		String file=ServiceContext.getContext().getSerializationPath()+File.separator+ServiceUtils.generateId("Job", ".xml");
+		String file=ServiceContext.getContext().getFolderPath(FOLDERS.SERIALIZED)+File.separator+ServiceUtils.generateId("Job", ".xml");
 		logger.debug("Serializing job "+toExecute.getName()+" to "+file);
 		AquaMapsXStream.serialize(file, toExecute);
 		Submitted toInsert=new Submitted(0);
@@ -138,6 +138,7 @@ public class JobExecutionManager {
 		toInsert.setStatus(SubmittedStatus.Pending);
 		toInsert.setTitle(toExecute.getName());	
 		toInsert.setSpeciesCoverage(toExecute.getCompressedCoverage());
+		toInsert.setForceRegeneration(forceRegeneration);
 		toInsert=SubmittedManager.insertInTable(toInsert);
 		logger.trace("Assigned id "+toInsert.getSearchId()+" to Job "+toInsert.getTitle()+" [ "+toInsert.getAuthor()+" ]");
 
@@ -149,7 +150,7 @@ public class JobExecutionManager {
 
 	public static void insertAquaMapsObjectExecutionRequest(List<AquaMapsObjectExecutionRequest> requests)throws Exception{
 		for(AquaMapsObjectExecutionRequest request:requests){
-			String file=ServiceContext.getContext().getSerializationPath()+File.separator+ServiceUtils.generateId("AQ", ".xml");
+			String file=ServiceContext.getContext().getFolderPath(FOLDERS.SERIALIZED)+File.separator+ServiceUtils.generateId("AQ", ".xml");
 			logger.debug("Serializing object "+request.getObject().getTitle()+" to "+file);
 			request.getObject().setSerializedRequest(file);
 			request.getObject().setStatus(SubmittedStatus.Generating);
@@ -230,7 +231,7 @@ public class JobExecutionManager {
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.isaquamap+"",object+"",FieldType.BOOLEAN));
 		filter.add(new Field(SubmittedFields.status+"",(object?SubmittedStatus.Generating:SubmittedStatus.Pending)+"",FieldType.STRING));
-		PagedRequestSettings settings= new PagedRequestSettings(maxSize,0,OrderDirection.ASC,SubmittedFields.submissiontime+"");
+		PagedRequestSettings settings= new PagedRequestSettings(maxSize,0,SubmittedFields.submissiontime+"",PagedRequestSettings.OrderDirection.ASC);
 		return SubmittedManager.getList(filter, settings);
 	}
 

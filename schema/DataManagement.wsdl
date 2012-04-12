@@ -56,7 +56,10 @@
 			</xsd:complexType>
 			<xsd:complexType name="getHCAFgenerationReportRequestType">
 				<xsd:sequence>
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -76,7 +79,10 @@
 
 			<xsd:complexType name="getGenerationReportByTypeRequestType">
 				<xsd:sequence>
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
 					<xsd:element name="resourceType" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
@@ -88,6 +94,7 @@
 					<xsd:element name="HSPECId" type="xsd:int" />
 					<xsd:element name="generateLayers" type="xsd:boolean" />
 					<xsd:element name="speciesFilter" type="aqtypes:fieldArray" />
+					<xsd:element name="forceRegeneration" type="xsd:boolean"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -97,9 +104,11 @@
 					<xsd:element name="author" type="xsd:string" />
 					<xsd:element name="generationName" type="xsd:string" />
 					<xsd:element name="description" type="xsd:string" />
-					<xsd:element name="hspenId" type="xsd:int"/>
-					<xsd:element name="hcafId" type="xsd:int"/>
-					<xsd:element name="occurrenceCellsId" type="xsd:int"/>
+					<xsd:element name="hspenIds" type="xsd:string"/>
+					<xsd:element name="hcafIds" type="xsd:string"/>
+					<xsd:element name="executionParameters" type="xsd:string"/>
+					<xsd:element name="generationParameters" type="xsd:string"/>
+					<xsd:element name="occurrenceCellsIds" type="xsd:string"/>
 					<xsd:element name="submissionBackend" type="xsd:string" />
 					<xsd:element name="executionEnvironment" type="xsd:string" />
 					<xsd:element name="backendUrl" type="xsd:string"/>
@@ -107,14 +116,15 @@
 					<xsd:element name="logic" type="xsd:string"/>
 					<xsd:element name="numPartitions" type="xsd:int"/>
 					<xsd:element name="algorithms" type="xsd:string" />
-					<xsd:element name="enableLayerGeneration" type="xsd:boolean" />
-					<xsd:element name="enableImageGeneration" type="xsd:boolean" />
 				</xsd:sequence>
 			</xsd:complexType>
 
 			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
 				<xsd:sequence>
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
 			
@@ -139,7 +149,10 @@
 			<xsd:complexType name="viewCustomQueryRequestType">
 				<xsd:sequence>
 					<xsd:element name="user" type="xsd:string"/>
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
 			
@@ -150,7 +163,14 @@
 				</xsd:sequence>
 			</xsd:complexType>
 			
-			
+			<xsd:complexType name="getJSONSubmittedAnalysisRequestType">
+				<xsd:sequence>
+					<xsd:element name="sortColumn" type="xsd:string" />
+					<xsd:element name="sortDirection" type="xsd:string" />
+					<xsd:element name="limit" type="xsd:int" />
+					<xsd:element name="offset" type="xsd:int" />
+				</xsd:sequence>
+			</xsd:complexType>
 
 			<!-- Data management request elements -->
 
@@ -221,6 +241,24 @@
 			
 			<xsd:element name="exportTableAsCSVRequest" type="xsd:string"/>
 			<xsd:element name="exportTableAsCSVResponse" type="xsd:string" />
+			
+			<xsd:element name="analyzeTablesRequest" type="aqtypes:analysis"/>
+			<xsd:element name="analyzeTablesResponse" type="xsd:string" />
+			
+			<xsd:element name="getJSONSubmittedAnalysisRequest" type="tns:getJSONSubmittedAnalysisRequestType" />
+			<xsd:element name="getJSONSubmittedAnalysisResponse" type="xsd:string" />
+			
+			<xsd:element name="loadAnalysisRequest" type="xsd:string"/>
+			<xsd:element name="loadAnalysisResponse" type="xsd:string"/>
+			
+			<xsd:element name="resubmitGenerationRequest" type="xsd:string"/>
+			<xsd:element name="resubmitGenerationResponse" type="xsd:string"/>
+			
+			<xsd:element name="exportCustomQueryRequest" type="xsd:string"/>
+			<xsd:element name="exportCustomQueryResponse" type="xsd:string"/>
+			
+			<xsd:element name="deleteAnalysisRequest" type="xsd:string"/>
+			<xsd:element name="deleteAnalysisResponse" type="coretypes:VOID"/>
 			
 		</xsd:schema>
 	</types>
@@ -375,6 +413,49 @@
 	</message>
 
 
+
+	<message name="AnalyzeTablesRequest">
+		<part name="request" element="tns:analyzeTablesRequest" />
+	</message>
+	<message name="AnalyzeTablesResponse">
+		<part name="response" element="tns:analyzeTablesResponse" />
+	</message>
+
+	<message name="GetJSONSubmittedAnalysisRequest">
+		<part name="request" element="tns:getJSONSubmittedAnalysisRequest" />
+	</message>
+	<message name="GetJSONSubmittedAnalysisResponse">
+		<part name="response" element="tns:getJSONSubmittedAnalysisResponse" />
+	</message>
+	
+	<message name="LoadAnalysisRequest">
+		<part name="request" element="tns:loadAnalysisRequest" />
+	</message>
+	<message name="LoadAnalysisResponse">
+		<part name="response" element="tns:loadAnalysisResponse" />
+	</message>
+	
+	<message name="ResubmitGenerationRequest">
+		<part name="request" element="tns:resubmitGenerationRequest" />
+	</message>
+	<message name="ResubmitGenerationResponse">
+		<part name="response" element="tns:resubmitGenerationResponse" />
+	</message>
+
+<message name="ExportCustomQueryRequest">
+		<part name="request" element="tns:exportCustomQueryRequest" />
+	</message>
+	<message name="ExportCustomQueryResponse">
+		<part name="response" element="tns:exportCustomQueryResponse" />
+	</message>
+	<message name="DeleteAnalysisRequest">
+		<part name="request" element="tns:deleteAnalysisRequest" />
+	</message>
+	<message name="DeleteAnalysisResponse">
+		<part name="response" element="tns:deleteAnalysisResponse" />
+	</message>
+
+
 	<portType name="DataManagementPortType">
 		<wsdl:operation name="generateHCAF">
 			<wsdl:input message="tns:GenerateHCAFRequest" />
@@ -480,6 +561,37 @@
 		<wsdl:operation name="ExportTableAsCSV">
 			<wsdl:input message="tns:ExportTableAsCSVRequest" />
 			<wsdl:output message="tns:ExportTableAsCSVResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		
+		<wsdl:operation name="AnalyzeTables">
+			<wsdl:input message="tns:AnalyzeTablesRequest" />
+			<wsdl:output message="tns:AnalyzeTablesResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetJSONSubmittedAnalysis">
+			<wsdl:input message="tns:GetJSONSubmittedAnalysisRequest" />
+			<wsdl:output message="tns:GetJSONSubmittedAnalysisResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="LoadAnalysis">
+			<wsdl:input message="tns:LoadAnalysisRequest" />
+			<wsdl:output message="tns:LoadAnalysisResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ResubmitGeneration">
+			<wsdl:input message="tns:ResubmitGenerationRequest" />
+			<wsdl:output message="tns:ResubmitGenerationResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ExportCustomQuery">
+			<wsdl:input message="tns:ExportCustomQueryRequest" />
+			<wsdl:output message="tns:ExportCustomQueryResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalysis">
+			<wsdl:input message="tns:DeleteAnalysisRequest" />
+			<wsdl:output message="tns:DeleteAnalysisResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

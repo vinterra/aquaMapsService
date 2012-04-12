@@ -48,12 +48,12 @@ public abstract class AquaMapsCall extends RICall{
 			list= isClient.execute(query, scope);
 		}
 		if(list.isEmpty()) {				
-			logger.info("Using default service @ : "+defaultURI);
+			logger.trace("Using default service @ : "+defaultURI);
 			epr=new EndpointReferenceType();
 			epr.setAddress(new AttributedURI(defaultURI));
 		}else{
 			epr= list.get(0).getAccessPoint().getEndpoint(getPortTypeName());
-			logger.info("Found RI @ : "+epr.getAddress().getHost());
+			logger.trace("Found RI @ : "+epr.getAddress().getHost());
 		}
 	}
 

@@ -1,15 +1,20 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBConnectionParameters;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBCredentialDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.ecomodelling.generators.aquamapsorg.MaxMinGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
@@ -17,7 +22,10 @@ import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Envelop
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.DistributionGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.EnvelopeGenerator;
+import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables;
+import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables.INTERPOLATIONFUNCTIONS;
 
 
 public class BatchGenerator implements BatchGeneratorI {
@@ -31,9 +39,11 @@ public class BatchGenerator implements BatchGeneratorI {
 	private DistributionGenerator dg =null;
 	private EnvelopeGenerator eg=null;
 	private Integer internalId;
+	private InterpolateTables interpolator=null;
 	
 	
-	public BatchGenerator(String path,DBCredentialDescriptor credentials) {
+	
+	public BatchGenerator(String path,DBDescriptor credentials) {
 		setConfiguration(path, credentials);
 	}
 	
@@ -46,23 +56,22 @@ public class BatchGenerator implements BatchGeneratorI {
 				type.equals(AlgorithmType.NativeRange)||type.equals(AlgorithmType.NativeRange2050),
 				type.equals(AlgorithmType.SuitableRange2050)||type.equals(AlgorithmType.NativeRange2050), 
 				NUM_OF_THREADS,
-				"", "", "", new HashMap<String, String>(), GenerationModel.AQUAMAPS);
+				"", "", "", new HashMap<String, String>(), GenerationModel.AQUAMAPS,SourceManager.getToUseTableStore());
 	}
 	@Override
-	public void setConfiguration(String path, DBCredentialDescriptor credentials) {
+	public void setConfiguration(String path, DBDescriptor credentials) {
 		logger.trace("***** SETTING BATCH GENERATOR CONFIGURATION (path : "+path+")");
 		//path to the configuration directory
 		e.setConfigPath(path);
 		//remote db username (default defined in the configuration)
 		
-		e.setDatabaseUserName(credentials.getValue(DBConnectionParameters.user));
-		logger.trace("user : "+credentials.getValue(DBConnectionParameters.user));
+		e.setDatabaseUserName(credentials.getUser());
+		logger.trace("user : "+credentials.getUser());
 		//remote db password (default defined in the configuration)
-		e.setDatabasePassword(credentials.getValue(DBConnectionParameters.password));
-		logger.trace("user : "+credentials.getValue(DBConnectionParameters.password));
+		e.setDatabasePassword(credentials.getPassword());
+		logger.trace("user : "+credentials.getPassword());
 		//remote db URL (default defined in the configuration)
-		String url= "jdbc:postgresql://"+credentials.getValue(DBConnectionParameters.host)+":"+
-		credentials.getValue(DBConnectionParameters.port)+"/"+credentials.getValue(DBConnectionParameters.dbName);
+		String url= "jdbc:postgresql:"+credentials.getEntryPoint();
 		e.setDatabaseURL(url);
 		//number of threads to use in the calculation
 //		e.setNumberOfThreads(NUM_OF_THREADS);
@@ -103,6 +112,15 @@ public class BatchGenerator implements BatchGeneratorI {
 				toReturn.setResourcesMap(eg.getResources());
 				toReturn.setElaboratedSpecies(eg.getSpeciesLoad());
 			}
+		}else if(interpolator!=null){
+			toReturn= new EnvironmentalExecutionReportItem();
+			toReturn.setPercent(new Double(interpolator.getStatus()));
+			if(getResourceInfo){
+				//Not available
+//				toReturn.setResourceLoad(interpolator.getResourceLoad());
+//				toReturn.setResourcesMap(interpolator.getResources());
+//				toReturn.setElaboratedSpecies(interpolator.getSpeciesLoad());
+			}
 		}
 
 		
@@ -117,37 +135,94 @@ public class BatchGenerator implements BatchGeneratorI {
 	
 	
 	@Override
-	public String generateTable(TableGenerationConfiguration configuration)
-			throws Exception {
-		if(configuration.getLogic().equals(LogicType.HSPEC))
-		return generateHSPEC(configuration.getSources().get(ResourceType.HCAF).getTableName(),
-				configuration.getSources().get(ResourceType.HSPEN).getTableName(),
-				configuration.getMaxMinHspenTable(),
-				configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
-				configuration.getAlgorithm().equals(AlgorithmType.SuitableRange2050)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
-				configuration.getPartitionsNumber(),
-				configuration.getBackendUrl(),
-				configuration.getAuthor(),
-				configuration.getExecutionEnvironment(),
-				configuration.getConfiguration(),
-				configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getName())?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS);
-		else return generateHSPEN(configuration.getSources().get(ResourceType.HCAF).getTableName(),
-				configuration.getSources().get(ResourceType.HSPEN).getTableName(),
-				configuration.getSources().get(ResourceType.OCCURRENCECELLS).getTableName(),
-				configuration.getPartitionsNumber(),
-				configuration.getBackendUrl(),
-				configuration.getAuthor(),
-				configuration.getExecutionEnvironment(),
-				configuration.getConfiguration(),
-				EnvelopeModel.AQUAMAPS);
+	public void generateTable(final TableGenerationConfiguration configuration)
+	throws Exception {
+		final BatchGeneratorI instance=this;
+		Thread t=new Thread (){ 
+			public void run() {
+				ArrayList<String> toReturn=new ArrayList<String>();
+				try{
+					switch(configuration.getLogic()){
+					case HSPEC :
+
+						toReturn.add(generateHSPEC(configuration.getSources().get(ResourceType.HCAF).get(0).getTableName(),
+								configuration.getSources().get(ResourceType.HSPEN).get(0).getTableName(),
+								configuration.getMaxMinHspenTable(),
+								configuration.getAlgorithm().equals(AlgorithmType.NativeRange)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
+								configuration.getAlgorithm().equals(AlgorithmType.SuitableRange2050)||configuration.getAlgorithm().equals(AlgorithmType.NativeRange2050),
+								configuration.getPartitionsNumber(),
+								configuration.getBackendUrl(),
+								configuration.getAuthor(),
+								configuration.getExecutionEnvironment(),
+								configuration.getConfiguration(),
+								configuration.getSubmissionBackend().equalsIgnoreCase(ServiceContext.getContext().getName())?GenerationModel.AQUAMAPS:GenerationModel.REMOTE_AQUAMAPS,
+										SourceManager.getToUseTableStore())); 
+						break;
+					case HSPEN : toReturn.add(generateHSPEN(configuration.getSources().get(ResourceType.HCAF).get(0).getTableName(),
+							configuration.getSources().get(ResourceType.HSPEN).get(0).getTableName(),
+							configuration.getSources().get(ResourceType.OCCURRENCECELLS).get(0).getTableName(),
+							configuration.getPartitionsNumber(),
+							configuration.getBackendUrl(),
+							configuration.getAuthor(),
+							configuration.getExecutionEnvironment(),
+							configuration.getConfiguration(),
+							EnvelopeModel.AQUAMAPS,
+							SourceManager.getToUseTableStore()));
+					break;
+
+					case HCAF :
+						int firstHcaf=0;
+						int secondHcaf=0;
+						int firstHcafTime=0;
+						int secondHcafTime=0;
+						int numInterpolations=0;
+						for(Field f:configuration.getAdditionalParameters()){
+							if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_ID)) firstHcaf=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_ID)) secondHcaf=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_TIME)) firstHcafTime=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_TIME)) secondHcafTime=f.getValueAsInteger();
+							else if(f.getName().equals(SourceGenerationRequest.NUM_INTERPOLATIONS)) numInterpolations=f.getValueAsInteger();
+						}
+						if(firstHcaf==0) throw new Exception("Unable to select first HCAF");
+						if(secondHcaf==0) throw new Exception("Unable to select second HCAF");
+						if(firstHcafTime==0) throw new Exception("Unable to detect first HCAF time");
+						if(secondHcafTime==0) throw new Exception("Unable to detect second HCAF time");
+						if(numInterpolations==0) throw new Exception("Unable to detect num Interpolations");
+						Resource first=null;
+						Resource second=null;
+						for(Resource hcaf:configuration.getSources().get(ResourceType.HCAF)){
+							if(hcaf.getSearchId()==firstHcaf) first=hcaf;
+							else if(hcaf.getSearchId()==secondHcaf) second=hcaf;
+						}
+						if(first==null)throw new Exception("First hcaf not found, passed id : "+firstHcaf);
+						if(second==null)throw new Exception("Second hcaf not found, passed id : "+secondHcaf);
+
+
+						toReturn.addAll(generateHCAF(
+								first.getTableName(),second.getTableName(),
+								numInterpolations,INTERPOLATIONFUNCTIONS.valueOf(configuration.getAlgorithm()+""),
+								firstHcafTime,secondHcafTime,SourceManager.getToUseTableStore()));
+						break;
+					}
+					Collections.sort(toReturn);
+					configuration.registerGeneratedSourcesCallback(toReturn);
+				}catch(Exception e){
+					logger.error("Unexpected error, request was "+configuration);
+					configuration.notifyError(e);
+				}finally{configuration.release(instance);}		
+			}
+		};
+		t.start();
 	}
 	
 	
 	private String generateHSPEC(String hcafTable, String hspenTable,String maxMinHspen,boolean isNative,boolean is2050,int threadNum,
-			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,GenerationModel model)throws Exception{
+			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,GenerationModel model,String tableStore)throws Exception{
 		
 		String toGenerate=ServiceUtils.generateId("hspec", "");
 
+		logger.debug("Current generator instance is "+this.toString());
+		logger.debug("Using Engine "+e.toString());
 		logger.trace("generating hspec : "+toGenerate);
 		
 		logger.trace("hspen : "+hspenTable);
@@ -186,7 +261,7 @@ public class BatchGenerator implements BatchGeneratorI {
 		e.setNumberOfThreads(threadNum);
 		e.setGeneralProperties(calculationConfig);
 		e.setGenerator(model);
-		
+		e.setTableStore(tableStore);
 		
 		dg= new DistributionGenerator(e);
 		//calculation
@@ -196,11 +271,14 @@ public class BatchGenerator implements BatchGeneratorI {
 	}
 	
 	private String generateHSPEN(String hcafTable, String hspenTable,String occurrenceCellsTable, int threadNum,
-			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,EnvelopeModel model)throws Exception{
+			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,EnvelopeModel model,String tableStore)throws Exception{
 		
 		
 		String toGenerate=ServiceUtils.generateId("hspen", "");
-
+		
+		
+		logger.debug("Current generator instance is "+this.toString());
+		logger.debug("Using Engine "+e.toString());
 		logger.trace("generating hspen : "+toGenerate);
 		
 		logger.trace("hspen : "+hspenTable);
@@ -234,6 +312,7 @@ public class BatchGenerator implements BatchGeneratorI {
 		e.setNumberOfThreads(threadNum);
 		e.setGeneralProperties(calculationConfig);
 		
+		e.setTableStore(tableStore);
 		
 		
 		eg=new EnvelopeGenerator(e);
@@ -246,6 +325,22 @@ public class BatchGenerator implements BatchGeneratorI {
 		maxmin.populatemaxminlat(toGenerate);
 		
 		return toGenerate;
+	}
+	
+	private List<String> generateHCAF(String startingHCAF,String endHCAF,int numIntervals,INTERPOLATIONFUNCTIONS function,int startingTime,int endTime,String tableStore)throws Exception{
+		logger.debug("Current generator instance is "+this.toString());
+		logger.debug("Using Engine "+e.toString());
+		ArrayList<String> toReturn=new ArrayList<String>();
+		interpolator=new InterpolateTables(e.getConfigPath(), ServiceContext.getContext().getFolderPath(FOLDERS.TABLES), e.getDatabaseURL(), e.getDatabaseUserName(), e.getDatabasePassword());
+		
+		interpolator.interpolate(startingHCAF, endHCAF, numIntervals, function,startingTime,endTime);
+		toReturn.addAll(Arrays.asList(interpolator.getInterpolatedTables()));
+		
+		//Removing first and last because are passed source tables
+		toReturn.remove(0);
+		toReturn.remove(toReturn.size()-1);
+		
+		return toReturn;
 	}
 	
 }

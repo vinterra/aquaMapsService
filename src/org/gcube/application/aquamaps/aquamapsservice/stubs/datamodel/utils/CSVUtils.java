@@ -12,7 +12,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
 
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
@@ -26,7 +25,7 @@ public class CSVUtils {
 
 	static GCUBELog logger= new GCUBELog(CSVUtils.class);
 	
-	public static ArrayList<String> CSVToList(String theString){
+	public static ArrayList<String> CSVToStringList(String theString){
 		ArrayList<String> toReturn= new ArrayList<String>();
 		if(theString!=null)
 			for(String s:theString.split(","))
@@ -34,11 +33,19 @@ public class CSVUtils {
 		return toReturn;
 	}
 
-	public static String listToCSV(List<String> values){
+	public static ArrayList<Integer> CSVTOIntegerList(String theString){
+		ArrayList<Integer> toReturn= new ArrayList<Integer>();
+		if(theString!=null)
+			for(String s:theString.split(","))
+				if(s!=null&&!s.equals("")&&!s.equals(" "))toReturn.add(Integer.parseInt(s.trim()));
+		return toReturn;
+	}
+	
+	public static String listToCSV(List values){
 		StringBuilder toReturn=new StringBuilder();
 		if((values!=null)&&(values.size()>0)){
-			for(String v:values)
-				if(v!=null&&!v.equals("")&&!v.equals(" "))toReturn.append(v.trim()+",");
+			for(Object v:values)
+				if(v!=null&&!v.equals("")&&!v.equals(" "))toReturn.append(v.toString().trim()+",");
 			if(toReturn.lastIndexOf(",")>-1)toReturn.deleteCharAt(toReturn.lastIndexOf(","));
 		}
 		return toReturn.toString();
