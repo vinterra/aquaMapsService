@@ -1,11 +1,21 @@
 package testClient;
 
+import java.util.ArrayList;
+
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FilterType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.scope.GCUBEScope;
 
 
@@ -40,11 +50,11 @@ public class WrapperTest {
 		
 //		ArrayList<Field> filter=new ArrayList<Field>();
 //		filter.add(new Field(MetaSourceFields.type+"",ResourceType.HSPEC+"",FieldType.STRING));
-//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), filter));
-//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEN));
-//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, MetaSourceFields.searchid+"", OrderDirection.ASC), ResourceType.HSPEC));
-//		System.out.println(wrapper.getJSONSubmitted(true, null, null, null, null, new PagedRequestSettings(3, 0, SubmittedFields.searchid+"", OrderDirection.ASC)));
-		
+//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, OrderDirection.ASC, MetaSourceFields.searchid+""), filter));
+//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, OrderDirection.ASC, MetaSourceFields.searchid+""), ResourceType.HSPEN));
+//		System.out.println(wrapper.getJSONResources(new PagedRequestSettings(3, 0, OrderDirection.ASC, MetaSourceFields.searchid+""), ResourceType.HSPEC));
+//		System.out.println(wrapper.getJSONSubmitted(true, null, null, null, null, new PagedRequestSettings(3, 0, OrderDirection.ASC, SubmittedFields.searchid+"")));
+//		
 //		Species s=new Species(specId);
 //		System.out.println("loading Envelope for Species ");
 //		
@@ -55,16 +65,16 @@ public class WrapperTest {
 //		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadResource(1, ResourceType.HCAF)));
 		
 		
-		System.out.println("Checking default sources");
-		for(Field f:dmInterface.getDefaultSources()){
-			try{				
-				int id=f.getValueAsInteger();
-				System.out.println(wrapper.loadResource(id));
-			}catch(Exception e){
-				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
-				e.printStackTrace();
-			}
-		}
+//		System.out.println("Checking default sources");
+//		for(Field f:dmInterface.getDefaultSources()){
+//			try{				
+//				int id=f.getValueAsInteger();
+//				System.out.println(wrapper.loadResource(id));
+//			}catch(Exception e){
+//				System.err.println("Skipping "+f.getName()+" : "+f.getValue());
+//				e.printStackTrace();
+//			}
+//		}
 			
 //		System.out.println(wrapper.loadResource(141, ResourceType.OCCURRENCECELLS));
 		
@@ -92,19 +102,58 @@ public class WrapperTest {
 
 //		public String getJSONResources(PagedRequestSettings settings, ResourceType type)throws Exception;
 
-//		public String getJSONSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception;
+//		public String getJSONSpecies(int hspen.getSearchId(), List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception;
 
-//		public Species loadEnvelope(String speciesId, int hspenId)throws Exception;
+//		public Species loadEnvelope(String speciesId, int hspen.getSearchId())throws Exception;
 
 //		public void markSaved(List<Integer> submittedIds)throws Exception;
 
 //		wrapper.submitJob(DummyObjects.createDummyJob(false, false, false, true));
 		
-		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(416596)));
+//		System.out.println(AquaMapsXStream.getXMLInstance().toXML(wrapper.loadObject(416596)));
+//		
+//		System.out.println("Completed");
 		
 		
 		
-		System.out.println("Completed");
+		//********************** CHeck species filter
+		
+		Resource hspen=null;
+		System.out.println("Checking defaults..");
+		for(Field f:dmInterface.getDefaultSources())
+			if(f.getName().equals(ResourceType.HSPEN+""))hspen=wrapper.loadResource(f.getValueAsInteger());
+		
+		if(hspen!=null) System.out.println("HSPEN IS "+hspen);
+		else throw new Exception("No Default HSPEN");
+		
+		PagedRequestSettings settings=new PagedRequestSettings(1, 0, OrderDirection.ASC, SpeciesOccursumFields.speciesid+"");
+		ArrayList<Filter> advancedFilter=new ArrayList<Filter>();
+		ArrayList<Filter> genericFilter=new ArrayList<Filter>();
+		System.out.println("String");
+		advancedFilter.add(new Filter(FilterType.begins, new Field(SpeciesOccursumFields.species+"", "a", FieldType.STRING)));
+		System.out.println("BEGINS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		advancedFilter.add(new Filter(FilterType.ends, new Field(SpeciesOccursumFields.species+"", "a", FieldType.STRING)));
+		System.out.println("ENDS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		advancedFilter.add(new Filter(FilterType.contains, new Field(SpeciesOccursumFields.species+"", "b", FieldType.STRING)));
+		System.out.println("Contains : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		advancedFilter.add(new Filter(FilterType.is, new Field(SpeciesOccursumFields.kingdom+"", "Animalia", FieldType.STRING)));
+		System.out.println("IS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		
+		System.out.println("INTEGER");
+		
+		genericFilter.add(new Filter(FilterType.is, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
+		System.out.println("IS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		
+		genericFilter.add(new Filter(FilterType.greater_then, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
+		System.out.println("GT : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		
+		genericFilter.add(new Filter(FilterType.smaller_then, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
+		System.out.println("ST : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		
+		System.out.println("BOOLEAN");
+		genericFilter.add(new Filter(FilterType.is, new Field(HspenFields.pelagic+"", true+"", FieldType.BOOLEAN)));
+		System.out.println("GT : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		
 	}
 
 	

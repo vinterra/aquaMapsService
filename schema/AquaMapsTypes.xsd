@@ -63,6 +63,7 @@
 					<xsd:element name="type" type="xsd:string" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="value" type="xsd:string" />
+					<xsd:element name="fieldType" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 

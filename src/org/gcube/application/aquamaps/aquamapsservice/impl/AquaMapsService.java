@@ -40,7 +40,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Reso
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.AquaMap;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -223,9 +222,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("Serving getSpecies by filters");
 		
 		try{
-			PagedRequestSettings settings=req.getPagedRequestSettings();
-			return SpeciesManager.getJsonList(settings.getOrderField(), settings.getOrderDirection()+"", settings.getLimit(), settings.getOffset(),
-					Field.load(req.getCharacteristicFilters()), Filter.load(req.getNameFilters()), Filter.load(req.getCodeFilters()), req.getHspen());
+			return SpeciesManager.getJSONList(req.getPagedRequestSettings(),
+					Filter.load(req.getGenericSearchFilters()), Filter.load(req.getSpecieficFilters()), req.getHspen());
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
@@ -340,7 +338,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("Serving getSpecies by filters");
 		
 		try{
-			File toExport=SpeciesManager.getCSVList(Field.load(arg0.getCharacteristicFilters()), Filter.load(arg0.getNameFilters()), Filter.load(arg0.getCodeFilters()), arg0.getHspen());
+			File toExport=SpeciesManager.getCSVList(Filter.load(arg0.getGenericSearchFilters()), Filter.load(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
 			RSWrapper wrapper=new RSWrapper(scope);

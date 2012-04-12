@@ -221,14 +221,18 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	}
 
 	@Override
-	public String getJSONSpecies(int hspenId, List<Field> characteristcs, List<Filter> names, List<Filter> codes, PagedRequestSettings settings)throws Exception{
+	public String getJSONSpecies(int hspenId, List<Filter> genericSearch, List<Filter> advancedFilters, PagedRequestSettings settings)throws Exception{
 		try{
 			GetSpeciesByFiltersRequestType request=new GetSpeciesByFiltersRequestType();
-			request.setCharacteristicFilters(Field.toStubsVersion(characteristcs));
-			request.setCodeFilters(Filter.toStubsVersion(codes));
+			request.setGenericSearchFilters(Filter.toStubsVersion(genericSearch));
+			request.setSpecieficFilters(Filter.toStubsVersion(advancedFilters));
 			request.setHspen(hspenId);
-			request.setNameFilters(Filter.toStubsVersion(names));
 			request.setPagedRequestSettings(settings);
+			logger.debug("Serving request, page settings : ");
+			logger.debug("OFFSET "+settings.getOffset());
+			logger.debug("LIMIT "+settings.getLimit());
+			logger.debug("ORDER BY "+settings.getOrderField());
+			logger.debug("DIRECTION "+settings.getOrderDirection());
 			return	pt.getSpeciesByFilters(request);			
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -302,14 +306,12 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 	}
 
 	@Override
-	public File getCSVSpecies(int hspenId, List<Field> characteristcs,
-			List<Filter> names, List<Filter> codes) throws Exception {
+	public File getCSVSpecies(int hspenId, List<Filter> genericSearch, List<Filter> advancedFilters) throws Exception {
 		try{
 			GetSpeciesByFiltersRequestType request=new GetSpeciesByFiltersRequestType();
-			request.setCharacteristicFilters(Field.toStubsVersion(characteristcs));
-			request.setCodeFilters(Filter.toStubsVersion(codes));
+			request.setGenericSearchFilters(Filter.toStubsVersion(genericSearch));
+			request.setSpecieficFilters(Filter.toStubsVersion(advancedFilters));
 			request.setHspen(hspenId);
-			request.setNameFilters(Filter.toStubsVersion(names));			
 					
 			String locator=pt.getSpeciesByFiltersASCSV(request);						
 			return RSWrapper.getStreamFromLocator(new URI(locator));
