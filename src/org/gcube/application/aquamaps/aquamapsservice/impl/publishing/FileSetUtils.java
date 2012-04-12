@@ -24,7 +24,15 @@ public class FileSetUtils {
 	
 
 
-	private static final String GENERATED_IMAGES=System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/";
+//	private static final String GENERATED_IMAGES=System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/";
+	
+	public static final String getTempMapsFolder(){
+		String tempFolderPath=System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid/maps/tmp_maps/";
+		File f=new File(tempFolderPath);
+		if(!f.exists())f.mkdirs();
+		return tempFolderPath;
+	}
+	
 	
 	private static final Map<String,String> imageFileAndName= new HashMap<String, String>();
 
@@ -58,8 +66,9 @@ public class FileSetUtils {
 	public static List<String> getTempFiles(String objectTitle){
 		objectTitle=objectTitle.replace(" ", "_");
 		ArrayList<String> toReturn=new ArrayList<String>();
-		toReturn.add(GENERATED_IMAGES+objectTitle+File.separator);
-		toReturn.add(GENERATED_IMAGES+"csq_map127.0.0.1_"+objectTitle+"_map_pic.jpg");
+		String tmpBasePath=getTempMapsFolder();
+		toReturn.add(tmpBasePath+objectTitle+File.separator);
+		toReturn.add(tmpBasePath+"csq_map127.0.0.1_"+objectTitle+"_map_pic.jpg");
 		return toReturn;
 	}
 	
@@ -107,12 +116,13 @@ public class FileSetUtils {
 	
 	static Map<String,String> getToPublishList(String header) throws Exception{
 		header=header.replace(" ", "_");
+		String tempFolderBasePath=getTempMapsFolder();
 		Map<String,String> toReturn=new HashMap<String, String>();
-		String basePath=GENERATED_IMAGES+header+File.separator;
+		String basePath=tempFolderBasePath+header+File.separator;
 		logger.trace("Checking generated images...");
 		logger.trace("base path : "+basePath);
 		logger.trace("header is "+header);
-		File f1 = new File(GENERATED_IMAGES+"csq_map127.0.0.1_"+header+"_map_pic.jpg");
+		File f1 = new File(tempFolderBasePath+"csq_map127.0.0.1_"+header+"_map_pic.jpg");
 		logger.trace("Checking file "+f1.getAbsolutePath());
 		if (f1.exists())
 			toReturn.put("Earth",f1.getAbsolutePath());			
@@ -133,13 +143,15 @@ public class FileSetUtils {
 	static int  generateImages(String file) throws Exception{
 		BufferedReader  input=null;
 		try{
-			File tmpImgFolder=new File(GENERATED_IMAGES);
-			tmpImgFolder.mkdirs();
+			//ensure perl file existance
 		logger.trace("Checking perl...");
 		String perlFileLocation=System.getenv("GLOBUS_LOCATION")+File.separator+"c-squaresOnGrid"+
 		File.separator+"bin"+File.separator+"cs_mapMod.pl";
 		File perlFile=new File(perlFileLocation);
 		if(perlFile.exists()){
+			//ensure temp folder existance
+			getTempMapsFolder();			
+			
 			logger.trace("Checking file existance... : "+file);
 			File clusteringFile=new File(file);
 			if(clusteringFile.exists()&&clusteringFile.canRead()){

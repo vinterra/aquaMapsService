@@ -7,8 +7,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.Analy
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.monitor.StatusMonitorThread;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.FileSetUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesReader;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.enabling.Configuration;
 import org.gcube.application.aquamaps.enabling.Impl.ConfigurationImpl;
 import org.gcube.application.aquamaps.enabling.Impl.crawler.CrawlerMode;
@@ -52,26 +54,7 @@ public class ServiceContext extends GCUBEServiceContext {
 	@Override
 	protected void onReady() throws Exception{
 		
-		
-//		
-//		//Monitoring
-		StatusMonitorThread t=new StatusMonitorThread(getPropertyAsInteger(PropertiesConstants.MONITOR_INTERVAL),
-				getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
-		logger.debug("Staring monitor thread: interval = "+getPropertyAsInteger(PropertiesConstants.MONITOR_INTERVAL)+
-				"; freespaceThreshold="+getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
-		t.start();
-		
-//		logger.trace("Starting hspec group request monitor..");
-//		HSPECGroupMonitor t3=new HSPECGroupMonitor(4*1000);
-//		t3.start();
-//		
-//		
-		
-		JobExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_OBJECTS));
-		TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS),getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
-		AnalysisManager.init(true,getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
-		
-		SourceManager.checkTables();
+		super.onReady();
 	}
 	
 	/**
@@ -112,8 +95,34 @@ public class ServiceContext extends GCUBEServiceContext {
 			throw e;
 		}
 		
+		try{
+			ServiceUtils.deleteFile(FileSetUtils.getTempMapsFolder());
+		}catch(Exception e){
+			logger.fatal("Unable to clean temp maps folder",e);
+			throw e;
+		}
 		
+		try{
+//			//Monitoring
+			StatusMonitorThread t=new StatusMonitorThread(getPropertyAsInteger(PropertiesConstants.MONITOR_INTERVAL),
+					getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
+			logger.debug("Staring monitor thread: interval = "+getPropertyAsInteger(PropertiesConstants.MONITOR_INTERVAL)+
+					"; freespaceThreshold="+getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
+			t.start();
+		}catch(Exception e){
+			logger.fatal("Unable to start disk monitoring",e);
+			throw e;
+		}
 			
+		
+		try{
+			JobExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_OBJECTS));
+			TableGenerationExecutionManager.init(getPropertyAsBoolean(PropertiesConstants.PURGE_PENDING_HSPEC_REQUESTS),getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
+			AnalysisManager.init(true,getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
+			SourceManager.checkTables();
+		}catch(Exception e){
+			logger.fatal("Unable to start managers",e);
+		}
 	}
 	
 	

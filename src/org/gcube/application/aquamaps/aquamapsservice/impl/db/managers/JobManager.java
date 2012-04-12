@@ -419,7 +419,7 @@ public class JobManager extends SubmittedManager{
 				row.add(new Field(SubmittedFields.serializedobject+"",serializedObjectPath,FieldType.STRING));
 				row.add(new Field(SubmittedFields.todelete+"",false+"",FieldType.BOOLEAN));
 				row.add(submittedJob.getField(SubmittedFields.forceregeneration));
-				if(!customized){
+				if(!customized&&!submittedJob.isForceRegeneration()){
 					
 					//***************CHECK IF EXISTING LAYERS / IMG
 					
