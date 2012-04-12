@@ -15,6 +15,13 @@
       </xsd:restriction>
     </xsd:simpleType>
 	
+	<xsd:simpleType name="orderDirection">
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration  value="ASC"/>
+				<xsd:enumeration  value="DESC"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+	
 	
 		<xsd:complexType name="perturbation">
 				<xsd:sequence>
@@ -201,6 +208,16 @@
 											
 			</xsd:sequence>
 			</xsd:complexType>
+
+<xsd:complexType name="pagedRequestSettings">
+				<xsd:sequence>
+					<xsd:element name="limit"	type="xsd:int"/>
+					<xsd:element name="offset"	type="xsd:int"/>
+					<xsd:element name="orderField"	type="xsd:string"/>
+					<xsd:element name="orderDirection"	type="tns:orderDirection"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
 
 			<!-- Arrays -->
 

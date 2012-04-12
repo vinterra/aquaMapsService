@@ -24,7 +24,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Hsp
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {
@@ -267,7 +267,7 @@ public class SpeciesManager {
 			session=DBSession.getInternalDBSession();
 			
 			return DBUtils.toJSon(session.getDistinct(toSelect, filters, speciesOccurSum, 
-					settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
+					settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}

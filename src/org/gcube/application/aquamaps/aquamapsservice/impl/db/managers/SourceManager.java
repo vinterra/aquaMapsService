@@ -18,8 +18,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Met
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -153,7 +153,7 @@ public class SourceManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderColumn(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}

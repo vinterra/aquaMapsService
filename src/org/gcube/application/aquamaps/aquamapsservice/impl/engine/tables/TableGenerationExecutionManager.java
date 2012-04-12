@@ -14,8 +14,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environmen
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class TableGenerationExecutionManager {
@@ -70,7 +70,7 @@ public class TableGenerationExecutionManager {
 		insertedRequest.acquire();
 		ArrayList<Field> filter= new ArrayList<Field>();
 		filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.pending+"",FieldType.STRING));
-		PagedRequestSettings settings=new PagedRequestSettings(1,0,SourceGenerationRequestFields.submissiontime+"",OrderDirection.DESC);
+		PagedRequestSettings settings=new PagedRequestSettings(1,0,OrderDirection.DESC,SourceGenerationRequestFields.submissiontime+"");
 		return SourceGenerationRequestsManager.getList(filter,settings);
 	}
 	

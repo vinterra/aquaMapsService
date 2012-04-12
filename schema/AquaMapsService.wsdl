@@ -30,10 +30,7 @@
 			<xsd:complexType name="getAquaMapsPerUserRequestType">
 				<xsd:sequence>
 					<xsd:element name="userID" type="xsd:string" />
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 					<xsd:element name="aquamaps" type="xsd:boolean" />
 					<xsd:element name="jobIdEnabled" type="xsd:boolean" />
 					<xsd:element name="jobIdValue" type="xsd:int" />
@@ -74,10 +71,7 @@
 			<xsd:complexType name="getOccurrenceCellsRequestType">
 				<xsd:sequence>
 					<xsd:element name="speciesID" type="xsd:string" />
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -85,10 +79,7 @@
 				<xsd:sequence>
 					<xsd:element name="fieldList" type="aqtypes:fieldArray" />
 					<xsd:element name="toSelect" type="aqtypes:field"/>
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -102,10 +93,7 @@
 					<xsd:element name="characteristicFilters" type="aqtypes:fieldArray" />
 					<xsd:element name="codeFilters" type="aqtypes:filterArray" />
 					<xsd:element name="nameFilters" type="aqtypes:filterArray" />
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 					<xsd:element name="hspen" type="xsd:int" />
 				</xsd:sequence>
 			</xsd:complexType>
@@ -113,10 +101,7 @@
 			<xsd:complexType name="getResourceListRequestType">
 				<xsd:sequence>
 					<xsd:element name="filters" type="aqtypes:fieldArray" />
-					<xsd:element name="sortColumn" type="xsd:string" />
-					<xsd:element name="sortDirection" type="xsd:string" />
-					<xsd:element name="limit" type="xsd:int" />
-					<xsd:element name="offset" type="xsd:int" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 

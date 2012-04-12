@@ -1,24 +1,11 @@
 package testClient;
 
-import java.util.ArrayList;
-
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Envelope;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.common.core.scope.GCUBEScope;
 
 

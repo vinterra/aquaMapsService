@@ -27,7 +27,6 @@ schema/AquaMapsTypes.wsdl -text
 schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
 schema/GISTypes.xsd -text
-schema/Publisher.wsdl_bk -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/CommonServiceLogic.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
@@ -173,7 +172,6 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/AquaMapsService
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/Constant.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementCall.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementInterface.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PagedRequestSettings.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PublisherInterface.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/AppZip.java -text

@@ -12,8 +12,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.Q
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CustomQueryManager {
@@ -62,7 +62,7 @@ public class CustomQueryManager {
 			if(rs.next()) {
 				String tableName=rs.getString(userQueryResultTable);
 				Long count=rs.getLong(userQueryCount);
-				String query="SELECT * from "+tableName+" ORDER BY "+settings.getOrderColumn()+" "+settings.getOrderDirection()+" LIMIT "+settings.getLimit()+" OFFSET "+settings.getOffset();
+				String query="SELECT * from "+tableName+" ORDER BY "+settings.getOrderField()+" "+settings.getOrderDirection()+" LIMIT "+settings.getLimit()+" OFFSET "+settings.getOffset();
 				return DBUtils.toJSon(session.executeQuery(query),count);
 			}else return null;
 		}catch(Exception e){throw e;}

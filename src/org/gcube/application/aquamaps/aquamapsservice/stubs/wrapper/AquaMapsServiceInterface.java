@@ -16,8 +16,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.S
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 
 public interface AquaMapsServiceInterface {
 

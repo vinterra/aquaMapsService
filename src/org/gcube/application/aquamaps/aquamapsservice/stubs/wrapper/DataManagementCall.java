@@ -7,8 +7,6 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedAnalysisRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRequestType;
@@ -21,6 +19,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environmen
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -101,12 +100,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public String getJSONSPECGroupGenreationRequests(
 			PagedRequestSettings settings) throws Exception {
 		try{
-			GetJSONSubmittedHSPECRequestType request=new GetJSONSubmittedHSPECRequestType();
-			request.setLimit(settings.getLimit());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			return pt.getJSONSubmittedHSPECGroup(request);
+			return pt.getJSONSubmittedHSPECGroup(settings);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
@@ -233,8 +227,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public String viewCustomQuery(String userId, PagedRequestSettings settings)
 			throws Exception {
 		try{									
-			return pt.viewCustomQuery(new ViewCustomQueryRequestType(settings.getLimit(), 
-					settings.getOffset(), settings.getOrderColumn(), settings.getOrderDirection()+"", userId));			
+			return pt.viewCustomQuery(new ViewCustomQueryRequestType(settings, userId));			
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());
@@ -302,12 +295,7 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	public String getJsonSubmittedAnalysis(PagedRequestSettings settings)
 			throws Exception {
 		try{
-			GetJSONSubmittedAnalysisRequestType request=new GetJSONSubmittedAnalysisRequestType();
-			request.setLimit(settings.getLimit());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			return pt.getJSONSubmittedAnalysis(request);
+			return pt.getJSONSubmittedAnalysis(settings);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
 			throw new ServiceException(f.getFaultMessage());

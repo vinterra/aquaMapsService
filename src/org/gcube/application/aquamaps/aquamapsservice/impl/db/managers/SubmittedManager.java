@@ -16,8 +16,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SubmittedManager {
@@ -222,7 +222,7 @@ public class SubmittedManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,settings.getOrderColumn(),settings.getOrderDirection()),settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, submittedTable,settings.getOrderField(),settings.getOrderDirection()),settings.getOffset(), settings.getLimit());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}
@@ -230,7 +230,7 @@ public class SubmittedManager {
 	public static Submitted getSubmittedById(int objId) throws Exception{
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.searchid+"",objId+"",FieldType.INTEGER));
-		List<Submitted> found= getList(filter,new PagedRequestSettings(1, 0, SubmittedFields.searchid+"", OrderDirection.ASC));
+		List<Submitted> found= getList(filter,new PagedRequestSettings(1, 0, OrderDirection.ASC, SubmittedFields.searchid+""));
 		return found.get(0);
 	}
 
@@ -258,9 +258,9 @@ public class SubmittedManager {
 		try{
 			session=DBSession.getInternalDBSession();
 			ArrayList<Submitted> toReturn=new ArrayList<Submitted>();
-			ResultSet rs=session.executeFilteredQuery(filter, submittedTable, settings.getOrderColumn(), settings.getOrderDirection());
+			ResultSet rs=session.executeFilteredQuery(filter, submittedTable, settings.getOrderField(), settings.getOrderDirection());
 			int rowIndex=0;
-			while(rs.next()&&toReturn.size()<settings.getPageSize()){
+			while(rs.next()&&toReturn.size()<settings.getLimit()){
 				if(rowIndex>=settings.getOffset()) toReturn.add(new Submitted(rs));
 				rowIndex++;				
 			}

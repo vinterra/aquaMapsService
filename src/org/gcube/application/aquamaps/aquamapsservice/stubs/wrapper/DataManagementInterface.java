@@ -9,6 +9,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.R
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 
 public interface DataManagementInterface {
 

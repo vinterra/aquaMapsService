@@ -17,8 +17,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Ana
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class AnalysisTableManager {
@@ -31,7 +31,7 @@ public class AnalysisTableManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, analysisTable, settings.getOrderColumn(), settings.getOrderDirection()),settings.getOffset(),settings.getOffset()+settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, analysisTable, settings.getOrderField(), settings.getOrderDirection()),settings.getOffset(),settings.getOffset()+settings.getLimit());
 		}catch(Exception e){
 			throw e;
 		}finally{
@@ -98,9 +98,9 @@ public class AnalysisTableManager {
 		try{
 			session=DBSession.getInternalDBSession();
 			ArrayList<Analysis> toReturn=new ArrayList<Analysis>();
-			ResultSet rs=session.executeFilteredQuery(filter,analysisTable, settings.getOrderColumn(), settings.getOrderDirection());
+			ResultSet rs=session.executeFilteredQuery(filter,analysisTable, settings.getOrderField(), settings.getOrderDirection());
 			int rowIndex=0;
-			while(rs.next()&&toReturn.size()<settings.getPageSize()){
+			while(rs.next()&&toReturn.size()<settings.getLimit()){
 				if(rowIndex>=settings.getOffset()) toReturn.add(new Analysis(rs));
 				rowIndex++;				
 			}
@@ -171,7 +171,7 @@ public class AnalysisTableManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, analysisTable, settings.getOrderColumn(), settings.getOrderDirection()),
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, analysisTable, settings.getOrderField(), settings.getOrderDirection()),
 					settings.getOffset(),settings.getOffset()+settings.getOffset()+settings.getLimit());
 		}catch (Exception e){
 			throw e;

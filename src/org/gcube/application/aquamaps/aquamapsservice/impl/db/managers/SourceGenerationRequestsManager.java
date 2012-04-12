@@ -15,8 +15,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sou
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceGenerationRequestsManager {
@@ -94,9 +94,9 @@ public class SourceGenerationRequestsManager {
 		try{
 			session=DBSession.getInternalDBSession();
 			ArrayList<SourceGenerationRequest> toReturn=new ArrayList<SourceGenerationRequest>();
-			ResultSet rs=session.executeFilteredQuery(filter,requestsTable, settings.getOrderColumn(), settings.getOrderDirection());
+			ResultSet rs=session.executeFilteredQuery(filter,requestsTable, settings.getOrderField(), settings.getOrderDirection());
 			int rowIndex=0;
-			while(rs.next()&&toReturn.size()<settings.getPageSize()){
+			while(rs.next()&&toReturn.size()<settings.getLimit()){
 				if(rowIndex>=settings.getOffset()) toReturn.add(new SourceGenerationRequest(rs));
 				rowIndex++;				
 			}
@@ -194,7 +194,7 @@ public class SourceGenerationRequestsManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filters, requestsTable, settings.getOrderColumn(), settings.getOrderDirection()),
+			return DBUtils.toJSon(session.executeFilteredQuery(filters, requestsTable, settings.getOrderField(), settings.getOrderDirection()),
 					settings.getOffset(),settings.getOffset()+settings.getOffset()+settings.getLimit());
 		}catch (Exception e){
 			throw e;

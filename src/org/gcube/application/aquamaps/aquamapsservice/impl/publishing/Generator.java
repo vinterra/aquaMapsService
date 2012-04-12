@@ -31,7 +31,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Spe
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
 import org.gcube.application.aquamaps.publisher.MetaInformations;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.datageneration.ObjectManager;

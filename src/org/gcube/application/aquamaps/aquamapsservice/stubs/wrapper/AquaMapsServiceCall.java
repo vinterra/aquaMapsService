@@ -32,6 +32,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Subm
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.AquaMapsServiceAddressingLocator;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.AquaMap;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -150,12 +151,9 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			if(jobId!=null)request.setJobIdValue(jobId);
 			request.setJobStatusEnabled(false);
 			request.setJobStatusValue(null);
-			request.setLimit(settings.getLimit());
 			request.setObjectStatusEnabled(status!=null);
 			if(status!=null)request.setObjectStatusValue(status.toString());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
+			request.setPagedRequestSettings(settings);
 			request.setTypeEnabled(objType!=null);
 			if(objType!=null)request.setTypeValue(objType.toString());
 			return pt.getAquaMapsPerUser(request);
@@ -170,10 +168,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			GetOccurrenceCellsRequestType request= new GetOccurrenceCellsRequestType();
 			request.setSpeciesID(speciesId);
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			request.setLimit(settings.getLimit());
+			request.setPagedRequestSettings(settings);
 			return pt.getOccurrenceCells(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -217,10 +212,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			GetResourceListRequestType request=new GetResourceListRequestType();
 			request.setFilters(Field.toStubsVersion(filter));
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			request.setLimit(settings.getLimit());
+			request.setPagedRequestSettings(settings);
 			return pt.getResourceList(request);
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -236,10 +228,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 			request.setCodeFilters(Filter.toStubsVersion(codes));
 			request.setHspen(hspenId);
 			request.setNameFilters(Filter.toStubsVersion(names));
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
-			request.setLimit(settings.getLimit());
+			request.setPagedRequestSettings(settings);
 			return	pt.getSpeciesByFilters(request);			
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);
@@ -303,10 +292,7 @@ public class AquaMapsServiceCall extends AquaMapsCall implements AquaMapsService
 		try{
 			GetPhylogenyRequestType request=new GetPhylogenyRequestType();
 			request.setFieldList(Field.toStubsVersion(filters));
-			request.setLimit(settings.getLimit());
-			request.setOffset(settings.getOffset());
-			request.setSortColumn(settings.getOrderColumn());
-			request.setSortDirection(settings.getOrderDirection()+"");
+			request.setPagedRequestSettings(settings);
 			request.setToSelect(new Field(level+"","",FieldType.STRING).toStubsVersion());
 			return pt.getPhylogeny(request);
 		}catch(GCUBEFault f){

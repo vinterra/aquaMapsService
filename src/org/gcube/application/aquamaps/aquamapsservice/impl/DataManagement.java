@@ -25,14 +25,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGe
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHCAFRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationReportByTypeRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetHCAFgenerationReportRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedAnalysisRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedHSPECRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RemoveHSPECGroupGenerationRequestResponseType;
@@ -52,10 +46,10 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Reso
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PagedRequestSettings.OrderDirection;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
+import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -70,39 +64,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		return ServiceContext.getContext();
 	}
 
-	public VOID generateHCAF(GenerateHCAFRequestType arg0)
-	throws RemoteException, GCUBEFault {
-		try{
-			throw new GCUBEFault("DISCONTINUED IMPLEMENTATION");
-			//			logger.trace("Submitting request for "+arg0.getResultingHCAFName()+" generation submitted by "+arg0.getUserId());
-			//			String[] sources=arg0.getUrls().getItems();
-			//			for(String s:sources) logger.trace("found source : "+s);
-			//			int id=SourceGenerationManager.insertHCAFRequest(arg0.getUserId(),Integer.parseInt(arg0.getSourceHCAFId()), arg0.getResultingHCAFName(), sources);
-			//			logger.trace("Inserted request with id : "+id);
-			//			return new VOID();
-		}catch(Exception e){
-			logger.error("",e);
-			throw new GCUBEFault("Unexpected error");
-		}
-	}
-
-	public String getHCAFGenerationReport(
-			GetHCAFgenerationReportRequestType arg0) throws RemoteException,
-			GCUBEFault {
-		throw new GCUBEFault ("OBSOLETE METHOD");
-	}
-
-	public VOID generateHSPEC(GenerateHSPECRequestType arg0)
-	throws RemoteException, GCUBEFault {
-			throw new GCUBEFault ("OBSOLETE METHOD");
-	}
-
-	public String getGenerationReportByType(
-			GetGenerationReportByTypeRequestType arg0) throws RemoteException,
-			GCUBEFault {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 
 	@Override
@@ -151,11 +113,11 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 
 	@Override
 	public String getJSONSubmittedHSPECGroup(
-			GetJSONSubmittedHSPECRequestType arg0) throws RemoteException,
+			PagedRequestSettings arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection()));
-			return SourceGenerationRequestsManager.getJSONList(new ArrayList<Field>(), settings);
+			
+			return SourceGenerationRequestsManager.getJSONList(new ArrayList<Field>(), arg0);
 
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
@@ -435,8 +397,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			throws RemoteException, GCUBEFault {
 		try{			
 			
-			return CustomQueryManager.getPagedResult(arg0.getUser(), 
-					new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), OrderDirection.valueOf(arg0.getSortDirection())));
+			return CustomQueryManager.getPagedResult(arg0.getUser(),arg0.getPagedRequestSettings());
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -498,11 +459,10 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 
 	@Override
 	public String getJSONSubmittedAnalysis(
-			GetJSONSubmittedAnalysisRequestType arg0) throws RemoteException,
+			PagedRequestSettings arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			PagedRequestSettings settings=new PagedRequestSettings(arg0.getLimit(), arg0.getOffset(), arg0.getSortColumn(), PagedRequestSettings.OrderDirection.valueOf(arg0.getSortDirection()));
-			return AnalysisTableManager.getJSONList(new ArrayList<Field>(), settings);
+			return AnalysisTableManager.getJSONList(new ArrayList<Field>(), arg0);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -544,7 +504,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			request.setId(arg0);
 			request=SourceGenerationRequestsManager.getList(
 					Arrays.asList(new Field[]{request.getField(SourceGenerationRequestFields.id)}),
-					new PagedRequestSettings(1, 0, SourceGenerationRequestFields.id+"", OrderDirection.ASC)).get(0);
+					new PagedRequestSettings(1, 0, OrderDirection.ASC, SourceGenerationRequestFields.id+"")).get(0);
 			
 			for(Integer resId:request.getHcafIds()){
 				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
