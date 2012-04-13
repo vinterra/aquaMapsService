@@ -100,7 +100,7 @@ public class Generator<T> implements ObjectManager<T> {
 	protected static void remove(FileSet toDestroy)throws Exception{
 		String physicalBasePath=publisher.getServerPathDir().getAbsolutePath();
 		for(org.gcube.application.aquamaps.publisher.impl.model.File f:toDestroy.getFiles()){
-			String path=physicalBasePath+f.getStoredUri();
+			String path=physicalBasePath+File.separator+f.getStoredUri();
 			try{
 				ServiceUtils.deleteFile(path);
 			}catch(Exception e){
