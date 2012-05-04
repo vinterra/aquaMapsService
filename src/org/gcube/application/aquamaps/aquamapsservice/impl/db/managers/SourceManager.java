@@ -153,7 +153,7 @@ public class SourceManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(filter, sourcesTable, settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}

@@ -153,6 +153,8 @@ public class Species extends DataModel implements Comparable<Species>{
 		else return this.id.compareTo(arg0.getId());
 	}
 	
-	
+	public String getScientificName(){
+		return getFieldbyName(SpeciesOccursumFields.genus+"").getValue()+"_"+getFieldbyName(SpeciesOccursumFields.species+"").getValue();		
+	}
 	
 }

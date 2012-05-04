@@ -45,6 +45,7 @@ public abstract class DBSession {
 		}
 	}
 	
+	protected static String CSV_DELIMITER=",";
 	
 	
 	protected Connection connection;
@@ -279,6 +280,9 @@ public abstract class DBSession {
 	
 	//************ EXECUTED OPERATIONS
 
+	public abstract String exportTableToCSV(String tableName,boolean exportHeaders)throws Exception;
+	
+	
 	
 	public abstract boolean checkExist(String tableName, List<Field> keys)throws Exception;
 	public abstract List<List<Field>> insertOperation(String tableName, List<List<Field>> rows) throws Exception;
@@ -367,7 +371,7 @@ public abstract class DBSession {
 	protected static String formUpdateQuery(List<Field> toSet, List<Field> keys,String tableName){
 		String toReturn="UPDATE "+tableName+" SET "+getCondition(toSet,",")+
 		(((keys!=null)&&keys.size()>0)?" WHERE "+getCondition(keys,"AND"):"");
-		logger.debug("QUERY STRING IS : "+toReturn);
+//		logger.debug("QUERY STRING IS : "+toReturn);
 		return toReturn;
 	}
 	

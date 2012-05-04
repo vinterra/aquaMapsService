@@ -19,7 +19,7 @@ public class AquaMapsServiceTester {
 //	static final String AQ_SERVICE_URI="http://aquamaps.ifm-geomar.de:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	static final String AQ_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	static final String DM_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";
-	
+	static final String PUB_SERVICE_URI="http://dbtest.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/PublisherService";
 	
 //	static final String AQ_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 //	static final String DM_SERVICE_URI="http://node49.p.d4science.research-infrastructures.eu:8080/wsrf/services/gcube/application/aquamaps/aquamapsservice/DataManagement";

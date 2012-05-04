@@ -47,18 +47,18 @@ public class AquaMapsManager extends SubmittedManager{
 		finally{if(session!=null)session.close();}
 	}
 
-	public static List<Submitted> getObjectsByCoverage(int hspecId, String md5SpeciesCoverage, boolean isGIS, boolean includeCustomized)throws Exception{
+	public static List<Submitted> getObjectsByCoverage(Integer hspecId, String md5SpeciesCoverage, Boolean isGIS, boolean includeCustomized)throws Exception{
 		DBSession session=null;
 		try{
 			logger.debug("looking for objects by coverage HSPEC ID="+hspecId+", md5="+md5SpeciesCoverage+", GIS="+isGIS+", custom="+includeCustomized);
 			session=DBSession.getInternalDBSession();
 			List<Field> filter=new ArrayList<Field>();
-			filter.add(new Field(SubmittedFields.sourcehspec+"",hspecId+"",FieldType.INTEGER));
-			filter.add(new Field(SubmittedFields.speciescoverage+"",md5SpeciesCoverage,FieldType.STRING));
-			filter.add(new Field(SubmittedFields.iscustomized+"",includeCustomized+"",FieldType.BOOLEAN));
+			if(hspecId!=null)filter.add(new Field(SubmittedFields.sourcehspec+"",hspecId+"",FieldType.INTEGER));
+			if(md5SpeciesCoverage!=null)filter.add(new Field(SubmittedFields.speciescoverage+"",md5SpeciesCoverage,FieldType.STRING));
+			if(!includeCustomized)filter.add(new Field(SubmittedFields.iscustomized+"",false+"",FieldType.BOOLEAN));
 			filter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));
 			filter.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
-			filter.add(new Field(SubmittedFields.gisenabled+"",isGIS+"",FieldType.BOOLEAN));
+			if(isGIS!=null)filter.add(new Field(SubmittedFields.gisenabled+"",isGIS+"",FieldType.BOOLEAN));
 			return Submitted.loadResultSet(session.executeFilteredQuery(filter, submittedTable, SubmittedFields.searchid+"", OrderDirection.ASC));
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}

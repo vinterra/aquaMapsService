@@ -1,21 +1,19 @@
 package testClient;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMap;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FilterType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementCall;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PublisherInterface;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.PublisherServiceCall;
 import org.gcube.common.core.scope.GCUBEScope;
 
 
@@ -35,12 +33,14 @@ public class WrapperTest {
 	static DataManagementInterface getDM()throws Exception{
 		return DataManagementCall.getCall(GCUBEScope.getScope(DEVSEC), AquaMapsServiceTester.DM_SERVICE_URI,false);
 	}
-	
+	static PublisherInterface getPUB()throws Exception{
+		return PublisherServiceCall.getCall(GCUBEScope.getScope(DEVSEC), AquaMapsServiceTester.PUB_SERVICE_URI,false);
+	}
 	public static void main(String[] args) throws Exception{
 		
 		AquaMapsServiceInterface wrapper= getAM();
 		DataManagementInterface dmInterface=getDM();
-		
+		PublisherInterface pubInterface=getPUB();
 		
 //		AquaMapsServiceInterface wrapper= AquaMapsServiceCall.getCall(
 //				GCUBEScope.getScope("/d4science.research-infrastructures.eu/Ecosystem/TryIt"),
@@ -118,42 +118,62 @@ public class WrapperTest {
 		
 		//********************** CHeck species filter
 		
-		Resource hspen=null;
-		System.out.println("Checking defaults..");
-		for(Field f:dmInterface.getDefaultSources())
-			if(f.getName().equals(ResourceType.HSPEN+""))hspen=wrapper.loadResource(f.getValueAsInteger());
+//		Resource hspen=null;
+//		System.out.println("Checking defaults..");
+//		for(Field f:dmInterface.getDefaultSources())
+//			if(f.getName().equals(ResourceType.HSPEN+""))hspen=wrapper.loadResource(f.getValueAsInteger());
+//		
+//		if(hspen!=null) System.out.println("HSPEN IS "+hspen);
+//		else throw new Exception("No Default HSPEN");
+//		
+//		PagedRequestSettings settings=new PagedRequestSettings(1, 0, OrderDirection.ASC, SpeciesOccursumFields.speciesid+"");
+//		ArrayList<Filter> advancedFilter=new ArrayList<Filter>();
+//		ArrayList<Filter> genericFilter=new ArrayList<Filter>();
+//		System.out.println("String");
+//		advancedFilter.add(new Filter(FilterType.begins, new Field(SpeciesOccursumFields.species+"", "a", FieldType.STRING)));
+//		System.out.println("BEGINS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		advancedFilter.add(new Filter(FilterType.ends, new Field(SpeciesOccursumFields.species+"", "a", FieldType.STRING)));
+//		System.out.println("ENDS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		advancedFilter.add(new Filter(FilterType.contains, new Field(SpeciesOccursumFields.species+"", "b", FieldType.STRING)));
+//		System.out.println("Contains : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		advancedFilter.add(new Filter(FilterType.is, new Field(SpeciesOccursumFields.kingdom+"", "Animalia", FieldType.STRING)));
+//		System.out.println("IS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		
+//		System.out.println("INTEGER");
+//		
+//		genericFilter.add(new Filter(FilterType.is, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
+//		System.out.println("IS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		
+//		genericFilter.add(new Filter(FilterType.greater_then, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
+//		System.out.println("GT : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		
+//		genericFilter.add(new Filter(FilterType.smaller_then, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
+//		System.out.println("ST : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		
+//		System.out.println("BOOLEAN");
+//		genericFilter.add(new Filter(FilterType.is, new Field(HspenFields.pelagic+"", true+"", FieldType.BOOLEAN)));
+//		System.out.println("GT : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+//		
+//		
+//		System.out.println("NULLS");
+//		System.out.println(wrapper.getJSONSpecies(hspen.getSearchId(), null, null, settings));
 		
-		if(hspen!=null) System.out.println("HSPEN IS "+hspen);
-		else throw new Exception("No Default HSPEN");
 		
-		PagedRequestSettings settings=new PagedRequestSettings(1, 0, OrderDirection.ASC, SpeciesOccursumFields.speciesid+"");
-		ArrayList<Filter> advancedFilter=new ArrayList<Filter>();
-		ArrayList<Filter> genericFilter=new ArrayList<Filter>();
-		System.out.println("String");
-		advancedFilter.add(new Filter(FilterType.begins, new Field(SpeciesOccursumFields.species+"", "a", FieldType.STRING)));
-		System.out.println("BEGINS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
-		advancedFilter.add(new Filter(FilterType.ends, new Field(SpeciesOccursumFields.species+"", "a", FieldType.STRING)));
-		System.out.println("ENDS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
-		advancedFilter.add(new Filter(FilterType.contains, new Field(SpeciesOccursumFields.species+"", "b", FieldType.STRING)));
-		System.out.println("Contains : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
-		advancedFilter.add(new Filter(FilterType.is, new Field(SpeciesOccursumFields.kingdom+"", "Animalia", FieldType.STRING)));
-		System.out.println("IS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
 		
-		System.out.println("INTEGER");
+		//**************** Check Publisher Interface
 		
-		genericFilter.add(new Filter(FilterType.is, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
-		System.out.println("IS : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
 		
-		genericFilter.add(new Filter(FilterType.greater_then, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
-		System.out.println("GT : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
+		List<AquaMap> result=(pubInterface.getMapsBySpecies(new String[]{"Lycenchelys_ratmanovi"}, true, false, null));
+		System.out.println("SPecies ONLY Loaded No Custom"+result.size());
+		for(AquaMap a:result) System.out.println("Map : "+result);
 		
-		genericFilter.add(new Filter(FilterType.smaller_then, new Field(HspenFields.depthmax+"", 100+"", FieldType.DOUBLE)));
-		System.out.println("ST : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
-		
-		System.out.println("BOOLEAN");
-		genericFilter.add(new Filter(FilterType.is, new Field(HspenFields.pelagic+"", true+"", FieldType.BOOLEAN)));
-		System.out.println("GT : "+wrapper.getJSONSpecies(hspen.getSearchId(), genericFilter, advancedFilter, settings));
-		
+//		result=(pubInterface.getMapsBySpecies(new String[]{species}, true, true, null));
+//		System.out.println("SPecies ONLY Loaded + Custom"+result.size());
+//		for(AquaMap a:result) System.out.println("Map : "+result);
+//		
+//		result=(pubInterface.getMapsBySpecies(new String[]{species}, true, true, new ArrayList<Resource>(Arrays.asList(new Resource[]{hspec}))));
+//		System.out.println("Selected Hspec Loaded + "+result.size());
+//		for(AquaMap a:result) System.out.println("Map : "+result);
 	}
 
 	

@@ -27,9 +27,11 @@ schema/AquaMapsTypes.wsdl -text
 schema/AquaMapsTypes.xsd -text
 schema/DataManagement.wsdl -text
 schema/GISTypes.xsd -text
+schema/PublisherService.wsdl -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/CommonServiceLogic.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/PublisherService.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
@@ -100,6 +102,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesConstants
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesReader.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/Analysis.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/AquaMap.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/AquaMapsObject.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/Area.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/enhanced/BoundingBox.java -text
@@ -173,6 +176,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/Constant.java -
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementCall.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/DataManagementInterface.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PublisherInterface.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/PublisherServiceCall.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/AppZip.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/RSWrapper.java -text

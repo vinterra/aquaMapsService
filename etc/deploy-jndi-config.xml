@@ -47,7 +47,13 @@
 	 		override="false" />
 	</service>
 	  
-	  
+	  <service name="gcube/application/aquamaps/aquamapsservice/PublisherService">
+    	 	<environment 
+			name="frequentUserLimit" 
+	 		value="3" 
+	 		type="java.lang.Integer"
+	 		override="false" />
+	</service>
 	  
 	  
 	  

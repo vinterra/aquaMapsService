@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.AnalysisManager;
@@ -173,7 +174,21 @@ public class ServiceContext extends GCUBEServiceContext {
 	public String getFolderPath(FOLDERS folderName){
 		String persistencePath = ServiceContext.getContext().getPersistenceRoot().getAbsolutePath()+File.separator+folderName;
 		File f=new File(persistencePath);
-		if(!f.exists())f.mkdirs();
+		if(!f.exists()){
+			logger.debug("Creating persistence folder "+persistencePath);
+			f.mkdirs();
+			try {
+				Process proc=Runtime.getRuntime().exec("chmod -R 777 "+persistencePath);
+				try{
+					proc.waitFor();
+				}catch(InterruptedException e){
+					int exitValue=proc.exitValue();
+					logger.debug("Permission execution exit value = "+exitValue);
+				}
+			} catch (IOException e) {
+				logger.warn("Unexpected Exception", e);
+			}
+		}
 		return persistencePath;
 	}
 	

@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,6 +14,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.AquaMapsObjectData;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.BiodiversityObjectExecutionRequest;
@@ -23,6 +25,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleG
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest.ClusterScaleType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
@@ -56,7 +59,9 @@ public class Generator<T> implements ObjectManager<T> {
 	private static final String GENERATION_min = "min";
 	private static final String GENERATION_csq = "csq";
 	private static final String GENERATION_path = "path";
-
+	private static final String GENERATION_SPECIES="species";
+	
+	
 	// ***********INSTANCE
 	protected GenerationRequest request;
 	protected Class<T> clazz;
@@ -140,10 +145,15 @@ public class Generator<T> implements ObjectManager<T> {
 				toGenerateStyle,
 				toAssociateStyleList,
 				0));
-		return new Layer(layerInfo.getType(), object.getIsCustomized(),
+		
+		ArrayList<String> speciesList=CSVUtils.CSVToStringList(data.getSpeciesCSVList());
+		Resource source=SourceManager.getById(object.getSourceHSPEC());
+		MetaInformations meta= new MetaInformations(object.getAuthor(), "", "", object.getTitle(), System.currentTimeMillis(), source.getAlgorithm()+"", source.getGenerationTime());
+		Layer toReturn=new Layer(layerInfo.getType(), object.getIsCustomized(),
 				layerInfo, new CoverageDescriptor(object.getSourceHSPEC() + "",
-						object.getSpeciesCoverage()), new MetaInformations(
-								object.getAuthor(), "", ""));
+						object.getSpeciesCoverage()), meta);
+		toReturn.setSpeciesIds(speciesList.toArray(new String[speciesList.size()]));
+		return toReturn;
 	}
 
 	protected static FileSet generateFileSet(AquaMapsObjectData data,
@@ -154,10 +164,16 @@ public class Generator<T> implements ObjectManager<T> {
 		}
 		if(files.size()>0){
 		logger.debug("Generated FileSet, passed base path "+data.getPath());
-		return new FileSet(files, new CoverageDescriptor(
+		ArrayList<String> speciesList=CSVUtils.CSVToStringList(data.getSpeciesCSVList());
+		Resource source=SourceManager.getById(object.getSourceHSPEC());
+		MetaInformations meta=new MetaInformations(object.getAuthor(), "", "", object.getTitle(), System.currentTimeMillis(), source.getAlgorithm()+"", source.getGenerationTime());
+		
+		FileSet toReturn=new FileSet(files, new CoverageDescriptor(
 				object.getSourceHSPEC() + "", object.getSpeciesCoverage()),
 				data.getPath(),
-				new MetaInformations(object.getAuthor(), "", ""));
+				meta);
+		toReturn.setSpeciesIds(speciesList.toArray(new String[speciesList.size()]));
+		return toReturn;
 		}else throw new Exception ("NO IMAGES WERE GENERATED FOR OBJECT "+object.getSearchId());
 	}
 
@@ -199,10 +215,10 @@ public class Generator<T> implements ObjectManager<T> {
 			ResultSet rs=session.executeFilteredQuery(filter, GENERATION_DATA_TABLE, GENERATION_ID, OrderDirection.ASC);
 			if(rs.next()){
 				logger.info("Deleting generation data for "+object.getSearchId());
-				ServiceUtils.deleteFile(rs.getString(GENERATION_csq));				
-				ServiceUtils.deleteFile(rs.getString(GENERATION_csv));
+				try{ServiceUtils.deleteFile(rs.getString(GENERATION_csq));}catch(Exception e){logger.warn("Unable to delete "+rs.getString(GENERATION_csq),e);}				
+				try{ServiceUtils.deleteFile(rs.getString(GENERATION_csv));}catch(Exception e){logger.warn("Unable to delete "+rs.getString(GENERATION_csv),e);}
 				for(String path:FileSetUtils.getTempFiles(object.getTitle()))					
-					ServiceUtils.deleteFile(path);								
+					try{ServiceUtils.deleteFile(path);}catch(Exception e){logger.warn("Unable to delete "+path,e);}								
 				session.deleteOperation(GENERATION_DATA_TABLE, filter);
 			}else logger.info("Unable to detect generation data for submitted "+object.getSearchId());
 		}catch(Exception e){throw e;}
@@ -225,22 +241,20 @@ public class Generator<T> implements ObjectManager<T> {
 						rs.getString(GENERATION_csq),
 						rs.getInt(GENERATION_min), rs.getInt(GENERATION_max),
 						rs.getString(GENERATION_csv),
-						rs.getString(GENERATION_path));
+						rs.getString(GENERATION_path),
+						rs.getString(GENERATION_SPECIES));
 			} else {
 				// ************* DATA NOT FOUND, GOING TO GENERATE
 				session.close();
 				AquaMapsObjectData toStore = null;
 				if (request instanceof BiodiversityObjectExecutionRequest) {
 					BiodiversityObjectExecutionRequest theRequest = (BiodiversityObjectExecutionRequest) request;
-					toStore = getBiodiversityData(theRequest.getObject(),
-							theRequest.getSelectedSpecies(),
-							JobManager.getWorkingHSPEC(theRequest.getObject()
-									.getJobId()), theRequest.getThreshold());
+					toStore = getBiodiversityData(theRequest.getObject(),theRequest.getSelectedSpecies(),					
+							JobManager.getWorkingHSPEC(theRequest.getObject().getJobId()), theRequest.getThreshold());
 				} else {
 					DistributionObjectExecutionRequest theRequest = (DistributionObjectExecutionRequest) request;
-					toStore = getDistributionData(theRequest.getObject(),
-							theRequest.getSelectedSpecies().iterator().next()
-							.getId(),
+					Species s=theRequest.getSelectedSpecies().iterator().next();				
+					toStore = getDistributionData(theRequest.getObject(),s.getId(),
 							JobManager.getWorkingHSPEC(theRequest.getObject()
 									.getJobId()));
 				}
@@ -267,6 +281,7 @@ public class Generator<T> implements ObjectManager<T> {
 			row.add(new Field(GENERATION_max, toStore.getMax() + "",FieldType.INTEGER));
 			row.add(new Field(GENERATION_min, toStore.getMin() + "",FieldType.INTEGER));
 			row.add(new Field(GENERATION_path,toStore.getPath()+"",FieldType.STRING));
+			row.add(new Field(GENERATION_SPECIES,toStore.getSpeciesCSVList(),FieldType.STRING));
 			rows.add(row);
 			session.insertOperation(GENERATION_DATA_TABLE, rows);
 			return toStore;
@@ -278,6 +293,9 @@ public class Generator<T> implements ObjectManager<T> {
 		}
 	}
 
+	
+	
+	
 	// ****************** DATA GENERATION
 
 	private static AquaMapsObjectData getBiodiversityData(
@@ -299,12 +317,16 @@ public class Generator<T> implements ObjectManager<T> {
 			JobManager.addToDropTableList(objectDescriptor.getJobId(),
 					tableName);
 			List<List<Field>> toInsertSpecies = new ArrayList<List<Field>>();
-			for (Species s : selectedSpecies) {
+			ArrayList<String> scientificNames=new ArrayList<String>();
+			
+			for (Species spec : selectedSpecies) {
 				List<Field> row = new ArrayList<Field>();
+				Species s=SpeciesManager.getSpeciesById(true, false, spec.getId(), 0);
 				row.add(new Field(SpeciesOccursumFields.speciesid + "", s
 						.getId(), FieldType.STRING));
 				toInsertSpecies.add(row);
-				;
+				String scientificName=s.getScientificName();
+				scientificNames.add(scientificName);
 			}
 			session.insertOperation(tableName, toInsertSpecies);
 
@@ -343,8 +365,11 @@ public class Generator<T> implements ObjectManager<T> {
 
 				// ******GIS
 
+				Collections.sort(scientificNames);
+				
+				
 				return new AquaMapsObjectData(objectDescriptor.getSearchId(),
-						clusterFile, min, max, csvFile, path);
+						clusterFile, min, max, csvFile, path,CSVUtils.listToCSV(scientificNames));
 			} else
 				return null;
 
@@ -375,6 +400,9 @@ public class Generator<T> implements ObjectManager<T> {
 				s.getFieldbyName(SpeciesOccursumFields.ordercolumn+"").getValue()+File.separator+
 				s.getFieldbyName(SpeciesOccursumFields.familycolumn+"").getValue()+File.separator+
 				s.getId()+(objectDescriptor.getIsCustomized()?ServiceUtils.generateId(objectDescriptor.getAuthor(), ""):"");
+				
+				String scientificName=s.getScientificName();
+				
 				String clusterFile=FileSetUtils.createClusteringFile(objectDescriptor.getSearchId(),objectDescriptor.getJobId()
 						,FileSetUtils.clusterize(rs, 2, 1, 2,false),objectDescriptor.getTitle());
 
@@ -384,7 +412,7 @@ public class Generator<T> implements ObjectManager<T> {
 				CSVUtils.resultSetToCSVFile(rs, csvFile,false);
 
 				logger.debug("DISTRIBUTION DATA FOR "+objectDescriptor.getSearchId()+".... COMPLETED");
-				return new AquaMapsObjectData(objectDescriptor.getSearchId(), clusterFile, 0, 0, csvFile,path);
+				return new AquaMapsObjectData(objectDescriptor.getSearchId(), clusterFile, 0, 0, csvFile,path,scientificName);
 			}else return null;
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}

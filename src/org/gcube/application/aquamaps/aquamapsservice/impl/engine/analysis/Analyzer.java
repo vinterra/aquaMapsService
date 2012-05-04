@@ -28,8 +28,8 @@ public class Analyzer {
 	
 	
 	public Analyzer(int i) {
-		logger.trace("Created batch analyzer with ID "+internalId);
 		internalId=i;
+		logger.trace("Created batch analyzer with ID "+internalId);
 	}
 	public EnvironmentalExecutionReportItem getReport(boolean getResources) {
 		EnvironmentalExecutionReportItem toReturn=new EnvironmentalExecutionReportItem();

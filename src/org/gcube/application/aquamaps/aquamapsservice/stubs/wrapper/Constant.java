@@ -6,5 +6,5 @@ public class Constant {
 	public static final String SERVICE_NAME="AquaMapsService";
 	public static final String AQUAMAPSSERVICE_PT_NAME="gcube/application/aquamaps/aquamapsservice/AquaMapsService";
 	public static final String DATAMANAGEMENT_PT_NAME="gcube/application/aquamaps/aquamapsservice/DataManagement";
-	
+	public static final String PUBLISHERSERVICE_PT_NAME="gcube/application/aquamaps/aquamapsservice/PublisherService";
 }

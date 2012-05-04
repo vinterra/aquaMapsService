@@ -5,6 +5,8 @@ public class AquaMapsObjectData {
 	private int submittedId;
 	
 	private String path;
+	private String speciesCSVList;
+	
 	//********* PERL
 	private String csq_str;
 	private int min;
@@ -57,7 +59,7 @@ public String getPath() {
 	return path;
 }
 	public AquaMapsObjectData(int submittedId,String csq_str, int min, int max,
-			String csvFile,String path) {
+			String csvFile,String path, String speciesList) {
 		super();
 		this.submittedId=submittedId;
 		this.csq_str = csq_str;
@@ -65,9 +67,12 @@ public String getPath() {
 		this.max = max;
 		this.csvFile = csvFile;
 		this.path=path;
+		this.speciesCSVList=speciesList;
 	}
 	
-	
+	public String getSpeciesCSVList() {
+		return speciesCSVList;
+	}
 	
 	
 }

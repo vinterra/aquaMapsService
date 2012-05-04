@@ -82,8 +82,8 @@ public class File extends DataModel{
 		this.setUuri(toLoad.getUrl());
 	}
 
-	public static List<File> load(org.gcube.application.aquamaps.datamodel.FileArray toLoad){
-		List<File> toReturn= new ArrayList<File>();
+	public static ArrayList<File> load(org.gcube.application.aquamaps.datamodel.FileArray toLoad){
+		ArrayList<File> toReturn= new ArrayList<File>();
 		if((toLoad!=null)&&(toLoad.getFileList()!=null))
 			for(org.gcube.application.aquamaps.datamodel.File f: toLoad.getFileList())
 				toReturn.add(new File(f));

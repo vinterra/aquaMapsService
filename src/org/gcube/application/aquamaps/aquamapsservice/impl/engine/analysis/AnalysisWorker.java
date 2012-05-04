@@ -18,6 +18,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.AppZip;
 import org.gcube.common.core.utils.logging.GCUBELog;
@@ -64,6 +65,10 @@ public class AnalysisWorker extends Thread{
 		blocking.acquire(requests.size());
 		
 		logger.debug("Woken up");
+		for(Entry<AnalysisType,String> entry:produced.getMessages().entrySet()){
+			logger.warn("Error message from execution, Analysis : "+entry.getKey()+", message : "+entry.getValue());
+		}
+		
 		
 		String path=archiveImages(produced,toPerform.getTitle()).getAbsolutePath();
 		logger.trace("Generated archive file "+path);
@@ -92,7 +97,7 @@ public class AnalysisWorker extends Thread{
 				BufferedImage bi = ImageTools.makeBuffered(image);
 				File outputfile = new File(subDir,entry.getValue().get(i).getName()+".png");
 				ImageIO.write(bi, "png", outputfile);
-			}
+			}			
 		}
 		
 		File toReturn=new File(ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS),ServiceUtils.generateId("Analysis", ".zip"));

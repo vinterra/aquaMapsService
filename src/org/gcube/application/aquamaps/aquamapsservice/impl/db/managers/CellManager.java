@@ -51,7 +51,7 @@ public class CellManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), HCAF_S, settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.executeFilteredQuery(new ArrayList<Field>(), HCAF_S, settings.getOrderField(), settings.getOrderDirection()), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}
@@ -66,7 +66,7 @@ public class CellManager {
 			String occurrenceCells=SourceManager.getById(SourceManager.getDefaultId(ResourceType.OCCURRENCECELLS)).getTableName();
 			PreparedStatement ps= session.preparedStatement("SELECT * FROM "+occurrenceCells+" as o INNER JOIN "+HCAF+" as h ON " +
 					"o."+HCAF_SFields.csquarecode+" = h."+HCAF_SFields.csquarecode+" WHERE o."+SpeciesOccursumFields.speciesid+" = ?");
-			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), settings.getOffset(), settings.getLimit());
+			return DBUtils.toJSon(session.fillParameters(filter,0, ps).executeQuery(), settings.getOffset(), settings.getLimit()+settings.getOffset());
 		}catch(Exception e){throw e;}
 		finally{if(session!=null) session.close();}
 	}

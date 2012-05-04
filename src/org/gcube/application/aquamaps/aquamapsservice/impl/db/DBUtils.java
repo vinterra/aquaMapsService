@@ -110,7 +110,6 @@ public class DBUtils {
 
 	public static String toJSon(ResultSet resultSet, int start, int end) throws SQLException
 	{
-		System.out.println("toJSon start: "+start+" end: "+end);
 		StringBuilder json = new StringBuilder();
 
 		json.append("{\"data\":[");

@@ -1,5 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,6 +9,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.datamodel.OrderDirection;
@@ -214,4 +218,21 @@ public class PostGresSQLDBSession extends DBSession {
 		return fillParameters(filters,0, ps).executeQuery();
 	}
 	
+	
+	@Override
+	public String exportTableToCSV(String tableName, boolean hasHeaders) throws Exception {
+		Statement stmt = null;
+		try{
+			File out=new File(ServiceContext.getContext().getFolderPath(FOLDERS.IMPORTS),ServiceUtils.generateId(tableName, ".csv"));
+			stmt=connection.createStatement();
+			String copyString ="COPY "+tableName+" TO '"+out.getAbsolutePath()+"' WITH DELIMITER '"+CSV_DELIMITER+"'"+(hasHeaders?" CSV HEADER":"");
+			logger.debug("Gonna execute copy  : "+copyString);
+			stmt.execute(copyString);			
+			return out.getAbsolutePath();
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(stmt!=null)stmt.close();
+		}
+	}
 }

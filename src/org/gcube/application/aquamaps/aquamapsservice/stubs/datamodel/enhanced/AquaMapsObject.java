@@ -207,4 +207,10 @@ public class AquaMapsObject extends DataModel{
 		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
 		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
 	}
+	public static String generateMD5fromIds(Set<String> set,String toIncludeParameterList){
+		StringBuilder concatSpeciesIds=new StringBuilder();
+		for(String s : set) concatSpeciesIds.append(s+",");
+		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
+		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
+	}
 }

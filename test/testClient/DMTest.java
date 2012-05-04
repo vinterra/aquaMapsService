@@ -1,16 +1,10 @@
 package testClient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.io.File;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
@@ -46,13 +40,6 @@ public class DMTest {
 //		System.out.println(dmInterface.queryResource("Select * from hspen where pelagic = 1", new PagedRequestSettings(2, 0, null, OrderDirection.ASC)));
 //		
 		
-//		System.out.println("Export Resource :");
-//
-//		File csv=dmInterface.exportResource(109);
-//		
-//		csv.renameTo(new File("exported_mini.csv"));
-//		
-//		System.out.println("Exported to exported_mini.csv"); 
 		
 		
 //		System.out.println("Import Resource :");
@@ -132,53 +119,42 @@ public class DMTest {
 		
 		//***************** GENERATE HSPEC
 		
-		SourceGenerationRequest request=new SourceGenerationRequest();		
-		request.getAlgorithms().add(AlgorithmType.SuitableRange);
-		request.setAuthor("fabio.sinibaldi");
-		request.setGenerationname("Test Regeneration");
-		request.setDescription("Testing");
-		
-		int[] resources=new int[]{
-			216,236
-		};
-		
-		for(int id:resources){
-			Resource toAdd=amInterface.loadResource(id);
-			System.out.println("Adding resource "+toAdd);
-			request.addSource(toAdd);
-		}
-			
-		
-		
-//		for (int hcafId=215;hcafId<235;hcafId++){
-//			Resource toAdd=amInterface.loadResource(hcafId);
-//			System.out.println("Adding resource "+toAdd);
-//			request.addSource(toAdd);
-//		}
+//		SourceGenerationRequest request=new SourceGenerationRequest();		
+//		request.getAlgorithms().add(AlgorithmType.SuitableRange);
+//		request.setAuthor("fabio.sinibaldi");
+//		request.setGenerationname("Test Regeneration");
+//		request.setDescription("Testing");
 //		
-//		for (int hspenId=235;hspenId<255;hspenId++){
-//			Resource toAdd=amInterface.loadResource(hspenId);
+//		int[] resources=new int[]{
+//			216,236
+//		};
+//		
+//		for(int id:resources){
+//			Resource toAdd=amInterface.loadResource(id);
 //			System.out.println("Adding resource "+toAdd);
 //			request.addSource(toAdd);
 //		}
-		
-		
-		request.setExecutionEnvironment("AquaMaps VRE");
-		request.setBackendURL("");
-		request.setSubmissionBackend(Constant.AQUAMAPSSERVICE_PT_NAME);
-		request.setEnvironmentConfiguration(new HashMap<String, String>());
-		request.setLogic(LogicType.HSPEC);
-		request.setNumPartitions(20);
-		
-		request.setExecutionParameters(new ArrayList<Field>(Arrays.asList(new Field[]{
-				new Field(SourceGenerationRequest.COMBINE_MATCHING,false+"",FieldType.BOOLEAN),
-				new Field(SourceGenerationRequest.FORCE_MAPS_REGENERATION,false+"",FieldType.BOOLEAN),
-				new Field(SourceGenerationRequest.GENERATE_MAPS,true+"",FieldType.BOOLEAN),
-				new Field(SourceGenerationRequest.GIS_ENABLED,true+"",FieldType.BOOLEAN),
-				})));
-		
-		System.out.println(dmInterface.submitRequest(request));
-		
+//			
+//		
+//		
+//		
+//		
+//		request.setExecutionEnvironment("AquaMaps VRE");
+//		request.setBackendURL("");
+//		request.setSubmissionBackend(Constant.AQUAMAPSSERVICE_PT_NAME);
+//		request.setEnvironmentConfiguration(new HashMap<String, String>());
+//		request.setLogic(LogicType.HSPEC);
+//		request.setNumPartitions(20);
+//		
+//		request.setExecutionParameters(new ArrayList<Field>(Arrays.asList(new Field[]{
+//				new Field(SourceGenerationRequest.COMBINE_MATCHING,false+"",FieldType.BOOLEAN),
+//				new Field(SourceGenerationRequest.FORCE_MAPS_REGENERATION,false+"",FieldType.BOOLEAN),
+//				new Field(SourceGenerationRequest.GENERATE_MAPS,true+"",FieldType.BOOLEAN),
+//				new Field(SourceGenerationRequest.GIS_ENABLED,true+"",FieldType.BOOLEAN),
+//				})));
+//		
+//		System.out.println(dmInterface.submitRequest(request));
+//		
 		
 		
 		//************************** RESUBMISSION
@@ -239,6 +215,19 @@ public class DMTest {
 //		System.out.println("resources Load : "+report.getResourceLoad());
 //		System.out.println("percent : "+report.getPercent());
 //		System.out.println("Species : "+report.getElaboratedSpecies());
+		
+		
+		//************************ EXPORT TABLE
+		int resourceId =128;
+		System.out.println("Export Resource : "+resourceId);
+
+		File csv=dmInterface.exportResource(resourceId);
+		
+		csv.renameTo(new File("exported_mini.csv"));
+		
+		System.out.println("Exported to exported_mini.csv"); 
+		
+		
 	}
 
 	

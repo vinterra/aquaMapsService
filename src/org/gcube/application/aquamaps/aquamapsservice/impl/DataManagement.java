@@ -45,7 +45,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Logi
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.application.aquamaps.datamodel.FieldArray;
 import org.gcube.application.aquamaps.datamodel.OrderDirection;
@@ -216,19 +215,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			logger.trace("Exporting resource id "+arg0);
 			String table=SourceManager.getById(arg0).getTableName();
 			
-			session=DBSession.getInternalDBSession();
-			File out=File.createTempFile(table, ".csv");
-			
-			logger.trace("Exporting table "+table+" to file "+out);
-			CSVUtils.resultSetToCSVFile(session.executeQuery("Select * from "+table),out.getAbsolutePath(),true);
-			
-			GCUBEScope scope=ServiceContext.getContext().getScope();
-			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper(scope);
-			wrapper.add(out);
-			String locator = wrapper.getLocator().toString();
-			logger.trace("Added file to locator "+locator);
-			return locator;
+			return exportTableAsCSV(table);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -421,15 +408,10 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		try{
 			
 			session=DBSession.getInternalDBSession();
-			File out=File.createTempFile(arg0, ".csv");
-			
-			logger.trace("Exporting table "+arg0+" to file "+out);
-			CSVUtils.resultSetToCSVFile(session.executeQuery("Select * from "+arg0),out.getAbsolutePath(),true);
-			
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
 			RSWrapper wrapper=new RSWrapper(scope);
-			wrapper.add(out);
+			wrapper.add(new File(session.exportTableToCSV(arg0,true)));
 			String locator = wrapper.getLocator().toString();
 			logger.trace("Added file to locator "+locator);
 			return locator;
