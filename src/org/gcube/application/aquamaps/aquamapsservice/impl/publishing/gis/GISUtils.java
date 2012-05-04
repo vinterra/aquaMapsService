@@ -73,6 +73,8 @@ public class GISUtils {
 			GeoServerDescriptor geoServer=getGeoServer();
 			DataSourceDescriptor geoNetwork=getGeoNetwork();
 			caller=getCaller(geoServer,geoNetwork);
+			
+			
 			//***** Create Layer table in postGIS
 			long start=System.currentTimeMillis();
 			logger.debug("Generating layer..");
@@ -110,10 +112,10 @@ public class GISUtils {
 			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),caller,geoServer);
 			if(!generatedLayer)	throw new Exception("Unable to generate Layer "+request.getMapName());
 
-		
-			logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start)+" url : "+geoServer.getEntryPoint()+"/wms/"+layerTable);
+			
+			logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start)+" layer : "+layerTable+", geoserver was "+caller.getCurrentWmsGeoserver());
 
-			return GISUtils.getLayer(request.getMapType(), layerTable, request.getMapName(), "NO DESCRIPTION", request.getToAssociateStyles(), request.getDefaultStyle(), geoServer);
+			return GISUtils.getLayer(request.getMapType(), layerTable, request.getMapName(), "NO DESCRIPTION", request.getToAssociateStyles(), request.getDefaultStyle(), geoServer,caller.getCurrentWmsGeoserver());
 		}catch(Exception e){
 			logger.trace("Layer generation failed, gonna clean up data.. exception was",e);
 			if(appTableName!=null){
@@ -403,7 +405,7 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static LayerInfo getLayer(LayersType type, String name, String title, String abstractDescription,List<String> styles, int defaultStyleIndex, GeoServerDescriptor geoserver)throws Exception{
+	private static LayerInfo getLayer(LayersType type, String name, String title, String abstractDescription,List<String> styles, int defaultStyleIndex, GeoServerDescriptor geoserver, String wmsUrl)throws Exception{
 		LayerInfo layer=ReadTemplate.getLayerTemplate(type);
 		
 		layer.setType(type);
@@ -411,7 +413,7 @@ public class GISUtils {
 		layer.setTitle(title);
 		layer.set_abstract(abstractDescription);
 		//GEOSERVER
-		layer.setUrl(geoserver.getEntryPoint());
+		layer.setUrl(wmsUrl);
 		layer.setServerProtocol("OGC:WMS");
 		layer.setServerLogin(geoserver.getUser());
 		layer.setServerPassword(geoserver.getPassword());
