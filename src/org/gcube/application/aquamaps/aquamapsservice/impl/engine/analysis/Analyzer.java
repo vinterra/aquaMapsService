@@ -45,7 +45,7 @@ public class Analyzer {
 		
 		String user=credentials.getUser();
 		String password=credentials.getPassword();
-		String url=credentials.getEntryPoint();
+		String url="jdbc:postgresql:"+credentials.getEntryPoint();
 		
 		logger.trace("passed argument : user "+user);
 		logger.trace("passed argument : password "+password);
