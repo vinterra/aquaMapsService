@@ -22,4 +22,10 @@
 		<Change>Analysis Support</Change>
 		<Change>GeoNetwork Support</Change>
 	</Changeset>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice.3-2-0" date="2012-05-04">
+		<Change>Runtime resources based configuration</Change>
+		<Change>Added Publisher port type</Change>
+		<Change>Stubs refactoring</Change>
+		<Change>CSV Export uses copy instead of result set</Change>
+	</Changeset>
 </ReleaseNotes>
