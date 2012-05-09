@@ -153,6 +153,7 @@ public class Generator<T> implements ObjectManager<T> {
 				layerInfo, new CoverageDescriptor(object.getSourceHSPEC() + "",
 						object.getSpeciesCoverage()), meta);
 		toReturn.setSpeciesIds(speciesList.toArray(new String[speciesList.size()]));
+		toReturn.setCustomized(object.getIsCustomized());
 		return toReturn;
 	}
 
@@ -173,6 +174,7 @@ public class Generator<T> implements ObjectManager<T> {
 				data.getPath(),
 				meta);
 		toReturn.setSpeciesIds(speciesList.toArray(new String[speciesList.size()]));
+		toReturn.setCustomized(object.getIsCustomized());
 		return toReturn;
 		}else throw new Exception ("NO IMAGES WERE GENERATED FOR OBJECT "+object.getSearchId());
 	}
