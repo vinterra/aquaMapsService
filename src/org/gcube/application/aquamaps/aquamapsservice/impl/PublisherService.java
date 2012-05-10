@@ -96,6 +96,7 @@ PublisherServicePortType {
 						formedCustomMaps.put(found.getSearchId(), formMap(fSet)); 
 					}catch(Exception e){
 						logger.warn("Unable to find an object for FS ID "+fSet.getId());
+						logger.debug("Exception was ",e);
 					}
 				}else {
 					if(formedMaps.containsKey(descr)){
@@ -113,22 +114,25 @@ PublisherServicePortType {
 					try{
 						layerFilter.get(0).setValue(l.getId());
 						Submitted found=SubmittedManager.getList(layerFilter, pagedSettings).get(0);
-						if(formedCustomMaps.containsKey(found.getSearchId())){							
-							formedCustomMaps.get(descr).setLayer(l.getLayerInfo());
-							formedCustomMaps.get(descr).setGis(true);
-							formedCustomMaps.get(descr).setLayerId(l.getId()); 
+						if(formedCustomMaps.containsKey(found.getSearchId())){
+							AquaMap toUpdate=formedCustomMaps.get(found.getSearchId());
+							toUpdate.setLayer(l.getLayerInfo());
+							toUpdate.setGis(true);
+							toUpdate.setLayerId(l.getId()); 
 						}else formedCustomMaps.put(found.getSearchId(), formMap(l));
 					}catch(Exception e){
 						logger.warn("Unable to find an object for layer ID "+l.getId());
+						logger.debug("Exception was ",e);
 					}
 				}else {	
 					if(formedMaps.containsKey(descr)){
 						if(formedMaps.get(descr).isGis())
 							logger.warn("Multiple Layer found for Coverage, current layer ID :  "+l.getId()+", previous : "+formedMaps.get(descr).getLayerId());
 						else{
-							formedMaps.get(descr).setLayer(l.getLayerInfo());
-							formedMaps.get(descr).setGis(true);
-							formedMaps.get(descr).setLayerId(l.getId());
+							AquaMap toUpdate=formedMaps.get(descr);
+							toUpdate.setLayer(l.getLayerInfo());
+							toUpdate.setGis(true);
+							toUpdate.setLayerId(l.getId());
 						}
 					}else{
 						formedMaps.put(descr, formMap(l));
@@ -137,7 +141,7 @@ PublisherServicePortType {
 			}
 			ArrayList<AquaMap> toReturn=new ArrayList<AquaMap>(formedMaps.values());
 			toReturn.addAll(formedCustomMaps.values());
-			logger.debug("Found "+toReturn.size()+" Maps in "+(System.currentTimeMillis()-starttime)+" ms");
+			logger.debug("Found "+toReturn.size()+" Maps ("+formedCustomMaps.size()+" custom)in "+(System.currentTimeMillis()-starttime)+" ms");
 			return AquaMap.toStubsVersion(toReturn);			
 		}catch(Exception e){
 			logger.error("Unable to get Maps ",e);
@@ -225,6 +229,7 @@ PublisherServicePortType {
 			toAdd.setSpeciesCsvList(CSVUtils.listToCSV(Arrays.asList(fSet.getSpeciesIds())));
 			toAdd.setCreationDate(fSet.getMetaInfo().getDate());
 			toAdd.setMapType(fSet.getSpeciesIds().length>1?ObjectType.Biodiversity:ObjectType.SpeciesDistribution);
+			toAdd.setCustom(fSet.isCustomized());
 		}else if(desc instanceof Layer){
 			Layer l=(Layer)desc;
 			toAdd.setAuthor(l.getMetaInfo().getAuthor());
@@ -236,6 +241,7 @@ PublisherServicePortType {
 			toAdd.setSpeciesCsvList(CSVUtils.listToCSV(Arrays.asList(l.getSpeciesIds())));
 			toAdd.setCreationDate(l.getMetaInfo().getDate());
 			toAdd.setMapType(l.getSpeciesIds().length>1?ObjectType.Biodiversity:ObjectType.SpeciesDistribution);
+			toAdd.setCustom(l.isCustomized());
 		}
 		return toAdd;
 	}

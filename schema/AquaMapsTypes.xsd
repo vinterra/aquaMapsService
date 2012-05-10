@@ -126,7 +126,7 @@
 					<xsd:element name="threshold" type="xsd:float" />
 					<xsd:element name="status" type="xsd:string" />
 					<xsd:element name="gis" type="xsd:boolean" />
-					<xsd:element name="algorithmType" type="xsd:string" />
+					<xsd:element name="algorithmType" type="xsd:string" />					
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -235,6 +235,7 @@
 					<xsd:element name="fileSetIt" type="xsd:string"/>
 					<xsd:element name="layerId" type="xsd:string"/>
 					<xsd:element name="speciesListCSV" type="xsd:string"/>
+					<xsd:element name="custom" type="xsd:boolean"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
