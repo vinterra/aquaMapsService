@@ -17,7 +17,7 @@ public class AnalyzerManager {
 	static{
 		try{
 		analyzerPool.setLifo(false);
-		analyzerPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.BATCH_POOL_SIZE));
+		analyzerPool.setMaxActive(ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.ANALYZER_BATCH_POOL_SIZE));
 		analyzerPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 			for(int i =0;i<analyzerPool.getMaxActive();i++){
 				analyzerPool.addObject();

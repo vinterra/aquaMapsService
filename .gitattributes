@@ -68,7 +68,6 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/Biodiversity
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/DistributionObjectExecutionRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/JobExecutionManager.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/JobWorker.java -text
-src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/MyPooledExecutor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/maps/RequestsMonitor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/predictions/BatchGenerator.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/engine/predictions/BatchGeneratorI.java -text
@@ -98,6 +97,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/GroupGene
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/LayerGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/StyleGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/WMSGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/util/MyPooledExecutor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesConstants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesReader.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text

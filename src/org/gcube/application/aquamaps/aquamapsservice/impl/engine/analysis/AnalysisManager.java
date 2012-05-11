@@ -2,12 +2,13 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.MyPooledExecutor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.MyPooledExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -23,17 +24,17 @@ public class AnalysisManager {
 
 private static final GCUBELog logger=new GCUBELog(AnalysisManager.class);
 	
-	private static MyPooledExecutor pool=null;
+	private static ExecutorService pool=null;
 	private static Semaphore insertedRequests=null;
 	
 	
 	public static void init(boolean purgeInvalid,int monitorInterval)throws Exception{
 		logger.trace("Initializing pools..");
-		pool=new MyPooledExecutor("ANALYSIS_WORKER", 
+		pool=MyPooledExecutor.getExecutor("ANALYSIS_WORKER", 
 				//					ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.JOB_PRIORITY),
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MAX_WORKERS),
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MIN_WORKERS),
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_INTERVAL_TIME));
+				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.ANALYSIS_MAX_WORKERS));
+//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MIN_WORKERS),
+//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_INTERVAL_TIME));
 		
 		logger.trace("Storing into "+ServiceContext.getContext().getFolderPath(FOLDERS.ANALYSIS));
 		

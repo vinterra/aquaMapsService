@@ -275,7 +275,7 @@ public class JobWorker extends Thread{
 			String filteredHSPEN=SpeciesManager.getFilteredHSPEN(JobManager.getWorkingHSPEN(jobId), selection);
 			JobManager.setWorkingHSPEN(jobId, filteredHSPEN);
 			JobManager.addToDropTableList(jobId, filteredHSPEN);
-			BatchGeneratorI generator=EnvironmentalLogicManager.getBatch();
+			BatchGeneratorI generator=EnvironmentalLogicManager.getBatch(ServiceContext.getContext().getName());
 			generator.setConfiguration(ServiceContext.getContext().getEcoligicalConfigDir()+File.separator, DBSession.getInternalCredentials());
 						return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId),
 					JobManager.getWorkingHSPEN(jobId), "maxminlat_"+sourceHspen, algorithm,false, "");

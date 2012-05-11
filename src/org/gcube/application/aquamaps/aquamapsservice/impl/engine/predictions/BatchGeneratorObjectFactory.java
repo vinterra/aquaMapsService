@@ -1,6 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
@@ -10,15 +10,35 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 
 	static GCUBELog logger= new GCUBELog(BatchGeneratorObjectFactory.class);	
 	
+	public static enum BatchPoolType{
+		LOCAL,REMOTE
+	}
 	
-	private static ArrayList<BatchGenerator> batchGenerators=new ArrayList<BatchGenerator>();
+	private static HashMap<Integer,BatchGenerator> generatorMap=new HashMap<Integer, BatchGenerator>();
+	
+	
+	public static EnvironmentalExecutionReportItem getReport(int batchId,boolean getResourceInfo)throws Exception{
+		BatchGenerator batch=generatorMap.get(batchId);
+		if(batch==null) return null;
+		else return batch.getReport(getResourceInfo);
+	}
+	
+	
+	//******************* INSTANCE 
+	
+	private final BatchPoolType type;
+	public BatchGeneratorObjectFactory(BatchPoolType type) {
+		super();
+		this.type=type;
+	}
+	
+	
 	
 	
 	@Override
-	public Object makeObject() throws Exception {
-		int id = batchGenerators.size();
-		BatchGenerator batch=new BatchGenerator(id);
-		batchGenerators.add(batch);
+	public Object makeObject() throws Exception {		
+		BatchGenerator batch=new BatchGenerator(type);
+		generatorMap.put(batch.getReportId(),batch);
 		return batch;
 	}
 	@Override
@@ -38,15 +58,6 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 //		((SourceGenerator)obj).setRequest(null);
 	}
 	
-	
-	public static EnvironmentalExecutionReportItem getReport(int batchId,boolean getResourceInfo)throws Exception{
-		try{
-			if(batchId<0||batchId>batchGenerators.size()-1) return null;
-			return batchGenerators.get(batchId).getReport(getResourceInfo);
-		}catch (IndexOutOfBoundsException e){
-			return null;
-		}
-	}
 	
 	
 }

@@ -13,7 +13,9 @@ public class PropertiesConstants {
 	
 	//*********	ENVIRONMENT LIBRARY
 	
-	public static final String BATCH_POOL_SIZE="BATCH_POOL_SIZE";
+	public static final String LOCAL_BATCH_POOL_SIZE="LOCAL_BATCH_POOL_SIZE";
+	public static final String ANALYZER_BATCH_POOL_SIZE="ANALYZER_BATCH_POOL_SIZE";
+	public static final String REMOTE_BATCH_POOL_SIZE="REMOTE_BATCH_POOL_SIZE";
 	public static final String PROGRESS_MONITOR_INTERVAL_SEC="PROGRESS_MONITOR_INTERVAL_SEC";
 	
 	
@@ -37,20 +39,21 @@ public class PropertiesConstants {
 	//********* WORKERS CONFIGURATION
 	
 	public static final String JOB_MAX_WORKERS="JOB_MAX_WORKERS";
-	public static final String JOB_MIN_WORKERS="JOB_MIN_WORKERS";
-	public static final String JOB_INTERVAL_TIME="JOB_INTERVAL_TIME";
-	public static final String JOB_PRIORITY="JOB_PRIORITY";
+//	public static final String JOB_MIN_WORKERS="JOB_MIN_WORKERS";
+//	public static final String JOB_INTERVAL_TIME="JOB_INTERVAL_TIME";
+//	public static final String JOB_PRIORITY="JOB_PRIORITY";
 	
 	public static final String AQUAMAPS_OBJECT_MAX_WORKERS="AQUAMAPS_OBJECT_MAX_WORKERS";
-	public static final String AQUAMAPS_OBJECT_MIN_WORKERS="AQUAMAPS_OBJECT_MIN_WORKERS";
-	public static final String AQUAMAPS_OBJECT_INTERVAL_TIME="AQUAMAPS_OBJECT_INTERVAL_TIME";
-	public static final String AQUAMAPS_OBJECT_PRIORITY="AQUAMAPS_OBJECT_PRIORITY";
+//	public static final String AQUAMAPS_OBJECT_MIN_WORKERS="AQUAMAPS_OBJECT_MIN_WORKERS";
+//	public static final String AQUAMAPS_OBJECT_INTERVAL_TIME="AQUAMAPS_OBJECT_INTERVAL_TIME";
+//	public static final String AQUAMAPS_OBJECT_PRIORITY="AQUAMAPS_OBJECT_PRIORITY";
 	
 	public static final String HSPEC_GROUP_MAX_WORKERS="HSPEC_GROUP_MAX_WORKERS";
-	public static final String HSPEC_GROUP_MIN_WORKERS="HSPEC_GROUP_MIN_WORKERS";
-	public static final String HSPEC_GROUP_INTERVAL_TIME="HSPEC_GROUP_INTERVAL_TIME";
-	public static final String HSPEC_GROUP_PRIORITY="HSPEC_GROUP_PRIORITY";
+//	public static final String HSPEC_GROUP_MIN_WORKERS="HSPEC_GROUP_MIN_WORKERS";
+//	public static final String HSPEC_GROUP_INTERVAL_TIME="HSPEC_GROUP_INTERVAL_TIME";
+//	public static final String HSPEC_GROUP_PRIORITY="HSPEC_GROUP_PRIORITY";
 	
+	public static final String ANALYSIS_MAX_WORKERS="ANALYSIS_MAX_WORKERS";
 	
 	//********* DEFAULT DB VALUES
 	

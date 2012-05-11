@@ -1,9 +1,9 @@
-package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
+package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
@@ -11,12 +11,11 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 
 
-public class MyPooledExecutor extends ThreadPoolExecutor {
+public class MyPooledExecutor {
 
 	private static final GCUBELog logger=new GCUBELog(MyPooledExecutor.class);
 	
@@ -27,7 +26,7 @@ public class MyPooledExecutor extends ThreadPoolExecutor {
 	 *
 	 */
 	
-	protected class MyThreadFactory implements ThreadFactory{
+	protected static class MyThreadFactory implements ThreadFactory{
 		
 		private String label;
 		private int priority;
@@ -54,31 +53,11 @@ public class MyPooledExecutor extends ThreadPoolExecutor {
 		}
 	}
 	
-	
-	public MyPooledExecutor(String threadLabel,int threadPriority,int maxThread,int minThread,int keepalive) {
-		super(minThread,maxThread,Long.MAX_VALUE,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(maxThread),new BlockingRejectionHandler());
-		setThreadFactory(new MyThreadFactory(threadLabel, threadPriority));
-		
-//		super(new BoundedBuffer(maxThread));
-//		setKeepAliveTime(keepalive);
-//		setMinimumPoolSize(minThread);
-//		setMaximumPoolSize(maxThread);
-//		setThreadFactory(new MyThreadFactory(threadLabel, threadPriority));
-//		waitWhenBlocked();
+	public static ExecutorService getExecutor(String threadLabel,int maxThread){
+		return Executors.newFixedThreadPool(maxThread, new MyThreadFactory(threadLabel));
 	}
 	
-	public MyPooledExecutor(String threadLabel,int maxThread,int minThread,int keepalive) {
-		super(minThread,maxThread,Long.MAX_VALUE,TimeUnit.MILLISECONDS,new ArrayBlockingQueue<Runnable>(maxThread), new BlockingRejectionHandler());
-		setThreadFactory(new MyThreadFactory(threadLabel));
-		
-//		
-//		super(new BoundedBuffer(maxThread));
-//		setKeepAliveTime(keepalive);
-//		setMinimumPoolSize(minThread);
-//		setMaximumPoolSize(maxThread);
-//		setThreadFactory();
-//		waitWhenBlocked();
-	}
+
 	
 	private static class BlockingRejectionHandler implements RejectedExecutionHandler{
 

@@ -35,6 +35,13 @@ public class SourceGenerationRequestsManager {
 			toInsert.setSubmissiontime(System.currentTimeMillis());	
 			toInsert.setGeneratedSources(new ArrayList<Integer>());
 			toInsert.setJobIds(new ArrayList<Integer>());
+			toInsert.setCurrentphasepercent(0d);
+			toInsert.setEndtime(0l);
+			toInsert.setEvaluatedComputationCount(0);
+			toInsert.setGenerationname(toInsert.getGenerationname()+"_reLaunch");
+			toInsert.setReportID(new ArrayList<Integer>());
+			toInsert.setStarttime(0l);
+			toInsert.setToGenerateTableCount(0);
 			List<List<Field>> rows=new ArrayList<List<Field>>();
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");

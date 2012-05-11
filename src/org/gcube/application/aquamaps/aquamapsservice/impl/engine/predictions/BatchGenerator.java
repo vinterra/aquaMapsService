@@ -9,6 +9,7 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory.BatchPoolType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
@@ -41,6 +42,8 @@ public class BatchGenerator implements BatchGeneratorI {
 	private Integer internalId;
 	private InterpolateTables interpolator=null;
 	
+	
+	private BatchPoolType type;
 	
 	
 	public BatchGenerator(String path,DBDescriptor credentials) {
@@ -85,11 +88,16 @@ public class BatchGenerator implements BatchGeneratorI {
 		logger.trace("passed argument : url "+e.getDatabaseURL());
 		logger.trace("passed argument : threads num "+e.getNumberOfThreads());
 	}
-	public BatchGenerator(Integer internalId) {
-		logger.trace("Created batch generator with ID "+internalId);
-		this.internalId=internalId;
+	
+	public BatchGenerator(BatchPoolType type) {
+		this.internalId=this.hashCode();
+		this.type=type;
+		logger.trace("Created batch "+type+"generator with ID "+internalId);
 	}
 
+	public BatchPoolType getType() {
+		return type;
+	}
 
 	@Override
 	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo) {

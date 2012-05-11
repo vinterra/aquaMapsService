@@ -73,7 +73,7 @@ public class HSPECGroupWorker extends Thread {
 			
 			for(List<Resource> sourcesSubset:sourcesSubsets)
 				for(AlgorithmType algorithm:request.getAlgorithms()){
-					BatchGeneratorI batch =EnvironmentalLogicManager.getBatch();
+					BatchGeneratorI batch =EnvironmentalLogicManager.getBatch(request.getSubmissionBackend());
 					logger.debug("Got batch Id "+batch.getReportId());
 					SourceGenerationRequestsManager.addReportId(batch.getReportId(), request.getId());
 					try{
@@ -322,12 +322,12 @@ public class HSPECGroupWorker extends Thread {
 
 	private static ArrayList<ArrayList<Resource>> getComplexGenerationSubSets(SourceGenerationRequest request)throws Exception{
 		ArrayList<ArrayList<Resource>> toReturn=new ArrayList<ArrayList<Resource>>();
-
 		switch(request.getLogic()){
 		case HSPEC : {
 			boolean combineMatching=true;
-			for(Field f:request.getGenerationParameters())
-				if(f.getName().equals(SourceGenerationRequest.COMBINE_MATCHING))combineMatching=f.getValueAsBoolean();
+			for(Field f:request.getExecutionParameters())				
+				if(f.getName().equals(SourceGenerationRequest.COMBINE_MATCHING)) combineMatching=f.getValueAsBoolean();
+			
 			if(request.getHcafIds().size()==0) throw new Exception ("No HCAF resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			if(request.getHspenIds().size()==0) throw new Exception ("No HSPEN resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			for(Integer hcafId:request.getHcafIds()){
