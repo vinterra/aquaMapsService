@@ -37,8 +37,7 @@ public class SourceGenerationRequestsManager {
 			toInsert.setJobIds(new ArrayList<Integer>());
 			toInsert.setCurrentphasepercent(0d);
 			toInsert.setEndtime(0l);
-			toInsert.setEvaluatedComputationCount(0);
-			toInsert.setGenerationname(toInsert.getGenerationname()+"_reLaunch");
+			toInsert.setEvaluatedComputationCount(0);			
 			toInsert.setReportID(new ArrayList<Integer>());
 			toInsert.setStarttime(0l);
 			toInsert.setToGenerateTableCount(0);

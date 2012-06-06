@@ -500,6 +500,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
 				if(r==null||!r.getType().equals(ResourceType.OCCURRENCECELLS))throw new Exception("Invalid Occurrence Cells id "+resId);
 			}			
+			request.setGenerationname(request.getGenerationname()+"_reLaunch");
 			return TableGenerationExecutionManager.insertRequest(request);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
