@@ -41,9 +41,14 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 					try{
 						int completedSteps=request.getGeneratedSources().size()/(request.getToGenerateTableCount()/request.getEvaluatedComputationCount());
 						Double percent=((double)completedSteps/request.getEvaluatedComputationCount())*100;
-						for(Integer reportId:request.getReportID())
-							percent+=BatchGeneratorObjectFactory.getReport(reportId,false).getPercent();
-						
+						StringBuilder logBuilder=new StringBuilder("completed steps = "+completedSteps);
+						logBuilder.append("computation count = "+request.getEvaluatedComputationCount());
+						for(Integer reportId:request.getReportID()){
+							Double reportStatus=BatchGeneratorObjectFactory.getReport(reportId,false).getPercent();
+							percent+=reportStatus/request.getEvaluatedComputationCount();
+							logBuilder.append("reportId "+reportId+" status "+reportStatus);
+						}
+						logger.trace("Updateing reference "+request.getId()+", percent "+percent+", formula details "+logBuilder);
 						SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
 					}catch(Exception e){
 						logger.warn("Skipping percent update for execution id "+request.getId()+", report id was "+request.getReportID(),e);

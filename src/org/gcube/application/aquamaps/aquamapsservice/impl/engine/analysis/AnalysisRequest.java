@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +66,7 @@ public class AnalysisRequest {
 		
 		
 		for(ResourceType type:ResourceType.values()){
-			if((sourceTables.containsKey(type)!=sourceLabels.containsKey(type))) 
+			if((sourceTables.containsKey(type)!=sourceLabels.containsKey(type))) // tables
 				throw new Exception("Incoherent labels/tables for "+type+", TABLES : "+sourceTables.keySet()+", LABELS : "+sourceLabels.keySet());
 			else if(sourceTables.containsKey(type)){
 				if(sourceTables.get(type).size()!=sourceLabels.get(type).size()) 
@@ -144,4 +145,40 @@ public class AnalysisRequest {
 	public void notify(AnalysisResponseDescriptor descriptor,Analyzer analyzer){
 		toNotify.notifyGenerated(descriptor, analyzer);
 	}
+
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("AnalysisRequest [toPerformAnalysis=");
+		builder.append(toPerformAnalysis);
+		builder.append(", hcafTables=");
+		builder.append(Arrays.toString(hcafTables));
+		builder.append(", hcafLabels=");
+		builder.append(Arrays.toString(hcafLabels));
+		builder.append(", hspecTables=");
+		builder.append(Arrays.toString(hspecTables));
+		builder.append(", hspecLabels=");
+		builder.append(Arrays.toString(hspecLabels));
+		builder.append(", hspenTables=");
+		builder.append(Arrays.toString(hspenTables));
+		builder.append(", hspenLabels=");
+		builder.append(Arrays.toString(hspenLabels));
+		builder.append(", occurrenceTables=");
+		builder.append(Arrays.toString(occurrenceTables));
+		builder.append(", occurrenceLabels=");
+		builder.append(Arrays.toString(occurrenceLabels));
+		builder.append(", hspecThreshold=");
+		builder.append(hspecThreshold);
+		builder.append(", toNotify=");
+		builder.append(toNotify);
+		builder.append("]");
+		return builder.toString();
+	}
+	
+	
 }
