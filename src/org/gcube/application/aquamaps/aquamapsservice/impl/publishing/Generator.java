@@ -23,6 +23,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.GISUti
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest.ClusterScaleType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
@@ -134,17 +135,35 @@ public class Generator<T> implements ObjectManager<T> {
 			toAssociateStyleList.add(StyleGenerationRequest.getDefaultDistributionStyle());
 		}
 
-
-		LayerInfo layerInfo = GISUtils
-		.generateLayer(new LayerGenerationRequest(		
-				data.getCsvFile(),
-				object.getType().equals(ObjectType.Biodiversity) ? AquaMapsManager.maxSpeciesCountInACell: HSPECFields.probability + "",
-				object.getType().equals(ObjectType.Biodiversity) ? "integer": "real",						
-				object.getTitle(),
-				object.getType().equals(ObjectType.Biodiversity) ?LayersType.Biodiversity:LayersType.Prediction,
-				toGenerateStyle,
-				toAssociateStyleList,
-				0));
+		//RETRY POLICY IN CASE OF GEOSERVER FAIL
+		boolean generated=false;
+		int attemptCount=0;
+		int maxAttempt=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_MAX_ATTEMPT);
+		LayerInfo layerInfo=null;
+		do{
+			try{
+				attemptCount++;
+				layerInfo = GISUtils
+				.generateLayer(new LayerGenerationRequest(		
+						data.getCsvFile(),
+						object.getType().equals(ObjectType.Biodiversity) ? AquaMapsManager.maxSpeciesCountInACell: HSPECFields.probability + "",
+						object.getType().equals(ObjectType.Biodiversity) ? "integer": "real",						
+						object.getTitle(),
+						object.getType().equals(ObjectType.Biodiversity) ?LayersType.Biodiversity:LayersType.Prediction,
+						toGenerateStyle,
+						toAssociateStyleList,
+						0));
+				generated=true;
+			}catch(Exception e){
+				if(attemptCount<=maxAttempt){
+					//retry
+					long toWaitTimeMinutes=attemptCount*ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_RETRY_MINUTES);
+					logger.warn("Layer generation failed, this was attempt N° "+attemptCount+", going to retry in "+toWaitTimeMinutes+" minutes..");
+					try{Thread.sleep(toWaitTimeMinutes*60*1000);}catch(InterruptedException e1){}
+				}else throw e;				
+			}
+		}while(attemptCount<=maxAttempt&&generated==false);
+		
 		
 		ArrayList<String> speciesList=CSVUtils.CSVToStringList(data.getSpeciesCSVList());
 		Resource source=SourceManager.getById(object.getSourceHSPEC());
