@@ -64,7 +64,7 @@ public class Analyzer {
 		Thread t=new Thread(){
 			@Override
 			public void run() {
-				AnalysisResponseDescriptor toReturn=new AnalysisResponseDescriptor();
+				AnalysisResponseDescriptor toReturn=new AnalysisResponseDescriptor(toPerform.getToPerformAnalysis());
 				logger.debug("Analyzer inner thread, request is "+toPerform);
 				try{
 					String groupLabel=getLabel(toPerform.getToPerformAnalysis());

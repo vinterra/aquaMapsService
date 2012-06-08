@@ -11,9 +11,10 @@ public class AnalysisResponseDescriptor {
 	
 	private HashMap<AnalysisType,Boolean> results=new HashMap<AnalysisType, Boolean>();
 	private HashMap<AnalysisType,String> messages=new HashMap<AnalysisType, String>();
+	private AnalysisType type;
 	
-	public AnalysisResponseDescriptor() {
-		// TODO Auto-generated constructor stub
+	public AnalysisResponseDescriptor(AnalysisType type) {
+		this.type=type;
 	}
 	public HashMap<String, ArrayList<ImageDescriptor>> getCategorizedImages() {
 		return categorizedImages;
@@ -28,5 +29,8 @@ public class AnalysisResponseDescriptor {
 		categorizedImages.putAll(toAppend.getCategorizedImages());
 		results.putAll(toAppend.results);
 		messages.putAll(toAppend.messages);
+	}
+	public AnalysisType getType() {
+		return type;
 	}
 }

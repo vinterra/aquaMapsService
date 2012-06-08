@@ -15,6 +15,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.A
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.AnalysisFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.datamodel.OrderDirection;
@@ -134,6 +135,15 @@ public class AnalysisTableManager {
 				req.getField(AnalysisFields.reportid)
 		})));
 	}
+	
+	public static void addCompletedAnalysis(String id,AnalysisType toAdd)throws Exception{
+		Analysis req=getById(id);		
+		req.getPerformedAnalysis().add(toAdd);
+		updateField(id, new ArrayList<Field>(Arrays.asList(new Field[]{
+				req.getField(AnalysisFields.performedanalysis)
+		})));
+	}
+	
 	public static void removeReportId(int reportId, String id)throws Exception{
 		Analysis req=getById(id);		
 		req.removeReportId(reportId);
