@@ -18,16 +18,16 @@ public class QueryConstructurThread extends Thread {
 	public enum Operation {
 		DELETE,CREATE
 	}
-	
-	
+
+
 	private String userId;
 	private Operation op;
 	private String table;
 	private String queryString;
-	
-	
-	
-	
+
+
+
+
 	public QueryConstructurThread(String userId, Operation op, String query, String tableName) {
 		super(op+"_"+userId);
 		this.userId=userId;
@@ -35,18 +35,18 @@ public class QueryConstructurThread extends Thread {
 		this.table=tableName;
 		this.queryString=query;
 	}
-	
+
 	@Override
 	public void run() {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			ArrayList<Field> field=new ArrayList<Field>();
-			field.add(new Field(CustomQueryManager.userQueryUser,userId,FieldType.STRING));
-			ResultSet rs=session.executeFilteredQuery(field, CustomQueryManager.userQueryTable, CustomQueryManager.userQueryUser, OrderDirection.ASC);
-			if(rs.next()){				
-				switch(op){
-					case CREATE : 
+			switch(op){
+				case CREATE :
+					ArrayList<Field> field=new ArrayList<Field>();
+					field.add(new Field(CustomQueryManager.userQueryUser,userId,FieldType.STRING));
+					ResultSet rs=session.executeFilteredQuery(field, CustomQueryManager.userQueryTable, CustomQueryManager.userQueryUser, OrderDirection.ASC);
+					if(rs.next()){				
 						logger.trace("Creating view [ "+table+" ]for "+userId+"'s query [ "+queryString+" ]");
 						session.executeUpdate("CREATE TABLE "+table+" AS ( "+queryString+" )");
 						long count=session.getTableCount(table);
@@ -60,16 +60,16 @@ public class QueryConstructurThread extends Thread {
 						ArrayList<List<Field>> keys=new ArrayList<List<Field>>();
 						keys.add(key);
 						session.updateOperation(CustomQueryManager.userQueryTable, keys, rows);
-						break;
-					case DELETE : 
-						logger.trace("Dropping "+userId+"'s custom query view "+table+", query was [ "+queryString+" ]");
-						session.dropTable(table);
-						break;
-						default : throw new Exception ("Operation not defined");
-				}
-				logger.trace("DONE");
+					}
+					else throw new Exception("User entry not found");
+					break;
+				case DELETE : 
+					logger.trace("Dropping "+userId+"'s custom query view "+table+", query was [ "+queryString+" ]");
+					session.dropTable(table);
+					break;
+				default : throw new Exception ("Operation not defined");
 			}
-			else throw new Exception("User entry not found");
+			logger.trace("DONE");
 		}catch(Exception e){
 			logger.error("Unable to "+op+" table",e);
 		}
@@ -80,6 +80,6 @@ public class QueryConstructurThread extends Thread {
 				logger.fatal("Unable to close session",e);
 			}}
 	}
-	
-	
+
+
 }

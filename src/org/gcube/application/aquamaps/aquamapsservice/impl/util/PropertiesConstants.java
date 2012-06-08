@@ -9,7 +9,8 @@ public class PropertiesConstants {
 	public static final String ENABLE_SCRIPT_LOGGING="ENABLE_SCRIPT_LOGGING";
 	public static final String PURGE_PENDING_OBJECTS="PURGE_PENDING_OBJECTS";
 	public static final String PURGE_PENDING_HSPEC_REQUESTS="PURGE_PENDING_HSPEC_REQUESTS";
-	
+	public static final String CUSTOM_QUERY_KEEP_ALIVE_MINUTES="CUSTOM_QUERY_KEEP_ALIVE_MINUTES";
+	public static final String CUSTOM_QUERY_DELETION="CUSTOM_QUERY_DELETION";
 	
 	//*********	ENVIRONMENT LIBRARY
 	

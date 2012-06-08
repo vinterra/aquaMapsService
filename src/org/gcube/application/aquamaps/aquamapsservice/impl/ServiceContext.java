@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.DeletionMonitor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.AnalysisManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
@@ -124,6 +125,15 @@ public class ServiceContext extends GCUBEServiceContext {
 		}catch(Exception e){
 			logger.fatal("Unable to start managers",e);
 		}
+		
+		try{
+			DeletionMonitor t=new DeletionMonitor(5000);
+			t.start();
+			logger.info("Deletion Monitor started");
+		}catch(Exception e){
+			logger.fatal("Unable to start Deletion Monitor ",e);
+		}
+		
 	}
 	
 	

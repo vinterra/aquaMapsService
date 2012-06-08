@@ -26,16 +26,7 @@ public class SubmittedManager {
 
 	protected static final String submittedTable="submitted";
 
-	static{
-		try{
-			DeletionMonitor t=new DeletionMonitor(5000);
-			t.start();
-			logger.info("Deletion Monitor started");
-		}catch(Exception e){
-			logger.fatal("Unable to start Deletion Monitor ",e);
-		}
-	}
-	
+		
 	
 	protected static Object getField(int id, SubmittedFields field)throws Exception{
 		DBSession session=null;
