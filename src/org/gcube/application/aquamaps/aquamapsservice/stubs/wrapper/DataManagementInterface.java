@@ -14,7 +14,7 @@ import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 public interface DataManagementInterface {
 
 	public String submitRequest(SourceGenerationRequest request)throws Exception;
-	public EnvironmentalExecutionReportItem getReport(Integer reportId) throws Exception;
+	public EnvironmentalExecutionReportItem getReport(List<String> reportIds) throws Exception;
 	public String getJSONSPECGroupGenreationRequests(PagedRequestSettings settings) throws Exception;
 	public Integer generateMaps(String author,boolean enableGIS,Integer hspecId,List<Field> speciesFilter,boolean forceRegeneration)throws Exception;
 	public SourceGenerationRequest getRequest(String id) throws Exception;

@@ -26,6 +26,7 @@ import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.security.GCUBESecurityManager;
 import org.gcube.common.core.security.GCUBESecurityManagerImpl;
 import org.gcube.common.core.types.VOID;
+import org.gcube.common.core.types.StringArray;
 
 public class DataManagementCall extends AquaMapsCall implements DataManagementInterface {
 
@@ -83,10 +84,10 @@ public class DataManagementCall extends AquaMapsCall implements DataManagementIn
 	}
 
 	@Override
-	public EnvironmentalExecutionReportItem getReport(Integer reportId)
+	public EnvironmentalExecutionReportItem getReport(List<String> ids)
 			throws Exception {
 		try{
-			GetGenerationLiveReportResponseType report= pt.getGenerationLiveReportGroup(reportId);
+			GetGenerationLiveReportResponseType report= pt.getGenerationLiveReportGroup(new StringArray(ids.toArray(new String[ids.size()])));
 			return new EnvironmentalExecutionReportItem(report.getPercent(), report.getResourceLoad(), report.getResourceMap(), report.getElaboratedSpecies());
 		}catch(GCUBEFault f){
 			logger.error("Service thrown Fault ",f);

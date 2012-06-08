@@ -54,7 +54,9 @@ import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
 import org.gcube.common.core.scope.GCUBEScope;
+import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
+import org.gcube.dataanalysis.ecoengine.utils.ResourceFactory;
 
 public class DataManagement extends GCUBEPortType implements DataManagementPortType{
 
@@ -126,13 +128,31 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 
 	@Override
 	public GetGenerationLiveReportResponseType getGenerationLiveReportGroup(
-			int arg0) throws RemoteException, GCUBEFault {
-		try{
-			logger.trace("Serving get generation Live Report, generator ID is "+arg0);
-			EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(arg0,true);
-			if(report==null) throw new Exception("Execution finished or not yet started");
+			StringArray ids) throws RemoteException, GCUBEFault {
+		try{			
+			if(ids==null||ids.getItems()==null||ids.getItems().length==0) throw new Exception ("INVALID REQUEST : No Report ID specified");
+			List<String> mapLoad=new ArrayList<String>();
+			List<String> resourceMap=new ArrayList<String>();
+			Double percent=0d;
+			for(String idString:ids.getItems()){
+				try{
+					Integer id=Integer.parseInt(idString);
+					EnvironmentalExecutionReportItem report=BatchGeneratorObjectFactory.getReport(id,true);
+					if(report==null) throw new Exception("Execution finished or not yet started");
+					mapLoad.add(report.getResourceLoad());
+					resourceMap.add(report.getResourcesMap());
+					percent+=report.getPercent()/ids.getItems().length;
+				}catch(Exception e){
+					logger.warn("Unable to get report, id "+idString, e);
+				}
+			}
+			
+			
+			
+			
+			//FIXME elaborated species not reported
 			return new GetGenerationLiveReportResponseType(
-					report.getElaboratedSpecies(), report.getPercent(), report.getResourceLoad(), report.getResourcesMap());
+					null, percent, ResourceFactory.getOverallResourceLoad(mapLoad), ResourceFactory.getOverallResources(resourceMap));
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

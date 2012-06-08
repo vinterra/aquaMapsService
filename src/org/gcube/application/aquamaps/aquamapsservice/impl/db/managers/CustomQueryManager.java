@@ -165,7 +165,7 @@ public class CustomQueryManager {
 			int keepAliveMinutes=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.CUSTOM_QUERY_KEEP_ALIVE_MINUTES);
 			Filter timeFilter=new Filter(FilterType.smaller_then, new Field(userQueryLastAccessTime,(System.currentTimeMillis()-(keepAliveMinutes*1000*60))+"",FieldType.LONG));
 			String queryString="SELECT * FROM "+userQueryTable+" WHERE "+userQueryLastAccessTime+" "+timeFilter.toSQLString();
-			logger.trace("Query String is "+queryString);
+//			logger.trace("Query String is "+queryString);
 			session=DBSession.getInternalDBSession();
 			ResultSet rs=session.executeQuery(queryString);
 			int count=0;

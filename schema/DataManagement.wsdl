@@ -139,7 +139,7 @@
 			<xsd:element name="getJSONSubmittedHSPECRequest" type="aqtypes:pagedRequestSettings" />
 			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string" />
 
-			<xsd:element name="getGenerationLiveReportRequest" type="xsd:int" />
+			<xsd:element name="getGenerationLiveReportRequest" type="coretypes:stringArray" />
 			<xsd:element name="getGenerationLiveReportResponse" type="tns:getGenerationLiveReportResponseType" />
 
 			<xsd:element name="removeHSPECGroupRequest" type="tns:removeHSPECGroupGenerationRequestResponseType" />
