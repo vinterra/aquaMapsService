@@ -6,7 +6,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGen
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
@@ -68,17 +68,31 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 							long totalObjCount=0;
 							ArrayList<Field> completedFilter=null;
 							ArrayList<Field> toCompleteFilter=null;
+							//checking jobIds
+							boolean completed=true;
+							SourceGenerationPhase toSetCompletedPhase=SourceGenerationPhase.completed;
 							for(Integer id:request.getJobIds()){
-								completedFilter=new ArrayList<Field>();
-								completedFilter.add(new Field(SubmittedFields.jobid+"",id+"",FieldType.INTEGER));
-								completedFilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));
-								completedObjCount+=SubmittedManager.getCount(completedFilter);
-								toCompleteFilter=new ArrayList<Field>();
-								toCompleteFilter.add(new Field(SubmittedFields.jobid+"",id+"",FieldType.INTEGER));
-								totalObjCount+=SubmittedManager.getCount(toCompleteFilter);
+								Submitted job=SubmittedManager.getSubmittedById(id);
+								if(!job.getStatus().equals(SubmittedStatus.Completed)&&!job.getStatus().equals(SubmittedStatus.Error)) completed=false;
+								if(job.getStatus().equals(SubmittedStatus.Error)) toSetCompletedPhase=SourceGenerationPhase.error;
 							}
-							Double percent=100d*completedObjCount/totalObjCount;
-							SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
+							if(completed){
+								logger.info("All jobs completed for source generation "+request.getId()+", to set phase : "+toSetCompletedPhase);
+								SourceGenerationRequestsManager.setPhase(toSetCompletedPhase,request.getId());
+							}else{
+								//percent calculation
+								for(Integer id:request.getJobIds()){
+									completedFilter=new ArrayList<Field>();
+									completedFilter.add(new Field(SubmittedFields.jobid+"",id+"",FieldType.INTEGER));
+									completedFilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));
+									completedObjCount+=SubmittedManager.getCount(completedFilter);
+									toCompleteFilter=new ArrayList<Field>();
+									toCompleteFilter.add(new Field(SubmittedFields.jobid+"",id+"",FieldType.INTEGER));
+									totalObjCount+=SubmittedManager.getCount(toCompleteFilter);
+								}
+								Double percent=100d*completedObjCount/totalObjCount;
+								SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
+							}
 						}catch(Exception e){logger.warn("Skipping percent update for execution id "+request.getId(),e);}
 					}
 			}catch(Exception e){
