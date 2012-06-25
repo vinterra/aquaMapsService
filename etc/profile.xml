@@ -97,6 +97,17 @@
 						<Scope level="GHN" />
 						<Optional>false</Optional>
 					</Dependency>
+					<Dependency>
+						<Service>
+							<Class>Application</Class>
+							<Name>ISCrawler</Name>
+							<Version>1.0.0</Version>
+						</Service>
+						<Package>ISCrawler</Package>
+						<Version>[1.0.0,2.0.0)</Version>
+						<Scope level="GHN" />
+						<Optional>false</Optional>
+					</Dependency>
 				</Dependencies>
 				<GARArchive>org.gcube.application.aquamaps.aquamapsservice.gar</GARArchive>
 				<PortType>
