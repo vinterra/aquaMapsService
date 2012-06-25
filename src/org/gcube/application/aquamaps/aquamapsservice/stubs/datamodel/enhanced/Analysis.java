@@ -306,8 +306,7 @@ public class Analysis extends DataModel{
 
 	public void setSources(List<Integer> sources) {
 		this.sources.clear();
-		this.sources.addAll(sources);
-		Collections.sort(this.sources);
+		this.sources.addAll(sources);		
 	}
 	
 	

@@ -184,7 +184,7 @@ public class Resource extends DataModel{
 			try{
 			this.setField(f);
 			}catch(Exception e){
-				//skips wrong fields
+				logger.debug("Uncompliant field "+f.getName()+" : "+f.getValue()+"; "+f.getType());
 			}
 	}
 	

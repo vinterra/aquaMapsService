@@ -184,10 +184,12 @@ src/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/RSWrapper
 test/testClient/AquaMapsServiceTester.class -text
 test/testClient/AquaMapsServiceTester.java -text
 test/testClient/BrokenPipeIssueTest.java -text
+test/testClient/CSVReader.java -text
 test/testClient/DBConnectionTest.java -text
 test/testClient/DMTest.java -text
 test/testClient/DataModelTest.java -text
 test/testClient/DummyObjects.java -text
+test/testClient/ExecutorTesting.java -text
 test/testClient/HSQLDBTest.java -text
 test/testClient/LayerPubblicationTest.java -text
 test/testClient/MD5Test.java -text
