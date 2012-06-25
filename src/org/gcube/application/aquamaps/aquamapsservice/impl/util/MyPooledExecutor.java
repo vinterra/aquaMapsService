@@ -2,10 +2,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -15,7 +13,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 
 
-public class MyPooledExecutor {
+public class MyPooledExecutor extends ThreadPoolExecutor implements ExtendedExecutor{
 
 	private static final GCUBELog logger=new GCUBELog(MyPooledExecutor.class);
 	
@@ -26,11 +24,13 @@ public class MyPooledExecutor {
 	 *
 	 */
 	
+
 	protected static class MyThreadFactory implements ThreadFactory{
 		
 		private String label;
 		private int priority;
 		private boolean setPriority;
+		private int index=0;
 		
 		public MyThreadFactory(String threadLabel,int priority) {
 			super();			
@@ -45,40 +45,53 @@ public class MyPooledExecutor {
 		}
 		
 		@Override
-		public Thread newThread(Runnable arg0) {
+		public Thread newThread(Runnable arg0) {			
 			Thread toReturn=Executors.defaultThreadFactory().newThread(arg0);
-			toReturn.setName(ServiceUtils.generateId(label, ""));
+//			toReturn.setName(ServiceUtils.generateId(label, ""));
+			toReturn.setName(label+index);
+			index++;
 			if(setPriority)toReturn.setPriority(priority);
 			return toReturn;
 		}
 	}
 	
-	public static ExecutorService getExecutor(String threadLabel,int maxThread){
-		return Executors.newFixedThreadPool(maxThread, new MyThreadFactory(threadLabel));
+	private MyPooledExecutor(final String threadLabel,int maxThread){
+		super(maxThread,
+				maxThread, 
+				Long.MAX_VALUE, 
+				TimeUnit.MILLISECONDS, 
+				new ArrayBlockingQueue<Runnable>(maxThread*2),  
+				new MyThreadFactory(threadLabel), new RejectedExecutionHandler() {
+					
+					@Override
+					public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+						try {
+							logger.info("Request queue for  "+threadLabel+" full, blocking request. Pool stats : "+((ExtendedExecutor)e).getDetails());
+							e.getQueue().put(r);
+						} catch (InterruptedException e1) {
+							 logger.warn("Work discarded because thread was interrupted while waiting to schedule: " + r);
+						}
+					}
+				});
+	}
+	
+	
+	@Override
+	public String getDetails() {
+		StringBuilder statusBuilder=new StringBuilder();
+		statusBuilder.append("Active Count : "+getActiveCount()+";");
+		statusBuilder.append("Core Size : "+getCorePoolSize()+";");
+		statusBuilder.append("Maximum pool size: "+getMaximumPoolSize()+";");
+		statusBuilder.append("Current Queue size: "+getQueue().size()+";");
+		statusBuilder.append("Largest pool size : "+getLargestPoolSize()+";");
+		statusBuilder.append("Executed Count : "+getCompletedTaskCount()+";");
+		return statusBuilder.toString();
+	}
+	
+	public static ExtendedExecutor getExecutor(String threadLabel,int maxThread){
+		return new MyPooledExecutor(threadLabel, maxThread); 
 	}
 	
 
-	
-	private static class BlockingRejectionHandler implements RejectedExecutionHandler{
-
-		@Override
-		public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-			 BlockingQueue<Runnable> queue = executor.getQueue();
-	         if (executor.isShutdown()) {
-	                    throw new RejectedExecutionException(
-	                        "ThreadPoolExecutor has shutdown while attempting to offer a new task.");
-	                }
-	         boolean sent=false;
-	         while(!sent){
-	        	 try{
-	        		 sent=queue.offer(r,executor.getKeepAliveTime(TimeUnit.MILLISECONDS),TimeUnit.MILLISECONDS);	
-	        	 }catch(Exception e){
-	        		 logger.debug("Timeout while waiting for execution retry.. ");
-	        	 }
-	         }
-		}
-		
-	}
-	
 	
 }

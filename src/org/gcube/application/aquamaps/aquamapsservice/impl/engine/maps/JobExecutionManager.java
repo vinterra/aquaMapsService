@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
@@ -14,6 +13,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManage
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ExtendedExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.MyPooledExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
@@ -33,8 +33,8 @@ public class JobExecutionManager {
 	private static final GCUBELog logger=new GCUBELog(JobExecutionManager.class);
 
 
-	private static ExecutorService jobPool=null;
-	private static ExecutorService aqPool=null;
+	private static ExtendedExecutor jobPool=null;
+	private static ExtendedExecutor aqPool=null;
 
 
 	private static final ConcurrentHashMap<Integer, Semaphore> blockedJobs=new ConcurrentHashMap<Integer, Semaphore>();
@@ -46,17 +46,11 @@ public class JobExecutionManager {
 
 		logger.trace("Initializing pools..");
 		jobPool=MyPooledExecutor.getExecutor("JOB_WORKER", 
-				//					ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.JOB_PRIORITY),
 				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.JOB_MAX_WORKERS)
-//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.JOB_MIN_WORKERS),
-//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.JOB_INTERVAL_TIME)
 				);
 
 		aqPool=MyPooledExecutor.getExecutor("AQ_WORKER", 
-				//					ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.AQUAMAPS_OBJECT_PRIORITY),
 				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.AQUAMAPS_OBJECT_MAX_WORKERS)
-//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.AQUAMAPS_OBJECT_MIN_WORKERS),
-//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.AQUAMAPS_OBJECT_INTERVAL_TIME)
 				);
 
 

@@ -16,8 +16,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
-import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.WMSGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
@@ -33,11 +31,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Obje
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube.application.aquamaps.publisher.StoreConfiguration;
-import org.gcube.application.aquamaps.publisher.UpdateConfiguration;
-import org.gcube.application.aquamaps.publisher.StoreConfiguration.StoreMode;
-import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
-import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobWorker extends Thread{

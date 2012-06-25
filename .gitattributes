@@ -97,6 +97,7 @@ src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/GroupGene
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/LayerGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/StyleGenerationRequest.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/WMSGenerationRequest.java -text
+src/org/gcube/application/aquamaps/aquamapsservice/impl/util/ExtendedExecutor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/MyPooledExecutor.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesConstants.java -text
 src/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesReader.java -text
