@@ -137,8 +137,8 @@ public class HSPECGroupWorker extends Thread {
 //								}catch(InterruptedException e){}
 //						}
 					}
-				}
-			}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non map generating jobs complete here, others will be set to completed by updater thread 
+				}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non map generating jobs complete here, others will be set to completed by updater thread 
+			}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non HSPEC jobs complete here  
 		}catch(Exception e){
 			logger.error("Unexpected Exception while executing request "+request.getId()+", execution error messages were :", e);
 			for(String msg:exceptions) logger.error(msg);
