@@ -24,7 +24,7 @@ public class SubmittedManager {
 
 	protected static GCUBELog logger= new GCUBELog(SubmittedManager.class);
 
-	protected static final String submittedTable="submitted";
+	public static final String submittedTable="submitted";
 
 		
 	

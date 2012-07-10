@@ -36,8 +36,8 @@ public class RequestsMonitor extends Thread {
 	public void run() {
 		while(true){
 			try{
-				List<Submitted> foundList=JobExecutionManager.getAvailableRequests(object,20);
-				if(foundList.size()>0)logger.info("FOUND "+foundList.size()+" PENDING "+(object?"OBJ":"JOB")+" REQUESTS ");
+				List<Submitted> foundList=JobExecutionManager.getAvailableRequests(object,1);
+				if(foundList.size()>0)logger.debug("FOUND "+foundList.size()+" PENDING "+(object?"OBJ":"JOB")+" REQUESTS ");
 				for(Submitted found:foundList){
 						logger.trace("handling pending "+(object?"OBJ ":"JOB ")+found.getTitle()+", ID : "+found.getSearchId());
 						try{
@@ -51,6 +51,10 @@ public class RequestsMonitor extends Thread {
 				}
 			}catch(Exception e){
 				logger.error("Unexpected exception", e);
+			}finally{
+				try{
+					Thread.sleep(2*1000);
+				}catch(InterruptedException e){}
 			}
 		}
 	}

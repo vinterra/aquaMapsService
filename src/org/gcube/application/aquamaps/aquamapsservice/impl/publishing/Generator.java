@@ -103,11 +103,12 @@ public class Generator<T> implements ObjectManager<T> {
 	
 	// **************** T REMOVE 
 	
-	protected static void remove(FileSet toDestroy)throws Exception{
+	protected static void remove(FileSet toDestroy)throws Exception{		
 		String physicalBasePath=publisher.getServerPathDir().getAbsolutePath();
 		for(org.gcube.application.aquamaps.publisher.impl.model.File f:toDestroy.getFiles()){
+			logger.debug("Deleting file "+f.getStoredUri()+" from FileSet "+toDestroy.getId());
 			String path=physicalBasePath+File.separator+f.getStoredUri();
-			try{
+			try{				
 				ServiceUtils.deleteFile(path);
 			}catch(Exception e){
 				logger.warn("Unable to delete "+path,e);

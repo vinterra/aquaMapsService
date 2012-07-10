@@ -61,18 +61,22 @@ public class MyPooledExecutor extends ThreadPoolExecutor implements ExtendedExec
 				Long.MAX_VALUE, 
 				TimeUnit.MILLISECONDS, 
 				new ArrayBlockingQueue<Runnable>(maxThread*2),  
-				new MyThreadFactory(threadLabel), new RejectedExecutionHandler() {
-					
-					@Override
-					public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-						try {
-							logger.info("Request queue for  "+threadLabel+" full, blocking request. Pool stats : "+((ExtendedExecutor)e).getDetails());
-							e.getQueue().put(r);
-						} catch (InterruptedException e1) {
-							 logger.warn("Work discarded because thread was interrupted while waiting to schedule: " + r);
-						}
-					}
-				});
+				new MyThreadFactory(threadLabel), 
+//				new RejectedExecutionHandler() {
+//					
+//					@Override
+//					public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+//						try {
+//							System.out.println("Request queue for  "+threadLabel+" full, blocking request. Pool stats : "+((ExtendedExecutor)e).getDetails());
+//							e.getQueue().put(r);
+//							System.out.println("Request queue for  "+threadLabel+" no more full, request queued. Pool stats : "+((ExtendedExecutor)e).getDetails());
+//						} catch (InterruptedException e1) {
+//							 logger.warn("Work discarded because thread was interrupted while waiting to schedule: " + r);
+//						}
+//					}
+//				}
+				new ThreadPoolExecutor.CallerRunsPolicy()
+		);
 	}
 	
 	

@@ -1,6 +1,8 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,6 +10,7 @@ import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
@@ -39,10 +42,10 @@ public class JobExecutionManager {
 
 	private static final ConcurrentHashMap<Integer, Semaphore> blockedJobs=new ConcurrentHashMap<Integer, Semaphore>();
 
-	private static Semaphore insertedJobs=null;
-	private static Semaphore insertedObjects=null;
+//	private static Semaphore insertedJobs=null;
+//	private static Semaphore insertedObjects=null;
 
-	public static void init(boolean purgeinvalid)throws Exception{
+	public static void init(boolean purgeInvalid)throws Exception{
 
 		logger.trace("Initializing pools..");
 		jobPool=MyPooledExecutor.getExecutor("JOB_WORKER", 
@@ -55,45 +58,56 @@ public class JobExecutionManager {
 
 
 
-
 		logger.trace("Storing into "+ServiceContext.getContext().getFolderPath(FOLDERS.SERIALIZED));
 		
-
-		List<Field> pendingObjFilter=new ArrayList<Field>();
-		pendingObjFilter.add(new Field(SubmittedFields.isaquamap+"",true+"",FieldType.BOOLEAN));
-		pendingObjFilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Generating+"",FieldType.STRING));
-		if(purgeinvalid){
+		
+		if(purgeInvalid){
 			logger.trace("Purging orphan objects requests...");
-			int orphanCount=0;
-			for(Submitted pendingObj:SubmittedManager.getList(pendingObjFilter)){
-				if(pendingObj.getJobId()==null)SubmittedManager.updateStatus(pendingObj.getSearchId(), SubmittedStatus.Error);
-				else { 
-					Submitted job=SubmittedManager.getSubmittedById(pendingObj.getJobId());
-					if((job!=null)&&(!job.getStatus().equals(SubmittedStatus.Pending))){
-						SubmittedManager.updateStatus(pendingObj.getSearchId(), SubmittedStatus.Error);
-						orphanCount++;
-					}
-				}
-			}
-
-			logger.trace("Purged "+orphanCount+" objects");
+			long orphanObjectCount=0;
+			SubmittedStatus[] invalidObjStatus=new SubmittedStatus[]{
+				SubmittedStatus.Generating,
+				SubmittedStatus.Pending,
+				SubmittedStatus.Publishing,
+				SubmittedStatus.Simulating,
+			};
+			for(SubmittedStatus invalid:invalidObjStatus){
+				orphanObjectCount+=invalidReference(true, invalid);
+			}			
+			logger.trace("Purged "+orphanObjectCount+" objects");
+			
+			
+					
+			logger.trace("Purging orphan jobs requests...");
+			long orphanJobCount=0;			
+			SubmittedStatus[] invalidJobStatus=new SubmittedStatus[]{
+					SubmittedStatus.Generating,
+//					SubmittedStatus.Pending,
+					SubmittedStatus.Publishing,
+					SubmittedStatus.Simulating,
+				};
+			for(SubmittedStatus invalid:invalidJobStatus){
+				orphanJobCount+=invalidReference(false, invalid);
+			}			
+			logger.trace("Purged "+orphanJobCount+" jobs");
+			
+			
 		}
 
 
 
-		logger.trace("Looking for existing obj requests...");			
-		Integer objCount=SubmittedManager.getCount(pendingObjFilter).intValue();
-		insertedObjects=new Semaphore(objCount);
-		logger.trace("Found "+objCount+" requests");
+//		logger.trace("Looking for existing obj requests...");			
+//		Integer objCount=SubmittedManager.getCount(pendingObjFilter).intValue();
+////		insertedObjects=new Semaphore(objCount);
+//		logger.trace("Found "+objCount+" requests");
 
 
-		logger.trace("Looking for existing job requests...");
-		List<Field> jobfilter=new ArrayList<Field>();
-		jobfilter.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
-		jobfilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Pending+"",FieldType.STRING));
-		int jobCount=SubmittedManager.getCount(jobfilter).intValue();
-		insertedJobs=new Semaphore(jobCount);
-		logger.trace("Found "+jobCount+" requests");
+//		logger.trace("Looking for existing job requests...");
+//		List<Field> jobfilter=new ArrayList<Field>();
+//		jobfilter.add(new Field(SubmittedFields.isaquamap+"",false+"",FieldType.BOOLEAN));
+//		jobfilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Pending+"",FieldType.STRING));
+//		int jobCount=SubmittedManager.getCount(jobfilter).intValue();
+////		insertedJobs=new Semaphore(jobCount);
+//		logger.trace("Found "+jobCount+" requests");
 
 
 
@@ -142,7 +156,7 @@ public class JobExecutionManager {
 		logger.trace("Assigned id "+toInsert.getSearchId()+" to Job "+toInsert.getTitle()+" [ "+toInsert.getAuthor()+" ]");
 
 
-		insertedJobs.release(1);
+//		insertedJobs.release(1);
 
 		return toInsert.getSearchId();
 	}
@@ -162,8 +176,8 @@ public class JobExecutionManager {
 		
 		
 		AquaMapsManager.insertRequests(requests);
-
-		insertedObjects.release(requests.size());
+//		insertedObjects.release(requests.size());
+//		logger.debug("Increment available object sempahore by "+requests.size()+", total available "+insertedObjects.availablePermits());
 
 		//************* BLOCKS current job
 		((Semaphore)blockedJobs.get(jobId)).acquireUninterruptibly();
@@ -224,8 +238,15 @@ public class JobExecutionManager {
 	
 
 	public static List<Submitted> getAvailableRequests(boolean object,int maxSize)throws Exception {
-		if(object) insertedObjects.acquireUninterruptibly();
-		else insertedJobs.acquireUninterruptibly();
+//		if(object) {
+//			logger.debug("Requesting available objects, sempahore value is "+insertedObjects.availablePermits());
+//			insertedObjects.acquireUninterruptibly();
+//		}
+//		else {
+//			logger.debug("Requesting available jobs, sempahore value is "+insertedObjects.availablePermits());
+//			insertedJobs.acquireUninterruptibly();
+//		}
+		
 
 		List<Field> filter=new ArrayList<Field>();
 		filter.add(new Field(SubmittedFields.isaquamap+"",object+"",FieldType.BOOLEAN));
@@ -234,5 +255,15 @@ public class JobExecutionManager {
 		return SubmittedManager.getList(filter, settings);
 	}
 
-	
+	private static long invalidReference(boolean isAquaMapObject,SubmittedStatus status) throws SQLException, IOException, Exception{
+		List<Field> invalidFilter=new ArrayList<Field>();
+		invalidFilter.add(new Field(SubmittedFields.isaquamap+"",isAquaMapObject+"",FieldType.BOOLEAN));
+		invalidFilter.add(new Field(SubmittedFields.status+"",status+"",FieldType.STRING));
+		long count=0;
+		for(Submitted submitted:SubmittedManager.getList(invalidFilter)){
+			SubmittedManager.updateStatus(submitted.getSearchId(), SubmittedStatus.Error);
+			count++;
+		}
+		return count;
+	}
 }
