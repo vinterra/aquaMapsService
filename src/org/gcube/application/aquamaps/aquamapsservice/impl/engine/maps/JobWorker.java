@@ -109,8 +109,8 @@ public class JobWorker extends Thread{
 					logger.trace("Job [ID : "+tableReference.getSearchId()+"] was not finished, forcing generation for skipped objects..");
 					toSubmitRequests=new ArrayList<AquaMapsObjectExecutionRequest>();
 					for(Submitted submitted:JobManager.getObjects(tableReference.getSearchId())){
-						if(!submitted.getStatus().equals(SubmittedStatus.Error)&&!submitted.getStatus().equals(SubmittedStatus.Completed));
-						toSubmitRequests.add((AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submitted.getSerializedRequest()));
+						if(!submitted.getStatus().equals(SubmittedStatus.Error)&&!submitted.getStatus().equals(SubmittedStatus.Completed))
+							toSubmitRequests.add((AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submitted.getSerializedRequest()));
 					}
 					logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
 					if(toSubmitRequests.size()>0)
