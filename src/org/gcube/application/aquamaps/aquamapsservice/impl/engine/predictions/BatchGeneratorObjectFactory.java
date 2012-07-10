@@ -19,7 +19,10 @@ public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 	
 	public static EnvironmentalExecutionReportItem getReport(int batchId,boolean getResourceInfo)throws Exception{
 		BatchGenerator batch=generatorMap.get(batchId);
-		if(batch==null) return null;
+		if(batch==null) {
+			logger.debug("Requested Batch id ("+batchId+") Not Found, available ids  : "+generatorMap.keySet());
+			return null;
+		}
 		else return batch.getReport(getResourceInfo);
 	}
 	
