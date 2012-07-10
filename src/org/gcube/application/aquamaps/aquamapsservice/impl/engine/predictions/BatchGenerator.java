@@ -273,11 +273,13 @@ public class BatchGenerator implements BatchGeneratorI {
 			e.setTableStore(tableStore);
 
 			dg= new DistributionGenerator(e);
+			logger.debug("Distribution Generator inited, gonna execute generation.. ");
 			//calculation
 			dg.generateHSPEC();
 
 			return toGenerate;
 		}catch(Exception e){
+			logger.warn("Execution failed, exception was "+e.getMessage());
 			cleanDirtyTables(toGenerate);
 			throw e;
 		}
