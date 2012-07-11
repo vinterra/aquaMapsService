@@ -64,10 +64,6 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 					filter.add(new Field(SourceGenerationRequestFields.phase+"",SourceGenerationPhase.mapgeneration+"",FieldType.STRING));
 					for(SourceGenerationRequest request : SourceGenerationRequestsManager.getList(filter)){
 						try{
-							long completedObjCount=0;
-							long totalObjCount=0;
-							ArrayList<Field> completedFilter=null;
-							ArrayList<Field> toCompleteFilter=null;
 							//checking jobIds
 							boolean completed=true;
 							SourceGenerationPhase toSetCompletedPhase=SourceGenerationPhase.completed;
@@ -80,17 +76,27 @@ public class EnvironmentalStatusUpdateThread extends Thread {
 								logger.info("All jobs completed for source generation "+request.getId()+", to set phase : "+toSetCompletedPhase);
 								SourceGenerationRequestsManager.setPhase(toSetCompletedPhase,request.getId());
 							}else{
-								//percent calculation
+								//percent calculation		[SUM(completedObj/totalObjCount/NJob)]*100d						
+								double sumPartials=0;
+								ArrayList<Field> completedFilter=null;
+								ArrayList<Field> toCompleteFilter=null;
+								StringBuilder logBuilder=new StringBuilder();
 								for(Integer id:request.getJobIds()){
 									completedFilter=new ArrayList<Field>();
 									completedFilter.add(new Field(SubmittedFields.jobid+"",id+"",FieldType.INTEGER));
-									completedFilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));
-									completedObjCount+=SubmittedManager.getCount(completedFilter);
+									completedFilter.add(new Field(SubmittedFields.status+"",SubmittedStatus.Completed+"",FieldType.STRING));									
 									toCompleteFilter=new ArrayList<Field>();
 									toCompleteFilter.add(new Field(SubmittedFields.jobid+"",id+"",FieldType.INTEGER));
-									totalObjCount+=SubmittedManager.getCount(toCompleteFilter);
+									long totalObjectCount=SubmittedManager.getCount(toCompleteFilter);
+									if(totalObjectCount>0){
+										long completedObjects = SubmittedManager.getCount(completedFilter);
+										double partial=((double)completedObjects/totalObjectCount/request.getJobIds().size());
+										logBuilder.append("Job ["+id+"] partial progress "+partial+" ("+completedObjects+"/"+totalObjectCount+")");
+										sumPartials+=partial;									
+									}
 								}
-								Double percent=100d*completedObjCount/totalObjCount;
+								Double percent=100d*sumPartials;
+								logger.debug("Progress for "+request.getId()+" : "+percent+" forumla details : "+logBuilder);
 								SourceGenerationRequestsManager.setPhasePercent(percent, request.getId());
 							}
 						}catch(Exception e){logger.warn("Skipping percent update for execution id "+request.getId(),e);}
