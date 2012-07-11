@@ -235,6 +235,7 @@ public class BatchGenerator implements BatchGeneratorI {
 		logger.trace("generating hspec : "+toGenerate);
 
 		logger.trace("hspen : "+hspenTable);
+		logger.trace("MAX MIN LAT To use : "+maxMinHspen);
 		logger.trace("hcaf : "+hcafTable);
 		logger.trace("native : "+isNative);
 		logger.trace("2050 : "+is2050);
