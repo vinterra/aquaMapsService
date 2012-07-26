@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.DeletionMonitor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.AnalysisManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
@@ -65,10 +66,10 @@ public class ServiceContext extends GCUBEServiceContext {
 	public void onInitialisation()throws Exception{
 		
 		try{
-			int interval=Integer.parseInt(getProperty(PropertiesConstants.ISCRAWLER_INTERVAL_MINUTES));
-			logger.debug("Interval time is "+interval);
-			configuration=ConfigurationImpl.get(CrawlerMode.SERVICE, interval);			
-			configurationScope=configuration.getAvailableScopes().iterator().next();
+//			int interval=Integer.parseInt(getProperty(PropertiesConstants.ISCRAWLER_INTERVAL_MINUTES));
+//			logger.debug("Interval time is "+interval);
+			configuration=ConfigurationImpl.get(CrawlerMode.SERVICE);			
+			configurationScope=GCUBEScope.getScope(configuration.getAvailableScopes().iterator().next());
 			if(configurationScope==null) throw new Exception ("NO valid scope found");
 			logger.trace("Configuration Scope will be "+configurationScope);
 		}catch (Exception e){
@@ -124,6 +125,15 @@ public class ServiceContext extends GCUBEServiceContext {
 		}catch(Exception e){
 			logger.fatal("Unable to start managers",e);
 		}
+		
+		try{
+			DeletionMonitor t=new DeletionMonitor(5000);
+			t.start();
+			logger.info("Deletion Monitor started");
+		}catch(Exception e){
+			logger.fatal("Unable to start Deletion Monitor ",e);
+		}
+		
 	}
 	
 	

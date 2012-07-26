@@ -163,9 +163,10 @@ public class WrapperTest {
 		//**************** Check Publisher Interface
 		
 		
-		List<AquaMap> result=(pubInterface.getMapsBySpecies(new String[]{"Lycenchelys_ratmanovi"}, true, false, null));
+		List<AquaMap> result=(pubInterface.getMapsBySpecies(new String[]{"Abalistes_stellaris"}, true, false, null));
 		System.out.println("SPecies ONLY Loaded No Custom"+result.size());
-		for(AquaMap a:result) System.out.println("Map : "+result);
+		for(AquaMap a:result) 
+			System.out.println("Map : "+a);
 		
 //		result=(pubInterface.getMapsBySpecies(new String[]{species}, true, true, null));
 //		System.out.println("SPecies ONLY Loaded + Custom"+result.size());

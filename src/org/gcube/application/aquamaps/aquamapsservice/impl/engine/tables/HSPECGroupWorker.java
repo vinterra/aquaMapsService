@@ -12,13 +12,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorI;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.TableGenerationConfiguration;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
@@ -27,7 +25,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Logi
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class HSPECGroupWorker extends Thread {
@@ -73,7 +70,7 @@ public class HSPECGroupWorker extends Thread {
 			
 			for(List<Resource> sourcesSubset:sourcesSubsets)
 				for(AlgorithmType algorithm:request.getAlgorithms()){
-					BatchGeneratorI batch =EnvironmentalLogicManager.getBatch();
+					BatchGeneratorI batch =EnvironmentalLogicManager.getBatch(request.getSubmissionBackend());
 					logger.debug("Got batch Id "+batch.getReportId());
 					SourceGenerationRequestsManager.addReportId(batch.getReportId(), request.getId());
 					try{
@@ -124,27 +121,24 @@ public class HSPECGroupWorker extends Thread {
 					}
 
 					if(jobIds.size()>0){
-						logger.trace("Generation "+request.getId()+" : submitted "+jobIds.size()+" job, waiting for them to complete..");
-						Boolean completed=false;
-						while(!completed){
-							for(Integer id:jobIds){
-								Submitted submittedJob=SubmittedManager.getSubmittedById(id);
-								if(!submittedJob.getStatus().equals(SubmittedStatus.Completed)&&!submittedJob.getStatus().equals(SubmittedStatus.Error)){
-									completed=false;
-									break;
-								}else completed=true;
-							}
-							if(!completed)
-								try{
-									Thread.sleep(10*1000);
-								}catch(InterruptedException e){}
-						}
+						logger.trace("Generation "+request.getId()+" : submitted  jobIds : "+jobIds);
+//						Boolean completed=false;
+//						while(!completed){
+//							for(Integer id:jobIds){
+//								Submitted submittedJob=SubmittedManager.getSubmittedById(id);
+//								if(!submittedJob.getStatus().equals(SubmittedStatus.Completed)&&!submittedJob.getStatus().equals(SubmittedStatus.Error)){
+//									completed=false;
+//									break;
+//								}else completed=true;
+//							}
+//							if(!completed)
+//								try{
+//									Thread.sleep(10*1000);
+//								}catch(InterruptedException e){}
+//						}
 					}
-				}
-			}
-			logger.trace("Generation "+request.getId()+" : All jobs complete!");
-
-			SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId());
+				}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non map generating jobs complete here, others will be set to completed by updater thread 
+			}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non HSPEC jobs complete here  
 		}catch(Exception e){
 			logger.error("Unexpected Exception while executing request "+request.getId()+", execution error messages were :", e);
 			for(String msg:exceptions) logger.error(msg);
@@ -322,12 +316,12 @@ public class HSPECGroupWorker extends Thread {
 
 	private static ArrayList<ArrayList<Resource>> getComplexGenerationSubSets(SourceGenerationRequest request)throws Exception{
 		ArrayList<ArrayList<Resource>> toReturn=new ArrayList<ArrayList<Resource>>();
-
 		switch(request.getLogic()){
 		case HSPEC : {
 			boolean combineMatching=true;
-			for(Field f:request.getGenerationParameters())
-				if(f.getName().equals(SourceGenerationRequest.COMBINE_MATCHING))combineMatching=f.getValueAsBoolean();
+			for(Field f:request.getExecutionParameters())				
+				if(f.getName().equals(SourceGenerationRequest.COMBINE_MATCHING)) combineMatching=f.getValueAsBoolean();
+			
 			if(request.getHcafIds().size()==0) throw new Exception ("No HCAF resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			if(request.getHspenIds().size()==0) throw new Exception ("No HSPEN resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			for(Integer hcafId:request.getHcafIds()){

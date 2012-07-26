@@ -33,7 +33,9 @@ public class Analyzer {
 	}
 	public EnvironmentalExecutionReportItem getReport(boolean getResources) {
 		EnvironmentalExecutionReportItem toReturn=new EnvironmentalExecutionReportItem();
-		toReturn.setPercent(new Double(bioClimate.getStatus()));
+		float status=bioClimate.getStatus();
+		logger.debug("bioclimate status for analyzer id "+internalId+" = "+status);
+		toReturn.setPercent(new Double(status));
 		return toReturn;
 	}
 	
@@ -62,7 +64,8 @@ public class Analyzer {
 		Thread t=new Thread(){
 			@Override
 			public void run() {
-				AnalysisResponseDescriptor toReturn=new AnalysisResponseDescriptor();		
+				AnalysisResponseDescriptor toReturn=new AnalysisResponseDescriptor(toPerform.getToPerformAnalysis());
+				logger.debug("Analyzer inner thread, request is "+toPerform);
 				try{
 					String groupLabel=getLabel(toPerform.getToPerformAnalysis());
 				

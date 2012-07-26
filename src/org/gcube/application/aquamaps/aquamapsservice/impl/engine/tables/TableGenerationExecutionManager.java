@@ -3,11 +3,12 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
-import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.MyPooledExecutor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.MyPooledExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
@@ -22,7 +23,7 @@ public class TableGenerationExecutionManager {
 
 	private static final GCUBELog logger=new GCUBELog(TableGenerationExecutionManager.class);
 	
-	private static MyPooledExecutor pool=null;
+	private static ExecutorService pool=null;
 	private static Semaphore insertedRequest=null;
 	
 	private static ConcurrentHashMap <Execution,Semaphore> subscribedGenerations=new ConcurrentHashMap<Execution, Semaphore>();
@@ -31,11 +32,12 @@ public class TableGenerationExecutionManager {
 	
 	public static void init(boolean purgeInvalid,int monitorInterval)throws Exception{
 		logger.trace("Initializing pools..");
-		pool=new MyPooledExecutor("HSPEC_WORKER", 
+		pool=MyPooledExecutor.getExecutor("HSPEC_WORKER", 
 //				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_PRIORITY),
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MAX_WORKERS),
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MIN_WORKERS),
-				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_INTERVAL_TIME));
+				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MAX_WORKERS)
+//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_MIN_WORKERS),
+//				ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.HSPEC_GROUP_INTERVAL_TIME)
+				);
 		if(purgeInvalid){
 			logger.trace("Purging pending requests...");
 			ArrayList<Field> filter= new ArrayList<Field>();

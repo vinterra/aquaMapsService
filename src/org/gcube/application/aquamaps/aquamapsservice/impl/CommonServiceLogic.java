@@ -54,7 +54,7 @@ public class CommonServiceLogic {
 		for(Species s: job.getSelectedSpecies()){
 			AquaMapsObject object=new AquaMapsObject(s.getFieldbyName(SpeciesOccursumFields.scientific_name+"").getValue(), 0, ObjectType.SpeciesDistribution);
 			if(object.getName()==null||object.getName().equals(Field.VOID))
-				object.setName(s.getFieldbyName(SpeciesOccursumFields.genus+"").getValue()+"_"+s.getFieldbyName(SpeciesOccursumFields.species+"").getValue());
+				object.setName(s.getFieldbyName(SpeciesOccursumFields.genus+"").getValue()+" "+s.getFieldbyName(SpeciesOccursumFields.species+"").getValue());
 			
 			object.setAuthor(job.getAuthor());
 			object.getSelectedSpecies().add(s);

@@ -28,7 +28,7 @@ public class AnalysisWorker extends Thread{
 	private static final GCUBELog logger=new GCUBELog(AnalysisWorker.class);
 
 	private Analysis toPerform;
-	private AnalysisResponseDescriptor produced=new AnalysisResponseDescriptor();
+	private AnalysisResponseDescriptor produced=new AnalysisResponseDescriptor(null);
 	final Semaphore blocking=new Semaphore(0);
 	
 	
@@ -116,6 +116,7 @@ public class AnalysisWorker extends Thread{
 			try {
 				AnalyzerManager.leaveBatch(analyzer);
 				AnalysisTableManager.removeReportId(analyzer.getReportId(),toPerform.getId());
+				AnalysisTableManager.addCompletedAnalysis(toPerform.getId(), result.getType());
 			} catch (Exception e) {
 				logger.fatal("Unable to leave analyzer",e);
 			}

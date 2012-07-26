@@ -28,7 +28,7 @@ public class AquaMap {
 	private String fileSetId="";
 	private String layerId="";
 	private String speciesCsvList="";
-	
+	private Boolean custom=false;
 	
 	public AquaMap() {
 		// TODO Auto-generated constructor stub
@@ -48,6 +48,7 @@ public class AquaMap {
 		toReturn.setSpeciesListCSV(speciesCsvList);
 		toReturn.setStaticImages(File.toStubsVersion(files));
 		toReturn.setTitle(title);
+		toReturn.setCustom(isCustom());
 		return toReturn;
 	}
 	
@@ -70,6 +71,7 @@ public class AquaMap {
 		setResource(new Resource(toLoad.getResource()));
 		setSpeciesCsvList(toLoad.getSpeciesListCSV());
 		setTitle(toLoad.getTitle());
+		setCustom(toLoad.isCustom());
 	}
 	
 	public static MapArray toStubsVersion(Collection<AquaMap> toConvert) throws JSONException{
@@ -128,7 +130,12 @@ public class AquaMap {
 	public Resource getResource() {
 		return resource;
 	}
-
+public Boolean isCustom() {
+	return custom;
+}
+public void setCustom(Boolean custom) {
+	this.custom = custom;
+}
 	public void setResource(Resource resource) {
 		this.resource = resource;
 	}
@@ -241,9 +248,13 @@ public class AquaMap {
 		builder.append(layerId);
 		builder.append(", speciesCsvList=");
 		builder.append(speciesCsvList);
+		builder.append(", custom=");
+		builder.append(custom);
 		builder.append("]");
 		return builder.toString();
 	}
+
+	
 
 	
 

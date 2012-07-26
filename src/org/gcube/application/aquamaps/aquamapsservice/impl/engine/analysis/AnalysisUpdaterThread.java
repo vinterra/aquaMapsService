@@ -31,9 +31,14 @@ public class AnalysisUpdaterThread extends Thread{
 				for(Analysis reference : AnalysisTableManager.getList(filter)){
 					try{
 						Double percent=((double)reference.getPerformedAnalysis().size()/reference.getType().size())*100;
+						StringBuilder logBuilder=new StringBuilder(" performed Size = "+reference.getPerformedAnalysis().size());
+						logBuilder.append("to perform size ="+reference.getType().size());
 						for(Integer reportId:reference.getReportID()){
-							percent=percent+AnalyzerFactory.getReport(reportId,false).getPercent();
+							Double reportStatus=(AnalyzerFactory.getReport(reportId,false).getPercent());
+							percent=percent+(reportStatus/reference.getType().size());
+							logBuilder.append("reportId "+reportId+" status "+reportStatus);
 						}
+						logger.debug("Updateing reference : "+reference.getId()+", percent "+percent+", forumla details "+logBuilder);
 						AnalysisTableManager.setPhasePercent(percent, reference.getId());
 					}catch(Exception e){logger.warn("Skipping percent update for analysis id "+reference.getId()+", report id was "+reference.getReportID(),e);}
 				}				

@@ -1,10 +1,14 @@
 package testClient;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.AquaMapsServiceInterface;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.Constant;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.DataManagementInterface;
@@ -28,6 +32,16 @@ public class DMTest {
 		
 		amInterface =WrapperTest.getAM();
 		dmInterface = WrapperTest.getDM();
+		
+		
+		//******************* GENERATE MAPS
+		
+		int hspecId=275;
+		
+		dmInterface.generateMaps("fabio.sinibaldi", false, hspecId, Arrays.asList(new Field[]{
+				new Field(SpeciesOccursumFields.familycolumn+"","Gadilidae",FieldType.STRING)
+		}), true);
+		
 		
 		
 		//PROD
@@ -218,14 +232,14 @@ public class DMTest {
 		
 		
 		//************************ EXPORT TABLE
-		int resourceId =128;
-		System.out.println("Export Resource : "+resourceId);
-
-		File csv=dmInterface.exportResource(resourceId);
-		
-		csv.renameTo(new File("exported_mini.csv"));
-		
-		System.out.println("Exported to exported_mini.csv"); 
+//		int resourceId =128;
+//		System.out.println("Export Resource : "+resourceId);
+//
+//		File csv=dmInterface.exportResource(resourceId);
+//		
+//		csv.renameTo(new File("exported_mini.csv"));
+//		
+//		System.out.println("Exported to exported_mini.csv"); 
 		
 		
 	}

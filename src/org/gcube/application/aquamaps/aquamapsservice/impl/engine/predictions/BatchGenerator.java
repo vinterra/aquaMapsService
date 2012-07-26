@@ -8,7 +8,9 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory.BatchPoolType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
@@ -31,27 +33,29 @@ import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables.
 public class BatchGenerator implements BatchGeneratorI {
 
 	private static final GCUBELog logger=new GCUBELog(BatchGenerator.class);
-	
+
 	private EngineConfiguration e = new EngineConfiguration();
-	
+
 	private static final int NUM_OF_THREADS=2;
-	
+
 	private DistributionGenerator dg =null;
 	private EnvelopeGenerator eg=null;
 	private Integer internalId;
 	private InterpolateTables interpolator=null;
-	
-	
-	
+
+
+	private BatchPoolType type;
+
+
 	public BatchGenerator(String path,DBDescriptor credentials) {
 		setConfiguration(path, credentials);
 	}
-	
-	
+
+
 	@Override
 	public String generateHSPECTable(String hcaf, String hspen,String filteredHSPEN,
 			AlgorithmType type,Boolean iscloud,String endpoint) throws Exception {
-		
+
 		return generateHSPEC(hcaf, hspen, filteredHSPEN,
 				type.equals(AlgorithmType.NativeRange)||type.equals(AlgorithmType.NativeRange2050),
 				type.equals(AlgorithmType.SuitableRange2050)||type.equals(AlgorithmType.NativeRange2050), 
@@ -64,7 +68,7 @@ public class BatchGenerator implements BatchGeneratorI {
 		//path to the configuration directory
 		e.setConfigPath(path);
 		//remote db username (default defined in the configuration)
-		
+
 		e.setDatabaseUserName(credentials.getUser());
 		logger.trace("user : "+credentials.getUser());
 		//remote db password (default defined in the configuration)
@@ -74,27 +78,32 @@ public class BatchGenerator implements BatchGeneratorI {
 		String url= "jdbc:postgresql:"+credentials.getEntryPoint();
 		e.setDatabaseURL(url);
 		//number of threads to use in the calculation
-//		e.setNumberOfThreads(NUM_OF_THREADS);
+		//		e.setNumberOfThreads(NUM_OF_THREADS);
 		//create table if it doesn't exist
 		e.setCreateTable(true);
-		
-		
-		
+
+
+
 		logger.trace("passed argument : user "+e.getDatabaseUserName());
 		logger.trace("passed argument : password "+e.getDatabasePassword());
 		logger.trace("passed argument : url "+e.getDatabaseURL());
 		logger.trace("passed argument : threads num "+e.getNumberOfThreads());
 	}
-	public BatchGenerator(Integer internalId) {
-		logger.trace("Created batch generator with ID "+internalId);
-		this.internalId=internalId;
+
+	public BatchGenerator(BatchPoolType type) {
+		this.internalId=this.hashCode();
+		this.type=type;
+		logger.trace("Created batch "+type+"generator with ID "+internalId);
 	}
 
+	public BatchPoolType getType() {
+		return type;
+	}
 
 	@Override
 	public EnvironmentalExecutionReportItem getReport(boolean getResourceInfo) {
-//		logger.trace("Forming report, my ID is "+getReportId());
-//		logger.trace("DistributionGenerator = "+dg);
+		//		logger.trace("Forming report, my ID is "+getReportId());
+		//		logger.trace("DistributionGenerator = "+dg);
 		EnvironmentalExecutionReportItem toReturn=null;
 		if(dg!=null){
 			toReturn= new EnvironmentalExecutionReportItem();
@@ -117,13 +126,13 @@ public class BatchGenerator implements BatchGeneratorI {
 			toReturn.setPercent(new Double(interpolator.getStatus()));
 			if(getResourceInfo){
 				//Not available
-//				toReturn.setResourceLoad(interpolator.getResourceLoad());
-//				toReturn.setResourcesMap(interpolator.getResources());
-//				toReturn.setElaboratedSpecies(interpolator.getSpeciesLoad());
+				//				toReturn.setResourceLoad(interpolator.getResourceLoad());
+				//				toReturn.setResourcesMap(interpolator.getResources());
+				//				toReturn.setElaboratedSpecies(interpolator.getSpeciesLoad());
 			}
 		}
 
-		
+
 		return toReturn;
 	}
 
@@ -132,8 +141,8 @@ public class BatchGenerator implements BatchGeneratorI {
 	public int getReportId() {
 		return internalId;
 	}
-	
-	
+
+
 	@Override
 	public void generateTable(final TableGenerationConfiguration configuration)
 	throws Exception {
@@ -214,18 +223,19 @@ public class BatchGenerator implements BatchGeneratorI {
 		};
 		t.start();
 	}
-	
-	
+
+
 	private String generateHSPEC(String hcafTable, String hspenTable,String maxMinHspen,boolean isNative,boolean is2050,int threadNum,
 			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,GenerationModel model,String tableStore)throws Exception{
-		
+
 		String toGenerate=ServiceUtils.generateId("hspec", "");
 
 		logger.debug("Current generator instance is "+this.toString());
 		logger.debug("Using Engine "+e.toString());
 		logger.trace("generating hspec : "+toGenerate);
-		
+
 		logger.trace("hspen : "+hspenTable);
+		logger.trace("MAX MIN LAT To use : "+maxMinHspen);
 		logger.trace("hcaf : "+hcafTable);
 		logger.trace("native : "+isNative);
 		logger.trace("2050 : "+is2050);
@@ -235,112 +245,138 @@ public class BatchGenerator implements BatchGeneratorI {
 		logger.trace("model : "+model);
 		logger.trace("environment : "+executioneEnvironment);
 		logger.trace("config values : "+calculationConfig.size());
-		
-		
-		
-		
-		//hspen reference table
-		e.setHspenTable(hspenTable);
-		//hcaf reference table
-		e.setHcafTable(hcafTable);
-		//output table - created if the CreateTable flag is true
-		e.setDistributionTable(toGenerate);
-		//native generation flag set to false - default value
-		e.setNativeGeneration(isNative);
-		//2050 generation flag set to false - default value
-		e.setType2050(is2050);
-		
-		
-		e.setMaxminLatTable(maxMinHspen);
-		
-		e.setGenerator(model);
-		e.setRemoteCalculator(calculatorUrl);
-		e.setServiceUserName(calculationUser);
-		
-		e.setRemoteEnvironment(executioneEnvironment);
-		e.setNumberOfThreads(threadNum);
-		e.setGeneralProperties(calculationConfig);
-		e.setGenerator(model);
-		e.setTableStore(tableStore);
-		
-		dg= new DistributionGenerator(e);
-		//calculation
-		dg.generateHSPEC();
-		
-		return toGenerate;
+
+
+
+		try{
+			//hspen reference table
+			e.setHspenTable(hspenTable);
+			//hcaf reference table
+			e.setHcafTable(hcafTable);
+			//output table - created if the CreateTable flag is true
+			e.setDistributionTable(toGenerate);
+			//native generation flag set to false - default value
+			e.setNativeGeneration(isNative);
+			//2050 generation flag set to false - default value
+			e.setType2050(is2050);
+
+
+			e.setMaxminLatTable(maxMinHspen);
+
+			e.setGenerator(model);
+			e.setRemoteCalculator(calculatorUrl);
+			e.setServiceUserName(calculationUser);
+
+			e.setRemoteEnvironment(executioneEnvironment);
+			e.setNumberOfThreads(threadNum);
+			e.setGeneralProperties(calculationConfig);
+			e.setGenerator(model);
+			e.setTableStore(tableStore);
+
+			dg= new DistributionGenerator(e);
+			logger.debug("Distribution Generator inited, gonna execute generation.. ");
+			//calculation
+			dg.generateHSPEC();
+
+			return toGenerate;
+		}catch(Exception e){
+			logger.warn("Execution failed, exception was "+e.getMessage());
+			cleanDirtyTables(toGenerate);
+			throw e;
+		}
 	}
-	
+
 	private String generateHSPEN(String hcafTable, String hspenTable,String occurrenceCellsTable, int threadNum,
 			String calculatorUrl,String calculationUser,String executioneEnvironment,HashMap<String,String> calculationConfig,EnvelopeModel model,String tableStore)throws Exception{
-		
-		
+
+
 		String toGenerate=ServiceUtils.generateId("hspen", "");
-		
-		
+
+
 		logger.debug("Current generator instance is "+this.toString());
 		logger.debug("Using Engine "+e.toString());
 		logger.trace("generating hspen : "+toGenerate);
-		
+
 		logger.trace("hspen : "+hspenTable);
 		logger.trace("hcaf : "+hcafTable);
-		
+
 		logger.trace("thread N : "+threadNum);
 		logger.trace("url : "+calculatorUrl);
 		logger.trace("calculation user : "+calculationUser);
 		logger.trace("model : "+model);
 		logger.trace("environment : "+executioneEnvironment);
 		logger.trace("config values : "+calculationConfig.size());
-		
-		
-		
-		
-		//hspen reference table
-		e.setOriginHspenTable(hspenTable);
-		
-		e.setHspenTable(toGenerate);
-		//hcaf reference table
-		e.setHcafTable(hcafTable);
-		
-		e.setOccurrenceCellsTable(occurrenceCellsTable);
-		e.setEnvelopeGenerator(model);
-		
-		
-		e.setRemoteCalculator(calculatorUrl);
-		e.setServiceUserName(calculationUser);
-		
-		e.setRemoteEnvironment(executioneEnvironment);
-		e.setNumberOfThreads(threadNum);
-		e.setGeneralProperties(calculationConfig);
-		
-		e.setTableStore(tableStore);
-		
-		
-		eg=new EnvelopeGenerator(e);
-		
-		eg.reGenerateEnvelopes();
-		
-		logger.trace("Generating Max Min table..");
-		
-		MaxMinGenerator maxmin = new MaxMinGenerator(e);
-		maxmin.populatemaxminlat(toGenerate);
-		
-		return toGenerate;
+
+
+
+		try{
+			//hspen reference table
+			e.setOriginHspenTable(hspenTable);
+
+			e.setHspenTable(toGenerate);
+			//hcaf reference table
+			e.setHcafTable(hcafTable);
+
+			e.setOccurrenceCellsTable(occurrenceCellsTable);
+			e.setEnvelopeGenerator(model);
+
+
+			e.setRemoteCalculator(calculatorUrl);
+			e.setServiceUserName(calculationUser);
+
+			e.setRemoteEnvironment(executioneEnvironment);
+			e.setNumberOfThreads(threadNum);
+			e.setGeneralProperties(calculationConfig);
+
+			e.setTableStore(tableStore);
+
+
+			eg=new EnvelopeGenerator(e);
+
+			eg.reGenerateEnvelopes();
+
+			logger.trace("Generating Max Min table..");
+
+			MaxMinGenerator maxmin = new MaxMinGenerator(e);
+			maxmin.populatemaxminlat(toGenerate);
+
+			return toGenerate;
+		}catch(Exception e){
+			cleanDirtyTables(toGenerate);
+			throw e;
+		}
 	}
-	
+
 	private List<String> generateHCAF(String startingHCAF,String endHCAF,int numIntervals,INTERPOLATIONFUNCTIONS function,int startingTime,int endTime,String tableStore)throws Exception{
 		logger.debug("Current generator instance is "+this.toString());
 		logger.debug("Using Engine "+e.toString());
 		ArrayList<String> toReturn=new ArrayList<String>();
 		interpolator=new InterpolateTables(e.getConfigPath(), ServiceContext.getContext().getFolderPath(FOLDERS.TABLES), e.getDatabaseURL(), e.getDatabaseUserName(), e.getDatabasePassword());
-		
+
 		interpolator.interpolate(startingHCAF, endHCAF, numIntervals, function,startingTime,endTime);
 		toReturn.addAll(Arrays.asList(interpolator.getInterpolatedTables()));
-		
+
 		//Removing first and last because are passed source tables
 		toReturn.remove(0);
 		toReturn.remove(toReturn.size()-1);
-		
+
 		return toReturn;
 	}
-	
+
+
+	private void cleanDirtyTables(String toDelete){
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();			
+			session.dropTable(toDelete);
+		}catch(Exception e){
+			logger.fatal("Unexpected Exception while trying to delete table "+toDelete,e);
+		}finally{
+			if(session!=null) try{
+				session.close();
+			}catch(Exception e){
+				logger.fatal("Unable to close connection ",e);
+			}
+		}
+	}
 }

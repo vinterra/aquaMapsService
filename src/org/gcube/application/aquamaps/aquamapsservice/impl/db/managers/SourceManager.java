@@ -339,12 +339,18 @@ public class SourceManager {
 		try{
 			session=DBSession.getInternalDBSession();
 			String candidateMaxMin="maxminlat_"+Hspen.getTableName();
-			if(session.checkTableExist(candidateMaxMin)) return candidateMaxMin;
+			if(session.checkTableExist(candidateMaxMin)) {
+				logger.debug("Found "+candidateMaxMin+" for HSPEN table "+Hspen.getTableName());
+				return candidateMaxMin;
+			}
 			else {
 				Resource defaultHSPEN=getById(getDefaultId(ResourceType.HSPEN));
 				if(defaultHSPEN==null) throw new Exception("Unable to evaluate default HSPEN Table");
 				candidateMaxMin="maxminlat_"+defaultHSPEN.getTableName();
-				if(session.checkTableExist(candidateMaxMin)) return candidateMaxMin;
+				if(session.checkTableExist(candidateMaxMin)) {
+					logger.debug("Found "+candidateMaxMin+" (From Default HSPEN Table ID : "+defaultHSPEN.getSearchId()+")for HSPEN table "+Hspen.getTableName());
+					return candidateMaxMin;
+				}
 				else throw new Exception("Unable to find default Max Min Hspen Table ");
 			}			
 		}catch(Exception e){throw e;}
