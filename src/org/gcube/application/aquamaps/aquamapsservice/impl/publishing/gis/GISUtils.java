@@ -193,7 +193,8 @@ public class GISUtils {
 
 
 	//************************** ROUTINES 
-	private static GeoCaller getCaller(GeoServerDescriptor geoServer, DataSourceDescriptor geoNetwork)throws Exception{
+	private static GeoCaller getCaller(GeoServerDescriptor geoServer, DataSourceDescriptor geoNetwork)throws Exception{		
+		logger.debug("instatiating caller, passed arguments are GEOSERVER : "+geoServer+", GEONETWORK : "+geoNetwork);
 		return new GeoCaller(geoNetwork.getEntryPoint(), geoNetwork.getUser(), geoNetwork.getPassword(), 
 				geoServer.getEntryPoint(),geoServer.getUser(),geoServer.getPassword()	,
 				GeoserverMethodResearch.MOSTUNLOAD);
