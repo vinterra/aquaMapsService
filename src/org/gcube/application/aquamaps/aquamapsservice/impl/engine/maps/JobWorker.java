@@ -30,7 +30,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Algo
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class JobWorker extends Thread{
@@ -52,12 +51,12 @@ public class JobWorker extends Thread{
 		logger.trace("Starting execution for job : "+tableReference.getSearchId());
 		try{		
 			SubmittedManager.setStartTime(tableReference.getSearchId());
-			
+
 			current.setId(tableReference.getSearchId());
 
 
 			current=JobManager.insertNewJob(current);
-			
+
 			if(current.getStatus().equals(SubmittedStatus.Completed)){
 				logger.debug("No need to generate for job "+tableReference.getSearchId()+", publisher returned Complete.");
 			}else{
@@ -105,35 +104,35 @@ public class JobWorker extends Thread{
 				logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
 				if(toSubmitRequests.size()>0)
 					JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
-//				while(!JobManager.isJobComplete(tableReference.getSearchId())){
-//					logger.trace("Job [ID : "+tableReference.getSearchId()+"] was not finished, forcing generation for skipped objects..");
-//					toSubmitRequests=new ArrayList<AquaMapsObjectExecutionRequest>();
-//					for(Submitted submitted:JobManager.getObjects(tableReference.getSearchId())){
-//						if(!submitted.getStatus().equals(SubmittedStatus.Error)&&!submitted.getStatus().equals(SubmittedStatus.Completed)){
-//							logger.trace("Found object "+submitted.getSearchId()+" with status "+submitted.getStatus()+" to resubmit..");
-//							toSubmitRequests.add((AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submitted.getSerializedRequest()));
-//						}
-//					}
-//					logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
-//					if(toSubmitRequests.size()>0)
-//						JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
-//					else throw new Exception("No object to resubmit for Job [ID : "+tableReference.getSearchId()+"]");
-//				}
-				
-				
-				
-//				if(tableReference.getGisEnabled()){
-//					String wmsID=ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(tableReference.getSearchId())){
-//						@Override
-//						public WMSContext generate() throws Exception {
-//							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
-//						}
-//					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
-//							new UpdateConfiguration(true, true, true))).getStoredId().getId();
-//					SubmittedManager.setGisPublishedId(tableReference.getSearchId(), wmsID);
-//				}
+				//				while(!JobManager.isJobComplete(tableReference.getSearchId())){
+				//					logger.trace("Job [ID : "+tableReference.getSearchId()+"] was not finished, forcing generation for skipped objects..");
+				//					toSubmitRequests=new ArrayList<AquaMapsObjectExecutionRequest>();
+				//					for(Submitted submitted:JobManager.getObjects(tableReference.getSearchId())){
+				//						if(!submitted.getStatus().equals(SubmittedStatus.Error)&&!submitted.getStatus().equals(SubmittedStatus.Completed)){
+				//							logger.trace("Found object "+submitted.getSearchId()+" with status "+submitted.getStatus()+" to resubmit..");
+				//							toSubmitRequests.add((AquaMapsObjectExecutionRequest) AquaMapsXStream.deSerialize(submitted.getSerializedRequest()));
+				//						}
+				//					}
+				//					logger.debug("Job "+tableReference.getSearchId()+" must wait for "+toSubmitRequests.size()+" object to complete..");
+				//					if(toSubmitRequests.size()>0)
+				//						JobExecutionManager.insertAquaMapsObjectExecutionRequest(toSubmitRequests);
+				//					else throw new Exception("No object to resubmit for Job [ID : "+tableReference.getSearchId()+"]");
+				//				}
+
+
+
+				//				if(tableReference.getGisEnabled()){
+				//					String wmsID=ServiceContext.getContext().getPublisher().store(WMSContext.class,  new Generator<WMSContext>(new WMSGenerationRequest(tableReference.getSearchId())){
+				//						@Override
+				//						public WMSContext generate() throws Exception {
+				//							return generateWMSContext(((WMSGenerationRequest)request).getJobId());
+				//						}
+				//					}, new StoreConfiguration(StoreMode.USE_EXISTING, 
+				//							new UpdateConfiguration(true, true, true))).getStoredId().getId();
+				//					SubmittedManager.setGisPublishedId(tableReference.getSearchId(), wmsID);
+				//				}
 				SubmittedManager.updateStatus(tableReference.getSearchId(), SubmittedStatus.Completed);
-				
+
 			}
 
 
@@ -151,7 +150,7 @@ public class JobWorker extends Thread{
 			logger.error("Failed Job execution "+tableReference.getSearchId(),e);
 			try {
 				SubmittedManager.updateStatus(tableReference.getSearchId(), SubmittedStatus.Error);
-				
+
 			} catch (Exception e1) {
 				logger.error("Unexpected Error ",e1);
 			}
@@ -258,7 +257,7 @@ public class JobWorker extends Thread{
 	}
 
 	/**
-	 * Uses previos embedded generator
+	 * 
 	 * @param jobId
 	 * @param weights
 	 * @param makeTemp
@@ -266,21 +265,22 @@ public class JobWorker extends Thread{
 	 * @throws Exception
 	 */
 	private static String generateHSPEC(int jobId, Set<Species> selection,String sourceHspen,AlgorithmType algorithm, Map<String,Map<EnvelopeFields,Field>> weights)throws Exception{
-		
-			String filteredHSPEN=SpeciesManager.getFilteredHSPEN(JobManager.getWorkingHSPEN(jobId), selection);
-			JobManager.setWorkingHSPEN(jobId, filteredHSPEN);
-			JobManager.addToDropTableList(jobId, filteredHSPEN);
-			BatchGeneratorI generator=null;
-			try{
-				EnvironmentalLogicManager.getBatch(ServiceContext.getContext().getName());			
+
+		String filteredHSPEN=SpeciesManager.getFilteredHSPEN(JobManager.getWorkingHSPEN(jobId), selection);
+		JobManager.setWorkingHSPEN(jobId, filteredHSPEN);
+		JobManager.addToDropTableList(jobId, filteredHSPEN);
+		BatchGeneratorI generator=null;
+		try{
+			logger.trace("Requesting batch generator for custom HSPEC");
+			generator=EnvironmentalLogicManager.getBatch(ServiceContext.getContext().getName());			
 			generator.setConfiguration(ServiceContext.getContext().getEcoligicalConfigDir()+File.separator, DBSession.getInternalCredentials());
-						return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId),
+			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId),
 					JobManager.getWorkingHSPEN(jobId), "maxminlat_"+sourceHspen, algorithm,false, "");
-			}catch(Exception e){
-				throw e;
-			}finally{
-				if(generator!=null) EnvironmentalLogicManager.leaveBatch(generator);
-			}
+		}catch(Exception e){
+			throw e;
+		}finally{
+			if(generator!=null) EnvironmentalLogicManager.leaveBatch(generator);
+		}
 	}
 
 
