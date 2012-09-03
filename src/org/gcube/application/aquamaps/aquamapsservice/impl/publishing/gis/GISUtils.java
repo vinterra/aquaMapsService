@@ -7,6 +7,8 @@ import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
@@ -109,7 +111,7 @@ public class GISUtils {
 			if(request.getToAssociateStyles().size()==0)
 				throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
 
-			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),caller,geoServer);
+			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),caller,geoServer);
 			if(!generatedLayer)	throw new Exception("Unable to generate Layer "+request.getMapName());
 
 			
@@ -325,7 +327,7 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,GeoCaller caller,GeoServerDescriptor geoServer) throws Exception{
+	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,String> meta,GeoCaller caller,GeoServerDescriptor geoServer) throws Exception{
 		try{
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();		
 		featureTypeRest.setDatastore(geoServer.getDatastore());
@@ -339,6 +341,9 @@ public class GISUtils {
 		featureTypeRest.setNativeCRS(crs);
 		featureTypeRest.setTitle(layerName);
 		featureTypeRest.setWorkspace(geoServer.getWorkspace()); 
+		if(meta!=null)
+			for(Entry<String,String> entry:meta.entrySet())
+				featureTypeRest.setMetadata(entry.getKey(), entry.getValue());
 		logger.debug("Invoking Caller for registering layer : ");
 		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
 		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());

@@ -17,6 +17,10 @@ import org.gcube.common.gis.datamodel.utils.Utils;
 
 public class AquaMapsObject extends DataModel{
 
+	public static final String CITATION="Kaschner, K., J. S. Ready, E. Agbayani, J. Rius, K. Kesner-Reyes, P. D. Eastwood, A. B. South, "+
+	"S. O. Kullander, T. Rees, C. H. Close, R. Watson, D. Pauly, and R. Froese. 2008 AquaMaps: "+
+	"Predicted range maps for aquatic species. World wide web electronic publication, www.aquamaps.org, Version 10/2008.";
+	
 	private int id;	
 	private String name;
 	private String author;
@@ -31,9 +35,7 @@ public class AquaMapsObject extends DataModel{
 	private float threshold=0.5f;	
 	private BoundingBox boundingBox=new BoundingBox();
 	
-	public String projectCitation=	"Kaschner, K., J. S. Ready, E. Agbayani, J. Rius, K. Kesner-Reyes, P. D. Eastwood, A. B. South, "+
-	"S. O. Kullander, T. Rees, C. H. Close, R. Watson, D. Pauly, and R. Froese. 2008 AquaMaps: "+
-	"Predicted range maps for aquatic species. World wide web electronic publication, www.aquamaps.org, Version 10/2008.";
+	private String projectCitation=	CITATION;
 
 	private AlgorithmType algorithmType=AlgorithmType.NativeRange;
 	

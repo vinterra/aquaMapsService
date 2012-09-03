@@ -2,6 +2,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.gcube.common.gis.datamodel.types.LayersType;
 
@@ -22,7 +23,7 @@ public class LayerGenerationRequest {
 	private List<StyleGenerationRequest> toGenerateStyles=new ArrayList<StyleGenerationRequest>();
 	private List<String> toAssociateStyles=new ArrayList<String>();
 	private int defaultStyle=0;
-		
+	private Map<String,String> meta;	
 	//************ Generated Layer references
 	
 
@@ -40,7 +41,7 @@ public class LayerGenerationRequest {
 	public LayerGenerationRequest(String csvFile, String featureLabel,
 			String featureDefinition, String mapName, LayersType mapType,
 			List<StyleGenerationRequest> toGenerateStyles,
-			List<String> toAssociateStyles, int defaultStyle) {
+			List<String> toAssociateStyles, int defaultStyle,Map<String,String> meta) {
 		super();
 		this.csvFile = csvFile;
 		this.featureLabel = featureLabel;
@@ -50,6 +51,7 @@ public class LayerGenerationRequest {
 		this.toGenerateStyles.addAll(toGenerateStyles);
 		this.toAssociateStyles.addAll(toAssociateStyles);
 		this.defaultStyle = defaultStyle;
+		this.meta=meta;
 	}
 
 
@@ -163,20 +165,16 @@ public class LayerGenerationRequest {
 
 
 
-	@Override
-	public String toString() {
-		return "LayerGenerationRequest [csvFile=" + csvFile + ", featureLabel="
-				+ featureLabel + ", FeatureDefinition=" + FeatureDefinition
-				+ ", mapName=" + mapName + ", mapType=" + mapType
-				+ ", toGenerateStyles=" + toGenerateStyles
-				+ ", toAssociateStyles=" + toAssociateStyles
-				+ ", defaultStyle=" + defaultStyle + "]";
+	public Map<String, String> getMeta() {
+		return meta;
 	}
 
 
 
 
-
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -191,6 +189,7 @@ public class LayerGenerationRequest {
 				+ ((featureLabel == null) ? 0 : featureLabel.hashCode());
 		result = prime * result + ((mapName == null) ? 0 : mapName.hashCode());
 		result = prime * result + ((mapType == null) ? 0 : mapType.hashCode());
+		result = prime * result + ((meta == null) ? 0 : meta.hashCode());
 		result = prime
 				* result
 				+ ((toAssociateStyles == null) ? 0 : toAssociateStyles
@@ -204,7 +203,9 @@ public class LayerGenerationRequest {
 
 
 
-
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -238,6 +239,11 @@ public class LayerGenerationRequest {
 			return false;
 		if (mapType != other.mapType)
 			return false;
+		if (meta == null) {
+			if (other.meta != null)
+				return false;
+		} else if (!meta.equals(other.meta))
+			return false;
 		if (toAssociateStyles == null) {
 			if (other.toAssociateStyles != null)
 				return false;
@@ -251,6 +257,36 @@ public class LayerGenerationRequest {
 		return true;
 	}
 
+
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("LayerGenerationRequest [csvFile=");
+		builder.append(csvFile);
+		builder.append(", featureLabel=");
+		builder.append(featureLabel);
+		builder.append(", FeatureDefinition=");
+		builder.append(FeatureDefinition);
+		builder.append(", mapName=");
+		builder.append(mapName);
+		builder.append(", mapType=");
+		builder.append(mapType);
+		builder.append(", toGenerateStyles=");
+		builder.append(toGenerateStyles);
+		builder.append(", toAssociateStyles=");
+		builder.append(toAssociateStyles);
+		builder.append(", defaultStyle=");
+		builder.append(defaultStyle);
+		builder.append(", meta=");
+		builder.append(meta);
+		builder.append("]");
+		return builder.toString();
+	}
 
 
 	

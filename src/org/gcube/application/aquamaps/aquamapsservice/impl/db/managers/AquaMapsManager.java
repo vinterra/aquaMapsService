@@ -1,13 +1,17 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
@@ -98,6 +102,22 @@ public class AquaMapsManager extends SubmittedManager{
 					logger.warn("Unable to load Layer "+submittedObj.getGisPublishedId());
 				}
 			}
+		return toReturn;
+	}
+	
+	public static Map<String,String> getMetaForGIS(Submitted obj)throws Exception{
+		HashMap<String,String> toReturn=new HashMap<String,String>();
+		Resource hspec=SourceManager.getById(obj.getSourceHSPEC());
+		Resource hspen=SourceManager.getById(obj.getSourceHSPEN());
+		Resource hcaf=SourceManager.getById(obj.getSourceHCAF());
+		toReturn.put("ALGORITHM", hspec.getAlgorithm()+"");
+		toReturn.put("ALGORITHM CITATION",AquaMapsObject.CITATION);
+		toReturn.put("HSPEC TITLE", hspec.getTitle());
+		toReturn.put("HSPEC GENERATION TIME", ServiceUtils.formatTimeStamp(hspec.getGenerationTime()));
+		toReturn.put("HSPEN TITLE", hspen.getTitle());
+		toReturn.put("HSPEN GENERATION TIME", ServiceUtils.formatTimeStamp(hspen.getGenerationTime()));
+		toReturn.put("HCAF TITLE", hcaf.getTitle());
+		toReturn.put("HCAF GENERATION TIME", ServiceUtils.formatTimeStamp(hcaf.getGenerationTime()));
 		return toReturn;
 	}
 }

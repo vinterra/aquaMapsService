@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -136,6 +137,11 @@ public class Generator<T> implements ObjectManager<T> {
 			toAssociateStyleList.add(StyleGenerationRequest.getDefaultDistributionStyle());
 		}
 
+		//Meta Data 
+		Map<String,String> meta=AquaMapsManager.getMetaForGIS(object);
+		
+		
+		
 		//RETRY POLICY IN CASE OF GEOSERVER FAIL
 		boolean generated=false;
 		int attemptCount=0;
@@ -153,7 +159,7 @@ public class Generator<T> implements ObjectManager<T> {
 						object.getType().equals(ObjectType.Biodiversity) ?LayersType.Biodiversity:LayersType.Prediction,
 						toGenerateStyle,
 						toAssociateStyleList,
-						0));
+						0,meta));
 				generated=true;
 			}catch(Exception e){
 				if(attemptCount<=maxAttempt){
@@ -168,10 +174,10 @@ public class Generator<T> implements ObjectManager<T> {
 		
 		ArrayList<String> speciesList=CSVUtils.CSVToStringList(data.getSpeciesCSVList());
 		Resource source=SourceManager.getById(object.getSourceHSPEC());
-		MetaInformations meta= new MetaInformations(object.getAuthor(), "", "", object.getTitle(), System.currentTimeMillis(), source.getAlgorithm()+"", source.getGenerationTime());
+		MetaInformations publisherMeta= new MetaInformations(object.getAuthor(), "", "", object.getTitle(), System.currentTimeMillis(), source.getAlgorithm()+"", source.getGenerationTime());
 		Layer toReturn=new Layer(layerInfo.getType(), object.getIsCustomized(),
 				layerInfo, new CoverageDescriptor(object.getSourceHSPEC() + "",
-						object.getSpeciesCoverage()), meta);
+						object.getSpeciesCoverage()), publisherMeta);
 		toReturn.setSpeciesIds(speciesList.toArray(new String[speciesList.size()]));
 		toReturn.setCustomized(object.getIsCustomized());
 		return toReturn;

@@ -14,7 +14,7 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class ServiceUtils {
 
-	private static DateFormat dateFormatter= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS");
+	private static DateFormat dateFormatter= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS_z");
 	private static DateFormat shortDateFormatter=new SimpleDateFormat("yyyy_MM_dd");
 	private static final GCUBELog logger = new GCUBELog(ServiceUtils.class);
 
@@ -79,11 +79,13 @@ public class ServiceUtils {
 		return prefix+getTimeStamp().replaceAll("-", "_")+suffix;
 	}
 	public static String getTimeStamp(){
-		return dateFormatter.format(System.currentTimeMillis());
+		return formatTimeStamp(System.currentTimeMillis());
 	}
 	public static String getDate(){
 		return shortDateFormatter.format(System.currentTimeMillis());
 	}
-
+	public static String formatTimeStamp(long time){
+		return dateFormatter.format(time);
+	}
 
 }
