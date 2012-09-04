@@ -21,8 +21,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVU
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
-import com.rapidminer.operator.preprocessing.filter.SetData;
-
 
 public class SourceGenerationRequest extends DataModel{
 
