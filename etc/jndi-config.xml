@@ -9,12 +9,12 @@
 	 	type="java.lang.String"
 	 	override="false" />
 		 
-		<environment 
+<!--  		<environment 
 		name="securityManagerClass" 
 	 	value="org.gcube.common.core.security.GCUBEServiceSecurityManagerImpl" 
 	 	type="java.lang.String"
 	 	override="false" />
-	 	
+	 -->	
 	 	
 	 	<environment
 			name="httpServerBasePath" 
