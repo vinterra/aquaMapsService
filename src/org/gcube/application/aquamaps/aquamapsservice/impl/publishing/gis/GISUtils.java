@@ -340,18 +340,20 @@ public class GISUtils {
 		featureTypeRest.setSrs("EPSG:4326");
 		featureTypeRest.setNativeCRS(crs);
 		featureTypeRest.setTitle(layerName);
-		featureTypeRest.setWorkspace(geoServer.getWorkspace()); 
+		featureTypeRest.setWorkspace(geoServer.getWorkspace());
+		StringBuilder description=new StringBuilder();
 		if(meta!=null)
 			for(Entry<String,String> entry:meta.entrySet())
-				featureTypeRest.setMetadata(entry.getKey(), entry.getValue());
+				description.append(entry.getKey()+" : "+entry.getValue()+" | ");
 		logger.debug("Invoking Caller for registering layer : ");
 		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
 		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());
-		if (caller.addFeatureType(featureTypeRest,GeonetworkCategory.DATASETS)){
+		if (caller.addFeatureType(featureTypeRest,GeonetworkCategory.DATASETS,description.toString(),"")){
 			logger.debug("Add feature type returned true .. waiting 6 secs..");
 			try {
 				Thread.sleep(GEO_SERVER_WAIT_TIME);
-			} catch (InterruptedException e) {}	
+			} catch (InterruptedException e) {}		
+			
 			boolean setLayerValue= caller.setLayer(featureTypeRest, styles.get(defaultStyleIndex), styles);
 			logger.debug("Set layer returned "+setLayerValue);
 			return setLayerValue;
