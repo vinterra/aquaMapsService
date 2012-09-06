@@ -70,9 +70,9 @@ public class Filter extends DataModel{
 
 	public String toSQLString() throws InvalidArgumentException{
 		switch(type){
-		case begins: return " like '"+field.getValue()+"%'";
-		case contains: return " like '%"+field.getValue()+"%'";
-		case ends: return " like '%"+field.getValue()+"'";
+		case begins: return " ilike '"+field.getValue()+"%'";
+		case contains: return " ilike '%"+field.getValue()+"%'";
+		case ends: return " ilike '%"+field.getValue()+"'";
 		case is: {
 					switch(field.getType()){
 					case STRING : return " = '"+field.getValue()+"'";
