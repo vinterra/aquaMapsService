@@ -10,7 +10,6 @@ import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
-import loci.formats.ImageTools;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
@@ -22,6 +21,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Anal
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.AppZip;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube.contentmanagement.graphtools.data.conversions.ImageTools;
 
 public class AnalysisWorker extends Thread{
 	
@@ -94,7 +94,7 @@ public class AnalysisWorker extends Thread{
 			subDir.mkdirs();
 			for(int i=0;i<entry.getValue().size();i++){
 				Image image=entry.getValue().get(i).getImage();
-				BufferedImage bi = ImageTools.makeBuffered(image);
+				BufferedImage bi = ImageTools.toBufferedImage(image);
 				File outputfile = new File(subDir,entry.getValue().get(i).getName()+".png");
 				ImageIO.write(bi, "png", outputfile);
 			}			

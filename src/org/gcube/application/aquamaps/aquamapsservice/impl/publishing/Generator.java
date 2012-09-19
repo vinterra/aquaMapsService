@@ -165,7 +165,7 @@ public class Generator<T> implements ObjectManager<T> {
 				if(attemptCount<=maxAttempt){
 					//retry
 					long toWaitTimeMinutes=attemptCount*ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_RETRY_MINUTES);
-					logger.warn("Layer generation failed, this was attempt N° "+attemptCount+", going to retry in "+toWaitTimeMinutes+" minutes..");
+					logger.warn("Layer generation failed, this was attempt N "+attemptCount+", going to retry in "+toWaitTimeMinutes+" minutes..");
 					try{Thread.sleep(toWaitTimeMinutes*60*1000);}catch(InterruptedException e1){}
 				}else throw e;				
 			}
