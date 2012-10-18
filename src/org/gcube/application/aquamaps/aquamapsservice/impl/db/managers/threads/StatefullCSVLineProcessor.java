@@ -115,14 +115,17 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 				logger.info("finalizing csv process...");								
 				session.commit();
 				session.close();
-				
-				toFillResource.setRowCount(count);
-				toFillResource.setStatus(status);
-				logger.info("Updateing resource "+toFillResource);
-				SourceManager.update(toFillResource);
 			}catch(Exception e){
 				logger.warn("Unable to close session", e);
 			}
+		}
+		try{
+			toFillResource.setRowCount(count);
+			toFillResource.setStatus(status);
+			logger.info("Updateing resource "+toFillResource);
+			SourceManager.update(toFillResource);
+		}catch(Exception e){
+			logger.warn("Unable to update resource meta ",e);
 		}
 	}
 }

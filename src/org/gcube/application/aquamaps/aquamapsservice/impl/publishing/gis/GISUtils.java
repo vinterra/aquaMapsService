@@ -342,6 +342,9 @@ public class GISUtils {
 		featureTypeRest.setTitle(layerName);
 		featureTypeRest.setWorkspace(geoServer.getWorkspace());
 		StringBuilder description=new StringBuilder();
+		
+		meta.put("LAYER_NAME", featureTypeRest.getName());
+		
 		if(meta!=null)
 			for(Entry<String,String> entry:meta.entrySet())
 				description.append(entry.getKey()+" : "+entry.getValue()+" | ");

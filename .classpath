@@ -6,7 +6,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/AquaMapsService"/>
 	<classpathentry kind="lib" path="/home/fabio/workspace/Dependencies/AquaMaps/dbinterface-1.0.0-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gCore"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Statistical"/>
 	<classpathentry kind="lib" path="/ISCrawler/lib/org.gcube.application.aquamaps.enabling.iscrawler.jar"/>
+	<classpathentry kind="lib" path="/EcologicalEngine/target/ecological-engine-1.3.0-SNAPSHOT.jar" sourcepath="/EcologicalEngine/target/apidocs"/>
+	<classpathentry kind="lib" path="/home/fabio/workspace/Dependencies/ecologicalmodelling-1.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
