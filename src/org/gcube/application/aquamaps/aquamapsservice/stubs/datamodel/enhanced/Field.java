@@ -118,8 +118,9 @@ public class Field extends DataModel implements Comparable<Field>{
 	}
 	
 	public static FieldType getType(int SQLType){
+		if(SQLType==Types.TIME||SQLType==Types.TIMESTAMP)return FieldType.TIMESTAMP;
 		if(SQLType==Types.BIGINT||SQLType==Types.TINYINT||SQLType==Types.SMALLINT||
-				SQLType==Types.INTEGER||SQLType==Types.BIT||SQLType==Types.TIMESTAMP) return FieldType.INTEGER;
+				SQLType==Types.INTEGER||SQLType==Types.BIT) return FieldType.INTEGER;
 		if(SQLType==Types.FLOAT||SQLType==Types.DOUBLE||SQLType==Types.REAL||SQLType==Types.DECIMAL||SQLType==Types.NUMERIC) return FieldType.DOUBLE;
 		if(SQLType==Types.BOOLEAN) return FieldType.BOOLEAN;
 		return FieldType.STRING;
