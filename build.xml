@@ -528,6 +528,8 @@ full.stubs:   			(optional) Set to 'false', it excludes auxiliary stub code plac
 	
 	<!-- javadoc tasks -->
 	<target name="doc">
+		<echo message="source.dir ->${source.dir}" level="info"/>
+						<echo message="package ->${package}" level="info"/>
 		<javadoc access="public" author="true" sourcepath="${source.dir}" packagenames="${package}.*"
 			destdir="doc/api" nodeprecated="false" nodeprecatedlist="false" 
 			noindex="false" nonavbar="false" notree="false" 
