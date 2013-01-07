@@ -94,9 +94,6 @@ aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservic
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/AppZip.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/RSWrapper.java -text
-aquamaps-service-fwk/target/classes/META-INF/MANIFEST.MF -text
-aquamaps-service-fwk/target/classes/META-INF/maven/org.gcube.application.aquamaps/aquamaps-service-fwk/pom.properties -text
-aquamaps-service-fwk/target/classes/META-INF/maven/org.gcube.application.aquamaps/aquamaps-service-fwk/pom.xml -text
 aquamaps-service-stubs/.classpath -text
 aquamaps-service-stubs/.project -text
 aquamaps-service-stubs/.settings/org.eclipse.core.resources.prefs -text
