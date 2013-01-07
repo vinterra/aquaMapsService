@@ -19,6 +19,7 @@ distro/LICENSE -text
 distro/MAINTAINERS -text
 distro/README -text
 distro/changelog.xml -text
+distro/descriptor.xml -text
 etc/DB/ChangesToAquaMapsDB.sql -text
 etc/build.properties -text
 etc/config.properties -text
