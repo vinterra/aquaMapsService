@@ -9,6 +9,15 @@
 /LICENSE -text
 /MAINTAINERS -text
 /README -text
+aquamaps-service-fwk/.classpath -text
+aquamaps-service-fwk/.project -text
+aquamaps-service-fwk/.settings/org.eclipse.core.resources.prefs -text
+aquamaps-service-fwk/.settings/org.eclipse.jdt.core.prefs -text
+aquamaps-service-fwk/.settings/org.eclipse.m2e.core.prefs -text
+aquamaps-service-fwk/pom.xml -text
+aquamaps-service-fwk/target/classes/META-INF/MANIFEST.MF -text
+aquamaps-service-fwk/target/classes/META-INF/maven/org.gcube.application.aquamaps/aquamaps-service-fwk/pom.properties -text
+aquamaps-service-fwk/target/classes/META-INF/maven/org.gcube.application.aquamaps/aquamaps-service-fwk/pom.xml -text
 aquamaps-service-stubs/.classpath -text
 aquamaps-service-stubs/.project -text
 aquamaps-service-stubs/.settings/org.eclipse.core.resources.prefs -text
