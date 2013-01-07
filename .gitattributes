@@ -19,10 +19,6 @@ etc/build.properties -text
 etc/config.properties -text
 etc/generator/ALog.properties -text
 etc/generator/DestinationDBHibernate.cfg.xml -text
-etc/jndi-config.xml -text
-etc/registration.xml -text
-etc/security_descriptor.xml -text
-etc/server-config.wsdd -text
 /install.sh -text
 /pom.xml -text
 schema/AquaMapsService.wsdl -text
