@@ -9,6 +9,9 @@
 /README -text
 /build.xml -text
 /changelog.xml -text
+config/deploy-jndi-config.xml -text
+config/deploy-server.wsdd -text
+config/profile.xml -text
 etc/DB/ChangesToAquaMapsDB.sql -text
 etc/build.properties -text
 etc/config.properties -text
