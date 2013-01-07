@@ -27,12 +27,6 @@ etc/generator/ALog.properties -text
 etc/generator/DestinationDBHibernate.cfg.xml -text
 /install.sh -text
 /pom.xml -text
-schema/AquaMapsService.wsdl -text
-schema/AquaMapsTypes.wsdl -text
-schema/AquaMapsTypes.xsd -text
-schema/DataManagement.wsdl -text
-schema/GISTypes.xsd -text
-schema/PublisherService.wsdl -text
 src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
 src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/CommonServiceLogic.java -text
 src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
