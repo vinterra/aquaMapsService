@@ -9,6 +9,15 @@
 /LICENSE -text
 /MAINTAINERS -text
 /README -text
+aquamaps-service-stubs/.classpath -text
+aquamaps-service-stubs/.project -text
+aquamaps-service-stubs/.settings/org.eclipse.core.resources.prefs -text
+aquamaps-service-stubs/.settings/org.eclipse.jdt.core.prefs -text
+aquamaps-service-stubs/.settings/org.eclipse.m2e.core.prefs -text
+aquamaps-service-stubs/pom.xml -text
+aquamaps-service-stubs/target/classes/META-INF/MANIFEST.MF -text
+aquamaps-service-stubs/target/classes/META-INF/maven/org.gcube.application.aquamaps/aquamaps-service-stubs/pom.properties -text
+aquamaps-service-stubs/target/classes/META-INF/maven/org.gcube.application.aquamaps/aquamaps-service-stubs/pom.xml -text
 /build.xml -text
 /changelog.xml -text
 config/deploy-jndi-config.xml -text
