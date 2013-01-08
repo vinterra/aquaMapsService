@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AreaType;
-import org.gcube.application.aquamaps.datamodel.AreasArray;
+import org.gcube_system.namespaces.application.aquamaps.types.AreasArray;
 
 
 public class Area extends DataModel{
@@ -56,15 +56,15 @@ public class Area extends DataModel{
 	}
 
 
-	public Area(org.gcube.application.aquamaps.datamodel.Area toLoad){
+	public Area(org.gcube_system.namespaces.application.aquamaps.types.Area toLoad){
 		super();
 		this.setCode(toLoad.getCode());
 		this.setName(toLoad.getName());
 		this.setType(AreaType.valueOf(toLoad.getType()));
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Area toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Area toReturn= new org.gcube.application.aquamaps.datamodel.Area();
+	public org.gcube_system.namespaces.application.aquamaps.types.Area toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Area toReturn= new org.gcube_system.namespaces.application.aquamaps.types.Area();
 		toReturn.setCode(this.getCode());
 		toReturn.setName(this.getName());
 		toReturn.setType(this.getType().toString());
@@ -72,18 +72,18 @@ public class Area extends DataModel{
 	}
 
 	public static AreasArray toStubsVersion(Set<Area> toConvert){
-		List<org.gcube.application.aquamaps.datamodel.Area> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Area>();
+		List<org.gcube_system.namespaces.application.aquamaps.types.Area> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Area>();
 		if(toConvert!=null)
 			for(Area obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new AreasArray(list.toArray(new org.gcube.application.aquamaps.datamodel.Area[list.size()]));
+		return new AreasArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Area[list.size()]));
 	}
 
 
 	public static Set<Area> load(AreasArray toLoad){
 		Set<Area> toReturn= new HashSet<Area>();
 		if((toLoad!=null)&&(toLoad.getAreasList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Area a:toLoad.getAreasList())
+			for(org.gcube_system.namespaces.application.aquamaps.types.Area a:toLoad.getAreasList())
 				toReturn.add(new Area(a));
 		return toReturn;
 	}

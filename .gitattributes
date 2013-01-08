@@ -62,7 +62,6 @@ aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservic
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/JSONStringer.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/JSONTokener.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/JSONWriter.java -text
-aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/Test.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/XML.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/json/XMLTokener.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/datamodel/types/AlgorithmType.java -text
@@ -94,6 +93,18 @@ aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservic
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/ServiceException.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/AppZip.java -text
 aquamaps-service-fwk/src/main/java/org/gcube/application/aquamaps/aquamapsservice/stubs/wrapper/utils/RSWrapper.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/enhanced/BoundsInfo.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/enhanced/LayerInfo.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/enhanced/TransectInfo.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/enhanced/WMSContextInfo.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/types/LayersType.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/utils/ReadTemplate.java -text
+aquamaps-service-fwk/src/main/java/org/gcube/common/gis/datamodel/utils/Utils.java -text
+aquamaps-service-fwk/src/main/resources/org/gcube/common/gis/datamodel/resources/template/BiodiversityTemplate.xml -text
+aquamaps-service-fwk/src/main/resources/org/gcube/common/gis/datamodel/resources/template/EnvironmentTemplate.xml -text
+aquamaps-service-fwk/src/main/resources/org/gcube/common/gis/datamodel/resources/template/PointMapTemplate.xml -text
+aquamaps-service-fwk/src/main/resources/org/gcube/common/gis/datamodel/resources/template/PredictionTemplate.xml -text
+aquamaps-service-fwk/src/main/resources/org/gcube/common/gis/datamodel/resources/template/WMSContext.xml -text
 aquamaps-service-stubs/.classpath -text
 aquamaps-service-stubs/.project -text
 aquamaps-service-stubs/.settings/org.eclipse.core.resources.prefs -text

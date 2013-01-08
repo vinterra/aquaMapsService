@@ -200,12 +200,12 @@ public class Job extends DataModel{
 	}
 	
 	
-	public Job (org.gcube.application.aquamaps.datamodel.Job toLoad){
+	public Job (org.gcube_system.namespaces.application.aquamaps.types.Job toLoad){
 		this.setAuthor(toLoad.getAuthor());
 		this.setDate(toLoad.getDate());
 		
 		if((toLoad.getWeights()!=null)&&(toLoad.getWeights().getEnvelopeWeightList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.EnvelopeWeights weights:toLoad.getWeights().getEnvelopeWeightList()){
+			for(org.gcube_system.namespaces.application.aquamaps.types.EnvelopeWeights weights:toLoad.getWeights().getEnvelopeWeightList()){
 				String speciesID=weights.getSpeciesId();
 				if(!envelopeWeights.containsKey(speciesID)) 
 					envelopeWeights.put(speciesID, new HashMap<EnvelopeFields, Field>());
@@ -213,7 +213,7 @@ public class Job extends DataModel{
 						envelopeWeights.get(speciesID).put(EnvelopeFields.valueOf(f.getName()), f);
 			}
 		if((toLoad.getEnvelopCustomization()!=null)&&(toLoad.getEnvelopCustomization().getPerturbationList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Perturbation pert:toLoad.getEnvelopCustomization().getPerturbationList()){
+			for(org.gcube_system.namespaces.application.aquamaps.types.Perturbation pert:toLoad.getEnvelopCustomization().getPerturbationList()){
 				String speciesID=pert.getToPerturbId();
 				if(!envelopeCustomization.containsKey(speciesID))
 					envelopeCustomization.put(speciesID, new HashMap<String, Perturbation>());
@@ -238,20 +238,20 @@ public class Job extends DataModel{
 		
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Job toStubsVersion() throws JSONException{
-		org.gcube.application.aquamaps.datamodel.Job toReturn= new org.gcube.application.aquamaps.datamodel.Job();
+	public org.gcube_system.namespaces.application.aquamaps.types.Job toStubsVersion() throws JSONException{
+		org.gcube_system.namespaces.application.aquamaps.types.Job toReturn= new org.gcube_system.namespaces.application.aquamaps.types.Job();
 		toReturn.setAquaMapList(AquaMapsObject.toStubsVersion(this.getAquaMapsObjectList()));
 		toReturn.setAuthor(this.getAuthor());
 		toReturn.setDate(date!=null?date:0);
 		
-		List<org.gcube.application.aquamaps.datamodel.Perturbation> pertList=new ArrayList<org.gcube.application.aquamaps.datamodel.Perturbation>();
+		List<org.gcube_system.namespaces.application.aquamaps.types.Perturbation> pertList=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Perturbation>();
 		for(String specId: this.envelopeCustomization.keySet())
 			for(String field: this.envelopeCustomization.get(specId).keySet()){
 				Perturbation p=this.envelopeCustomization.get(specId).get(field);
-				pertList.add(new org.gcube.application.aquamaps.datamodel.Perturbation(field,specId,p.getType().toString(),p.getPerturbationValue()));
+				pertList.add(new org.gcube_system.namespaces.application.aquamaps.types.Perturbation(field,specId,p.getType().toString(),p.getPerturbationValue()));
 			}
 		toReturn.setEnvelopCustomization(
-				new org.gcube.application.aquamaps.datamodel.PerturbationArray(pertList.toArray(new org.gcube.application.aquamaps.datamodel.Perturbation[pertList.size()])));
+				new org.gcube_system.namespaces.application.aquamaps.types.PerturbationArray(pertList.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Perturbation[pertList.size()])));
 		
 		toReturn.setHcaf(this.sourceHCAF.toStubsVersion());
 		toReturn.setHspec(this.sourceHSPEC.toStubsVersion());
@@ -266,12 +266,12 @@ public class Job extends DataModel{
 		toReturn.setGis(this.isGis);
 		toReturn.setGroupId(this.getWmsContextId());
 		
-		List<org.gcube.application.aquamaps.datamodel.EnvelopeWeights> weightList= new ArrayList<org.gcube.application.aquamaps.datamodel.EnvelopeWeights>();
+		List<org.gcube_system.namespaces.application.aquamaps.types.EnvelopeWeights> weightList= new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.EnvelopeWeights>();
 		for(String specId:this.envelopeWeights.keySet()){
-			weightList.add(new org.gcube.application.aquamaps.datamodel.EnvelopeWeights(
+			weightList.add(new org.gcube_system.namespaces.application.aquamaps.types.EnvelopeWeights(
 					specId,Field.toStubsVersion(this.envelopeWeights.get(specId).values())));
 		}
-		toReturn.setWeights(new org.gcube.application.aquamaps.datamodel.EnvelopeWeightArray(weightList.toArray(new org.gcube.application.aquamaps.datamodel.EnvelopeWeights[weightList.size()])));
+		toReturn.setWeights(new org.gcube_system.namespaces.application.aquamaps.types.EnvelopeWeightArray(weightList.toArray(new org.gcube_system.namespaces.application.aquamaps.types.EnvelopeWeights[weightList.size()])));
 		return toReturn;
 	}
 	
@@ -315,7 +315,7 @@ public class Job extends DataModel{
 	public void setWmsContextId(String wmsContextId) {
 		this.wmsContextId = wmsContextId;
 	}
-	public String getCompressedCoverage(){
-		return AquaMapsObject.generateMD5(selectedSpecies,"");
-	}
+//	public String getCompressedCoverage(){
+//		return AquaMapsObject.generateMD5(selectedSpecies,"");
+//	}
 }

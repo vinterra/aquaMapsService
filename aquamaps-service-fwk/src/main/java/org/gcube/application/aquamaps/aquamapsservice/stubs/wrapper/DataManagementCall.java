@@ -19,7 +19,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environmen
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.DataManagementServiceAddressingLocator;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;

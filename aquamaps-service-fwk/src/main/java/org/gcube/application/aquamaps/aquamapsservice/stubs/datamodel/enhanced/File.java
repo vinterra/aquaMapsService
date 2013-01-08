@@ -75,31 +75,31 @@ public class File extends DataModel{
 		this.name = name;
 	}
 
-	public File (org.gcube.application.aquamaps.datamodel.File toLoad){
+	public File (org.gcube_system.namespaces.application.aquamaps.types.File toLoad){
 		super();
 		this.setName(toLoad.getName());
 		this.setType(FileType.valueOf(toLoad.getType()));
 		this.setUuri(toLoad.getUrl());
 	}
 
-	public static ArrayList<File> load(org.gcube.application.aquamaps.datamodel.FileArray toLoad){
+	public static ArrayList<File> load(org.gcube_system.namespaces.application.aquamaps.types.FileArray toLoad){
 		ArrayList<File> toReturn= new ArrayList<File>();
 		if((toLoad!=null)&&(toLoad.getFileList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.File f: toLoad.getFileList())
+			for(org.gcube_system.namespaces.application.aquamaps.types.File f: toLoad.getFileList())
 				toReturn.add(new File(f));
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.FileArray toStubsVersion(List<File> toConvert){
-		List<org.gcube.application.aquamaps.datamodel.File> list=new ArrayList<org.gcube.application.aquamaps.datamodel.File>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.FileArray toStubsVersion(List<File> toConvert){
+		List<org.gcube_system.namespaces.application.aquamaps.types.File> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.File>();
 		if(toConvert!=null)
 			for(File obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.FileArray(list.toArray(new org.gcube.application.aquamaps.datamodel.File[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.FileArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.File[list.size()]));
 	}
 
-	public org.gcube.application.aquamaps.datamodel.File toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.File toReturn= new org.gcube.application.aquamaps.datamodel.File();
+	public org.gcube_system.namespaces.application.aquamaps.types.File toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.File toReturn= new org.gcube_system.namespaces.application.aquamaps.types.File();
 		toReturn.setName(this.name);
 		toReturn.setType(this.type.toString());
 		toReturn.setUrl(this.uuri);

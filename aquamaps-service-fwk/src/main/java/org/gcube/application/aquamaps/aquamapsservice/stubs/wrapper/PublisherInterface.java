@@ -6,7 +6,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.A
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 
 public interface PublisherInterface {

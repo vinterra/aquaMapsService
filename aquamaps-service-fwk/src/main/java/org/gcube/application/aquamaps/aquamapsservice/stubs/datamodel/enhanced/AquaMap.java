@@ -7,9 +7,9 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.datamodel.Map;
-import org.gcube.application.aquamaps.datamodel.MapArray;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
+import org.gcube_system.namespaces.application.aquamaps.types.Map;
+import org.gcube_system.namespaces.application.aquamaps.types.MapArray;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

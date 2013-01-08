@@ -8,7 +8,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 
 public class Submitted extends DataModel{
 
@@ -200,7 +199,7 @@ public class Submitted extends DataModel{
 	}
 
 
-	public Submitted (org.gcube.application.aquamaps.datamodel.Submitted toLoad){
+	public Submitted (org.gcube_system.namespaces.application.aquamaps.types.Submitted toLoad){
 		super();
 		this.author=toLoad.getAuthor();
 		setSubmissionTime(toLoad.getSubmissionTime());
@@ -225,8 +224,8 @@ public class Submitted extends DataModel{
 		this.setForceRegeneration(toLoad.isForceRegeneration());
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Submitted toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Submitted toReturn=new org.gcube.application.aquamaps.datamodel.Submitted();
+	public org.gcube_system.namespaces.application.aquamaps.types.Submitted toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Submitted toReturn=new org.gcube_system.namespaces.application.aquamaps.types.Submitted();
 		toReturn.setAuthor(author);
 		toReturn.setSubmissionTime(submissionTime);
 		toReturn.setEndTime(endTime);

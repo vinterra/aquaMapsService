@@ -54,33 +54,33 @@ public class Perturbation extends DataModel{
 		return perturbationValue;
 	}
 
-	public Perturbation (org.gcube.application.aquamaps.datamodel.Perturbation toLoad){
+	public Perturbation (org.gcube_system.namespaces.application.aquamaps.types.Perturbation toLoad){
 		this.setPerturbationValue(toLoad.getValue());
 		this.setType(PerturbationType.valueOf(toLoad.getType()));
 	}
 
-	public List<Perturbation> load(org.gcube.application.aquamaps.datamodel.PerturbationArray toLoad){
+	public List<Perturbation> load(org.gcube_system.namespaces.application.aquamaps.types.PerturbationArray toLoad){
 		List<Perturbation> toReturn=new ArrayList<Perturbation>();
 		if((toLoad!=null)&&(toLoad.getPerturbationList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Perturbation p:toLoad.getPerturbationList())
+			for(org.gcube_system.namespaces.application.aquamaps.types.Perturbation p:toLoad.getPerturbationList())
 				toReturn.add(new Perturbation(p));
 		return toReturn;
 	}
 
 	@Deprecated
-	public org.gcube.application.aquamaps.datamodel.Perturbation toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Perturbation toReturn= new org.gcube.application.aquamaps.datamodel.Perturbation();
+	public org.gcube_system.namespaces.application.aquamaps.types.Perturbation toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Perturbation toReturn= new org.gcube_system.namespaces.application.aquamaps.types.Perturbation();
 		toReturn.setValue(this.getPerturbationValue());
 		toReturn.setType(this.getType().toString());
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.PerturbationArray toStubsVersion(List<Perturbation> toConvert){
-		List<org.gcube.application.aquamaps.datamodel.Perturbation> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Perturbation>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.PerturbationArray toStubsVersion(List<Perturbation> toConvert){
+		List<org.gcube_system.namespaces.application.aquamaps.types.Perturbation> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Perturbation>();
 		if(toConvert!=null)
 			for(Perturbation obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.PerturbationArray(list.toArray(new org.gcube.application.aquamaps.datamodel.Perturbation[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.PerturbationArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Perturbation[list.size()]));
 	}
 
 

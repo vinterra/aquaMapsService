@@ -333,8 +333,8 @@ public class Analysis extends DataModel{
 	}
 	
 	
-	public org.gcube.application.aquamaps.datamodel.Analysis toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Analysis toReturn=new org.gcube.application.aquamaps.datamodel.Analysis();
+	public org.gcube_system.namespaces.application.aquamaps.types.Analysis toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Analysis toReturn=new org.gcube_system.namespaces.application.aquamaps.types.Analysis();
 		toReturn.setArchiveLocation(archiveLocation);
 		toReturn.setAuthor(author);
 		toReturn.setCurrentPhasePercent(currentphasepercent);
@@ -352,7 +352,7 @@ public class Analysis extends DataModel{
 		return toReturn;		
 	}
 	
-	public Analysis(org.gcube.application.aquamaps.datamodel.Analysis stubs){
+	public Analysis(org.gcube_system.namespaces.application.aquamaps.types.Analysis stubs){
 		setArchiveLocation(stubs.getArchiveLocation());
 		setAuthor(stubs.getAuthor());
 		setCurrentphasepercent(stubs.getCurrentPhasePercent());

@@ -113,30 +113,30 @@ public class Species extends DataModel implements Comparable<Species>{
 	}
 
 
-	public Species(org.gcube.application.aquamaps.datamodel.Specie toLoad){
+	public Species(org.gcube_system.namespaces.application.aquamaps.types.Specie toLoad){
 		super();
 		this.setId(toLoad.getId());
 		this.getAttributesList().addAll(Field.load(toLoad.getAdditionalField()));
 	}
 
-	public static List<Species> load(org.gcube.application.aquamaps.datamodel.SpeciesArray toLoad){
+	public static List<Species> load(org.gcube_system.namespaces.application.aquamaps.types.SpeciesArray toLoad){
 		ArrayList<Species> toReturn = new ArrayList<Species>();
 		if((toLoad!=null)&&(toLoad.getSpeciesList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Specie s:toLoad.getSpeciesList())
+			for(org.gcube_system.namespaces.application.aquamaps.types.Specie s:toLoad.getSpeciesList())
 				toReturn.add(new Species(s));
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.SpeciesArray toStubsVersion(Set<Species> toConvert){
-		List<org.gcube.application.aquamaps.datamodel.Specie> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Specie>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.SpeciesArray toStubsVersion(Set<Species> toConvert){
+		List<org.gcube_system.namespaces.application.aquamaps.types.Specie> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Specie>();
 		if(toConvert!=null)
 			for(Species obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.SpeciesArray(list.toArray(new org.gcube.application.aquamaps.datamodel.Specie[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.SpeciesArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Specie[list.size()]));
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Specie toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Specie toReturn=new org.gcube.application.aquamaps.datamodel.Specie();
+	public org.gcube_system.namespaces.application.aquamaps.types.Specie toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Specie toReturn=new org.gcube_system.namespaces.application.aquamaps.types.Specie();
 		toReturn.setAdditionalField(Field.toStubsVersion(this.getAttributesList()));
 		toReturn.setId(this.id);
 		return toReturn;

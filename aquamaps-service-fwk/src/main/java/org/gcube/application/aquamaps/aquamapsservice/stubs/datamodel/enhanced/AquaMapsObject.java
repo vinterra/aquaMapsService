@@ -6,14 +6,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.datamodel.AquaMap;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.utils.Utils;
-
+import org.gcube_system.namespaces.application.aquamaps.types.AquaMap;
 
 public class AquaMapsObject extends DataModel{
 
@@ -148,24 +146,24 @@ public class AquaMapsObject extends DataModel{
 	public void setImages(List<File> images) {
 		this.images = images;
 	}
-	public static List<AquaMapsObject> load(org.gcube.application.aquamaps.datamodel.AquaMapArray toLoad){
+	public static List<AquaMapsObject> load(org.gcube_system.namespaces.application.aquamaps.types.AquaMapArray toLoad){
 		List<AquaMapsObject> toReturn= new ArrayList<AquaMapsObject>();
 		if((toLoad!=null)&&(toLoad.getAquaMapList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.AquaMap a: toLoad.getAquaMapList())
+			for(org.gcube_system.namespaces.application.aquamaps.types.AquaMap a: toLoad.getAquaMapList())
 				toReturn.add(new AquaMapsObject(a));
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.AquaMapArray toStubsVersion(List<AquaMapsObject> toConvert){
-		List<org.gcube.application.aquamaps.datamodel.AquaMap> list=new ArrayList<org.gcube.application.aquamaps.datamodel.AquaMap>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.AquaMapArray toStubsVersion(List<AquaMapsObject> toConvert){
+		List<org.gcube_system.namespaces.application.aquamaps.types.AquaMap> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.AquaMap>();
 		if(toConvert!=null)
 			for(AquaMapsObject obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.AquaMapArray(list.toArray(new org.gcube.application.aquamaps.datamodel.AquaMap[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.AquaMapArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.AquaMap[list.size()]));
 	}
 
-	public org.gcube.application.aquamaps.datamodel.AquaMap toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.AquaMap toReturn= new org.gcube.application.aquamaps.datamodel.AquaMap();
+	public org.gcube_system.namespaces.application.aquamaps.types.AquaMap toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.AquaMap toReturn= new org.gcube_system.namespaces.application.aquamaps.types.AquaMap();
 		toReturn.setAuthor(this.author);
 		toReturn.setBoundingBox(this.boundingBox.toString());
 		toReturn.setDate(this.date!=null?date:0);
@@ -199,20 +197,20 @@ public class AquaMapsObject extends DataModel{
 		return algorithmType;
 	}
 	
-	public String getCompressedSpeciesCoverage(){
-		return generateMD5(selectedSpecies,(type.equals(ObjectType.Biodiversity)?threshold+"":""));
-	}
-	
-	public static String generateMD5(Set<Species> set,String toIncludeParameterList){
-		StringBuilder concatSpeciesIds=new StringBuilder();
-		for(Species s : set) concatSpeciesIds.append(s.getId()+",");
-		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
-		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
-	}
-	public static String generateMD5fromIds(Set<String> set,String toIncludeParameterList){
-		StringBuilder concatSpeciesIds=new StringBuilder();
-		for(String s : set) concatSpeciesIds.append(s+",");
-		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
-		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
-	}
+//	public String getCompressedSpeciesCoverage(){
+//		return generateMD5(selectedSpecies,(type.equals(ObjectType.Biodiversity)?threshold+"":""));
+//	}
+//	
+//	public static String generateMD5(Set<Species> set,String toIncludeParameterList){
+//		StringBuilder concatSpeciesIds=new StringBuilder();
+//		for(Species s : set) concatSpeciesIds.append(s.getId()+",");
+//		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
+//		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
+//	}
+//	public static String generateMD5fromIds(Set<String> set,String toIncludeParameterList){
+//		StringBuilder concatSpeciesIds=new StringBuilder();
+//		for(String s : set) concatSpeciesIds.append(s+",");
+//		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
+//		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
+//	}
 }

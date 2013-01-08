@@ -9,7 +9,7 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.datamodel.FieldArray;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 
 
 public class Envelope extends DataModel{
@@ -262,16 +262,16 @@ public class Envelope extends DataModel{
 		}
 		
 		public FieldArray toFieldArray(){
-			List<org.gcube.application.aquamaps.datamodel.Field> fields=new ArrayList<org.gcube.application.aquamaps.datamodel.Field>();
+			List<org.gcube_system.namespaces.application.aquamaps.types.Field> fields=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Field>();
 			for(EnvelopeFields envF:EnvelopeFields.values())
 				for(HspenFields paramName:this.getValueNames(envF)){
-					org.gcube.application.aquamaps.datamodel.Field f= new org.gcube.application.aquamaps.datamodel.Field();
+					org.gcube_system.namespaces.application.aquamaps.types.Field f= new org.gcube_system.namespaces.application.aquamaps.types.Field();
 					f.setName(paramName.toString());
 					f.setType(FieldType.DOUBLE.toString());
 					f.setValue(String.valueOf(this.getValue(envF, paramName)));
 					fields.add(f);
 				}
-			return new FieldArray(fields.toArray(new org.gcube.application.aquamaps.datamodel.Field[fields.size()]));
+			return new FieldArray(fields.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Field[fields.size()]));
 		}
 		
 		

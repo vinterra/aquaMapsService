@@ -1,7 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedByFiltersRequestType;
@@ -12,10 +10,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.F
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.service.PublisherServiceAddressingLocator;
-import org.gcube.application.aquamaps.datamodel.FieldArray;
-import org.gcube.application.aquamaps.datamodel.Map;
-import org.gcube.application.aquamaps.datamodel.MapArray;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBERemotePortTypeContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.scope.GCUBEScope;
@@ -23,7 +17,7 @@ import org.gcube.common.core.security.GCUBESecurityManager;
 import org.gcube.common.core.security.GCUBESecurityManagerImpl;
 import org.gcube.common.core.types.StringArray;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
-import org.gcube.common.gis.datamodel.utils.Utils;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 
 public class PublisherServiceCall extends AquaMapsCall implements
 		PublisherInterface {

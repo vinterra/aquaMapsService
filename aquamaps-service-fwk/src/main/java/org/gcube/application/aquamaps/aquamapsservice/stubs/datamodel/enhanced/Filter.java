@@ -35,7 +35,7 @@ public class Filter extends DataModel{
 	}
 	
 	
-	public Filter (org.gcube.application.aquamaps.datamodel.Filter toLoad){
+	public Filter (org.gcube_system.namespaces.application.aquamaps.types.Filter toLoad){
 		Field field= new Field();
 		field.setName(toLoad.getName());
 		field.setValue(toLoad.getValue());
@@ -44,23 +44,23 @@ public class Filter extends DataModel{
 		this.setType(FilterType.valueOf(toLoad.getType()));
 	}
 
-	public static List<Filter> load(org.gcube.application.aquamaps.datamodel.FilterArray toLoad){
+	public static List<Filter> load(org.gcube_system.namespaces.application.aquamaps.types.FilterArray toLoad){
 		List<Filter> toReturn=new ArrayList<Filter>();
 		if((toLoad!=null)&&(toLoad.getFilterList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Filter f: toLoad.getFilterList())toReturn.add(new Filter(f));
+			for(org.gcube_system.namespaces.application.aquamaps.types.Filter f: toLoad.getFilterList())toReturn.add(new Filter(f));
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.FilterArray toStubsVersion(List<Filter> toConvert){
-		List<org.gcube.application.aquamaps.datamodel.Filter> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Filter>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.FilterArray toStubsVersion(List<Filter> toConvert){
+		List<org.gcube_system.namespaces.application.aquamaps.types.Filter> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Filter>();
 		if(toConvert!=null)
 			for(Filter obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.FilterArray(list.toArray(new org.gcube.application.aquamaps.datamodel.Filter[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.FilterArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Filter[list.size()]));
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Filter toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Filter toReturn= new org.gcube.application.aquamaps.datamodel.Filter();
+	public org.gcube_system.namespaces.application.aquamaps.types.Filter toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Filter toReturn= new org.gcube_system.namespaces.application.aquamaps.types.Filter();
 		toReturn.setName(this.getField().getName());
 		toReturn.setType(this.getType().toString());
 		toReturn.setValue(this.getField().getValue());

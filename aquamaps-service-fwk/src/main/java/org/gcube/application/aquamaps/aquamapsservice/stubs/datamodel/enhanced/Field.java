@@ -12,7 +12,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONA
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONException;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.json.JSONObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.datamodel.FieldArray;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -71,27 +71,27 @@ public class Field extends DataModel implements Comparable<Field>{
 	public static List<Field> load(FieldArray toLoad){
 		List<Field> toReturn=new ArrayList<Field>();
 		if((toLoad!=null)&&(toLoad.getFields()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Field f:toLoad.getFields())toReturn.add(new Field(f));
+			for(org.gcube_system.namespaces.application.aquamaps.types.Field f:toLoad.getFields())toReturn.add(new Field(f));
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.FieldArray toStubsVersion(Collection<Field> collection){
-		List<org.gcube.application.aquamaps.datamodel.Field> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Field>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.FieldArray toStubsVersion(Collection<Field> collection){
+		List<org.gcube_system.namespaces.application.aquamaps.types.Field> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Field>();
 		if(collection!=null)
 			for(Field obj:collection)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.FieldArray(list.toArray(new org.gcube.application.aquamaps.datamodel.Field[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.FieldArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Field[list.size()]));
 	}
 
 
-	public Field(org.gcube.application.aquamaps.datamodel.Field toLoad){
+	public Field(org.gcube_system.namespaces.application.aquamaps.types.Field toLoad){
 		super();
 		this.setName(toLoad.getName());
 		this.setType(FieldType.valueOf(toLoad.getType()));
 		this.setValue(toLoad.getValue());
 	}
-	public org.gcube.application.aquamaps.datamodel.Field toStubsVersion(){
-		org.gcube.application.aquamaps.datamodel.Field toReturn=new org.gcube.application.aquamaps.datamodel.Field();
+	public org.gcube_system.namespaces.application.aquamaps.types.Field toStubsVersion(){
+		org.gcube_system.namespaces.application.aquamaps.types.Field toReturn=new org.gcube_system.namespaces.application.aquamaps.types.Field();
 		toReturn.setName(this.getName());
 		toReturn.setType(this.getType().toString());
 		toReturn.setValue(this.getValue());

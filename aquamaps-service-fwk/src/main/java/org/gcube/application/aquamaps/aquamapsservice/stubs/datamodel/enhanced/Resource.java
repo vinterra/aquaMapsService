@@ -60,7 +60,7 @@ public class Resource extends DataModel{
 
 
 
-	public Resource (org.gcube.application.aquamaps.datamodel.Resource toLoad){
+	public Resource (org.gcube_system.namespaces.application.aquamaps.types.Resource toLoad){
 		try{this.setAlgorithm(AlgorithmType.valueOf(toLoad.getAlgorithm()));}
 		catch(Exception e){this.setAlgorithm(DEFAULT_ALGORITHM_TYPE);}
 		this.setAuthor(toLoad.getAuthor());
@@ -131,8 +131,8 @@ public class Resource extends DataModel{
 		setRowCount(toLoad.getPercent());
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Resource toStubsVersion() throws JSONException{
-		org.gcube.application.aquamaps.datamodel.Resource toReturn=new org.gcube.application.aquamaps.datamodel.Resource();
+	public org.gcube_system.namespaces.application.aquamaps.types.Resource toStubsVersion() throws JSONException{
+		org.gcube_system.namespaces.application.aquamaps.types.Resource toReturn=new org.gcube_system.namespaces.application.aquamaps.types.Resource();
 		
 		toReturn.setAlgorithm(getAlgorithm()+"");
 		toReturn.setAuthor(getAuthor());
@@ -160,19 +160,19 @@ public class Resource extends DataModel{
 	}
 
 
-	public static List<Resource> load(org.gcube.application.aquamaps.datamodel.ResourceArray toLoad){
+	public static List<Resource> load(org.gcube_system.namespaces.application.aquamaps.types.ResourceArray toLoad){
 		List<Resource> toReturn=new ArrayList<Resource>();
 		if((toLoad!=null)&&(toLoad.getResourceList()!=null))
-			for(org.gcube.application.aquamaps.datamodel.Resource f: toLoad.getResourceList())toReturn.add(new Resource(f));
+			for(org.gcube_system.namespaces.application.aquamaps.types.Resource f: toLoad.getResourceList())toReturn.add(new Resource(f));
 		return toReturn;
 	}
 
-	public static org.gcube.application.aquamaps.datamodel.ResourceArray toStubsVersion(List<Resource> toConvert) throws JSONException{
-		List<org.gcube.application.aquamaps.datamodel.Resource> list=new ArrayList<org.gcube.application.aquamaps.datamodel.Resource>();
+	public static org.gcube_system.namespaces.application.aquamaps.types.ResourceArray toStubsVersion(List<Resource> toConvert) throws JSONException{
+		List<org.gcube_system.namespaces.application.aquamaps.types.Resource> list=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Resource>();
 		if(toConvert!=null)
 			for(Resource obj:toConvert)
 				list.add(obj.toStubsVersion());
-		return new org.gcube.application.aquamaps.datamodel.ResourceArray(list.toArray(new org.gcube.application.aquamaps.datamodel.Resource[list.size()]));
+		return new org.gcube_system.namespaces.application.aquamaps.types.ResourceArray(list.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Resource[list.size()]));
 	}
 	
 	
