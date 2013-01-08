@@ -1,2 +1,5 @@
+aquamapsservice-fwk/target
+aquamapsservice-service/target
+aquamapsservice-stubs/target
 /exported.csv
 /exported_mini.csv
