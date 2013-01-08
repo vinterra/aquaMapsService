@@ -113,5 +113,11 @@
 			<artifactId>commons-codec</artifactId>
 			<version>1.6</version>
 		</dependency>
+		<dependency>
+			<groupId>org.gcube.tools</groupId>
+			<artifactId>my-container</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
