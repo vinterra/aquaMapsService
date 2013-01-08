@@ -12,6 +12,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Subm
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.utils.Utils;
 import org.gcube_system.namespaces.application.aquamaps.types.AquaMap;
+import org.apache.commons.codec.digest.DigestUtils;
 
 public class AquaMapsObject extends DataModel{
 
@@ -197,20 +198,20 @@ public class AquaMapsObject extends DataModel{
 		return algorithmType;
 	}
 	
-//	public String getCompressedSpeciesCoverage(){
-//		return generateMD5(selectedSpecies,(type.equals(ObjectType.Biodiversity)?threshold+"":""));
-//	}
-//	
-//	public static String generateMD5(Set<Species> set,String toIncludeParameterList){
-//		StringBuilder concatSpeciesIds=new StringBuilder();
-//		for(Species s : set) concatSpeciesIds.append(s.getId()+",");
-//		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
-//		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
-//	}
-//	public static String generateMD5fromIds(Set<String> set,String toIncludeParameterList){
-//		StringBuilder concatSpeciesIds=new StringBuilder();
-//		for(String s : set) concatSpeciesIds.append(s+",");
-//		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
-//		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
-//	}
+	public String getCompressedSpeciesCoverage(){
+		return generateMD5(selectedSpecies,(type.equals(ObjectType.Biodiversity)?threshold+"":""));
+	}
+	
+	public static String generateMD5(Set<Species> set,String toIncludeParameterList){
+		StringBuilder concatSpeciesIds=new StringBuilder();
+		for(Species s : set) concatSpeciesIds.append(s.getId()+",");
+		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
+		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
+	}
+	public static String generateMD5fromIds(Set<String> set,String toIncludeParameterList){
+		StringBuilder concatSpeciesIds=new StringBuilder();
+		for(String s : set) concatSpeciesIds.append(s+",");
+		concatSpeciesIds.deleteCharAt(concatSpeciesIds.lastIndexOf(","));		
+		return DigestUtils.md5Hex(concatSpeciesIds.toString()+toIncludeParameterList);
+	}
 }
