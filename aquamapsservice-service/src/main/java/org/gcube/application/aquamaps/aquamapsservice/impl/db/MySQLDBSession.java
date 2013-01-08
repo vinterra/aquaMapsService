@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class MySQLDBSession extends DBSession {
 

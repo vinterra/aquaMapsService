@@ -14,7 +14,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDER
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class PostGresSQLDBSession extends DBSession {
 

@@ -38,8 +38,8 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Area
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube.application.aquamaps.datamodel.AquaMap;
-import org.gcube.application.aquamaps.datamodel.FieldArray;
+import org.gcube_system.namespaces.application.aquamaps.types.AquaMap;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -166,7 +166,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
-	public String submitJob(org.gcube.application.aquamaps.datamodel.Job req)throws GCUBEFault{
+	public String submitJob(org.gcube_system.namespaces.application.aquamaps.types.Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
 			logger.trace("Forcing group enabling if layers requested");
@@ -234,7 +234,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 
 
-	public org.gcube.application.aquamaps.datamodel.Resource getResourceInfo(org.gcube.application.aquamaps.datamodel.Resource myResource) throws GCUBEFault{
+	public org.gcube_system.namespaces.application.aquamaps.types.Resource getResourceInfo(org.gcube_system.namespaces.application.aquamaps.types.Resource myResource) throws GCUBEFault{
 		Resource toReturn=new Resource(myResource);		
 		
 		try{
@@ -307,7 +307,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		
 	}
 
-	public org.gcube.application.aquamaps.datamodel.Submitted loadSubmittedById(int arg0) throws RemoteException,
+	public org.gcube_system.namespaces.application.aquamaps.types.Submitted loadSubmittedById(int arg0) throws RemoteException,
 			GCUBEFault {
 		try{
 			logger.trace("Loading submitted id : "+arg0);

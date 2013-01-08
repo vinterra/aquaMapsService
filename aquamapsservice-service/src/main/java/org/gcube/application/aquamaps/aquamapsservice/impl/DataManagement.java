@@ -46,9 +46,9 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Reso
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube.application.aquamaps.datamodel.FieldArray;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -198,7 +198,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	}
 
 	@Override
-	public org.gcube.application.aquamaps.datamodel.Resource editResource(org.gcube.application.aquamaps.datamodel.Resource arg0) throws RemoteException,
+	public org.gcube_system.namespaces.application.aquamaps.types.Resource editResource(org.gcube_system.namespaces.application.aquamaps.types.Resource arg0) throws RemoteException,
 	GCUBEFault {
 		try{
 			logger.trace("Editing resource "+arg0.getSearchId());
@@ -449,7 +449,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	}
 	
 	@Override
-	public String analyzeTables(org.gcube.application.aquamaps.datamodel.Analysis arg0) throws RemoteException,
+	public String analyzeTables(org.gcube_system.namespaces.application.aquamaps.types.Analysis arg0) throws RemoteException,
 			GCUBEFault {
 		try{
 			return AnalysisManager.insertRequest(new Analysis(arg0));

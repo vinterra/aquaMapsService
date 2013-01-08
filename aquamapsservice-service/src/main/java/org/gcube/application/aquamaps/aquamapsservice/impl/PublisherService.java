@@ -21,10 +21,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.File
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.datamodel.FileArray;
-import org.gcube.application.aquamaps.datamodel.MapArray;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
@@ -32,7 +28,11 @@ import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
-import org.gcube.common.gisdatamodel.stubs.LayerInfoType;
+import org.gcube_system.namespaces.application.aquamaps.gistypes.LayerInfoType;
+import org.gcube_system.namespaces.application.aquamaps.types.FileArray;
+import org.gcube_system.namespaces.application.aquamaps.types.MapArray;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 
 public class PublisherService extends GCUBEPortType implements
 PublisherServicePortType {

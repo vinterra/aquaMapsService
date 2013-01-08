@@ -24,7 +24,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Hsp
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.application.aquamaps.datamodel.PagedRequestSettings;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {

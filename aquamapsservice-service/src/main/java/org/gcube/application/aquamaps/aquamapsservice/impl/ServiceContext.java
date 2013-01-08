@@ -69,7 +69,7 @@ public class ServiceContext extends GCUBEServiceContext {
 //			int interval=Integer.parseInt(getProperty(PropertiesConstants.ISCRAWLER_INTERVAL_MINUTES));
 //			logger.debug("Interval time is "+interval);
 			configuration=ConfigurationImpl.get(CrawlerMode.SERVICE);			
-			configurationScope=GCUBEScope.getScope(configuration.getAvailableScopeNames().iterator().next());
+			configurationScope=GCUBEScope.getScope(configuration.getAvailableScopes().iterator().next()+"");
 			if(configurationScope==null) throw new Exception ("NO valid scope found");
 			logger.trace("Configuration Scope will be "+configurationScope);
 		}catch (Exception e){

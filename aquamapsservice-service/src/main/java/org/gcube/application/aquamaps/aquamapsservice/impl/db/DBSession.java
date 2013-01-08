@@ -14,7 +14,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConsta
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.datamodel.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
