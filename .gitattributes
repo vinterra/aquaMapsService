@@ -176,6 +176,7 @@ aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsser
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesConstants.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/util/PropertiesReader.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/util/ServiceUtils.java -text
+aquamapsservice-service/src/test/java/org/gcube/application/aquamaps/aquamapsservice/tests/Test.java -text
 aquamapsservice-stubs/.classpath -text
 aquamapsservice-stubs/.project -text
 aquamapsservice-stubs/.settings/org.eclipse.core.resources.prefs -text
