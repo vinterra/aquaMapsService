@@ -187,6 +187,7 @@ distro/MAINTAINERS -text
 distro/README -text
 distro/changelog.xml -text
 distro/descriptor.xml -text
+/pom.xml -text
 wsdl/AquaMapsService.wsdl -text
 wsdl/AquaMapsTypes.wsdl -text
 wsdl/AquaMapsTypes.xsd -text
