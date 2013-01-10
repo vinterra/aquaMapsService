@@ -42,7 +42,6 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>aquamapsservice-stubs</module>
-		<module>aquamapsservice-fwk</module>
 		<module>aquamapsservice-service</module>
 	</modules>
 </project>
