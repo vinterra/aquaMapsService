@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="DataManagement" targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/bindings" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:porttype="http://gcube-system.org/namespaces/application/aquamaps/datamanagement" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:import namespace="http://gcube-system.org/namespaces/application/aquamaps/datamanagement" location="DataManagement_flattened.wsdl"/>
+  <wsdl:binding name="DataManagementPortTypeSOAPBinding" type="porttype:DataManagementPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="generateMaps">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/generateMapsRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GenerateHSPECGroup">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/GenerateHSPECGroupRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetJSONSubmittedHSPECGroup">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/GetJSONSubmittedHSPECGroupRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetGenerationLiveReportGroup">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/GetGenerationLiveReportGroupRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveHSPECGroup">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/RemoveHSPECGroupRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="EditHSPECGroupDetails">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/EditHSPECGroupDetailsRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetDefaultSources">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/GetDefaultSourcesRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="EditResource">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/EditResourceRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="RemoveResource">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/RemoveResourceRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ExportResource">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/ExportResourceRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ViewCustomQuery">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/ViewCustomQueryRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetCustomQuery">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/SetCustomQueryRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteCustomQuery">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/DeleteCustomQueryRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ImportResource">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/ImportResourceRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetImportStatus">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/GetImportStatusRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="IsCustomQueryReady">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/IsCustomQueryReadyRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ExportTableAsCSV">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/ExportTableAsCSVRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="AnalyzeTables">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/AnalyzeTablesRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetJSONSubmittedAnalysis">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/GetJSONSubmittedAnalysisRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="LoadAnalysis">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/LoadAnalysisRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ResubmitGeneration">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/ResubmitGenerationRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ExportCustomQuery">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/ExportCustomQueryRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteAnalysis">
+      <soap:operation soapAction="http://gcube-system.org/namespaces/application/aquamaps/datamanagement/DataManagementPortType/DeleteAnalysisRequest"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="fault">
+        <soap:fault name="fault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+</wsdl:definitions>

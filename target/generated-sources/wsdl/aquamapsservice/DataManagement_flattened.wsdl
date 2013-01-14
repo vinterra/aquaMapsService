@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="DataManagement" targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/datamanagement" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlpp="http://www.globus.org/namespaces/2004/10/WSDLPreprocessor" xmlns:coretypes="http://gcube-system.org/namespaces/common/core/types" xmlns:aqtypes="http://gcube-system.org/namespaces/application/aquamaps/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/datamanagement" xmlns:wsntw="http://docs.oasis-open.org/wsn/2004/06/wsn-WS-BaseNotification-1.2-draft-01.wsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsrp="http://docs.oasis-open.org/wsrf/2004/06/wsrf-WS-ResourceProperties-1.2-draft-01.xsd" xmlns:provider="http://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider" xmlns:corefaults="http://gcube-system.org/namespaces/common/core/faults">
+  <import namespace="http://gcube-system.org/namespaces/common/core/faults" location="../gcube/common/core/faults/GCUBEFaults.wsdl"/>
+  <types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/datamanagement" xmlns:tns="http://gcube-system.org/namespaces/application/aquamaps/datamanagement">
+			<xsd:import namespace="http://gcube-system.org/namespaces/common/core/types" schemaLocation="../gcube/common/core/types/GCUBETypes.xsd"/>
+			<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/types" schemaLocation="AquaMapsTypes.xsd"/>
+			<xsd:import namespace="http://gcube-system.org/namespaces/application/aquamaps/gistypes" schemaLocation="GISTypes.xsd"/>
+
+			<!-- DataManagement portType request types -->
+
+	
+		<xsd:complexType name="importResourceRequestType">
+			<xsd:sequence>
+				<xsd:element maxOccurs="1" minOccurs="1" name="rsLocator" type="xsd:string"/>
+				<xsd:element maxOccurs="1" minOccurs="1" name="encoding" type="xsd:string"/>
+				<xsd:element maxOccurs="1" minOccurs="1" name="delimiter" type="aqtypes:character"/>
+				<xsd:element maxOccurs="1" minOccurs="1" name="hasHeader" type="xsd:boolean"/>
+				<xsd:element maxOccurs="unbounded" minOccurs="0" name="fieldsMask" type="xsd:boolean"/>
+				<xsd:element name="user" type="xsd:string"/>
+				<xsd:element name="resourceType" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		
+			
+			
+	
+
+
+			<xsd:complexType name="generateMapsRequestType">
+				<xsd:sequence>
+					<xsd:element name="author" type="xsd:string"/>
+					<xsd:element name="HSPECId" type="xsd:int"/>
+					<xsd:element name="generateLayers" type="xsd:boolean"/>
+					<xsd:element name="speciesFilter" type="aqtypes:fieldArray"/>
+					<xsd:element name="forceRegeneration" type="xsd:boolean"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+
+			<xsd:complexType name="hspecGroupGenerationRequestType">
+				<xsd:sequence>
+					<xsd:element name="author" type="xsd:string"/>
+					<xsd:element name="generationName" type="xsd:string"/>
+					<xsd:element name="description" type="xsd:string"/>
+					<xsd:element name="hspenIds" type="xsd:string"/>
+					<xsd:element name="hcafIds" type="xsd:string"/>
+					<xsd:element name="executionParameters" type="xsd:string"/>
+					<xsd:element name="generationParameters" type="xsd:string"/>
+					<xsd:element name="occurrenceCellsIds" type="xsd:string"/>
+					<xsd:element name="submissionBackend" type="xsd:string"/>
+					<xsd:element name="executionEnvironment" type="xsd:string"/>
+					<xsd:element name="backendUrl" type="xsd:string"/>
+					<xsd:element name="environmentConfiguration" type="xsd:string"/>
+					<xsd:element name="logic" type="xsd:string"/>
+					<xsd:element name="numPartitions" type="xsd:int"/>
+					<xsd:element name="algorithms" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
+				<xsd:sequence>
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+
+			<xsd:complexType name="getGenerationLiveReportResponseType">
+				<xsd:sequence>
+					<xsd:element name="percent" type="xsd:double"/>
+					<xsd:element name="resourceMap" type="xsd:string"/>
+					<xsd:element name="resourceLoad" type="xsd:string"/>
+					<xsd:element name="elaboratedSpecies" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="removeHSPECGroupGenerationRequestResponseType">
+				<xsd:sequence>
+					<xsd:element name="requestId" type="xsd:string"/>
+					<xsd:element name="removeTables" type="xsd:boolean"/>
+					<xsd:element name="removeJobs" type="xsd:boolean"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="viewCustomQueryRequestType">
+				<xsd:sequence>
+					<xsd:element name="user" type="xsd:string"/>
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="setUserCustomQueryRequestType">
+				<xsd:sequence>
+					<xsd:element name="user" type="xsd:string"/>
+					<xsd:element name="queryString" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="getJSONSubmittedAnalysisRequestType">
+				<xsd:sequence>
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings"/>
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<!-- Data management request elements -->
+
+			
+
+			
+
+
+			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType"/>
+			<xsd:element name="generateMapsResponse" type="xsd:int"/>
+
+
+			<xsd:element name="hspecGroupGenerationRequest" type="tns:hspecGroupGenerationRequestType"/>
+			<xsd:element name="hspecGroupGenerationResponse" type="xsd:string"/>
+
+			<xsd:element name="getJSONSubmittedHSPECRequest" type="aqtypes:pagedRequestSettings"/>
+			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string"/>
+
+			<xsd:element name="getGenerationLiveReportRequest" type="coretypes:stringArray"/>
+			<xsd:element name="getGenerationLiveReportResponse" type="tns:getGenerationLiveReportResponseType"/>
+
+			<xsd:element name="removeHSPECGroupRequest" type="tns:removeHSPECGroupGenerationRequestResponseType"/>
+			<xsd:element name="removeHSPECGroupResponse" type="tns:removeHSPECGroupGenerationRequestResponseType"/>
+			
+			<xsd:element name="editHSPECGroupDetailsRequest" type="tns:hspecGroupGenerationRequestType"/>
+			<xsd:element name="editHSPECGroupDetailsResponse" type="coretypes:VOID"/>
+
+			<xsd:element name="getDefaultSourcesRequest" type="coretypes:VOID"/>
+			<xsd:element name="getDefaultSourcesResponse" type="aqtypes:fieldArray"/>
+
+			<xsd:element name="editResourceRequest" type="aqtypes:resource"/>
+			<xsd:element name="editResourceResponse" type="aqtypes:resource"/>
+
+			<xsd:element name="removeResourceRequest" type="xsd:int"/>
+			<xsd:element name="removeResourceResponse" type="coretypes:VOID"/>
+				
+			<xsd:element name="exportResourceRequest" type="xsd:int"/>
+			<xsd:element name="exportResourceResponse" type="xsd:string"/>
+			
+			<xsd:element name="viewCustomQueryRequest" type="tns:viewCustomQueryRequestType"/>
+			<xsd:element name="viewCustomQueryResponse" type="xsd:string"/>
+			
+			<xsd:element name="setCustomQueryRequest" type="tns:setUserCustomQueryRequestType"/>
+			<xsd:element name="setCustomQueryResponse" type="coretypes:VOID"/>
+			
+			<xsd:element name="deleteCustomQueryRequest" type="xsd:string"/>
+			<xsd:element name="deleteCustomQueryResponse" type="xsd:boolean"/>
+			
+			<xsd:element name="importResourceRequest" type="tns:importResourceRequestType"/>
+			<xsd:element name="importResourceResponse" type="xsd:int"/>
+			
+			<xsd:element name="getImportStatusRequest" type="xsd:int"/>
+			<xsd:element name="getImportStatusResponse" type="xsd:int"/>
+			
+			<xsd:element name="isCustomQueryReadyRequest" type="xsd:string"/>
+			<xsd:element name="isCustomQueryReadyResponse" type="aqtypes:fieldArray"/>
+			
+			<xsd:element name="exportTableAsCSVRequest" type="xsd:string"/>
+			<xsd:element name="exportTableAsCSVResponse" type="xsd:string"/>
+			
+			<xsd:element name="analyzeTablesRequest" type="aqtypes:analysis"/>
+			<xsd:element name="analyzeTablesResponse" type="xsd:string"/>
+			
+			<xsd:element name="getJSONSubmittedAnalysisRequest" type="aqtypes:pagedRequestSettings"/>
+			<xsd:element name="getJSONSubmittedAnalysisResponse" type="xsd:string"/>
+			
+			<xsd:element name="loadAnalysisRequest" type="xsd:string"/>
+			<xsd:element name="loadAnalysisResponse" type="xsd:string"/>
+			
+			<xsd:element name="resubmitGenerationRequest" type="xsd:string"/>
+			<xsd:element name="resubmitGenerationResponse" type="xsd:string"/>
+			
+			<xsd:element name="exportCustomQueryRequest" type="xsd:string"/>
+			<xsd:element name="exportCustomQueryResponse" type="xsd:string"/>
+			
+			<xsd:element name="deleteAnalysisRequest" type="xsd:string"/>
+			<xsd:element name="deleteAnalysisResponse" type="coretypes:VOID"/>
+			
+		</xsd:schema>
+  </types>
+  <message name="IsCustomQueryReadyRequest">
+    <part name="request" element="tns:isCustomQueryReadyRequest"/>
+  </message>
+  <message name="GenerateMapsRequest">
+    <part name="request" element="tns:generateMapsRequest"/>
+  </message>
+  <message name="EditResourceResponse">
+    <part name="response" element="tns:editResourceResponse"/>
+  </message>
+  <message name="ImportResourceResponse">
+    <part name="response" element="tns:importResourceResponse"/>
+  </message>
+  <message name="GetGenerationLiveReportResponse">
+    <part name="response" element="tns:getGenerationLiveReportResponse"/>
+  </message>
+  <message name="EditHSPECGroupDetailsRequest">
+    <part name="request" element="tns:editHSPECGroupDetailsRequest"/>
+  </message>
+  <message name="GetDefaultSourcesRequest">
+    <part name="request" element="tns:getDefaultSourcesRequest"/>
+  </message>
+  <message name="GetJSONSubmittedHSPECResponse">
+    <part name="response" element="tns:getJSONSubmittedHSPECResponse"/>
+  </message>
+  <message name="ViewCustomQueryResponse">
+    <part name="response" element="tns:viewCustomQueryResponse"/>
+  </message>
+  <message name="DeleteAnalysisResponse">
+    <part name="response" element="tns:deleteAnalysisResponse"/>
+  </message>
+  <message name="EditResourceRequest">
+    <part name="request" element="tns:editResourceRequest"/>
+  </message>
+  <message name="LoadAnalysisRequest">
+    <part name="request" element="tns:loadAnalysisRequest"/>
+  </message>
+  <message name="AnalyzeTablesRequest">
+    <part name="request" element="tns:analyzeTablesRequest"/>
+  </message>
+  <message name="ExportTableAsCSVRequest">
+    <part name="request" element="tns:exportTableAsCSVRequest"/>
+  </message>
+  <message name="SetCustomQueryRequest">
+    <part name="request" element="tns:setCustomQueryRequest"/>
+  </message>
+  <message name="DeleteAnalysisRequest">
+    <part name="request" element="tns:deleteAnalysisRequest"/>
+  </message>
+  <message name="ExportCustomQueryResponse">
+    <part name="response" element="tns:exportCustomQueryResponse"/>
+  </message>
+  <message name="ImportResourceRequest">
+    <part name="request" element="tns:importResourceRequest"/>
+  </message>
+  <message name="SetCustomQueryResponse">
+    <part name="response" element="tns:setCustomQueryResponse"/>
+  </message>
+  <message name="GetJSONSubmittedHSPECRequest">
+    <part name="request" element="tns:getJSONSubmittedHSPECRequest"/>
+  </message>
+  <message name="LoadAnalysisResponse">
+    <part name="response" element="tns:loadAnalysisResponse"/>
+  </message>
+  <message name="RemoveHSPECGroupResponse">
+    <part name="response" element="tns:removeHSPECGroupResponse"/>
+  </message>
+  <message name="RemoveResourceResponse">
+    <part name="response" element="tns:removeResourceResponse"/>
+  </message>
+  <message name="ResubmitGenerationResponse">
+    <part name="response" element="tns:resubmitGenerationResponse"/>
+  </message>
+  <message name="ExportCustomQueryRequest">
+    <part name="request" element="tns:exportCustomQueryRequest"/>
+  </message>
+  <message name="RemoveResourceRequest">
+    <part name="request" element="tns:removeResourceRequest"/>
+  </message>
+  <message name="ResubmitGenerationRequest">
+    <part name="request" element="tns:resubmitGenerationRequest"/>
+  </message>
+  <message name="GetImportStatusRequest">
+    <part name="request" element="tns:getImportStatusRequest"/>
+  </message>
+  <message name="GetJSONSubmittedAnalysisResponse">
+    <part name="response" element="tns:getJSONSubmittedAnalysisResponse"/>
+  </message>
+  <message name="GetDefaultSourcesResponse">
+    <part name="response" element="tns:getDefaultSourcesResponse"/>
+  </message>
+  <message name="DeleteCustomQueryRequest">
+    <part name="request" element="tns:deleteCustomQueryRequest"/>
+  </message>
+  <message name="GenerateMapsResponse">
+    <part name="response" element="tns:generateMapsResponse"/>
+  </message>
+  <message name="IsCustomQueryReadyResponse">
+    <part name="response" element="tns:isCustomQueryReadyResponse"/>
+  </message>
+  <message name="DeleteCustomQueryResponse">
+    <part name="response" element="tns:deleteCustomQueryResponse"/>
+  </message>
+  <message name="RemoveHSPECGroupRequest">
+    <part name="request" element="tns:removeHSPECGroupRequest"/>
+  </message>
+  <message name="GetJSONSubmittedAnalysisRequest">
+    <part name="request" element="tns:getJSONSubmittedAnalysisRequest"/>
+  </message>
+  <message name="ExportTableAsCSVResponse">
+    <part name="response" element="tns:exportTableAsCSVResponse"/>
+  </message>
+  <message name="HSPECGroupGenerationRequest">
+    <part name="request" element="tns:hspecGroupGenerationRequest"/>
+  </message>
+  <message name="ExportResourceRequest">
+    <part name="request" element="tns:exportResourceRequest"/>
+  </message>
+  <message name="GetGenerationLiveReportRequest">
+    <part name="request" element="tns:getGenerationLiveReportRequest"/>
+  </message>
+  <message name="GetImportStatusResponse">
+    <part name="response" element="tns:getImportStatusResponse"/>
+  </message>
+  <message name="HSPECGroupGenerationResponse">
+    <part name="response" element="tns:hspecGroupGenerationResponse"/>
+  </message>
+  <message name="AnalyzeTablesResponse">
+    <part name="response" element="tns:analyzeTablesResponse"/>
+  </message>
+  <message name="ViewCustomQueryRequest">
+    <part name="request" element="tns:viewCustomQueryRequest"/>
+  </message>
+  <message name="ExportResourceResponse">
+    <part name="response" element="tns:exportResourceResponse"/>
+  </message>
+  <message name="EditHSPECGroupDetailsResponse">
+    <part name="response" element="tns:editHSPECGroupDetailsResponse"/>
+  </message>
+  <portType name="DataManagementPortType">
+    <operation name="generateMaps">
+      <input message="tns:GenerateMapsRequest"/>
+      <output message="tns:GenerateMapsResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="GenerateHSPECGroup">
+      <input message="tns:HSPECGroupGenerationRequest"/>
+      <output message="tns:HSPECGroupGenerationResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="GetJSONSubmittedHSPECGroup">
+      <input message="tns:GetJSONSubmittedHSPECRequest"/>
+      <output message="tns:GetJSONSubmittedHSPECResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="GetGenerationLiveReportGroup">
+      <input message="tns:GetGenerationLiveReportRequest"/>
+      <output message="tns:GetGenerationLiveReportResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="RemoveHSPECGroup">
+      <input message="tns:RemoveHSPECGroupRequest"/>
+      <output message="tns:RemoveHSPECGroupResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="EditHSPECGroupDetails">
+      <input message="tns:EditHSPECGroupDetailsRequest"/>
+      <output message="tns:EditHSPECGroupDetailsResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="GetDefaultSources">
+      <input message="tns:GetDefaultSourcesRequest"/>
+      <output message="tns:GetDefaultSourcesResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="EditResource">
+      <input message="tns:EditResourceRequest"/>
+      <output message="tns:EditResourceResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="RemoveResource">
+      <input message="tns:RemoveResourceRequest"/>
+      <output message="tns:RemoveResourceResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="ExportResource">
+      <input message="tns:ExportResourceRequest"/>
+      <output message="tns:ExportResourceResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="ViewCustomQuery">
+      <input message="tns:ViewCustomQueryRequest"/>
+      <output message="tns:ViewCustomQueryResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="SetCustomQuery">
+      <input message="tns:SetCustomQueryRequest"/>
+      <output message="tns:SetCustomQueryResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="DeleteCustomQuery">
+      <input message="tns:DeleteCustomQueryRequest"/>
+      <output message="tns:DeleteCustomQueryResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="ImportResource">
+      <input message="tns:ImportResourceRequest"/>
+      <output message="tns:ImportResourceResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="GetImportStatus">
+      <input message="tns:GetImportStatusRequest"/>
+      <output message="tns:GetImportStatusResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="IsCustomQueryReady">
+      <input message="tns:IsCustomQueryReadyRequest"/>
+      <output message="tns:IsCustomQueryReadyResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="ExportTableAsCSV">
+      <input message="tns:ExportTableAsCSVRequest"/>
+      <output message="tns:ExportTableAsCSVResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="AnalyzeTables">
+      <input message="tns:AnalyzeTablesRequest"/>
+      <output message="tns:AnalyzeTablesResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="GetJSONSubmittedAnalysis">
+      <input message="tns:GetJSONSubmittedAnalysisRequest"/>
+      <output message="tns:GetJSONSubmittedAnalysisResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="LoadAnalysis">
+      <input message="tns:LoadAnalysisRequest"/>
+      <output message="tns:LoadAnalysisResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="ResubmitGeneration">
+      <input message="tns:ResubmitGenerationRequest"/>
+      <output message="tns:ResubmitGenerationResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="ExportCustomQuery">
+      <input message="tns:ExportCustomQueryRequest"/>
+      <output message="tns:ExportCustomQueryResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+    <operation name="DeleteAnalysis">
+      <input message="tns:DeleteAnalysisRequest"/>
+      <output message="tns:DeleteAnalysisResponse"/>
+      <fault name="fault" message="corefaults:GCUBEFaultMessage"/>
+    </operation>
+  </portType>
+</definitions>
