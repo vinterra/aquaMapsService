@@ -170,10 +170,7 @@ target/generated-sources/wsdl/wsrf/servicegroup/WS-ServiceGroup.xsd -text
 target/generated-sources/wsdl/wsrf/servicegroup/WS-ServiceGroup_bindings.wsdl -text
 target/generated-sources/wsdl/wsrf/servicegroup/WS-ServiceGroup_service.wsdl -text
 wsdl/AquaMapsService.wsdl -text
-wsdl/AquaMapsTypes.wsdl -text
-wsdl/AquaMapsTypes.xsd -text
 wsdl/DataManagement.wsdl -text
-wsdl/GISTypes.xsd -text
 wsdl/PublisherService.wsdl -text
 wsdl/schema/AquaMapsTypes.xsd -text
 wsdl/schema/GISTypes.xsd -text
