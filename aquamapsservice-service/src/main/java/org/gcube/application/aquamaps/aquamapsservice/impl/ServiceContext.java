@@ -64,7 +64,8 @@ public class ServiceContext extends GCUBEServiceContext {
      */
 	@Override
 	public void onInitialisation()throws Exception{
-		
+		logger.trace("Initializing AquaMaps Service Context...");
+		super.onInitialisation();
 		try{
 //			int interval=Integer.parseInt(getProperty(PropertiesConstants.ISCRAWLER_INTERVAL_MINUTES));
 //			logger.debug("Interval time is "+interval);
