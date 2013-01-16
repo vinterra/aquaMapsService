@@ -25,7 +25,7 @@ public class ExportManager extends Thread{
 	
 	private static final String EXPORT_REFERENCE_TABLE="exports";
 	private static final String EXPORT_ID="id";
-	private static final String EXPORT_TABLE="table";
+	private static final String EXPORT_TABLE="toexporttable";
 	private static final String EXPORT_SETTINGS="settings";
 	private static final String EXPORT_STATUS="status";
 	private static final String EXPORT_ERROR_MSG="errors";
