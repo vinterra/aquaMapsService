@@ -227,12 +227,12 @@ public class PostGresSQLDBSession extends DBSession {
 	
 	
 	@Override
-	public String exportTableToCSV(String tableName, boolean hasHeaders) throws Exception {
+	public String exportTableToCSV(String tableName, boolean hasHeaders,char delimiter) throws Exception {
 		Statement stmt = null;
 		try{
 			File out=new File(ServiceContext.getContext().getFolderPath(FOLDERS.IMPORTS),ServiceUtils.generateId(tableName, ".csv"));
 			stmt=connection.createStatement();
-			String copyString ="COPY "+tableName+" TO '"+out.getAbsolutePath()+"' WITH DELIMITER '"+CSV_DELIMITER+"'"+(hasHeaders?" CSV HEADER":"");
+			String copyString ="COPY "+tableName+" TO '"+out.getAbsolutePath()+"' WITH DELIMITER '"+delimiter+"'"+(hasHeaders?" CSV HEADER":"");
 			logger.debug("Gonna execute copy  : "+copyString);
 			stmt.execute(copyString);			
 			return out.getAbsolutePath();

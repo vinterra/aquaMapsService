@@ -115,7 +115,7 @@ public class SourceManager {
 			if(session!=null) session.close();
 		}
 	}
-	private static void updateField(int id, MetaSourceFields field, FieldType objectType,Object value)throws Exception{
+	private static int updateField(int id, MetaSourceFields field, FieldType objectType,Object value)throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
@@ -127,7 +127,7 @@ public class SourceManager {
 			List<Field> valueList=new ArrayList<Field>();
 			valueList.add(new Field(field+"",value+"",objectType));
 			values.add(valueList);
-			session.updateOperation(sourcesTable, keys, values);
+			return session.updateOperation(sourcesTable, keys, values);
 		}catch (Exception e){
 			throw e;
 		}finally {

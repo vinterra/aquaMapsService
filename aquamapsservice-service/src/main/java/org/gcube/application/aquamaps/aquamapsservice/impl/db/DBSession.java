@@ -280,7 +280,7 @@ public abstract class DBSession {
 	
 	//************ EXECUTED OPERATIONS
 
-	public abstract String exportTableToCSV(String tableName,boolean exportHeaders)throws Exception;
+	public abstract String exportTableToCSV(String tableName,boolean exportHeaders,char delimiter)throws Exception;
 	
 	
 	

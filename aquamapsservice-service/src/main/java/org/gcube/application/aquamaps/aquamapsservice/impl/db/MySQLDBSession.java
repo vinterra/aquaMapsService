@@ -213,7 +213,7 @@ public class MySQLDBSession extends DBSession {
 
 
 	@Override
-	public String exportTableToCSV(String tableName,boolean hasHeaders) throws Exception {
+	public String exportTableToCSV(String tableName,boolean hasHeaders,char delimiter) throws Exception {
 		throw new Exception("NOt Implemented for this DB type");
 	}
 
