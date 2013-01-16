@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +49,12 @@ public class MySQLDBSession extends DBSession {
 				//trying long
 				ps.setLong(i+1+parameterOffset, Long.parseLong(f.getValue()));
 			}
-			break;				
+			break;	
+			case TIMESTAMP : try{
+				ps.setTimestamp(i+1+parameterOffset, Timestamp.valueOf(f.getValue()));
+			}catch(IllegalArgumentException e){
+				ps.setNull(i+1+parameterOffset, Types.TIMESTAMP);
+			}break;
 			case STRING: ps.setString(i+1+parameterOffset,f.getValue());
 			break;
 			case LONG: ps.setLong(i+1+parameterOffset, f.getValueAsLong(DEFAULT_LONG_VALUE));
