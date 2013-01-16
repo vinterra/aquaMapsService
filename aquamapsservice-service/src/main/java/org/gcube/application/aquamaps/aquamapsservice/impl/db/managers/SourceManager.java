@@ -11,6 +11,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.SourceImporter;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportCSVSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
@@ -18,10 +19,10 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Met
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
-import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 
 public class SourceManager {
 
@@ -234,7 +235,9 @@ public class SourceManager {
 			toRegister.setStatus(ResourceStatus.Importing);
 			toRegister.setRowCount(0l);
 			toRegister=registerSource(toRegister);
-			SourceImporter t=new SourceImporter(csvFile, toRegister,getDefaultId(type),request.getDelimiter().charAt(0),request.getFieldsMask(),request.isHasHeader(),request.getEncoding());
+			ExportCSVSettings settings=request.getCsvSettings();
+			SourceImporter t=new SourceImporter(csvFile, toRegister,getDefaultId(type),settings.getDelimiter().charAt(0),
+					settings.getFieldsMask(),settings.isHasHeader(),settings.getEncoding());
 			t.start();
 			return toRegister.getSearchId();
 		}catch(Exception e){throw e;}

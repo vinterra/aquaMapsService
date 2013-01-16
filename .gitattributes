@@ -21,6 +21,7 @@ aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsser
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AquaMapsManager.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CellManager.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/CustomQueryManager.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/ExportManager.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/JobManager.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceGenerationRequestsManager.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/SourceManager.java -text

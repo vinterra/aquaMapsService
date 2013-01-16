@@ -13,9 +13,9 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.ExportManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
@@ -24,7 +24,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.Ba
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.CustomQueryDescriptorStubs;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportTableRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportTableStatusType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GenerateMapsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetGenerationLiveReportResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.HspecGroupGenerationRequestType;
@@ -46,9 +49,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Reso
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
-import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
-import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -57,6 +57,9 @@ import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
 import org.gcube.dataanalysis.ecoengine.utils.ResourceFactory;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 
 public class DataManagement extends GCUBEPortType implements DataManagementPortType{
 
@@ -228,27 +231,19 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		}
 	}
 
+
+	
 	@Override
-	public String exportResource(int arg0) throws RemoteException, GCUBEFault {
-		DBSession session=null;
+	public String exportTableAsCSV(ExportTableRequestType request)
+			throws RemoteException, GCUBEFault {
 		try{
-			logger.trace("Exporting resource id "+arg0);
-			String table=SourceManager.getById(arg0).getTableName();
-			
-			return exportTableAsCSV(table);
+			return ExportManager.submitExportOperation(request.getTableName(), request.getCsvSettings());
 		}catch(Exception e){
-			logger.error("Unable to execute request ",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}finally{
-			if(session!=null)
-				try {
-					session.close();
-				} catch (Exception e) {
-					logger.error("Unexpected error while closing session ",e);
-				}
+			logger.debug("Unable to export table "+request.getTableName(),e);
+			throw new GCUBEFault("Unable to export table "+request.getTableName()+", cause : "+e.getLocalizedMessage());
 		}
 	}
-
+	
 	@Override
 	public VOID removeResource(int arg0) throws RemoteException, GCUBEFault {
 		try{
@@ -350,35 +345,19 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	
 	
 	@Override
-	public VOID setCustomQuery(SetUserCustomQueryRequestType arg0)
+	public String setCustomQuery(SetUserCustomQueryRequestType arg0)
 			throws RemoteException, GCUBEFault {
 		try{
 			logger.trace("Setting custom query, user : "+arg0.getUser()+", query : "+arg0.getQueryString());
-			CustomQueryManager.setUserCustomQuery(arg0.getUser(), arg0.getQueryString());
-			return new VOID();
+			return CustomQueryManager.setUserCustomQuery(arg0.getUser(), arg0.getQueryString());
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
 	
-	@Override
-	public boolean deleteCustomQuery(String arg0) throws RemoteException,
-			GCUBEFault {
-		try{
-			logger.trace("Deleting custom query, user : "+arg0);
-			logger.trace("Deleted "+CustomQueryManager.deleteUserQuery(arg0)+" references.");
-			return true;
-		}catch(Exception e){
-			logger.error("Unable to execute request ",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}
-	}
-	@Override
-	public int getImportStatus(int arg0) throws RemoteException, GCUBEFault {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	
+	
 	@Override
 	public int importResource(ImportResourceRequestType arg0)
 			throws RemoteException, GCUBEFault {
@@ -388,7 +367,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			
 			FileWriter writer=new FileWriter(csvLocation);
 			FileInputStream is=new FileInputStream(RSWrapper.getStreamFromLocator(new URI(arg0.getRsLocator())));
-			IOUtils.copy(is, writer, arg0.getEncoding());
+			IOUtils.copy(is, writer, arg0.getCsvSettings().getEncoding());
 			IOUtils.closeQuietly(writer);
 			IOUtils.closeQuietly(is);
 			logger.trace("CSV imported into "+csvLocation);
@@ -408,43 +387,6 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}
-	}
-	@Override
-	public FieldArray isCustomQueryReady(String arg0) throws RemoteException,
-			GCUBEFault {
-		try{
-			return Field.toStubsVersion(CustomQueryManager.isCustomQueryReady(arg0));
-		}catch(Exception e){
-			logger.error("Unable to execute request ",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}
-	}
-	
-	@Override
-	public String exportTableAsCSV(String arg0) throws RemoteException,
-			GCUBEFault {
-		DBSession session=null;
-		try{
-			
-			session=DBSession.getInternalDBSession();
-			GCUBEScope scope=ServiceContext.getContext().getScope();
-			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper(scope);
-			wrapper.add(new File(session.exportTableToCSV(arg0,true)));
-			String locator = wrapper.getLocator().toString();
-			logger.trace("Added file to locator "+locator);
-			return locator;
-		}catch(Exception e){
-			logger.error("Unable to execute request ",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}finally{
-			if(session!=null)
-				try {
-					session.close();
-				} catch (Exception e) {
-					logger.error("Unexpected error while closing session ",e);
-				}
 		}
 	}
 	
@@ -540,15 +482,23 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	}
 	
 	@Override
-	public String exportCustomQuery(String arg0) throws RemoteException,
-			GCUBEFault {
+	public CustomQueryDescriptorStubs getCustomQueryDescriptor(String request)
+			throws RemoteException, GCUBEFault {
 		try{
-			if(CustomQueryManager.isCustomQueryReady(arg0)!=null){
-				String table=CustomQueryManager.getUsersTableName(arg0);
-				return exportTableAsCSV(table);
-			}else throw new Exception("No query setted for user "+arg0+" or query not ready");
+			return CustomQueryManager.getDescriptor(request).toStubsVersion();
 		}catch(Exception e){
-			logger.error("Unable to export custom query for user "+arg0,e);
+			logger.error("Unable to get descriptor for custom query "+request,e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
+	
+	@Override
+	public ExportTableStatusType getExportStatus(String request)
+			throws RemoteException, GCUBEFault {
+		try{
+			return ExportManager.getStatus(request);
+		}catch(Exception e){
+			logger.error("Unable to get status for export operation "+request,e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
