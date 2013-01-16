@@ -40,7 +40,7 @@ public class HSPECGroupWorker extends Thread {
 
 	@Override
 	public void run() {
-		
+
 		try{
 			logger.trace("Starting execution for request ID "+request.getId());
 			logger.debug("Request is "+request.toXML());
@@ -64,50 +64,56 @@ public class HSPECGroupWorker extends Thread {
 			SourceGenerationRequestsManager.setEvaluatedComputationCount(sourcesSubsets.size()*request.getAlgorithms().size(), request.getId());
 			SourceGenerationRequestsManager.setToGenerateTableCount(sourcesSubsets.size()*Ntabs_per_step*request.getAlgorithms().size(), request.getId());
 
-			
-			
-			
-			
+
+
+
+
 			for(List<Resource> sourcesSubset:sourcesSubsets)
 				for(AlgorithmType algorithm:request.getAlgorithms()){
-					BatchGeneratorI batch =EnvironmentalLogicManager.getBatch(request.getSubmissionBackend());
-					logger.debug("Got batch Id "+batch.getReportId());
-					SourceGenerationRequestsManager.addReportId(batch.getReportId(), request.getId());
+					BatchGeneratorI batch=null;
 					try{
-						simpleExecution(algorithm,request, sourcesSubset, batch,this);
+						batch =EnvironmentalLogicManager.getBatch(request.getSubmissionBackend());
+						logger.debug("Got batch Id "+batch.getReportId());
+						SourceGenerationRequestsManager.addReportId(batch.getReportId(), request.getId());
+						try{
+							simpleExecution(algorithm,request, sourcesSubset, batch,this);
+						}catch(Exception e){
+							logger.error("Failed single execution step for "+request.getId()+", sources subset was "+Arrays.toString(sourcesSubset.toArray()));
+						}
 					}catch(Exception e){
-						logger.error("Failed single execution step for "+request.getId()+", sources subset was "+Arrays.toString(sourcesSubset.toArray()));
+						logger.error("Unexpected Exception ",e);
+						if (batch!=null)release(batch);
 					}
 				}
-			
-			
+
+
 			//******************* BLOCKING waiting for executions to complete
 			logger.debug("Going to wait for generations, acquiring "+sourcesSubsets.size()*request.getAlgorithms().size()+" permits, currently available : "+blocking.availablePermits());
-			
+
 			blocking.acquire(sourcesSubsets.size()*request.getAlgorithms().size());
-			
-			
+
+
 			ArrayList<Integer> generatedSources=SourceGenerationRequestsManager.getById(request.getId()).getGeneratedSources();
-			
+
 			logger.debug("Awaken process, generated "+generatedSources.size());
-			
+
 			if(generatedSources.size()==0) throw new Exception("No sources were generated/ registered. Check previous log.");
 
 			////******* SINGLE EXECUTION
-			
+
 
 			if(request.getLogic().equals(LogicType.HSPEC)){
 				boolean forceRegeneration=false;
 				boolean generateMaps=false;
 				boolean generateGis=false;
-				
+
 				for(Field f:request.getExecutionParameters()){
 					if(f.getName().equals(SourceGenerationRequest.FORCE_MAPS_REGENERATION)) forceRegeneration=f.getValueAsBoolean();
 					else if(f.getName().equals(SourceGenerationRequest.GENERATE_MAPS)) generateMaps=f.getValueAsBoolean();
 					else if(f.getName().equals(SourceGenerationRequest.GIS_ENABLED)) generateGis=f.getValueAsBoolean();
 				}
 				if(generateMaps){
-							
+
 					logger.trace("Generating jobs for request "+request.getId());
 					ArrayList<Integer> jobIds=new ArrayList<Integer>();
 					SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.mapgeneration,request.getId());
@@ -122,20 +128,20 @@ public class HSPECGroupWorker extends Thread {
 
 					if(jobIds.size()>0){
 						logger.trace("Generation "+request.getId()+" : submitted  jobIds : "+jobIds);
-//						Boolean completed=false;
-//						while(!completed){
-//							for(Integer id:jobIds){
-//								Submitted submittedJob=SubmittedManager.getSubmittedById(id);
-//								if(!submittedJob.getStatus().equals(SubmittedStatus.Completed)&&!submittedJob.getStatus().equals(SubmittedStatus.Error)){
-//									completed=false;
-//									break;
-//								}else completed=true;
-//							}
-//							if(!completed)
-//								try{
-//									Thread.sleep(10*1000);
-//								}catch(InterruptedException e){}
-//						}
+						//						Boolean completed=false;
+						//						while(!completed){
+						//							for(Integer id:jobIds){
+						//								Submitted submittedJob=SubmittedManager.getSubmittedById(id);
+						//								if(!submittedJob.getStatus().equals(SubmittedStatus.Completed)&&!submittedJob.getStatus().equals(SubmittedStatus.Error)){
+						//									completed=false;
+						//									break;
+						//								}else completed=true;
+						//							}
+						//							if(!completed)
+						//								try{
+						//									Thread.sleep(10*1000);
+						//								}catch(InterruptedException e){}
+						//						}
 					}
 				}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non map generating jobs complete here, others will be set to completed by updater thread 
 			}else SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.completed,request.getId()); // Only non HSPEC jobs complete here  
@@ -159,16 +165,16 @@ public class HSPECGroupWorker extends Thread {
 		ArrayList<Field> requestFilter= new ArrayList<Field>();
 
 		SourceGenerationRequest requestFilterModel=new SourceGenerationRequest();
-//		requestFilterModel.getAlgorithms().add(algorithm);
-//		for(Resource r: sources)requestFilterModel.addSource(r);
+		//		requestFilterModel.getAlgorithms().add(algorithm);
+		//		for(Resource r: sources)requestFilterModel.addSource(r);
 		requestFilterModel.setGenerationParameters(generationParameters);
-		
+
 		requestFilterModel.setLogic(logic);
 
-		
+
 		requestFilter.add(requestFilterModel.getField(SourceGenerationRequestFields.logic));
 		requestFilter.add(requestFilterModel.getField(SourceGenerationRequestFields.generationparameters));
-		
+
 
 
 		for(SourceGenerationRequest request: SourceGenerationRequestsManager.getList(requestFilter)){
@@ -176,7 +182,7 @@ public class HSPECGroupWorker extends Thread {
 				if(request.getPhase().equals(SourceGenerationPhase.pending)||request.getPhase().equals(SourceGenerationPhase.datageneration)){
 					//check subset 
 					ArrayList<ArrayList<Resource>> subsets=getComplexGenerationSubSets(request);
-					
+
 					boolean found=false;
 					for(ArrayList<Resource> subset:subsets){						
 						if(subset.size()==sources.size()){
@@ -187,7 +193,7 @@ public class HSPECGroupWorker extends Thread {
 						}
 						if(found)break;
 					}
-					
+
 					if(found){						
 						//Found subset
 						logger.trace("Found existing request [PHASE : "+request.getPhase()+" ; ID : "+request.getId()+"], waiting for generation");
@@ -220,8 +226,8 @@ public class HSPECGroupWorker extends Thread {
 
 
 	private static void simpleExecution(final AlgorithmType algorithmType,final SourceGenerationRequest theRequest, final List<Resource> sourcesSubSet,BatchGeneratorI batch,final HSPECGroupWorker worker)throws Exception{
-	
-		
+
+
 
 
 		batch.setConfiguration(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator, 
@@ -230,87 +236,87 @@ public class HSPECGroupWorker extends Thread {
 		//********** START PROCESS INIT
 
 
-		
-		
-			try{
 
-				//************* CHECK EXISTING
-				Set<Resource> existing=getExisting(algorithmType, sourcesSubSet,theRequest.getId(),theRequest.getLogic(),theRequest.getGenerationParameters());
 
-				if(existing.size()==0){
-					logger.trace("No Resources found, submitting generation..");	
-					//*********** Submitting generation for one algorithm
-					batch.generateTable(
-							new TableGenerationConfiguration(
-									theRequest.getLogic(), 
-									algorithmType, 
-									sourcesSubSet,
-									theRequest.getSubmissionBackend(), 
-									theRequest.getExecutionEnvironment(), 
-									theRequest.getBackendURL(), 
-									theRequest.getEnvironmentConfiguration(),
-									theRequest.getNumPartitions(), 
-									theRequest.getAuthor(),theRequest.getGenerationParameters(),worker){
+		try{
 
-										@Override
-										public void registerGeneratedSourcesCallback(
-												List<String> toRegisterTables) throws Exception{
-											//Register sources
-											List<Resource> toReturn=registerSources(toRegisterTables,
-													ResourceType.valueOf(this.getLogic()+""), 
-													this.getAlgorithm(), this.getAuthor(), theRequest.getDescription(), this.getExecutionEnvironment(),
-													sourcesSubSet, theRequest.getGenerationname()+"_"+this.getAlgorithm(),getAdditionalParameters());
-											
-											if (toReturn.size()==0) throw new Exception("No tables were generated");
-											//Notify Pending generations
-											int[] sourcesIds=new int[sourcesSubSet.size()];
-											for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sourcesSubSet.get(i).getSearchId();
-											TableGenerationExecutionManager.notifyGeneration(
-													new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
-											worker.notifyGenerated(toReturn);
+			//************* CHECK EXISTING
+			Set<Resource> existing=getExisting(algorithmType, sourcesSubSet,theRequest.getId(),theRequest.getLogic(),theRequest.getGenerationParameters());
 
-										}
-										@Override
-										public void notifyError(Exception e) {
-											logger.warn("Unexpected Exception", e);
-											
-											
-											//Notify Pending generations
-											int[] sourcesIds=new int[sourcesSubSet.size()];
-											for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sourcesSubSet.get(i).getSearchId();
-											try {
-												TableGenerationExecutionManager.notifyGeneration(
-														new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
-											} catch (Exception e2) {
-												logger.warn("Unable to notify pending generations... ",e2);
-											}
-											
-											
-											try{
-												worker.notifyException(e, 
-														new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
-											}catch(Exception e1){
-												//Exception only if empty sources 
-											}
-										}
-								@Override
-								public void release(
-										BatchGeneratorI batch) {
-									worker.release(batch);
+			if(existing.size()==0){
+				logger.trace("No Resources found, submitting generation..");	
+				//*********** Submitting generation for one algorithm
+				batch.generateTable(
+						new TableGenerationConfiguration(
+								theRequest.getLogic(), 
+								algorithmType, 
+								sourcesSubSet,
+								theRequest.getSubmissionBackend(), 
+								theRequest.getExecutionEnvironment(), 
+								theRequest.getBackendURL(), 
+								theRequest.getEnvironmentConfiguration(),
+								theRequest.getNumPartitions(), 
+								theRequest.getAuthor(),theRequest.getGenerationParameters(),worker){
+
+							@Override
+							public void registerGeneratedSourcesCallback(
+									List<String> toRegisterTables) throws Exception{
+								//Register sources
+								List<Resource> toReturn=registerSources(toRegisterTables,
+										ResourceType.valueOf(this.getLogic()+""), 
+										this.getAlgorithm(), this.getAuthor(), theRequest.getDescription(), this.getExecutionEnvironment(),
+										sourcesSubSet, theRequest.getGenerationname()+"_"+this.getAlgorithm(),getAdditionalParameters());
+
+								if (toReturn.size()==0) throw new Exception("No tables were generated");
+								//Notify Pending generations
+								int[] sourcesIds=new int[sourcesSubSet.size()];
+								for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sourcesSubSet.get(i).getSearchId();
+								TableGenerationExecutionManager.notifyGeneration(
+										new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+								worker.notifyGenerated(toReturn);
+
+							}
+							@Override
+							public void notifyError(Exception e) {
+								logger.warn("Unexpected Exception", e);
+
+
+								//Notify Pending generations
+								int[] sourcesIds=new int[sourcesSubSet.size()];
+								for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sourcesSubSet.get(i).getSearchId();
+								try {
+									TableGenerationExecutionManager.notifyGeneration(
+											new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+								} catch (Exception e2) {
+									logger.warn("Unable to notify pending generations... ",e2);
 								}
-							});						
-					
-				}else{
-					logger.trace("Found "+existing.size()+" existing sources ");
-					ArrayList<Resource> generated=new ArrayList<Resource>(); 
-					for(Resource r:existing)generated.add(r);
-					worker.notifyGenerated(generated);
-					worker.release(batch);
-				}
-			}catch(Exception e){
-				logger.error("Unable to generate data for  algorithm "+algorithmType+" subset was : "+Arrays.toString(sourcesSubSet.toArray()),e);
+
+
+								try{
+									worker.notifyException(e, 
+											new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+								}catch(Exception e1){
+									//Exception only if empty sources 
+								}
+							}
+							@Override
+							public void release(
+									BatchGeneratorI batch) {
+								worker.release(batch);
+							}
+						});						
+
+			}else{
+				logger.trace("Found "+existing.size()+" existing sources ");
+				ArrayList<Resource> generated=new ArrayList<Resource>(); 
+				for(Resource r:existing)generated.add(r);
+				worker.notifyGenerated(generated);
 				worker.release(batch);
 			}
+		}catch(Exception e){
+			logger.error("Unable to generate data for  algorithm "+algorithmType+" subset was : "+Arrays.toString(sourcesSubSet.toArray()),e);
+			worker.release(batch);
+		}
 	}
 
 
@@ -321,7 +327,7 @@ public class HSPECGroupWorker extends Thread {
 			boolean combineMatching=true;
 			for(Field f:request.getExecutionParameters())				
 				if(f.getName().equals(SourceGenerationRequest.COMBINE_MATCHING)) combineMatching=f.getValueAsBoolean();
-			
+
 			if(request.getHcafIds().size()==0) throw new Exception ("No HCAF resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			if(request.getHspenIds().size()==0) throw new Exception ("No HSPEN resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			for(Integer hcafId:request.getHcafIds()){
@@ -434,13 +440,13 @@ public class HSPECGroupWorker extends Thread {
 			SourceGenerationRequestsManager.addGeneratedResource(r.getSearchId(), request.getId());
 		blocking.release();
 	}
-	
+
 	public void notifyException(Exception e,Execution exec){
 		exceptions.add("Execution "+exec+" threw exception : "+e.getMessage());
 		blocking.release();
 	}
-	
-	
+
+
 	public void release(BatchGeneratorI batch){
 		logger.debug("leaving batch ID "+batch.getReportId());
 		try{						
