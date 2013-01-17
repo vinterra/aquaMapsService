@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions name="AquaMapsService" targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/service" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:binding="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/bindings" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
-  <wsdl:import namespace="http://gcube-system.org/namespaces/application/aquamaps/aquamapsservice/bindings" location="AquaMapsService_bindings.wsdl"/>
-  <wsdl:service name="AquaMapsService">
-    <wsdl:port name="AquaMapsServicePortTypePort" binding="binding:AquaMapsServicePortTypeSOAPBinding">
-      <soap:address location="http://localhost:8080/wsrf/services/"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>

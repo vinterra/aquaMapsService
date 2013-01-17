@@ -1,3 +1,0 @@
-http\://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider=org.gcube.common.core.porttypes.gcubeprovider.stubs
-http\://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider/service=org.gcube.common.core.porttypes.gcubeprovider.stubs
-http\://gcube-system.org/namespaces/common/core/porttypes/GCUBEProvider/bindings=org.gcube.common.core.porttypes.gcubeprovider.stubs

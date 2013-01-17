@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions name="PublisherService" targetNamespace="http://gcube-system.org/namespaces/application/aquamaps/publisherservice/service" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:binding="http://gcube-system.org/namespaces/application/aquamaps/publisherservice/bindings" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
-  <wsdl:import namespace="http://gcube-system.org/namespaces/application/aquamaps/publisherservice/bindings" location="PublisherService_bindings.wsdl"/>
-  <wsdl:service name="PublisherService">
-    <wsdl:port name="PublisherServicePortTypePort" binding="binding:PublisherServicePortTypeSOAPBinding">
-      <soap:address location="http://localhost:8080/wsrf/services/"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>
