@@ -8,39 +8,35 @@
 		<Version>1.0.0</Version>
 		<Packages>
 			<Main>
-				<Description>Aquamaps Stateless Service</Description>
 				<Name>AquaMapsService</Name>
-				<Version>4.0.0</Version>
+				<Version>4.0.0-SNAPSHOT</Version>
 				<MavenCoordinates>
 					<groupId>org.gcube.application</groupId>
-					<artifactId>aquamapsservice</artifactId>
-					<version>4.0.0</version>
+					<artifactId>aquamapsservice-service</artifactId>
+					<version>4.0.0-SNAPSHOT</version>
 				</MavenCoordinates>
-				<GARArchive>aquamapsservice-4.0.0.gar</GARArchive>
+				<GARArchive>aquamapsservice-service-4.0.0-SNAPSHOT.gar</GARArchive>
 				<PortType>
 					<Name>gcube/application/aquamaps/aquamapsservice/AquaMapsService</Name>
-					<WSDL></WSDL>
 				</PortType>
 				<PortType>
 					<Name>gcube/application/aquamaps/aquamapsservice/DataManagement</Name>
-					<WSDL></WSDL>
 				</PortType>
 				<PortType>
 					<Name>gcube/application/aquamaps/aquamapsservice/PublisherService</Name>
-					<WSDL></WSDL>
 				</PortType>
 			</Main>
 			<Software>
 				<Name>aquamapsservice-stubs</Name>
-				<Version>org.gcube.application</Version>
+				<Version>4.0.0-SNAPSHOT</Version>
 				<MavenCoordinates>
 					<groupId>org.gcube.application</groupId>
 					<artifactId>aquamapsservice-stubs</artifactId>
-					<version>4.0.0</version>
+					<version>4.0.0-SNAPSHOT</version>
 				</MavenCoordinates>
 				<Type>library</Type>
 				<Files>
-					<File>aquamapsservice-stubs-4.0.0.jar</File>
+					<File>aquamapsservice-stubs-4.0.0-SNAPSHOT.jar</File>
 				</Files>
 			</Software>
 		</Packages>
