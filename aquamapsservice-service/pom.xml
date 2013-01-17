@@ -95,6 +95,37 @@
 				</executions>
 			</plugin>
 
+
+<!-- interpolates profiles and copies from distribution location to configuration 
+					location, where it is need for embedding into stub artifact, gar generation, 
+					and service archive. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>2.6</version>
+					<executions>
+						<execution>
+							<id>copy-profile</id>
+							<goals>
+								<goal>copy-resources</goal>
+							</goals>
+							<phase>process-resources</phase>
+							<configuration>
+								<outputDirectory>${configDirectory}</outputDirectory>
+								<resources>
+									<resource>
+										<directory>${distroDirectory}</directory>
+										<includes>
+											<include>profile.xml</include>
+										</includes>
+										<filtering>true</filtering>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
 		</plugins>
 	</build>
 	<dependencies>

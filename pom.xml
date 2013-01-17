@@ -10,6 +10,10 @@
   <version>4.0.0-SNAPSHOT</version>
   <name>aquamapsservice</name>
    <properties>
+   		<stubsArtifactId>aquamapsservice-stubs</stubsArtifactId>
+		<serviceArtifactId>aquamapsservice-service</serviceArtifactId>
+   
+   
 		<wsdlDirectory>${project.basedir}/../wsdl</wsdlDirectory>
 		<wsdlOutputDirectory>${project.basedir}/../target/generated-sources/wsdl</wsdlOutputDirectory>
 		<configDirectory>${project.basedir}/../config</configDirectory>
