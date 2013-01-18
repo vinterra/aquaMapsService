@@ -21,7 +21,7 @@ import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class ExportManager extends Thread{
 
-	private static final GCUBELog logger=new GCUBELog(CustomQueryManager.class);
+	private static final GCUBELog logger=new GCUBELog(ExportManager.class);
 	
 	private static final String EXPORT_REFERENCE_TABLE="exports";
 	private static final String EXPORT_ID="id";
