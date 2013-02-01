@@ -33,33 +33,38 @@ public class MySQLDBSession extends DBSession {
 
 	@Override
 	public PreparedStatement fillParameters(List<Field> fields,int parameterOffset, PreparedStatement ps) throws SQLException{
+//		logger.debug("Fillin prepared statement : ");
 		for(int i=0;i<fields.size();i++){
+			int psIndex=i+1+parameterOffset;
 			Field f=fields.get(i);
+			if(f.isNull()) ps.setNull(psIndex, ps.getMetaData().getColumnType(psIndex));
+			
+//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
 			switch(f.getType()){
 			case BOOLEAN:{ 
-							Integer value=f.getValueAsBoolean(DEFAULT_BOOLEAN_VALUE)?1:0;
-							ps.setInt(i+1+parameterOffset, value);
+							Integer value=f.getValueAsBoolean()?1:0;
+							ps.setInt(psIndex, value);
 							break;
 							}
-			case DOUBLE: ps.setDouble(i+1+parameterOffset, f.getValueAsDouble(DEFAULT_DOUBLE_VALUE));
+			case DOUBLE: ps.setDouble(psIndex, f.getValueAsDouble());
 							break;
 			case INTEGER: try{
-				ps.setInt(i+1+parameterOffset, f.getValueAsInteger(DEFAULT_INTEGER_VALUE));
+				ps.setInt(psIndex, f.getValueAsInteger());
 			}catch(NumberFormatException e){
 				//trying long
-				ps.setLong(i+1+parameterOffset, Long.parseLong(f.getValue()));
+				ps.setLong(psIndex, Long.parseLong(f.getValue()));
 			}
 			break;	
 			case TIMESTAMP : try{
-				ps.setTimestamp(i+1+parameterOffset, Timestamp.valueOf(f.getValue()));
+				ps.setTimestamp(psIndex, Timestamp.valueOf(f.getValue()));
 			}catch(IllegalArgumentException e){
-				ps.setNull(i+1+parameterOffset, Types.TIMESTAMP);
+				ps.setNull(psIndex, Types.TIMESTAMP);
 			}break;
-			case STRING: ps.setString(i+1+parameterOffset,f.getValue());
+			case STRING: ps.setString(psIndex,f.getValue());
 			break;
-			case LONG: ps.setLong(i+1+parameterOffset, f.getValueAsLong(DEFAULT_LONG_VALUE));
+			case LONG: ps.setLong(psIndex, f.getValueAsLong());
 			break;
-			}					
+			}			
 		}
 		return ps;
 	}

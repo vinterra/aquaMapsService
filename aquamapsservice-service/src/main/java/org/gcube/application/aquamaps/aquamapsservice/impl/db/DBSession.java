@@ -30,20 +30,20 @@ import org.gcube.common.core.utils.logging.GCUBELog;
 public abstract class DBSession {
 
 	protected static GCUBELog logger= new GCUBELog(DBSession.class);
-	protected static String DEFAULT_BOOLEAN_VALUE=null;
-	protected static String DEFAULT_INTEGER_VALUE=null;
-	protected static String DEFAULT_LONG_VALUE=null;
-	protected static String DEFAULT_DOUBLE_VALUE=null;
-	static{
-		try{
-			DEFAULT_BOOLEAN_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.BOOLEAN_DEFAULT_VALUE);
-			DEFAULT_DOUBLE_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.DOUBLE_DEFAULT_VALUE);
-			DEFAULT_INTEGER_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.INTEGER_DEFAULT_VALUE);
-			DEFAULT_LONG_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.INTEGER_DEFAULT_VALUE);
-		}catch(Exception e){
-			logger.fatal("Unable to evaluate DB default values",e);
-		}
-	}
+//	protected static String DEFAULT_BOOLEAN_VALUE=null;
+//	protected static String DEFAULT_INTEGER_VALUE=null;
+//	protected static String DEFAULT_LONG_VALUE=null;
+//	protected static String DEFAULT_DOUBLE_VALUE=null;
+//	static{
+//		try{
+//			DEFAULT_BOOLEAN_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.BOOLEAN_DEFAULT_VALUE);
+//			DEFAULT_DOUBLE_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.DOUBLE_DEFAULT_VALUE);
+//			DEFAULT_INTEGER_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.INTEGER_DEFAULT_VALUE);
+//			DEFAULT_LONG_VALUE=ServiceContext.getContext().getProperty(PropertiesConstants.INTEGER_DEFAULT_VALUE);
+//		}catch(Exception e){
+//			logger.fatal("Unable to evaluate DB default values",e);
+//		}
+//	}
 	
 	protected static String CSV_DELIMITER=",";
 	
