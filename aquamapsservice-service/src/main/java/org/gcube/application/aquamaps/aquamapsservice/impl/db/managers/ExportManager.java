@@ -21,7 +21,7 @@ import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class ExportManager extends Thread{
 
-	private static final GCUBELog logger=new GCUBELog(CustomQueryManager.class);
+	private static final GCUBELog logger=new GCUBELog(ExportManager.class);
 	
 	private static final String EXPORT_REFERENCE_TABLE="exports";
 	private static final String EXPORT_ID="id";
@@ -68,6 +68,8 @@ public class ExportManager extends Thread{
 				status.setStatus(ExportStatus.fromValue(rs.getString(EXPORT_STATUS)));
 				status.setRsLocator(rs.getString(EXPORT_LOCATOR));
 				status.setTableName(rs.getString(EXPORT_TABLE));
+				status.setErrors(rs.getString(EXPORT_ERROR_MSG));
+				logger.debug("Found export status [refID:"+requestId+"] : "+status.getStatus()+","+status.getTableName()+","+status.getRsLocator());
 				return status;
 			}else throw new Exception("Reference "+requestId+" not found");
 		}finally{if(session!=null) session.close();}		

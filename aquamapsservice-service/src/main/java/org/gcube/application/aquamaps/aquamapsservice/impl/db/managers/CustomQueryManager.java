@@ -85,6 +85,9 @@ public class CustomQueryManager {
 			ArrayList<Field> field=new ArrayList<Field>();
 			field.add(desc.getField(CustomQueryDescriptorFields.userid));
 			return session.deleteOperation(userQueryTable, field);
+		}catch(Exception e){
+			// custom query non existent
+			return 0;
 		}finally{if(session!=null) session.close();}
 	}
 
