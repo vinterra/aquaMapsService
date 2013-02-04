@@ -7,7 +7,7 @@
   </parent>
   <groupId>org.gcube.application</groupId>
   <artifactId>aquamapsservice</artifactId>
-  <version>4.0.0-SNAPSHOT</version>
+  <version>4.0.1-SNAPSHOT</version>
   <name>aquamapsservice</name>
    <properties>
    		<stubsArtifactId>aquamapsservice-stubs</stubsArtifactId>
@@ -48,4 +48,16 @@
 		<module>aquamapsservice-stubs</module>
 		<module>aquamapsservice-service</module>
 	</modules>
+	
+	<dependencyManagement>
+    <dependencies>
+       <dependency>
+           <groupId>org.gcube.distribution</groupId>
+           <artifactId>maven-bom</artifactId>
+           <version>LATEST</version>
+           <type>pom</type>
+           <scope>import</scope>		
+      </dependency>
+   </dependencies>
+</dependencyManagement>
 </project>
