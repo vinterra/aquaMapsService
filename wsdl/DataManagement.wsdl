@@ -164,6 +164,7 @@
 					<xsd:element name="csvSettings" type="tns:exportCSVSettings"/>
 					<xsd:element name="rsLocator" type="xsd:string"/>
 					<xsd:element name="status" type="tns:exportStatus"/>
+					<xsd:element name="errors" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
