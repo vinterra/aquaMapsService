@@ -95,8 +95,18 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.gcube.core</groupId>
-			<artifactId>gcf</artifactId>
-			<version>1.5.0</version>
+			<artifactId>gcf</artifactId>			
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+    <dependencies>
+       <dependency>
+           <groupId>org.gcube.distribution</groupId>
+           <artifactId>maven-bom</artifactId>
+           <version>LATEST</version>
+           <type>pom</type>
+           <scope>import</scope>		
+      </dependency>
+   </dependencies>
+</dependencyManagement>
 </project>
