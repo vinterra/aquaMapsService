@@ -30,7 +30,7 @@
 				<plugin>
 					<groupId>org.gcube.tools</groupId>
 					<artifactId>maven-service-plugin</artifactId>
-					<version>1.0.0</version>
+					<version>1.2.0</version>
 					<configuration>
 						<serviceId>aquamapsservice</serviceId>
 						<basePackage>org.gcube.application.aquamaps.aquamapsservice</basePackage>
