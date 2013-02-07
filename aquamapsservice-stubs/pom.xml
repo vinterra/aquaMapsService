@@ -93,20 +93,10 @@
 	</build>
 	
 	<dependencies>
-		<dependency>
-			<groupId>org.gcube.core</groupId>
-			<artifactId>gcf</artifactId>			
-		</dependency>
+	<dependency>
+		<groupId>org.gcube.core</groupId>
+		<artifactId>gcf</artifactId>
+		<version>[1.6.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
+	</dependency>
 	</dependencies>
-	<dependencyManagement>
-    <dependencies>
-       <dependency>
-           <groupId>org.gcube.distribution</groupId>
-           <artifactId>maven-bom</artifactId>
-           <version>LATEST</version>
-           <type>pom</type>
-           <scope>import</scope>		
-      </dependency>
-   </dependencies>
-</dependencyManagement>
 </project>
