@@ -271,15 +271,4 @@
 			<artifactId>xml-apis</artifactId>
 		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.gcube.distribution</groupId>
-				<artifactId>maven-bom</artifactId>
-				<version>LATEST</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>
