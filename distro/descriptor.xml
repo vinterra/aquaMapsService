@@ -37,11 +37,11 @@
 	<files>
 		<file>
 			<source>target/${build.finalName}.gar</source>
-			<outputDirectory>${project.artifactId}</outputDirectory>
+			<outputDirectory>AquaMapsService</outputDirectory>
 		</file>
 		<file>
 			<source>${distroDirectory}/svnpath.txt</source>
-			<outputDirectory>${project.artifactId}</outputDirectory>
+			<outputDirectory>AquaMapsService</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
