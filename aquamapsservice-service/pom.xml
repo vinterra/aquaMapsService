@@ -219,17 +219,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.gcube.common</groupId>
-			<artifactId>dbinterface</artifactId>
-			<version>[1.4.0-SNAPSHOT, 2.0.0)</version>
-		</dependency>
 
-		<dependency>
-			<groupId>org.gcube.dbinterface</groupId>
-			<artifactId>postgres</artifactId>
-			<version>[1.4.0-SNAPSHOT,2.0.0)</version>
-		</dependency>
 		<dependency>
 			<groupId>org.gcube.common</groupId>
 			<artifactId>csv4j</artifactId>
