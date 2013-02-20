@@ -37,12 +37,6 @@
 						<xsd:element name="includeGisLayers" type="xsd:boolean"/>
 					</xsd:sequence>
 				</xsd:complexType>
-				<xsd:complexType name="getJSONSubmittedByFiltersRequestType">
-					<xsd:sequence>
-						<xsd:element name="filters" type="aqtypes:fieldArray"/>
-						<xsd:element name="settings" type="aqtypes:pagedRequestSettings"/>
-					</xsd:sequence>
-				</xsd:complexType>
 	
 	<!-- Message elements --> 
 	
@@ -52,8 +46,6 @@
 	<xsd:element name="getFileSetByIdResponse" type="aqtypes:fileArray" />
 	<xsd:element name="getLayerByIdRequest" type="xsd:string" />
 	<xsd:element name="getLayerByIdResponse" type="gistypes:layerInfoType" />
-	<xsd:element name="getJSONSubmittedByFiltersRequest" type="tns:getJSONSubmittedByFiltersRequestType" />
-	<xsd:element name="getJSONSubmittedByFiltersResponse" type="xsd:string" />
 
 
 		</xsd:schema>
@@ -85,12 +77,6 @@
 		<part name="response" element="tns:getLayerByIdResponse" />
 	</message>
 	
-	<message name="GetJSONSubmittedByFiltersRequest">
-		<part name="request" element="tns:getJSONSubmittedByFiltersRequest" />
-	</message>
-	<message name="GetJSONSubmittedByFiltersResponse">
-		<part name="response" element="tns:getJSONSubmittedByFiltersResponse" />
-	</message>
 
 	<portType name="PublisherServicePortType">
 		<wsdl:operation name="RetrieveMapsByCoverage">
@@ -106,11 +92,6 @@
 		<wsdl:operation name="GetLayerById">
 			<wsdl:input message="tns:GetLayerByIdRequest" />
 			<wsdl:output message="tns:GetLayerByIdResponse" />
-			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
-		</wsdl:operation>
-		<wsdl:operation name="GetJSONSubmittedByFilters">
-			<wsdl:input message="tns:GetJSONSubmittedByFiltersRequest" />
-			<wsdl:output message="tns:GetJSONSubmittedByFiltersResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>
