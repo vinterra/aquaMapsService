@@ -55,7 +55,6 @@
 
 	<!-- Messages --> 
 	
-	
 	<message name="RetrieveMapsByCoverageRequest">
 		<part name="request" element="tns:retrieveMapsByCoverageRequest" />
 	</message>
@@ -79,16 +78,19 @@
 	
 
 	<portType name="PublisherServicePortType">
+		
 		<wsdl:operation name="RetrieveMapsByCoverage">
 			<wsdl:input message="tns:RetrieveMapsByCoverageRequest" />
 			<wsdl:output message="tns:RetrieveMapsByCoverageResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		
 		<wsdl:operation name="GetFileSetById">
 			<wsdl:input message="tns:GetFileSetByIdRequest" />
 			<wsdl:output message="tns:GetFileSetByIdResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		
 		<wsdl:operation name="GetLayerById">
 			<wsdl:input message="tns:GetLayerByIdRequest" />
 			<wsdl:output message="tns:GetLayerByIdResponse" />
