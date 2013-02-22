@@ -37,6 +37,7 @@
 					<xsd:element name="fieldList" type="aqtypes:fieldArray" />
 					<xsd:element name="toSelect" type="aqtypes:field" />
 					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
+					<xsd:element name="format" type="aqtypes:outputFormat"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -86,10 +87,9 @@
 			<xsd:complexType name="generateMapRequestType">
 				<xsd:sequence>
 					<xsd:element name="author" type="xsd:string" />
-					<xsd:element name="hspecId" type="xsd:int" />
-					<xsd:element name="selection" type="coretypes:stringArray"/>
+					<xsd:element name="hspecId" type="xsd:int" />					
 					<xsd:element name="enableGis" type="xsd:boolean"/>
-					<xsd:element name="customizationSet" type="aqtypes:customizationArray"/>
+					<xsd:element name="selection" type="aqtypes:customizationArray"/>
 				</xsd:sequence>
 			</xsd:complexType>
 

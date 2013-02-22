@@ -132,6 +132,7 @@
 				<xsd:sequence>
 					<xsd:element name="tableName" type="xsd:string"/>
 					<xsd:element name="csvSettings" type="tns:exportCSVSettings"/>
+					<xsd:element name="format" type="aqtypes:outputFormat"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
