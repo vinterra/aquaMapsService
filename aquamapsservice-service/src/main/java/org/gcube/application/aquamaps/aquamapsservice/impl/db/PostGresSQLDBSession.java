@@ -11,70 +11,72 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.impl.contexts.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.contexts.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class PostGresSQLDBSession extends DBSession {
 
-	
+
 	public PostGresSQLDBSession(Connection conn){
 		super(conn);
 	}
 
-	
-	
-	
+
+
+
 
 	@Override
 	public ResultSet executeFilteredQuery(List<Field> filters, String table, String orderColumn, OrderDirection orderMode)throws Exception{
 		PreparedStatement ps=getPreparedStatementForQuery(filters, table, orderColumn, orderMode);
 		return fillParameters(filters,0, ps).executeQuery();
 	}
-	
-	
+
+
 	@Override
 	public PreparedStatement fillParameters(List<Field> fields,int parameterOffset, PreparedStatement ps) throws SQLException{
-//		logger.debug("Fillin prepared statement : ");
+		//		logger.debug("Fillin prepared statement : ");
 		for(int i=0;i<fields.size();i++){
 			int psIndex=i+1+parameterOffset;
 			Field f=fields.get(i);
 			if(f.isNull()) ps.setNull(psIndex, ps.getMetaData().getColumnType(psIndex));
-			
-//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
-			switch(f.getType()){
-			case BOOLEAN:{ 
-							Integer value=f.getValueAsBoolean()?1:0;
-							ps.setInt(psIndex, value);
-							break;
-							}
-			case DOUBLE: ps.setDouble(psIndex, f.getValueAsDouble());
-							break;
-			case INTEGER: try{
-				ps.setInt(psIndex, f.getValueAsInteger());
-			}catch(NumberFormatException e){
-				//trying long
-				ps.setLong(psIndex, Long.parseLong(f.getValue()));
+
+			else if(f.getType().equals(FieldType.BOOLEAN)){ 
+				Integer value=f.getValueAsBoolean()?1:0;
+				ps.setInt(psIndex, value);
 			}
-			break;	
-			case TIMESTAMP : try{
-				ps.setTimestamp(psIndex, Timestamp.valueOf(f.getValue()));
-			}catch(IllegalArgumentException e){
-				ps.setNull(psIndex, Types.TIMESTAMP);
-			}break;
-			case STRING: ps.setString(psIndex,f.getValue());
-			break;
-			case LONG: ps.setLong(psIndex, f.getValueAsLong());
-			break;
-			}			
-		}
+
+			else if(f.getType().equals(FieldType.DOUBLE))ps.setDouble(psIndex, f.getValueAsDouble());
+
+			else if(f.getType().equals(FieldType.INTEGER)){
+				try{
+					ps.setInt(psIndex, f.getValueAsInteger());
+				}catch(NumberFormatException e){
+					ps.setLong(psIndex, Long.parseLong(f.getValue()));
+				}}
+
+			else if(f.getType().equals(FieldType.TIMESTAMP)){
+				try{
+					ps.setTimestamp(psIndex, Timestamp.valueOf(f.getValue()));
+				}catch(IllegalArgumentException e){
+					ps.setNull(psIndex, Types.TIMESTAMP);
+				}
+			}
+			else if(f.getType().equals(FieldType.STRING)){
+				ps.setString(psIndex,f.getValue());
+			}else if(f.getType().equals(FieldType.LONG)){
+				ps.setLong(psIndex, f.getValueAsLong());
+			}
+		}			
+
 		return ps;
 	}
 
-	
+
 	@Override
 	public boolean checkExist(String tableName, List<Field> keys)
 			throws Exception {
@@ -104,29 +106,29 @@ public class PostGresSQLDBSession extends DBSession {
 	@Override
 	public PreparedStatement getFilterCellByAreaQuery(HSPECFields filterByCodeType,
 			String sourceTableName, String destinationTableName) throws Exception {
-		
+
 		String conditionString=null;
-		
+
 		switch(filterByCodeType){
 		case eezall : conditionString=" ? NOT IN s."+filterByCodeType;
 		break;
 		default : conditionString=" s."+filterByCodeType+"= ? ";
 		break;
-		
-		
-		
-//		case faoaream : return preparedStatement("INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-//						" where "+sourceTableName+"."+HSPECFields.faoaream+" = ? ) ");
-//		case eezall : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-//						" where find_in_set( ? , "+sourceTableName+"."+HSPECFields.eezall+")) ";
-//		case lme : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
-//						" where "+sourceTableName+"."+HSPECFields.lme+" = ? ) ";
-//		default : throw new SQLException("Invalid Field "+filterByCodeType);
+
+
+
+		//		case faoaream : return preparedStatement("INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
+		//						" where "+sourceTableName+"."+HSPECFields.faoaream+" = ? ) ");
+		//		case eezall : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
+		//						" where find_in_set( ? , "+sourceTableName+"."+HSPECFields.eezall+")) ";
+		//		case lme : return "INSERT IGNORE INTO "+destinationTableName+" ( Select "+sourceTableName+".* from "+sourceTableName+
+		//						" where "+sourceTableName+"."+HSPECFields.lme+" = ? ) ";
+		//		default : throw new SQLException("Invalid Field "+filterByCodeType);
 		}
 		String query="INSERT INTO "+destinationTableName+" (SELECT * FROM "+sourceTableName+" s WHERE "+conditionString+" EXCEPT "+
-		"( SELECT * FROM "+destinationTableName+" ) )";
+				"( SELECT * FROM "+destinationTableName+" ) )";
 		logger.trace("FILTER STRING : "+query);
-		
+
 		return preparedStatement(query);
 	}
 
@@ -137,9 +139,9 @@ public class PostGresSQLDBSession extends DBSession {
 		List<List<Field>> toReturn= new ArrayList<List<Field>>();
 		//**** Create Query
 		if(rows.size()==0) throw new Exception("Empty rows to insert");
-		
+
 		PreparedStatement ps= getPreparedStatementForInsert(rows.get(0), tableName);
-		
+
 		for(List<Field> row:rows){
 			ps=fillParameters(row,0, ps);
 			if(ps.executeUpdate()>0)
@@ -154,16 +156,16 @@ public class PostGresSQLDBSession extends DBSession {
 			List<List<Field>> rows) throws Exception {
 		int count=0;
 		//**** Create Query
-		
+
 		if(rows.size()==0) throw new Exception("Empty rows to insert");
 		if(keys.size()==0) throw new Exception("Empty keys");
 		if(rows.size()!=keys.size()) throw new Exception("Un matching rows/keys sizes "+rows.size()+"/"+keys.size());
-		
+
 		PreparedStatement ps=getPreparedStatementForUpdate(rows.get(0), keys.get(0), tableName);
-		
-		
+
+
 		for(int i=0;i<rows.size();i++){
-			
+
 			//fill values
 			ps=fillParameters(rows.get(i), 0, ps);
 			//fill keys
@@ -172,7 +174,7 @@ public class PostGresSQLDBSession extends DBSession {
 		}
 		return count;
 	}
-	
+
 
 	@Override
 	public void createLikeTable(String newTableName, String oldTable)
@@ -187,19 +189,19 @@ public class PostGresSQLDBSession extends DBSession {
 	@Override
 	public void createTable(String tableName,
 			String[] columnsAndConstraintDefinition)
-			throws Exception {
-		
+					throws Exception {
+
 		this.dropTable(tableName);
-		
+
 		Statement statement = connection.createStatement();
-		
+
 		StringBuilder createQuery= new StringBuilder("CREATE TABLE "+tableName+" (");
 		for (String singleColumnDef:columnsAndConstraintDefinition)			
 			createQuery.append(singleColumnDef+",");
-		
+
 		createQuery.deleteCharAt(createQuery.length()-1);
 		createQuery.append(") ");
-		
+
 		logger.debug("the query is: " + createQuery.toString());
 		statement.executeUpdate(createQuery.toString());
 		statement.close();
@@ -212,7 +214,7 @@ public class PostGresSQLDBSession extends DBSession {
 	@Override
 	public PreparedStatement getPreparedStatementForInsertOnDuplicate(
 			List<Field> fields, String table, Integer[] keyIndexes)
-			throws Exception {
+					throws Exception {
 		//TODO
 		throw new Exception("YET TO IMPLEMENT");
 	}
@@ -227,8 +229,8 @@ public class PostGresSQLDBSession extends DBSession {
 		PreparedStatement ps=getPreparedStatementForDISTINCT(filters, toSelect, table, orderColumn, orderMode);
 		return fillParameters(filters,0, ps).executeQuery();
 	}
-	
-	
+
+
 	@Override
 	public String exportTableToCSV(String tableName, boolean hasHeaders,char delimiter) throws Exception {
 		Statement stmt = null;

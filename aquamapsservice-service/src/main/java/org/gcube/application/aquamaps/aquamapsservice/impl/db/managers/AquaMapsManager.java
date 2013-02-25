@@ -5,21 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Submitted;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.client.model.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.aquamapsservice.impl.contexts.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldType;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class AquaMapsManager extends SubmittedManager{
 

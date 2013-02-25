@@ -19,7 +19,6 @@ aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsser
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/contexts/ServiceContext.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
-aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/MySQLDBSession.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/PoolManager.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/PostGresSQLDBSession.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/managers/AnalysisTableManager.java -text
