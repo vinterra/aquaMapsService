@@ -12,6 +12,11 @@ aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsser
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/PublisherService.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/contexts/AquaMapsServiceContext.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/contexts/DataManagementContext.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/contexts/PortTypeContext.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/contexts/PublisherContext.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/contexts/ServiceContext.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBSession.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBUtils.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/MySQLDBSession.java -text
