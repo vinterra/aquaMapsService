@@ -170,7 +170,7 @@
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>org.gcube.application.aquamaps</groupId>
+			<groupId>org.gcube.application</groupId>
 			<artifactId>iscrawler</artifactId>
 			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
