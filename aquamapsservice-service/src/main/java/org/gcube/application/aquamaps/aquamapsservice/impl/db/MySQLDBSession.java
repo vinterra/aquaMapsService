@@ -33,45 +33,46 @@ public class MySQLDBSession extends DBSession {
 
 	@Override
 	public PreparedStatement fillParameters(List<Field> fields,int parameterOffset, PreparedStatement ps) throws SQLException{
-//		logger.debug("Fillin prepared statement : ");
+		//		logger.debug("Fillin prepared statement : ");
 		for(int i=0;i<fields.size();i++){
 			int psIndex=i+1+parameterOffset;
 			Field f=fields.get(i);
 			if(f.isNull()) ps.setNull(psIndex, ps.getMetaData().getColumnType(psIndex));
-			
-//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
-			switch(f.getType()){
-			case BOOLEAN:{ 
-							Integer value=f.getValueAsBoolean()?1:0;
-							ps.setInt(psIndex, value);
-							break;
-							}
-			case DOUBLE: ps.setDouble(psIndex, f.getValueAsDouble());
-							break;
-			case INTEGER: try{
-				ps.setInt(psIndex, f.getValueAsInteger());
-			}catch(NumberFormatException e){
-				//trying long
-				ps.setLong(psIndex, Long.parseLong(f.getValue()));
+			else{
+				//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
+				switch(f.getType()){
+				case BOOLEAN:{ 
+					Integer value=f.getValueAsBoolean()?1:0;
+					ps.setInt(psIndex, value);
+					break;
+				}
+				case DOUBLE: ps.setDouble(psIndex, f.getValueAsDouble());
+				break;
+				case INTEGER: try{
+					ps.setInt(psIndex, f.getValueAsInteger());
+				}catch(NumberFormatException e){
+					//trying long
+					ps.setLong(psIndex, Long.parseLong(f.getValue()));
+				}
+				break;	
+				case TIMESTAMP : try{
+					ps.setTimestamp(psIndex, Timestamp.valueOf(f.getValue()));
+				}catch(IllegalArgumentException e){
+					ps.setNull(psIndex, Types.TIMESTAMP);
+				}break;
+				case STRING: ps.setString(psIndex,f.getValue());
+				break;
+				case LONG: ps.setLong(psIndex, f.getValueAsLong());
+				break;
+				}		
 			}
-			break;	
-			case TIMESTAMP : try{
-				ps.setTimestamp(psIndex, Timestamp.valueOf(f.getValue()));
-			}catch(IllegalArgumentException e){
-				ps.setNull(psIndex, Types.TIMESTAMP);
-			}break;
-			case STRING: ps.setString(psIndex,f.getValue());
-			break;
-			case LONG: ps.setLong(psIndex, f.getValueAsLong());
-			break;
-			}			
 		}
 		return ps;
 	}
 
 	@Override
 	public boolean checkExist(String tableName, List<Field> keys)
-	throws Exception {
+			throws Exception {
 		PreparedStatement ps=getPreparedStatementForQuery(keys, tableName, null, null);
 		ResultSet rs=fillParameters(keys,0, ps).executeQuery();
 		return rs.first();
@@ -80,7 +81,7 @@ public class MySQLDBSession extends DBSession {
 
 	@Override
 	public int deleteOperation(String tableName, List<Field> filters)
-	throws Exception {
+			throws Exception {
 		PreparedStatement ps=getPreparedStatementForDelete(filters, tableName);
 		return fillParameters(filters,0, ps).executeUpdate();
 	}
@@ -173,7 +174,7 @@ public class MySQLDBSession extends DBSession {
 
 	@Override
 	public void createLikeTable(String newTableName, String oldTable)
-	throws Exception {
+			throws Exception {
 		Statement statement = connection.createStatement();
 		statement.executeUpdate("CREATE TABLE IF NOT EXISTS "+newTableName+" LIKE "+oldTable);
 		logger.debug("the like creation is : CREATE TABLE IF NOT EXISTS "+newTableName+" LIKE "+oldTable);
@@ -184,7 +185,7 @@ public class MySQLDBSession extends DBSession {
 	@Override
 	public void createTable(String tableName,
 			String[] columnsAndConstraintDefinition)
-	throws Exception {
+					throws Exception {
 		Statement statement = connection.createStatement();
 
 		StringBuilder createQuery= new StringBuilder("CREATE TABLE IF NOT EXISTS "+tableName+" (");
@@ -203,7 +204,7 @@ public class MySQLDBSession extends DBSession {
 	@Override
 	public PreparedStatement getPreparedStatementForInsertOnDuplicate(
 			List<Field> fields, String table, Integer[] keyIndexes)
-	throws Exception {
+					throws Exception {
 		// TODO Auto-generated method stub
 		throw new Exception ("YET TO IMPLEMENT");
 	}
