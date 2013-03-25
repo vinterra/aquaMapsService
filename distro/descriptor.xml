@@ -41,16 +41,16 @@
 		</file>
 		<file>
 			<source>target/${build.finalName}.gar</source>
-			<outputDirectory>AquaMapsService-service</outputDirectory>
+			<outputDirectory>${serviceArtifactId}</outputDirectory>
 		</file>
 		<file>
 			<source>${distroDirectory}/svnpath.txt</source>
-			<outputDirectory>AquaMapsService-service</outputDirectory>
+			<outputDirectory>${serviceArtifactId}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 		<file>
 			<source>${distroDirectory}/svnpath.txt</source>
-			<outputDirectory>AquaMapsService-stubs</outputDirectory>
+			<outputDirectory>${stubsArtifactId}</outputDirectory>
 			<filtered>true</filtered>
 		</file>
 	</files>

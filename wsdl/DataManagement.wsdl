@@ -30,12 +30,15 @@
 
 			<!-- DataManagement portType request types -->
 
-			<!-- ENUMS -->
+			<xsd:simpleType name="exportStatus">
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="PENDING" />
+					<xsd:enumeration value="ONGOING" />
+					<xsd:enumeration value="COMPLETED" />
+					<xsd:enumeration value="ERROR" />
+				</xsd:restriction>
+			</xsd:simpleType>
 
-			
-
-
-			<!-- DATA TYPES -->
 			<xsd:complexType name="exportCSVSettings">
 				<xsd:sequence>
 					<xsd:element name="encoding" type="xsd:string"
@@ -49,10 +52,20 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-			
-			
 
-			<!-- BATCH PROCESSES -->
+			<xsd:complexType name="importResourceRequestType">
+				<xsd:sequence>
+					<xsd:element name="rsLocator" type="xsd:string"
+						minOccurs="1" maxOccurs="1" />
+					<xsd:element name="csvSettings" type="tns:exportCSVSettings" />
+					<xsd:element name="user" type="xsd:string" />
+					<xsd:element name="resourceType" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+
+
+
 
 
 			<xsd:complexType name="generateMapsRequestType">
@@ -64,45 +77,58 @@
 					<xsd:element name="forceRegeneration" type="xsd:boolean" />
 				</xsd:sequence>
 			</xsd:complexType>
-			
-			<xsd:complexType name="deleteRequestType">
+
+
+			<xsd:complexType name="hspecGroupGenerationRequestType">
 				<xsd:sequence>
-					<xsd:element  name="author" type="xsd:string" />
-					<xsd:element  name="id" type="xsd:string" />
-					<xsd:element  name="deleteData" type="xsd:boolean" />
-					<xsd:element  name="deleteRelated" type="xsd:boolean" />
-					<xsd:element  name="toDeleteType" type="aqtypes:deleteType"/>
+					<xsd:element name="author" type="xsd:string" />
+					<xsd:element name="generationName" type="xsd:string" />
+					<xsd:element name="description" type="xsd:string" />
+					<xsd:element name="hspenIds" type="xsd:string" />
+					<xsd:element name="hcafIds" type="xsd:string" />
+					<xsd:element name="executionParameters" type="xsd:string" />
+					<xsd:element name="generationParameters" type="xsd:string" />
+					<xsd:element name="occurrenceCellsIds" type="xsd:string" />
+					<xsd:element name="submissionBackend" type="xsd:string" />
+					<xsd:element name="executionEnvironment" type="xsd:string" />
+					<xsd:element name="backendUrl" type="xsd:string" />
+					<xsd:element name="environmentConfiguration" type="xsd:string" />
+					<xsd:element name="logic" type="xsd:string" />
+					<xsd:element name="numPartitions" type="xsd:int" />
+					<xsd:element name="algorithms" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
+				<xsd:sequence>
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 
 
-			<!-- STATISTICAL SUPPORT -->
-
-			<xsd:complexType name="submitBatchProcessRequestType">
+			<xsd:complexType name="getGenerationLiveReportResponseType">
 				<xsd:sequence>
-					<xsd:element name="author" type="xsd:string"/>
-					<xsd:element name="title" type="xsd:string"/>
-					<xsd:element name="description" type="xsd:string"/>
-					<xsd:element name="algorithm" type="xsd:string"/>
-					<xsd:element name="algorithmDescription" type="xsd:string"/>
-					<xsd:element name="algorithmCategory" type="xsd:string"/>
-					<xsd:element name="parameters" type="coretypes:stringMap"/>
+					<xsd:element name="percent" type="xsd:double" />
+					<xsd:element name="resourceMap" type="xsd:string" />
+					<xsd:element name="resourceLoad" type="xsd:string" />
+					<xsd:element name="elaboratedSpecies" type="xsd:string" />
 				</xsd:sequence>
 			</xsd:complexType>
 
-			<!-- RESOURCES -->
-
-			<xsd:complexType name="importResourceRequestType">
+			<xsd:complexType name="removeHSPECGroupGenerationRequestResponseType">
 				<xsd:sequence>
-					<xsd:element name="rsLocator" type="xsd:string"
-						minOccurs="1" maxOccurs="1" />
-					<xsd:element name="csvSettings" type="tns:exportCSVSettings" />
+					<xsd:element name="requestId" type="xsd:string" />
+					<xsd:element name="removeTables" type="xsd:boolean" />
+					<xsd:element name="removeJobs" type="xsd:boolean" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="viewCustomQueryRequestType">
+				<xsd:sequence>
 					<xsd:element name="user" type="xsd:string" />
-					<xsd:element name="resourceType" type="aqtypes:tableTemplate" />
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
-
-			<!-- INSPECTOR -->
 
 			<xsd:complexType name="setUserCustomQueryRequestType">
 				<xsd:sequence>
@@ -111,13 +137,12 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-
 			<xsd:complexType name="customQueryDescriptorStubs">
 				<xsd:sequence>
 					<xsd:element name="user" type="xsd:string" />
 					<xsd:element name="rows" type="xsd:long" />
 					<xsd:element name="fields" type="aqtypes:fieldArray" />
-					<xsd:element name="status" type="aqtypes:status" />
+					<xsd:element name="status" type="tns:exportStatus" />
 					<xsd:element name="errorMsg" type="xsd:string" />
 					<xsd:element name="actualTableName" type="xsd:string" />
 					<xsd:element name="query" type="xsd:string" />
@@ -126,13 +151,10 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-			<!-- EXPORT -->
-
 			<xsd:complexType name="exportTableRequestType">
 				<xsd:sequence>
 					<xsd:element name="tableName" type="xsd:string"/>
 					<xsd:element name="csvSettings" type="tns:exportCSVSettings"/>
-					<xsd:element name="format" type="aqtypes:outputFormat"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
@@ -141,43 +163,46 @@
 					<xsd:element name="tableName" type="xsd:string"/>
 					<xsd:element name="csvSettings" type="tns:exportCSVSettings"/>
 					<xsd:element name="rsLocator" type="xsd:string"/>
-					<xsd:element name="status" type="aqtypes:status"/>
+					<xsd:element name="status" type="tns:exportStatus"/>
 					<xsd:element name="errors" type="xsd:string"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
-
-			<!-- JSON -->
-			
-			<xsd:complexType name="JSONRequestType">
+			<xsd:complexType name="getJSONSubmittedAnalysisRequestType">
 				<xsd:sequence>
-					<xsd:element name="settings" type="aqtypes:pagedRequestSettings"/>
-					<xsd:element name="viewCategory" type="aqtypes:jsonView"/>
-					<xsd:element name="filters" type="aqtypes:fieldArray"/>
+					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
 				</xsd:sequence>
 			</xsd:complexType>
 
 			<!-- Data management request elements -->
 
-			<!-- BATCH PROCESSES -->
-			
+
 			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType" />
-			<xsd:element name="generateMapsResponse" type="xsd:string" />
-			
-			<xsd:element name="deleteRequest" type="tns:deleteRequestType" />
-			<xsd:element name="deleteResponse" type="xsd:string" />
+			<xsd:element name="generateMapsResponse" type="xsd:int" />
 
-				<!-- STATISTICAL SUPPORT -->
-			
-			<xsd:element name="submitBatchProcessRequest" type="tns:submitBatchProcessRequestType" />
-			<xsd:element name="submitBatchProcessResponse" type="xsd:string" />
 
-						
+			<xsd:element name="hspecGroupGenerationRequest" type="tns:hspecGroupGenerationRequestType" />
+			<xsd:element name="hspecGroupGenerationResponse" type="xsd:string" />
 
-			<!-- RESOURCES -->
-			
-			<xsd:element name="getResourceByIdRequest" type="xsd:int" />
-			<xsd:element name="getResourceByIdResponse" type="aqtypes:resource" />
+			<xsd:element name="removeHSPECGroupRequest"
+				type="tns:removeHSPECGroupGenerationRequestResponseType" />
+			<xsd:element name="removeHSPECGroupResponse"
+				type="tns:removeHSPECGroupGenerationRequestResponseType" />
+
+			<xsd:element name="getJSONSubmittedHSPECRequest" type="aqtypes:pagedRequestSettings" />
+			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string" />
+
+			<xsd:element name="getGenerationLiveReportRequest" type="coretypes:stringArray" />
+			<xsd:element name="getGenerationLiveReportResponse"
+				type="tns:getGenerationLiveReportResponseType" />
+
+			<xsd:element name="editHSPECGroupDetailsRequest" type="tns:hspecGroupGenerationRequestType" />
+			<xsd:element name="editHSPECGroupDetailsResponse" type="coretypes:VOID" />
+
+			<xsd:element name="resubmitGenerationRequest" type="xsd:string" />
+			<xsd:element name="resubmitGenerationResponse" type="xsd:string" />
+
+
 
 			<xsd:element name="getDefaultSourcesRequest" type="coretypes:VOID" />
 			<xsd:element name="getDefaultSourcesResponse" type="aqtypes:fieldArray" />
@@ -185,11 +210,13 @@
 			<xsd:element name="editResourceRequest" type="aqtypes:resource" />
 			<xsd:element name="editResourceResponse" type="aqtypes:resource" />
 
-			<xsd:element name="importResourceRequest" type="tns:importResourceRequestType" />
-			<xsd:element name="importResourceResponse" type="xsd:int" />
-			
-			
-			<!-- INSPECTOR -->
+			<xsd:element name="removeResourceRequest" type="xsd:int" />
+			<xsd:element name="removeResourceResponse" type="coretypes:VOID" />
+
+
+
+			<xsd:element name="viewCustomQueryRequest" type="tns:viewCustomQueryRequestType" />
+			<xsd:element name="viewCustomQueryResponse" type="xsd:string" />
 
 			<xsd:element name="setCustomQueryRequest" type="tns:setUserCustomQueryRequestType" />
 			<xsd:element name="setCustomQueryResponse" type="xsd:string" />
@@ -198,7 +225,10 @@
 			<xsd:element name="getCustomQueryDescriptorResponse" type="tns:customQueryDescriptorStubs" />
 
 
-			<!-- EXPORT -->
+
+			<xsd:element name="importResourceRequest" type="tns:importResourceRequestType" />
+			<xsd:element name="importResourceResponse" type="xsd:int" />
+
 
 			<xsd:element name="exportTableAsCSVRequest" type="tns:exportTableRequestType" />
 			<xsd:element name="exportTableAsCSVResponse" type="xsd:string" />
@@ -207,17 +237,30 @@
 			<xsd:element name="getExportStatusResponse" type="tns:exportTableStatusType" />
 
 
-			<!-- JSON -->
-			
-			<xsd:element name="jSONViewRequest" type="tns:JSONRequestType" />
-			<xsd:element name="jSONViewResponse" type="xsd:string" />
+
+
+
+			<xsd:element name="analyzeTablesRequest" type="aqtypes:analysis" />
+			<xsd:element name="analyzeTablesResponse" type="xsd:string" />
+
+			<xsd:element name="getJSONSubmittedAnalysisRequest" type="aqtypes:pagedRequestSettings" />
+			<xsd:element name="getJSONSubmittedAnalysisResponse"
+				type="xsd:string" />
+
+			<xsd:element name="loadAnalysisRequest" type="xsd:string" />
+			<xsd:element name="loadAnalysisResponse" type="xsd:string" />
+
+			<xsd:element name="deleteAnalysisRequest" type="xsd:string" />
+			<xsd:element name="deleteAnalysisResponse" type="coretypes:VOID" />
 
 		</xsd:schema>
 	</types>
 
 
-	<!--  BATCH PROCESSES -->
-	
+	<!-- DATA management messages -->
+
+
+
 	<message name="GenerateMapsRequest">
 		<part name="request" element="tns:generateMapsRequest" />
 	</message>
@@ -225,31 +268,50 @@
 		<part name="response" element="tns:generateMapsResponse" />
 	</message>
 
-	<message name="DeleteRequest">
-		<part name="request" element="tns:deleteRequest" />
+
+	<message name="HSPECGroupGenerationRequest">
+		<part name="request" element="tns:hspecGroupGenerationRequest" />
 	</message>
-	<message name="DeleteResponse">
-		<part name="response" element="tns:deleteResponse" />
+	<message name="HSPECGroupGenerationResponse">
+		<part name="response" element="tns:hspecGroupGenerationResponse" />
 	</message>
 
-			<!-- STATISTICAL SUPPORT -->
-
-	<message name="SubmitBatchProcessRequest">
-		<part name="request" element="tns:submitBatchProcessRequest" />
+	<message name="RemoveHSPECGroupRequest">
+		<part name="request" element="tns:removeHSPECGroupRequest" />
 	</message>
-	<message name="SubmitBatchProcessResponse">
-		<part name="response" element="tns:submitBatchProcessResponse" />
+	<message name="RemoveHSPECGroupResponse">
+		<part name="response" element="tns:removeHSPECGroupResponse" />
 	</message>
 
-	
-	<!-- RESOURCES -->
+	<message name="GetJSONSubmittedHSPECRequest">
+		<part name="request" element="tns:getJSONSubmittedHSPECRequest" />
+	</message>
+	<message name="GetJSONSubmittedHSPECResponse">
+		<part name="response" element="tns:getJSONSubmittedHSPECResponse" />
+	</message>
 
-	<message name="GetResourceByIdRequest">
-		<part name="request" element="tns:getResourceByIdRequest" />
+	<message name="GetGenerationLiveReportRequest">
+		<part name="request" element="tns:getGenerationLiveReportRequest" />
 	</message>
-	<message name="GetResourceByIdResponse">
-		<part name="response" element="tns:getResourceByIdResponse" />
+	<message name="GetGenerationLiveReportResponse">
+		<part name="response" element="tns:getGenerationLiveReportResponse" />
 	</message>
+
+	<message name="EditHSPECGroupDetailsRequest">
+		<part name="request" element="tns:editHSPECGroupDetailsRequest" />
+	</message>
+	<message name="EditHSPECGroupDetailsResponse">
+		<part name="response" element="tns:editHSPECGroupDetailsResponse" />
+	</message>
+
+	<message name="ResubmitGenerationRequest">
+		<part name="request" element="tns:resubmitGenerationRequest" />
+	</message>
+	<message name="ResubmitGenerationResponse">
+		<part name="response" element="tns:resubmitGenerationResponse" />
+	</message>
+
+
 
 	<message name="GetDefaultSourcesRequest">
 		<part name="request" element="tns:getDefaultSourcesRequest" />
@@ -265,16 +327,21 @@
 		<part name="response" element="tns:editResourceResponse" />
 	</message>
 
-	<message name="ImportResourceRequest">
-		<part name="request" element="tns:importResourceRequest" />
+	<message name="RemoveResourceRequest">
+		<part name="request" element="tns:removeResourceRequest" />
 	</message>
-	<message name="ImportResourceResponse">
-		<part name="response" element="tns:importResourceResponse" />
+	<message name="RemoveResourceResponse">
+		<part name="response" element="tns:removeResourceResponse" />
 	</message>
 
 
-	<!-- INSPECTOR -->
 
+	<message name="ViewCustomQueryRequest">
+		<part name="request" element="tns:viewCustomQueryRequest" />
+	</message>
+	<message name="ViewCustomQueryResponse">
+		<part name="response" element="tns:viewCustomQueryResponse" />
+	</message>
 	<message name="SetCustomQueryRequest">
 		<part name="request" element="tns:setCustomQueryRequest" />
 	</message>
@@ -290,7 +357,14 @@
 	</message>
 
 
-	<!-- EXPORT -->
+	<message name="ImportResourceRequest">
+		<part name="request" element="tns:importResourceRequest" />
+	</message>
+	<message name="ImportResourceResponse">
+		<part name="response" element="tns:importResourceResponse" />
+	</message>
+
+
 
 	<message name="ExportTableAsCSVRequest">
 		<part name="request" element="tns:exportTableAsCSVRequest" />
@@ -298,7 +372,7 @@
 	<message name="ExportTableAsCSVResponse">
 		<part name="response" element="tns:exportTableAsCSVResponse" />
 	</message>
-	
+
 	<message name="GetExportStatusRequest">
 		<part name="request" element="tns:getExportStatusRequest" />
 	</message>
@@ -308,48 +382,76 @@
 
 
 
-	<!-- JSON -->
-	
-	<message name="JSONViewRequest">
-		<part name="request" element="tns:jSONViewRequest" />
+	<message name="AnalyzeTablesRequest">
+		<part name="request" element="tns:analyzeTablesRequest" />
 	</message>
-	<message name="JSONViewResponse">
-		<part name="response" element="tns:jSONViewResponse" />
+	<message name="AnalyzeTablesResponse">
+		<part name="response" element="tns:analyzeTablesResponse" />
 	</message>
+
+	<message name="GetJSONSubmittedAnalysisRequest">
+		<part name="request" element="tns:getJSONSubmittedAnalysisRequest" />
+	</message>
+	<message name="GetJSONSubmittedAnalysisResponse">
+		<part name="response" element="tns:getJSONSubmittedAnalysisResponse" />
+	</message>
+
+	<message name="LoadAnalysisRequest">
+		<part name="request" element="tns:loadAnalysisRequest" />
+	</message>
+	<message name="LoadAnalysisResponse">
+		<part name="response" element="tns:loadAnalysisResponse" />
+	</message>
+
+
+	<message name="DeleteAnalysisRequest">
+		<part name="request" element="tns:deleteAnalysisRequest" />
+	</message>
+	<message name="DeleteAnalysisResponse">
+		<part name="response" element="tns:deleteAnalysisResponse" />
+	</message>
+
 
 	<portType name="DataManagementPortType">
 
-		<!--  BATCH PROCESSES -->
-
-		<wsdl:operation name="GenerateMaps">
+		<wsdl:operation name="generateMaps">
 			<wsdl:input message="tns:GenerateMapsRequest" />
 			<wsdl:output message="tns:GenerateMapsResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		
-		<wsdl:operation name="Delete">
-			<wsdl:input message="tns:DeleteRequest" />
-			<wsdl:output message="tns:DeleteResponse" />
+		<wsdl:operation name="GenerateHSPECGroup">
+			<wsdl:input message="tns:HSPECGroupGenerationRequest" />
+			<wsdl:output message="tns:HSPECGroupGenerationResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
-		</wsdl:operation>		
-		
-		
-				<!-- STATISTICAL SUPPORT -->
-				
-		<wsdl:operation name="SubmitBatchProcess">
-			<wsdl:input message="tns:SubmitBatchProcessRequest" />
-			<wsdl:output message="tns:SubmitBatchProcessResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="RemoveHSPECGroup">
+			<wsdl:input message="tns:RemoveHSPECGroupRequest" />
+			<wsdl:output message="tns:RemoveHSPECGroupResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetJSONSubmittedHSPECGroup">
+			<wsdl:input message="tns:GetJSONSubmittedHSPECRequest" />
+			<wsdl:output message="tns:GetJSONSubmittedHSPECResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetGenerationLiveReportGroup">
+			<wsdl:input message="tns:GetGenerationLiveReportRequest" />
+			<wsdl:output message="tns:GetGenerationLiveReportResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="EditHSPECGroupDetails">
+			<wsdl:input message="tns:EditHSPECGroupDetailsRequest" />
+			<wsdl:output message="tns:EditHSPECGroupDetailsResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="ResubmitGeneration">
+			<wsdl:input message="tns:ResubmitGenerationRequest" />
+			<wsdl:output message="tns:ResubmitGenerationResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 
-		
-		<!-- RESOURCES -->
 
-		<wsdl:operation name="GetResourceById">
-			<input message="tns:GetResourceByIdRequest" />
-			<output message="tns:GetResourceByIdResponse" />
-			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
-		</wsdl:operation>
+
 		<wsdl:operation name="GetDefaultSources">
 			<wsdl:input message="tns:GetDefaultSourcesRequest" />
 			<wsdl:output message="tns:GetDefaultSourcesResponse" />
@@ -360,19 +462,24 @@
 			<wsdl:output message="tns:EditResourceResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		<wsdl:operation name="ImportResource">
-			<wsdl:input message="tns:ImportResourceRequest" />
-			<wsdl:output message="tns:ImportResourceResponse" />
+		<wsdl:operation name="RemoveResource">
+			<wsdl:input message="tns:RemoveResourceRequest" />
+			<wsdl:output message="tns:RemoveResourceResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		
-		<!-- INSPECTOR -->
 
+
+
+		<wsdl:operation name="ViewCustomQuery">
+			<wsdl:input message="tns:ViewCustomQueryRequest" />
+			<wsdl:output message="tns:ViewCustomQueryResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
 		<wsdl:operation name="SetCustomQuery">
 			<wsdl:input message="tns:SetCustomQueryRequest" />
 			<wsdl:output message="tns:SetCustomQueryResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
-		</wsdl:operation>		
+		</wsdl:operation>
 		<wsdl:operation name="GetCustomQueryDescriptor">
 			<wsdl:input message="tns:GetCustomQueryDescriptorRequest" />
 			<wsdl:output message="tns:GetCustomQueryDescriptorResponse" />
@@ -380,7 +487,12 @@
 		</wsdl:operation>
 
 
-		<!--  EXPORT -->
+
+		<wsdl:operation name="ImportResource">
+			<wsdl:input message="tns:ImportResourceRequest" />
+			<wsdl:output message="tns:ImportResourceResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
 
 
 		<wsdl:operation name="ExportTableAsCSV">
@@ -394,12 +506,26 @@
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 
-		
-		<!-- JSON -->
-		
-		<wsdl:operation name="JSONView">
-			<wsdl:input message="tns:JSONViewRequest" />
-			<wsdl:output message="tns:JSONViewResponse" />
+
+
+		<wsdl:operation name="AnalyzeTables">
+			<wsdl:input message="tns:AnalyzeTablesRequest" />
+			<wsdl:output message="tns:AnalyzeTablesResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetJSONSubmittedAnalysis">
+			<wsdl:input message="tns:GetJSONSubmittedAnalysisRequest" />
+			<wsdl:output message="tns:GetJSONSubmittedAnalysisResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="LoadAnalysis">
+			<wsdl:input message="tns:LoadAnalysisRequest" />
+			<wsdl:output message="tns:LoadAnalysisResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAnalysis">
+			<wsdl:input message="tns:DeleteAnalysisRequest" />
+			<wsdl:output message="tns:DeleteAnalysisResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
 	</portType>

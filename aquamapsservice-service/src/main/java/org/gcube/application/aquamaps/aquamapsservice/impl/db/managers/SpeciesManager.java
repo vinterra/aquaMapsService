@@ -12,18 +12,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.HspenFields;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.types.FieldType;
-import org.gcube_system.namespaces.application.aquamaps.types.Filter;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SpeciesManager {
 

@@ -11,11 +11,12 @@ import java.util.List;
 import net.sf.csv4j.CSVReaderProcessor;
 
 import org.apache.tools.ant.util.FileUtils;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class SourceImporter extends Thread {

@@ -9,14 +9,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.HSPECFields;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.vo.DBDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.impl.contexts.ServiceContext;
-import org.gcube.common.core.scope.GCUBEScope;
-import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 
 
@@ -67,28 +67,31 @@ public abstract class DBSession {
 	 * @throws Exception
 	 */
 
-	public static DBDescriptor getInternalCredentials(GCUBEScope scope)throws Exception{
-		return ServiceContext.getContext().getConfiguration().getInternalDB(scope);
+	public static DBDescriptor getInternalCredentials()throws Exception{
+		return ServiceContext.getContext().getConfiguration().getInternalDB(ServiceContext.getContext().getConfigurationScope());
+	}
+	public static DBDescriptor getPostGisCredentials()throws Exception{
+		return ServiceContext.getContext().getConfiguration().getGeoServerDb(ServiceContext.getContext().getConfigurationScope());
 	}
 	
-//	public static DBDescriptor getPostGisCredentials(GCUBEScope scope)throws Exception{
-//		return ServiceContext.getContext().getConfiguration().getGeoServerDb(scope);
-//	}
-	
 
-	public static DBSession getInternalDBSession(GCUBEScope scope)throws Exception{
+	public static DBSession getInternalDBSession()throws Exception{
 		try{
-			Connection conn=PoolManager.get(scope).getConnection();
-			return new PostGresSQLDBSession(conn);
+			Connection conn=PoolManager.getInternalDBConnection();
+			switch(getInternalCredentials().getType()){
+			case mysql: return new MySQLDBSession(conn);
+			default: return new PostGresSQLDBSession(conn);
+			}
 		}catch(Exception e){
 			logger.fatal("ERROR ON OPENING CONNECTION ",e);
+			logger.fatal("Connection parameters were : "+getInternalCredentials());
 			throw e;
 		}
 	}
 
-//	public static DBSession getPostGisDBSession()throws Exception{
-//		return new PostGresSQLDBSession(PoolManager.getPostGisDBConnection());
-//	}
+	public static DBSession getPostGisDBSession()throws Exception{
+		return new PostGresSQLDBSession(PoolManager.getPostGisDBConnection());
+	}
 
 
 	protected DBSession(Connection conn){

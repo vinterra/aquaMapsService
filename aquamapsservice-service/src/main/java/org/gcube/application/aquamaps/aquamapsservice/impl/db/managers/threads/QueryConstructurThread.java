@@ -3,12 +3,13 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.CustomQueryDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.CustomQueryDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.types.FieldType;
 
 public class QueryConstructurThread extends Thread {
 

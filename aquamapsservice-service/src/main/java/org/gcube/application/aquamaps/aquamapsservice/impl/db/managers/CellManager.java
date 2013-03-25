@@ -7,17 +7,19 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Cell;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.aquamapsservice.client.model.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube_system.namespaces.application.aquamaps.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
-import org.opengis.geometry.BoundingBox;
+import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class CellManager {
 
