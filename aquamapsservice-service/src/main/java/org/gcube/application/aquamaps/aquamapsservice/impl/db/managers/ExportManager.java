@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportCSVSettings;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportOperation;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportTableStatusType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -17,6 +19,9 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.Aq
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube.portlets.user.homelibrary.home.HomeLibrary;
+import org.gcube.portlets.user.homelibrary.home.HomeManagerFactory;
+import org.gcube.portlets.user.homelibrary.home.workspace.Workspace;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class ExportManager extends Thread{
@@ -33,8 +38,14 @@ public class ExportManager extends Thread{
 	private static final String EXPORT_TIME="time";
 	private static final String EXPORT_LOCATOR="locator";
 	private static final String EXPORT_SCOPE="scope";
+	//******** NEW
+	private static final String EXPORT_OPERATION="operation";
+	private static final String EXPORT_USER="user";
+	private static final String EXPORT_BASKET="basket";
+	private static final String EXPORT_NAME="name";
 	
-	public static String submitExportOperation(String tableName, ExportCSVSettings settings) throws Exception{
+	
+	public static String submitExportOperation(String tableName,String user,String basket,String name,ExportOperation operation, ExportCSVSettings settings) throws Exception{
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
@@ -46,6 +57,11 @@ public class ExportManager extends Thread{
 			row.add(new Field(EXPORT_SETTINGS,AquaMapsXStream.getXMLInstance().toXML(settings),FieldType.STRING));
 			row.add(new Field(EXPORT_STATUS,ExportStatus._PENDING,FieldType.STRING));
 			row.add(new Field(EXPORT_SCOPE,ServiceContext.getContext().getScope()+"",FieldType.STRING));
+			row.add(new Field(EXPORT_OPERATION,operation.toString(),FieldType.STRING));
+			row.add(new Field(EXPORT_USER,user,FieldType.STRING));
+			row.add(new Field(EXPORT_BASKET,basket,FieldType.STRING));
+			row.add(new Field(EXPORT_NAME,name,FieldType.STRING));
+			
 			ArrayList<List<Field>> rows=new ArrayList<List<Field>>();
 			rows.add(row);
 			session.insertOperation(EXPORT_REFERENCE_TABLE, rows);
@@ -121,12 +137,27 @@ public class ExportManager extends Thread{
 				updateField(referenceId, EXPORT_LOCAL_PATH, FieldType.STRING, fileName);
 
 				GCUBEScope scope=GCUBEScope.getScope(rs.getString(EXPORT_SCOPE));
-				RSWrapper wrapper=new RSWrapper(scope);
-				wrapper.add(new File(fileName));
-				String locator = wrapper.getLocator().toString();
-				logger.trace("Added file to locator "+locator);
+				ExportOperation operation=ExportOperation.fromString(rs.getString(EXPORT_OPERATION));
+				if(operation.equals(ExportOperation.SAVE)){
+					//SAVE TO WORKSPACE
+					String owner=rs.getString(EXPORT_USER);
+					String destinationBasketId=rs.getString(EXPORT_BASKET);
+					String toSaveName=rs.getString(EXPORT_NAME);
+					HomeManagerFactory factory = HomeLibrary.getHomeManagerFactory();
+					Workspace workspace = factory.getHomeManager().getHome(owner,
+							GCUBEScope.getScope(scope.toString())).getWorkspace();
+					workspace.createExternalFile(toSaveName, "Exported table", "text/csv", new FileInputStream(fileName), destinationBasketId);
+				}else {
+					//EXPORT TO CLIENT
+					RSWrapper wrapper=new RSWrapper(scope);
+					wrapper.add(new File(fileName));
+					String locator = wrapper.getLocator().toString();
+					logger.trace("Added file to locator "+locator);
+					
+					updateField(referenceId, EXPORT_LOCATOR, FieldType.STRING, locator);
+					
+				}
 				
-				updateField(referenceId, EXPORT_LOCATOR, FieldType.STRING, locator);
 				updateField(referenceId, EXPORT_TIME, FieldType.LONG, System.currentTimeMillis());
 				updateField(referenceId, EXPORT_STATUS, FieldType.STRING, ExportStatus.COMPLETED);
 			}else throw new Exception("Reference "+referenceId+" not found");

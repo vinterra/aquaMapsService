@@ -237,7 +237,8 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public String exportTableAsCSV(ExportTableRequestType request)
 			throws RemoteException, GCUBEFault {
 		try{
-			return ExportManager.submitExportOperation(request.getTableName(), request.getCsvSettings());
+			return ExportManager.submitExportOperation(
+					request.getTableName(), request.getUser(), request.getBasketId(),request.getToSaveName(),request.getOperationType(),request.getCsvSettings());
 		}catch(Exception e){
 			logger.debug("Unable to export table "+request.getTableName(),e);
 			throw new GCUBEFault("Unable to export table "+request.getTableName()+", cause : "+e.getLocalizedMessage());
