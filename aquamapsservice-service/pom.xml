@@ -220,7 +220,11 @@
 			<artifactId>aquamapsservice-cl</artifactId>
 			<version>[1.0.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.gcube.application</groupId>
+			<artifactId>aquamapsservice-stubs</artifactId>
+			<version>[4.0.0-SNAPSHOT,5.0.0-SNAPSHOT)</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.gcube.tools</groupId>
