@@ -40,7 +40,7 @@ public class ExportManager extends Thread{
 	private static final String EXPORT_SCOPE="scope";
 	//******** NEW
 	private static final String EXPORT_OPERATION="operation";
-	private static final String EXPORT_USER="user";
+	private static final String EXPORT_USER="username";
 	private static final String EXPORT_BASKET="basket";
 	private static final String EXPORT_NAME="name";
 	
