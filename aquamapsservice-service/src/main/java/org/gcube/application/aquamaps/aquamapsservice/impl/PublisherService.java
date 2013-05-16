@@ -64,14 +64,14 @@ PublisherServicePortType {
 
 
 			//**************** Load layers by species
-			logger.debug("Checking maps by coverage from Publisher, species Selection is "+Arrays.toString(speciesArray));
+//			logger.debug("Checking maps by coverage from Publisher, species Selection is "+Arrays.toString(speciesArray));
 
 			foundLayers.addAll(publisher.getLayersBySpeciesIds(speciesArray[0]));
 
 			foundFileSet.addAll(publisher.getFileSetsBySpeciesIds(speciesArray[0]));
 
 
-			logger.debug("Found "+foundFileSet.size()+" related FileSet and "+foundLayers.size()+" layers, gonna form maps information..");
+//			logger.debug("Found "+foundFileSet.size()+" related FileSet and "+foundLayers.size()+" layers, gonna form maps information..");
 
 
 			HashMap<CoverageDescriptor,AquaMap> formedMaps=new HashMap<CoverageDescriptor, AquaMap>();
@@ -141,7 +141,7 @@ PublisherServicePortType {
 			}
 			ArrayList<AquaMap> toReturn=new ArrayList<AquaMap>(formedMaps.values());
 			toReturn.addAll(formedCustomMaps.values());
-			logger.debug("Found "+toReturn.size()+" Maps ("+formedCustomMaps.size()+" custom)in "+(System.currentTimeMillis()-starttime)+" ms");
+//			logger.debug("Found "+toReturn.size()+" Maps ("+formedCustomMaps.size()+" custom)in "+(System.currentTimeMillis()-starttime)+" ms");
 			return AquaMap.toStubsVersion(toReturn);			
 		}catch(Exception e){
 			logger.error("Unable to get Maps ",e);

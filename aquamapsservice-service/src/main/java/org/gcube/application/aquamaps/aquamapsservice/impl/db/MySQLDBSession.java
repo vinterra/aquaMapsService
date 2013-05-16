@@ -37,7 +37,7 @@ public class MySQLDBSession extends DBSession {
 		for(int i=0;i<fields.size();i++){
 			int psIndex=i+1+parameterOffset;
 			Field f=fields.get(i);
-			if(f.isNull()) ps.setNull(psIndex, ps.getMetaData().getColumnType(psIndex));
+			if(f.isNull()) ps.setNull(psIndex, ps.getParameterMetaData().getParameterType(psIndex));
 			else{
 				//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
 				switch(f.getType()){

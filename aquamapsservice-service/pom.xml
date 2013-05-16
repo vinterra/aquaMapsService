@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>aquamapsservice</artifactId>
 		<groupId>org.gcube.application</groupId>
-		<version>4.1.0-SNAPSHOT</version>
+		<version>4.1.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>aquamapsservice-service</artifactId>
@@ -170,6 +170,16 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>org.gcube.portlets.user</groupId>
+			<artifactId>home-library</artifactId>
+			<version>[4.5.0-SNAPSHOT,5.0.0-SNAPSHOT]</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gcube.portlets.user</groupId>
+			<artifactId>home-library-jcr</artifactId>
+			<version>[1.5.0-SNAPSHOT,2.0.0-SNAPSHOT]</version>
+		</dependency>
+		<dependency>
 			<groupId>org.gcube.application</groupId>
 			<artifactId>iscrawler</artifactId>
 			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
@@ -177,7 +187,7 @@
 		<dependency>
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
-			<version>[1.4.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
+			<version>1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.application</groupId>
@@ -210,7 +220,11 @@
 			<artifactId>aquamapsservice-cl</artifactId>
 			<version>[1.0.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.gcube.application</groupId>
+			<artifactId>aquamapsservice-stubs</artifactId>
+			<version>[4.0.0-SNAPSHOT,5.0.0-SNAPSHOT)</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.gcube.tools</groupId>
@@ -223,17 +237,17 @@
 		<dependency>
 			<groupId>org.gcube.common</groupId>
 			<artifactId>csv4j</artifactId>
-			<version>[1.2.0-SNAPSHOT,2.0.0)</version>
+			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.contentmanagement</groupId>
 			<artifactId>statisticsextractor</artifactId>
-			<version>[1.2.0-SNAPSHOT,2.0.0)</version>
+			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.contentmanagement</groupId>
 			<artifactId>lexicalmatcher</artifactId>
-			<version>[1.2.0-SNAPSHOT,2.0.0)</version>
+			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
 
 		<!-- my-container distribution for integration testing -->
@@ -247,11 +261,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.gcube.contentmanagement</groupId>
 			<artifactId>ecologicalmodelling</artifactId>
 			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
@@ -259,6 +268,12 @@
 		<dependency>
 			<groupId>xml-apis</groupId>
 			<artifactId>xml-apis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>
