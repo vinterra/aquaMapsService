@@ -32,7 +32,7 @@ public class PoolManager {
 	private static PoolableConnectionFactory postGISpoolableConnectionFactory;
 	private static PoolingDriver postGISdriver;
 
-	
+	private static String validationQUERY="Select 1";
 
 	private static String internalDBconnectionString=null; 
 
