@@ -39,6 +39,14 @@
 				</xsd:restriction>
 			</xsd:simpleType>
 
+			<xsd:simpleType name="exportOperation">
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="TRANSFER" />
+					<xsd:enumeration value="SAVE" />					
+				</xsd:restriction>
+			</xsd:simpleType>
+
+
 			<xsd:complexType name="exportCSVSettings">
 				<xsd:sequence>
 					<xsd:element name="encoding" type="xsd:string"
@@ -154,6 +162,10 @@
 			<xsd:complexType name="exportTableRequestType">
 				<xsd:sequence>
 					<xsd:element name="tableName" type="xsd:string"/>
+					<xsd:element name="operationType" type="tns:exportOperation"/>
+					<xsd:element name="user" type="xsd:string"/>
+					<xsd:element name="basketId" type="xsd:string"/>
+					<xsd:element name="toSaveName" type="xsd:string"/>
 					<xsd:element name="csvSettings" type="tns:exportCSVSettings"/>
 				</xsd:sequence>
 			</xsd:complexType>

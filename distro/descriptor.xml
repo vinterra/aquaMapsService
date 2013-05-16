@@ -18,6 +18,7 @@
 				<include>INSTALL</include>
 				<include>MAINTAINERS</include>
 				<include>changelog.xml</include>
+				<include>profile.xml</include>
 			</includes>
 			<fileMode>755</fileMode>
 			<filtered>true</filtered>
@@ -34,11 +35,6 @@
 		</dependencySet>	
 	</dependencySets>
 	<files>
-		<file>
-			<source>${configDirectory}/profile.xml</source>
-			<outputDirectory>/</outputDirectory>
-			<filtered>true</filtered>
-		</file>
 		<file>
 			<source>target/${build.finalName}.gar</source>
 			<outputDirectory>${serviceArtifactId}</outputDirectory>
