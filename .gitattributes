@@ -101,6 +101,7 @@ config/deploy-jndi-config.xml -text
 config/deploy-server.wsdd -text
 config/generator/ALog.properties -text
 config/generator/DestinationDBHibernate.cfg.xml -text
+config/profile.xml -text
 config/security_descriptor.xml -text
 distro/INSTALL -text
 distro/LICENSE -text
