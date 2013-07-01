@@ -105,19 +105,34 @@ public class AquaMapsManager extends SubmittedManager{
 		return toReturn;
 	}
 	
-	public static Map<String,String> getMetaForGIS(Submitted obj)throws Exception{
+	public static Map<String,String> getMetaForGIS(Submitted obj){
 		HashMap<String,String> toReturn=new HashMap<String,String>();
-		Resource hspec=SourceManager.getById(obj.getSourceHSPEC());
-		Resource hspen=SourceManager.getById(obj.getSourceHSPEN());
-		Resource hcaf=SourceManager.getById(obj.getSourceHCAF());
-		toReturn.put("ALGORITHM", hspec.getAlgorithm()+"");
 		toReturn.put("ALGORITHM CITATION",AquaMapsObject.CITATION);
-		toReturn.put("HSPEC TITLE", hspec.getTitle());
-		toReturn.put("HSPEC GENERATION TIME", ServiceUtils.formatTimeStamp(hspec.getGenerationTime()));
-		toReturn.put("HSPEN TITLE", hspen.getTitle());
-		toReturn.put("HSPEN GENERATION TIME", ServiceUtils.formatTimeStamp(hspen.getGenerationTime()));
-		toReturn.put("HCAF TITLE", hcaf.getTitle());
-		toReturn.put("HCAF GENERATION TIME", ServiceUtils.formatTimeStamp(hcaf.getGenerationTime()));
+		Resource hspec=null;
+		try {
+			hspec = SourceManager.getById(obj.getSourceHSPEC());
+			toReturn.put("ALGORITHM", hspec.getAlgorithm()+"");
+			toReturn.put("HSPEC TITLE", hspec.getTitle());
+			toReturn.put("HSPEC GENERATION TIME", ServiceUtils.formatTimeStamp(hspec.getGenerationTime()));
+		} catch (Exception e) {
+			logger.warn("Unable to find hspec for obj "+obj.getSearchId()+", "+e.getMessage());
+		}
+		Resource hspen=null;
+		try {
+			hspen = SourceManager.getById(obj.getSourceHSPEN());
+			toReturn.put("HSPEN TITLE", hspen.getTitle());
+			toReturn.put("HSPEN GENERATION TIME", ServiceUtils.formatTimeStamp(hspen.getGenerationTime()));
+		} catch (Exception e) {
+			logger.warn("Unable to find hspen for obj "+obj.getSearchId()+", "+e.getMessage());
+		}
+		Resource hcaf=null;
+		try {
+			hcaf = SourceManager.getById(obj.getSourceHCAF());
+			toReturn.put("HCAF TITLE", hcaf.getTitle());
+			toReturn.put("HCAF GENERATION TIME", ServiceUtils.formatTimeStamp(hcaf.getGenerationTime()));
+		} catch (Exception e) {
+			logger.warn("Unable to find hcaf for obj "+obj.getSearchId()+", "+e.getMessage());
+		}
 		return toReturn;
 	}
 }

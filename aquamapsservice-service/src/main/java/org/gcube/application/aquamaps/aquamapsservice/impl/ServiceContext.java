@@ -13,13 +13,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.FileSetUti
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesReader;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.enabling.Configuration;
-import org.gcube.application.aquamaps.enabling.Impl.ConfigurationImpl;
-import org.gcube.application.aquamaps.enabling.Impl.crawler.CrawlerMode;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.PublisherConfiguration;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
+import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.scope.GCUBEScope;
 
 
@@ -50,8 +49,8 @@ public class ServiceContext extends GCUBEServiceContext {
 	
 		//********PUBLISHER
 	private Publisher publisher;
-	private Configuration configuration;
-	private GCUBEScope configurationScope;
+	
+	private String configurationScope;
 	
 	@Override
 	protected void onReady() throws Exception{
@@ -69,9 +68,9 @@ public class ServiceContext extends GCUBEServiceContext {
 		try{
 //			int interval=Integer.parseInt(getProperty(PropertiesConstants.ISCRAWLER_INTERVAL_MINUTES));
 //			logger.debug("Interval time is "+interval);
-			configuration=ConfigurationImpl.get(CrawlerMode.SERVICE);			
-			configurationScope=GCUBEScope.getScope(configuration.getAvailableScopes().iterator().next()+"");
-			if(configurationScope==null) throw new Exception ("NO valid scope found");
+			GCUBEScope infrastructureScope=GHNContext.getContext().getStartScopes()[0].getInfrastructure();
+			configurationScope=ConfigurationManager.init(infrastructureScope);
+			
 			logger.trace("Configuration Scope will be "+configurationScope);
 		}catch (Exception e){
 			logger.fatal("Unable to init configuration",e);
@@ -80,7 +79,7 @@ public class ServiceContext extends GCUBEServiceContext {
 		
 		
 		try{
-			DBDescriptor publisherDB=configuration.getPublisherDataBase(configurationScope);
+			DBDescriptor publisherDB=ConfigurationManager.getVODescriptor().getPublisherDB();
 			logger.debug("Publisher Database is "+publisherDB);
 			publisher=Publisher.getPublisher();
 			PublisherConfiguration config= new PublisherConfiguration(
@@ -203,11 +202,7 @@ public class ServiceContext extends GCUBEServiceContext {
 		return persistencePath;
 	}
 	
-	public Configuration getConfiguration(){
-		return configuration;
-	}
-	
-	public GCUBEScope getConfigurationScope(){
+	public String getConfigurationScope(){
 		return configurationScope;
 	}
 }

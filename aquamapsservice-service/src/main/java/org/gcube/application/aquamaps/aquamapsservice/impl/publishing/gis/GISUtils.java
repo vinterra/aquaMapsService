@@ -18,15 +18,13 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.BadRequestException;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DataSourceDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.GeoServerDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.enabling.ParameterNotFoundException;
-import org.gcube.application.aquamaps.enabling.ScopeNotFoundException;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
-import org.gcube.application.aquamaps.enabling.model.DataSourceDescriptor;
-import org.gcube.application.aquamaps.enabling.model.GeoServerDescriptor;
-import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.geoserverinterface.GeoCaller;
 import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeonetworkCategory;
@@ -182,14 +180,12 @@ public class GISUtils {
 
 
 
-	public static GeoServerDescriptor getGeoServer() throws ParameterNotFoundException, ScopeNotFoundException{
-		GCUBEScope scope=ServiceContext.getContext().getConfigurationScope();
-		return ServiceContext.getContext().getConfiguration().getGeoServers(scope).get(0);
+	public static GeoServerDescriptor getGeoServer() throws Exception{		
+		return ConfigurationManager.getVODescriptor().getGeoServers().get(0);
 	}
 
-	public static DataSourceDescriptor getGeoNetwork() throws ParameterNotFoundException, ScopeNotFoundException{
-		GCUBEScope scope=ServiceContext.getContext().getConfigurationScope();
-		return ServiceContext.getContext().getConfiguration().getGeoNetwork(scope);
+	public static DataSourceDescriptor getGeoNetwork() throws Exception{		
+		return ConfigurationManager.getVODescriptor().getGeoNetwork();
 
 	}
 
@@ -266,7 +262,7 @@ public class GISUtils {
 	private static String createLayerTable(String appTableName,String layerName,String featureLabel,DBSession session)throws Exception{
 
 		String featureTable=ServiceUtils.generateId("L"+layerName, "").replaceAll(" ", "").replaceAll("_","").replaceAll("-","").toLowerCase();
-		String worldTable=DBSession.getPostGisCredentials().getProperty(DBDescriptor.AQUAMAPS_WORLD_TABLE);
+		String worldTable=ConfigurationManager.getVODescriptor().getGeoDb().getProperty(DBDescriptor.AQUAMAPS_WORLD_TABLE);
 		logger.trace("Creating table "+featureTable);
 		session.executeUpdate("Create table "+featureTable+" AS (Select "+
 				worldTable+".*, app."+featureLabel+

@@ -10,12 +10,13 @@ import java.util.concurrent.Semaphore;
 
 import javax.imageio.ImageIO;
 
-
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
@@ -52,8 +53,9 @@ public class AnalysisWorker extends Thread{
 			try{
 				analyzer=AnalyzerManager.getBatch();
 				logger.debug("Got batch Id "+analyzer.getReportId());
+				DBDescriptor internalDB=ConfigurationManager.getVODescriptor().getInternalDB();
 				analyzer.setConfiguration(ServiceContext.getContext().getFile("generator", false).getAbsolutePath()+File.separator, 
-						DBSession.getInternalCredentials());
+						internalDB);
 
 				//********** START PROCESS INIT
 				AnalysisTableManager.addReportId(analyzer.getReportId(),toPerform.getId());		 

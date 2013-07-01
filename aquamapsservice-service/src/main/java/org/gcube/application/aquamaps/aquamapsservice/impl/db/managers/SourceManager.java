@@ -11,6 +11,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.SourceImporter;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportCSVSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -19,7 +21,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Met
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
@@ -325,7 +326,7 @@ public class SourceManager {
 				lastId=rs.getInt(MetaSourceFields.searchid+"");
 				rs.close();
 			}
-			DBDescriptor dbDescr=DBSession.getInternalCredentials();
+			DBDescriptor dbDescr=ConfigurationManager.getVODescriptor().getInternalDB();
 			int numTableSpaces=Integer.parseInt(dbDescr.getProperty(DBDescriptor.TABLESPACE_COUNT));
 			int toUseTableSpace=((lastId+1) % numTableSpaces)+1;
 			String toReturn=dbDescr.getProperty(DBDescriptor.TABLESPACE_PREFIX)+toUseTableSpace;

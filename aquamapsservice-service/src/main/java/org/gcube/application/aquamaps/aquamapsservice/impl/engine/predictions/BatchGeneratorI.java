@@ -1,9 +1,9 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory.BatchPoolType;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 
 public interface BatchGeneratorI {
 	

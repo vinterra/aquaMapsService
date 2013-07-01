@@ -17,6 +17,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.Ba
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -273,7 +274,7 @@ public class JobWorker extends Thread{
 		try{
 			logger.trace("Requesting batch generator for custom HSPEC");
 			generator=EnvironmentalLogicManager.getBatch(ServiceContext.getContext().getName());			
-			generator.setConfiguration(ServiceContext.getContext().getEcoligicalConfigDir()+File.separator, DBSession.getInternalCredentials());
+			generator.setConfiguration(ServiceContext.getContext().getEcoligicalConfigDir()+File.separator, ConfigurationManager.getVODescriptor().getInternalDB());
 			return generator.generateHSPECTable(JobManager.getWorkingHCAF(jobId),
 					JobManager.getWorkingHSPEN(jobId), "maxminlat_"+sourceHspen, algorithm,false, "");
 		}catch(Exception e){

@@ -56,6 +56,7 @@ import org.gcube.common.core.porttypes.GCUBEPortType;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
+import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.dataanalysis.ecoengine.utils.ResourceFactory;
 import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
@@ -367,6 +368,9 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			String csvLocation=ServiceContext.getContext().getFolderPath(FOLDERS.IMPORTS)+File.separator+ServiceUtils.generateId("import", ".csv");
 			
 			FileWriter writer=new FileWriter(csvLocation);
+			logger.trace("Scope provider value : "+ScopeProvider.instance.get());
+			
+			
 			FileInputStream is=new FileInputStream(RSWrapper.getStreamFromLocator(new URI(arg0.getRsLocator())));
 			IOUtils.copy(is, writer, arg0.getCsvSettings().getEncoding());
 			IOUtils.closeQuietly(writer);
