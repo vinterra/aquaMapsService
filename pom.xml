@@ -7,7 +7,7 @@
   </parent>
   <groupId>org.gcube.application</groupId>
   <artifactId>aquamapsservice</artifactId>
-  <version>4.1.1-SNAPSHOT</version>
+  <version>4.1.2-SNAPSHOT</version>
   <name>aquamapsservice</name>
    <properties>
    		<stubsArtifactId>aquamapsservice-stubs</stubsArtifactId>

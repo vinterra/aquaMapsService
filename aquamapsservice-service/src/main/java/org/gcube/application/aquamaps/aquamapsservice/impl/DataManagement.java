@@ -3,16 +3,11 @@ package org.gcube.application.aquamaps.aquamapsservice.impl;
 import gr.uoa.di.madgik.commons.utils.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.net.URI;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.ExportManager;
@@ -23,7 +18,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis.Analy
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables.TableGenerationExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CustomQueryDescriptorStubs;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.DataManagementPortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportTableRequestType;
@@ -56,7 +50,6 @@ import org.gcube.common.core.porttypes.GCUBEPortType;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
-import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.dataanalysis.ecoengine.utils.ResourceFactory;
 import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
@@ -69,8 +62,18 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		return ServiceContext.getContext();
 	}
 
-	
-
+	@Override
+	public org.gcube_system.namespaces.application.aquamaps.types.Resource getResourceInfo(org.gcube_system.namespaces.application.aquamaps.types.Resource myResource) throws GCUBEFault{
+		Resource toReturn=new Resource(myResource);		
+		
+		try{
+		
+		return SourceManager.getById(toReturn.getSearchId()).toStubsVersion();
+		}catch(Exception e){
+			logger.error("Unable to load source details. id: "+myResource.getSearchId(), e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
+	}
 
 	@Override
 	public int generateMaps(GenerateMapsRequestType arg0) throws RemoteException,GCUBEFault{
@@ -365,18 +368,8 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			throws RemoteException, GCUBEFault {
 		try{
 			logger.trace("Importing resource , user : "+arg0.getUser()+", locator :"+arg0.getRsLocator());
-			String csvLocation=ServiceContext.getContext().getFolderPath(FOLDERS.IMPORTS)+File.separator+ServiceUtils.generateId("import", ".csv");
 			
-			FileWriter writer=new FileWriter(csvLocation);
-			logger.trace("Scope provider value : "+ScopeProvider.instance.get());
-			
-			
-			FileInputStream is=new FileInputStream(RSWrapper.getStreamFromLocator(new URI(arg0.getRsLocator())));
-			IOUtils.copy(is, writer, arg0.getCsvSettings().getEncoding());
-			IOUtils.closeQuietly(writer);
-			IOUtils.closeQuietly(is);
-			logger.trace("CSV imported into "+csvLocation);
-			return SourceManager.importFromCSVFile(csvLocation, arg0);
+			return SourceManager.importFromCSVFile(arg0);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

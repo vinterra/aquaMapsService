@@ -175,11 +175,6 @@
 			<xsd:element name="getResourceListResponse" type="xsd:string" />
 
 
-			<xsd:element name="getResourceInfoRequest" type="aqtypes:resource" />
-
-			<xsd:element name="getResourceInfoResponse" type="aqtypes:resource" />
-
-
 
 			<xsd:element name="getSpeciesEnvelopRequest" type="tns:getSpeciesEnvelopeRequestType" />
 			<xsd:element name="getSpeciesEnvelopResponse" type="aqtypes:fieldArray" />
@@ -295,12 +290,6 @@
 		<part name="response" element="tns:getResourceListResponse" />
 	</message>
 
-	<message name="GetResourceInfoRequest">
-		<part name="request" element="tns:getResourceInfoRequest" />
-	</message>
-	<message name="GetResourceInfoResponse">
-		<part name="response" element="tns:getResourceInfoResponse" />
-	</message>
 
 	<message name="LoadSubmittedByIdRequest">
 		<part name="request" element="tns:loadSubmittedByIdRequest" />
@@ -401,11 +390,6 @@
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
 
-		<wsdl:operation name="getResourceInfo">
-			<input message="tns:GetResourceInfoRequest" />
-			<output message="tns:GetResourceInfoResponse" />
-			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
-		</wsdl:operation>
 
 		<wsdl:operation name="loadSubmittedById">
 			<input message="tns:LoadSubmittedByIdRequest" />

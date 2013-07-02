@@ -217,15 +217,13 @@ public class SourceManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-	public static Integer importFromCSVFile(final String csvFile,ImportResourceRequestType request)throws Exception{
+	public static Integer importFromCSVFile(ImportResourceRequestType request)throws Exception{
 		DBSession session=null;
 		try{
 			ResourceType type=ResourceType.valueOf(request.getResourceType());
 			session=DBSession.getInternalDBSession();
-			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();
-			logger.debug("Importing "+csvFile+" to TABLE "+tableName+" [ "+type+" ]");
-			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());
-			
+			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();			
+			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());			
 			Resource toRegister=new Resource(type, 0);
 			toRegister.setAuthor(request.getUser());
 			toRegister.setDefaultSource(false);
@@ -237,7 +235,7 @@ public class SourceManager {
 			toRegister.setRowCount(0l);
 			toRegister=registerSource(toRegister);
 			ExportCSVSettings settings=request.getCsvSettings();
-			SourceImporter t=new SourceImporter(csvFile, toRegister,getDefaultId(type),settings.getDelimiter().charAt(0),
+			SourceImporter t=new SourceImporter(request.getRsLocator(), toRegister,getDefaultId(type),settings.getDelimiter().charAt(0),
 					settings.getFieldsMask(),settings.isHasHeader(),settings.getEncoding());
 			t.start();
 			return toRegister.getSearchId();

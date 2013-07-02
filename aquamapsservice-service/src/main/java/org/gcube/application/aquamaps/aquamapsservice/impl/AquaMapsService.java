@@ -59,6 +59,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		return ServiceContext.getContext();
 	}
 
+	@Override
 	public String getPhylogeny(GetPhylogenyRequestType req) throws GCUBEFault{
 		try{
 			Field toSelect= new Field(req.getToSelect());
@@ -68,7 +69,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
-
+	@Override
 	public int deleteSubmitted(StringArray submittedIds)throws GCUBEFault{
 		int toReturn=0;
 		if((submittedIds!=null)&&(submittedIds.getItems()!=null))
@@ -85,7 +86,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 
 
-
+	@Override
 	public FieldArray calculateEnvelope(CalculateEnvelopeRequestType req)throws GCUBEFault{
 		logger.trace("Serving calculateEnvelope");
 		try{
@@ -132,6 +133,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
+	@Override
 	public FieldArray calculateEnvelopefromCellSelection(CalculateEnvelopefromCellSelectionRequestType request)throws GCUBEFault{
 		logger.trace("Serving calculateEnvelopefromCellSelection for speciesID : "+request.getSpeciesID());
 		try{
@@ -156,7 +158,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
-
+	@Override
 	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
 		try{
 			return CellManager.getJSONOccurrenceCells(request.getSpeciesID(),request.getPagedRequestSettings()); 
@@ -165,7 +167,9 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}
 	}
-
+	
+	
+	@Override	
 	public String submitJob(org.gcube_system.namespaces.application.aquamaps.types.Job req)throws GCUBEFault{
 		try{
 			logger.trace("Serving submit job "+req.getName());
@@ -194,7 +198,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 
 
 
-
+	@Override
 	public FieldArray getSpeciesEnvelop(GetSpeciesEnvelopeRequestType arg0)throws GCUBEFault{
 		logger.trace("serving get Species envelope");
 		try{
@@ -217,7 +221,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	 */
 
 
-
+	@Override
 	public String getSpeciesByFilters(GetSpeciesByFiltersRequestType req) throws GCUBEFault{
 		logger.trace("Serving getSpecies by filters");
 		
@@ -233,19 +237,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	}
 
 
-
-	public org.gcube_system.namespaces.application.aquamaps.types.Resource getResourceInfo(org.gcube_system.namespaces.application.aquamaps.types.Resource myResource) throws GCUBEFault{
-		Resource toReturn=new Resource(myResource);		
-		
-		try{
-		
-		return SourceManager.getById(toReturn.getSearchId()).toStubsVersion();
-		}catch(Exception e){
-			logger.error("Unable to load source details. id: "+myResource.getSearchId(), e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}
-	}
-
+	@Override
 	public String getResourceList(GetResourceListRequestType req) throws GCUBEFault{
 		logger.debug("entroin getResourceList");
 		try{
@@ -259,7 +251,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	}
 
 
-
+	@Override
 	public String getAquaMapsPerUser(GetAquaMapsPerUserRequestType arg0)throws GCUBEFault{
 		logger.trace("Serving get submitted ..");
 		try{
@@ -294,7 +286,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			throw new GCUBEFault("ServerSide Msg: "+e.getMessage());
 		} 
 	}
-
+	
+	@Override
 	public VOID markSaved(StringArray ids)throws GCUBEFault{
 		try{
 			if((ids!=null)&&(ids.getItems()!=null))
@@ -307,6 +300,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		
 	}
 
+	@Override
 	public org.gcube_system.namespaces.application.aquamaps.types.Submitted loadSubmittedById(int arg0) throws RemoteException,
 			GCUBEFault {
 		try{
@@ -320,6 +314,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
+	
+	@Override
 	public AquaMap getObject(int arg0) throws RemoteException, GCUBEFault {
 		try{
 			AquaMapsObject obj=AquaMapsManager.loadObject(arg0,true,true);

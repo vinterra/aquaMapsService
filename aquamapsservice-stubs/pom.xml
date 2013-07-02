@@ -3,7 +3,7 @@
   <parent>
     <artifactId>aquamapsservice</artifactId>
     <groupId>org.gcube.application</groupId>
-    <version>4.1.1-SNAPSHOT</version>
+    <version>4.1.2-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <artifactId>aquamapsservice-stubs</artifactId>
