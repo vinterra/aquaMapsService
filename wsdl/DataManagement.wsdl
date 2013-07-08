@@ -46,6 +46,12 @@
 				</xsd:restriction>
 			</xsd:simpleType>
 
+			<xsd:simpleType name="viewTableFormat">
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="JSON" />					
+				</xsd:restriction>
+			</xsd:simpleType>
+
 
 			<xsd:complexType name="exportCSVSettings">
 				<xsd:sequence>
@@ -107,11 +113,7 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-			<xsd:complexType name="getJSONSubmittedHSPECRequestType">
-				<xsd:sequence>
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
-				</xsd:sequence>
-			</xsd:complexType>
+			
 
 
 			<xsd:complexType name="getGenerationLiveReportResponseType">
@@ -180,14 +182,22 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-			<xsd:complexType name="getJSONSubmittedAnalysisRequestType">
+			
+
+			<xsd:complexType name="viewTableRequestType">
 				<xsd:sequence>
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
+					<xsd:element name="tablename" type="xsd:string"/>
+					<xsd:element name="settings" type="aqtypes:pagedRequestSettings"/>
+					<xsd:element name="filter" type="aqtypes:fieldArray"/>
+					<xsd:element name="format" type="tns:viewTableFormat"/>
 				</xsd:sequence>
 			</xsd:complexType>
 
 			<!-- Data management request elements -->
 
+			<xsd:element name="viewTableRequest" type="tns:viewTableRequestType"/>
+			<xsd:element name="viewTableResponse" type="xsd:string"/>
+			
 
 			<xsd:element name="generateMapsRequest" type="tns:generateMapsRequestType" />
 			<xsd:element name="generateMapsResponse" type="xsd:int" />
@@ -201,8 +211,7 @@
 			<xsd:element name="removeHSPECGroupResponse"
 				type="tns:removeHSPECGroupGenerationRequestResponseType" />
 
-			<xsd:element name="getJSONSubmittedHSPECRequest" type="aqtypes:pagedRequestSettings" />
-			<xsd:element name="getJSONSubmittedHSPECResponse" type="xsd:string" />
+			
 
 			<xsd:element name="getGenerationLiveReportRequest" type="coretypes:stringArray" />
 			<xsd:element name="getGenerationLiveReportResponse"
@@ -259,9 +268,7 @@
 			<xsd:element name="analyzeTablesRequest" type="aqtypes:analysis" />
 			<xsd:element name="analyzeTablesResponse" type="xsd:string" />
 
-			<xsd:element name="getJSONSubmittedAnalysisRequest" type="aqtypes:pagedRequestSettings" />
-			<xsd:element name="getJSONSubmittedAnalysisResponse"
-				type="xsd:string" />
+			
 
 			<xsd:element name="loadAnalysisRequest" type="xsd:string" />
 			<xsd:element name="loadAnalysisResponse" type="xsd:string" />
@@ -275,7 +282,12 @@
 
 	<!-- DATA management messages -->
 
-
+	<message name="ViewTableRequest">
+		<part name="request" element="tns:viewTableRequest" />
+	</message>
+	<message name="ViewTableResponse">
+		<part name="response" element="tns:viewTableResponse" />
+	</message>
 
 	<message name="GenerateMapsRequest">
 		<part name="request" element="tns:generateMapsRequest" />
@@ -299,12 +311,6 @@
 		<part name="response" element="tns:removeHSPECGroupResponse" />
 	</message>
 
-	<message name="GetJSONSubmittedHSPECRequest">
-		<part name="request" element="tns:getJSONSubmittedHSPECRequest" />
-	</message>
-	<message name="GetJSONSubmittedHSPECResponse">
-		<part name="response" element="tns:getJSONSubmittedHSPECResponse" />
-	</message>
 
 	<message name="GetGenerationLiveReportRequest">
 		<part name="request" element="tns:getGenerationLiveReportRequest" />
@@ -412,12 +418,6 @@
 		<part name="response" element="tns:analyzeTablesResponse" />
 	</message>
 
-	<message name="GetJSONSubmittedAnalysisRequest">
-		<part name="request" element="tns:getJSONSubmittedAnalysisRequest" />
-	</message>
-	<message name="GetJSONSubmittedAnalysisResponse">
-		<part name="response" element="tns:getJSONSubmittedAnalysisResponse" />
-	</message>
 
 	<message name="LoadAnalysisRequest">
 		<part name="request" element="tns:loadAnalysisRequest" />
@@ -436,12 +436,21 @@
 
 
 	<portType name="DataManagementPortType">
+		
+		<wsdl:operation name="viewTable">
+			<wsdl:input message="tns:ViewTableRequest" />
+			<wsdl:output message="tns:ViewTableResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+
 
 		<wsdl:operation name="generateMaps">
 			<wsdl:input message="tns:GenerateMapsRequest" />
 			<wsdl:output message="tns:GenerateMapsResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		
+		
 		<wsdl:operation name="GenerateHSPECGroup">
 			<wsdl:input message="tns:HSPECGroupGenerationRequest" />
 			<wsdl:output message="tns:HSPECGroupGenerationResponse" />
@@ -452,11 +461,7 @@
 			<wsdl:output message="tns:RemoveHSPECGroupResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		<wsdl:operation name="GetJSONSubmittedHSPECGroup">
-			<wsdl:input message="tns:GetJSONSubmittedHSPECRequest" />
-			<wsdl:output message="tns:GetJSONSubmittedHSPECResponse" />
-			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
-		</wsdl:operation>
+		
 		<wsdl:operation name="GetGenerationLiveReportGroup">
 			<wsdl:input message="tns:GetGenerationLiveReportRequest" />
 			<wsdl:output message="tns:GetGenerationLiveReportResponse" />
@@ -542,11 +547,6 @@
 			<wsdl:output message="tns:AnalyzeTablesResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
-		<wsdl:operation name="GetJSONSubmittedAnalysis">
-			<wsdl:input message="tns:GetJSONSubmittedAnalysisRequest" />
-			<wsdl:output message="tns:GetJSONSubmittedAnalysisResponse" />
-			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
-		</wsdl:operation>
 		<wsdl:operation name="LoadAnalysis">
 			<wsdl:input message="tns:LoadAnalysisRequest" />
 			<wsdl:output message="tns:LoadAnalysisResponse" />
@@ -557,5 +557,8 @@
 			<wsdl:output message="tns:DeleteAnalysisResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		
+		
+		
 	</portType>
 </definitions>
