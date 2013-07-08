@@ -68,7 +68,7 @@ public class SourceImporter extends Thread {
 		try{		
 			//Read File from RS
 			csv=ServiceContext.getContext().getFolderPath(FOLDERS.IMPORTS)+File.separator+ServiceUtils.generateId("import", ".csv");			
-			logger.debug("Importing file from locator "+locator+" to file "+csv);
+			logger.debug("Importing file from locator "+locator+" to file "+csv+" under scope "+scope);
 			
 			ScopeProvider.instance.set(scope);
 			

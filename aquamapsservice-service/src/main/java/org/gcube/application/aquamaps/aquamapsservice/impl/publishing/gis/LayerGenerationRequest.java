@@ -23,7 +23,7 @@ public class LayerGenerationRequest {
 	private List<StyleGenerationRequest> toGenerateStyles=new ArrayList<StyleGenerationRequest>();
 	private List<String> toAssociateStyles=new ArrayList<String>();
 	private int defaultStyle=0;
-	private Map<String,String> meta;	
+	private Map<String,Object> meta;	
 	//************ Generated Layer references
 	
 
@@ -41,7 +41,7 @@ public class LayerGenerationRequest {
 	public LayerGenerationRequest(String csvFile, String featureLabel,
 			String featureDefinition, String mapName, LayersType mapType,
 			List<StyleGenerationRequest> toGenerateStyles,
-			List<String> toAssociateStyles, int defaultStyle,Map<String,String> meta) {
+			List<String> toAssociateStyles, int defaultStyle,Map<String,Object> meta) {
 		super();
 		this.csvFile = csvFile;
 		this.featureLabel = featureLabel;
@@ -165,7 +165,7 @@ public class LayerGenerationRequest {
 
 
 
-	public Map<String, String> getMeta() {
+	public Map<String, Object> getMeta() {
 		return meta;
 	}
 

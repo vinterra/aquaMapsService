@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,7 +38,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Spe
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube.application.aquamaps.publisher.MetaInformations;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.datageneration.ObjectManager;
@@ -48,6 +49,7 @@ import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.types.LayersType;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class Generator<T> implements ObjectManager<T> {
 	private static final GCUBELog logger = new GCUBELog(Generator.class);
@@ -137,10 +139,43 @@ public class Generator<T> implements ObjectManager<T> {
 			toAssociateStyleList.add(StyleGenerationRequest.getDefaultDistributionStyle());
 		}
 
-		//Meta Data 
-		Map<String,String> meta=AquaMapsManager.getMetaForGIS(object);
+		//Meta Data
+		logger.debug("Loading metadata details for OBJ ID "+object.getSearchId());
+		Map<String,Object> meta=AquaMapsManager.getMetaForGIS(object);
 		
 		
+		//Filling meta with additional details
+		//Static image uris
+		
+		ArrayList<String> imgUris=new ArrayList<String>();
+		FileSet fs=ServiceContext.getContext().getPublisher().getById(FileSet.class, object.getFileSetId());
+		String publisherHost=ServiceContext.getContext().getPublisher().getWebServerUrl();
+		for(org.gcube.application.aquamaps.publisher.impl.model.File f:fs.getFiles()){
+			imgUris.add(publisherHost+f.getStoredUri());
+		}
+		meta.put(AquaMapsManager.META_FILESET_URIS, imgUris);
+		//Set geometryCount
+		meta.put(AquaMapsManager.META_GEOMETRY_COUNT, new Integer(CSVUtils.countCSVRows(data.getCsvFile(), ',', true).intValue()));
+		//Set keywords
+		HashMap<String,HashSet<String>> keyMap=new HashMap<String, HashSet<String>>();
+		
+		for(String s:CSVUtils.CSVToStringList(data.getSpeciesCSVList())){
+			Map<String,String> speciesNames=SpeciesManager.getSpeciesNamesById(s);
+			for(Entry<String,String> speciesName:speciesNames.entrySet()){
+				if(speciesName.getValue()!=null){
+					if(!keyMap.containsKey(speciesName.getKey())) keyMap.put(speciesName.getKey(), new HashSet<String>());
+					keyMap.get(speciesName.getKey()).add(speciesName.getValue());
+				}
+			}
+		}
+		HashSet<String> generalKeys=new HashSet<String>();
+		generalKeys.add("AquaMaps");
+		generalKeys.add("iMarine");
+		generalKeys.add("Ecological niche modelling");
+		generalKeys.add(object.getType()+"");
+		keyMap.put("General", generalKeys);
+		
+		meta.put(AquaMapsManager.META_KEYWORDS_MAP, keyMap);
 		
 		//RETRY POLICY IN CASE OF GEOSERVER FAIL
 		boolean generated=false;

@@ -24,15 +24,45 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Hsp
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 
 public class SpeciesManager {
 
 	private static GCUBELog logger= new GCUBELog(SpeciesManager.class);
 	public static final String speciesOccurSum="speciesoccursum";
 	
+	public static final String CATALOG_OF_LIFE="CATALOG OF LIFE";
+	public static final String FISHBASE="FISHBASE";
+	public static final String IRMNG="IRMNG";
+	public static final String ITIS="ITIS";
+	public static final String THREE_A_CODE="3A Code";
+	public static final String WORMS="WORMS";
+	public static final String OBIS="OBIS";
 	
+	
+	
+	public static Map<String,String> getSpeciesNamesById(String speciesId) throws SQLException, Exception{
+		DBSession session=null;
+		try{
+			session=DBSession.getInternalDBSession();
+			List<Field> filters=new ArrayList<Field>();
+			filters.add(new Field(SpeciesOccursumFields.speciesid+"", speciesId, FieldType.STRING));
+			ResultSet rs=session.executeFilteredQuery(filters, "namedSpecies", SpeciesOccursumFields.speciesid+"", OrderDirection.ASC);
+			HashMap<String,String> toReturn=new HashMap<String, String>();
+			if(rs.next()){
+				toReturn.put(CATALOG_OF_LIFE, rs.getString("col_id"));
+				toReturn.put(FISHBASE, rs.getString("fbname"));
+				toReturn.put(IRMNG, rs.getString("irmng_id"));
+				toReturn.put(ITIS, rs.getString("itis_id"));
+				toReturn.put(THREE_A_CODE, rs.getString("3a_code"));
+				toReturn.put(WORMS, rs.getString("worms_id"));
+				toReturn.put(OBIS, rs.getString("genus")+" "+rs.getString("species"));
+			}else logger.debug("Unable to find species names for "+speciesId);
+			return toReturn;
+		}finally{if(session!=null) session.close();}
+	}
 	
 	public static Species getSpeciesById(boolean fetchStatic,boolean fetchEnvelope, String id, int hspenId) throws Exception{
 		DBSession session=null;

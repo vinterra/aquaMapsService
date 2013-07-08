@@ -43,12 +43,13 @@ public class AquaMapsObjectWorker extends Thread {
 			if(request.getObject().getIsCustomized()||request.getObject().isForceRegeneration()){
 				descriptor.setCustomized(request.getObject().getIsCustomized());
 					fileSetID=publisher.store(FileSet.class, fileSetGenerator,new StoreConfiguration(StoreMode.UPDATE_EXISTING, new UpdateConfiguration(true, true, true)) ,descriptor).getStoredId().getId();
+					request.getObject().setFileSetId(fileSetID); //needed to generate gismetadata
 					if(request.getObject().getGisEnabled())layerID=publisher.store(Layer.class, layerGenrator,new StoreConfiguration(StoreMode.UPDATE_EXISTING, new UpdateConfiguration(true, true, true)) ,descriptor).getStoredId().getId();
 			}else {
 				fileSetID=publisher.get(FileSet.class, fileSetGenerator, descriptor).get().getId();
+				request.getObject().setFileSetId(fileSetID); //needed to generate gismetadata
 				if(request.getObject().getGisEnabled())layerID=publisher.get(Layer.class, layerGenrator, descriptor).get().getId();
 			}
-			request.getObject().setFileSetId(fileSetID);
 			request.getObject().setGisPublishedId(layerID);
 			SubmittedManager.update(request.getObject());
 			SubmittedManager.updateStatus(request.getObject().getSearchId(), SubmittedStatus.Completed);

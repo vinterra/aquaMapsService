@@ -17,10 +17,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.Si
 import org.gcube.application.aquamaps.aquamapsservice.stubs.AquaMapsServicePortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.CalculateEnvelopefromCellSelectionRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetAquaMapsPerUserRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetOccurrenceCellsRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetPhylogenyRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.GetResourceListRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesByFiltersRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetSpeciesEnvelopeRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
@@ -30,7 +27,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.C
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
@@ -38,14 +34,14 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Area
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube_system.namespaces.application.aquamaps.types.AquaMap;
-import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
+import org.gcube_system.namespaces.application.aquamaps.types.AquaMap;
+import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 
 
 public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePortType{
@@ -158,15 +154,15 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		}
 	}
 
-	@Override
-	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
-		try{
-			return CellManager.getJSONOccurrenceCells(request.getSpeciesID(),request.getPagedRequestSettings()); 
-		} catch (Exception e){
-			logger.error("General Exception, unable to serve request",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}
-	}
+//	@Override
+//	public String getOccurrenceCells(GetOccurrenceCellsRequestType request)throws GCUBEFault{
+//		try{
+//			return CellManager.getJSONOccurrenceCells(request.getSpeciesID(),request.getPagedRequestSettings()); 
+//		} catch (Exception e){
+//			logger.error("General Exception, unable to serve request",e);
+//			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+//		}
+//	}
 	
 	
 	@Override	
@@ -237,55 +233,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	}
 
 
-	@Override
-	public String getResourceList(GetResourceListRequestType req) throws GCUBEFault{
-		logger.debug("entroin getResourceList");
-		try{
-			
-			return SourceManager.getJsonList(Field.load(req.getFilters()),
-					 req.getPagedRequestSettings());
-		}catch(Exception e){
-			logger.error("Errors while performing getResourceList operation",e);
-			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-		}
-	}
 
 
-	@Override
-	public String getAquaMapsPerUser(GetAquaMapsPerUserRequestType arg0)throws GCUBEFault{
-		logger.trace("Serving get submitted ..");
-		try{
-		
-			ArrayList<Field> parameters=new ArrayList<Field>();		
-			
-			parameters.add(new Field(SubmittedFields.author+"",arg0.getUserID(),FieldType.STRING));
-			parameters.add(new Field(SubmittedFields.isaquamap+"",arg0.isAquamaps()+"",FieldType.BOOLEAN));
-			parameters.add(new Field(SubmittedFields.todelete+"",false+"",FieldType.BOOLEAN));
-			if(arg0.isJobIdEnabled()) {
-				parameters.add(new Field(SubmittedFields.jobid+"",arg0.getJobIdValue()+"",FieldType.INTEGER));
-			}
-			if(arg0.isDateEnabled()) {
-				parameters.add(new Field(SubmittedFields.submissiontime+"",arg0.getDateValue(),FieldType.INTEGER));
-			}
-			if(arg0.isObjectStatusEnabled()) {
-				parameters.add(new Field(SubmittedFields.status+"",arg0.getObjectStatusValue(),FieldType.STRING));
-			}
-			if(arg0.isTypeEnabled()){
-				parameters.add(new Field(SubmittedFields.type+"",arg0.getTypeValue(),FieldType.STRING));			
-			}
-			if(arg0.isJobStatusEnabled()){
-				throw new GCUBEFault("JOB STATUS filter is not yet supported");
-			}
-			logger.trace("Filtering parameters : ");
-			for(Field f:parameters)
-				logger.trace(f.getName()+" = "+f.getValue()+" ("+f.getType()+")");
-			
-			return SubmittedManager.getJsonList(parameters,arg0.getPagedRequestSettings()); 			
-		}catch(Exception e ){
-			logger.error("Exception while trying to serve -getAquaMapsPerUser : user = "+arg0.getUserID(),e);
-			throw new GCUBEFault("ServerSide Msg: "+e.getMessage());
-		} 
-	}
 	
 	@Override
 	public VOID markSaved(StringArray ids)throws GCUBEFault{
