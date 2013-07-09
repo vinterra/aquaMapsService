@@ -219,6 +219,16 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			toEdit.setDefaultSource(request.getDefaultSource());
 			toEdit.setDisclaimer(request.getDisclaimer());
 			toEdit.setProvenance(request.getProvenance());
+			if(toEdit.getType().equals(ResourceType.HSPEC)&&request.getSourceHSPENIds().size()>0){
+				
+				toEdit.setSourceHSPENIds(request.getSourceHSPENIds());
+				toEdit.setSourceHSPENTables(request.getSourceHSPENTables());
+			}
+			if((toEdit.getType().equals(ResourceType.HSPEC)||toEdit.getType().equals(ResourceType.HSPEN))&&request.getSourceHSPENIds().size()>0){
+				toEdit.setSourceHCAFIds(request.getSourceHCAFIds());
+				toEdit.setSourceHCAFTables(request.getSourceHCAFTables());
+			}
+				
 			SourceManager.update(toEdit);
 			return arg0;
 		}catch(Exception e){
