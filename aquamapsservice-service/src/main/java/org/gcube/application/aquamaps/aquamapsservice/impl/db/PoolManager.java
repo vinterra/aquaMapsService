@@ -9,7 +9,8 @@ import org.apache.commons.dbcp.PoolableConnectionFactory;
 import org.apache.commons.dbcp.PoolingDriver;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.commons.pool.impl.StackKeyedObjectPoolFactory;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class PoolManager {
@@ -32,7 +33,7 @@ public class PoolManager {
 	private static PoolableConnectionFactory postGISpoolableConnectionFactory;
 	private static PoolingDriver postGISdriver;
 
-	
+	private static String validationQUERY="Select 1";
 
 	private static String internalDBconnectionString=null; 
 
@@ -40,9 +41,8 @@ public class PoolManager {
 	static{
 		//MYSQL
 
-		try{
-
-			DBDescriptor internalDBDescriptor=DBSession.getInternalCredentials();
+		try{			
+			DBDescriptor internalDBDescriptor=ConfigurationManager.getVODescriptor().getInternalDB();
 		try {
 			switch(internalDBDescriptor.getType()){
 			case mysql:	Class.forName("com.mysql.jdbc.Driver");
@@ -74,7 +74,7 @@ public class PoolManager {
 
 		//POSTGIS
 
-		DBDescriptor postgisDBDescriptor=DBSession.getPostGisCredentials();
+		DBDescriptor postgisDBDescriptor=ConfigurationManager.getVODescriptor().getGeoDb();
 		
 		try {
 			Class.forName("org.postgresql.Driver");

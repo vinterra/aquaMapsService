@@ -11,6 +11,8 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.SourceImporter;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportCSVSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
@@ -19,7 +21,6 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Met
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
@@ -216,15 +217,13 @@ public class SourceManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-	public static Integer importFromCSVFile(final String csvFile,ImportResourceRequestType request)throws Exception{
+	public static Integer importFromCSVFile(ImportResourceRequestType request)throws Exception{
 		DBSession session=null;
 		try{
 			ResourceType type=ResourceType.valueOf(request.getResourceType());
 			session=DBSession.getInternalDBSession();
-			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();
-			logger.debug("Importing "+csvFile+" to TABLE "+tableName+" [ "+type+" ]");
-			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());
-			
+			final String tableName=ServiceUtils.generateId(type+"", "").toLowerCase();			
+			session.createLikeTable(tableName, getById(getDefaultId(type)).getTableName());			
 			Resource toRegister=new Resource(type, 0);
 			toRegister.setAuthor(request.getUser());
 			toRegister.setDefaultSource(false);
@@ -236,7 +235,7 @@ public class SourceManager {
 			toRegister.setRowCount(0l);
 			toRegister=registerSource(toRegister);
 			ExportCSVSettings settings=request.getCsvSettings();
-			SourceImporter t=new SourceImporter(csvFile, toRegister,getDefaultId(type),settings.getDelimiter().charAt(0),
+			SourceImporter t=new SourceImporter(request.getRsLocator(), toRegister,getDefaultId(type),settings.getDelimiter().charAt(0),
 					settings.getFieldsMask(),settings.isHasHeader(),settings.getEncoding());
 			t.start();
 			return toRegister.getSearchId();
@@ -325,7 +324,7 @@ public class SourceManager {
 				lastId=rs.getInt(MetaSourceFields.searchid+"");
 				rs.close();
 			}
-			DBDescriptor dbDescr=DBSession.getInternalCredentials();
+			DBDescriptor dbDescr=ConfigurationManager.getVODescriptor().getInternalDB();
 			int numTableSpaces=Integer.parseInt(dbDescr.getProperty(DBDescriptor.TABLESPACE_COUNT));
 			int toUseTableSpace=((lastId+1) % numTableSpaces)+1;
 			String toReturn=dbDescr.getProperty(DBDescriptor.TABLESPACE_PREFIX)+toUseTableSpace;

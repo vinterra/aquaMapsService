@@ -2,11 +2,9 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis;
 
 import java.awt.Color;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.enabling.ParameterNotFoundException;
-import org.gcube.application.aquamaps.enabling.ScopeNotFoundException;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
 public class StyleGenerationRequest {
@@ -30,8 +28,8 @@ public class StyleGenerationRequest {
 	private  ClusterScaleType clusterScaleType;  
 	
 	
-	public static String getDefaultDistributionStyle() throws ParameterNotFoundException, ScopeNotFoundException{
-		return ServiceContext.getContext().getConfiguration().getGeoServers(ServiceContext.getContext().getConfigurationScope()).get(0).getDefaultDistributionStyle();
+	public static String getDefaultDistributionStyle() throws Exception{		
+		return ConfigurationManager.getVODescriptor().getGeoServers().get(0).getDefaultDistributionStyle();
 	}
 	
 	

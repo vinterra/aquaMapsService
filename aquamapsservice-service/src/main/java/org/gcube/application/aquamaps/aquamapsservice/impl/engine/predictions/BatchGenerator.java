@@ -12,6 +12,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory.BatchPoolType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
@@ -24,7 +25,6 @@ import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Envelop
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.DistributionGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.EnvelopeGenerator;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables.INTERPOLATIONFUNCTIONS;

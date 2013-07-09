@@ -6,6 +6,8 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,29 +17,33 @@ import net.sf.csv4j.CSVReaderProcessor;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.BadRequestException;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DataSourceDescriptor;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.GeoServerDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.enabling.ParameterNotFoundException;
-import org.gcube.application.aquamaps.enabling.ScopeNotFoundException;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
-import org.gcube.application.aquamaps.enabling.model.DataSourceDescriptor;
-import org.gcube.application.aquamaps.enabling.model.GeoServerDescriptor;
-import org.gcube.common.core.scope.GCUBEScope;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.geoserverinterface.GeoCaller;
 import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeonetworkCategory;
 import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeoserverMethodResearch;
 import org.gcube.common.geoserverinterface.bean.BoundsRest;
 import org.gcube.common.geoserverinterface.bean.FeatureTypeRest;
+import org.gcube.common.geoserverinterface.bean.iso.Thesaurus;
 import org.gcube.common.geoserverinterface.engine.MakeStyle;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.datamodel.types.LayersType;
 import org.gcube.common.gis.datamodel.utils.ReadTemplate;
+import org.gcube.common.scope.api.ScopeProvider;
 
 public class GISUtils {
 
@@ -182,14 +188,12 @@ public class GISUtils {
 
 
 
-	public static GeoServerDescriptor getGeoServer() throws ParameterNotFoundException, ScopeNotFoundException{
-		GCUBEScope scope=ServiceContext.getContext().getConfigurationScope();
-		return ServiceContext.getContext().getConfiguration().getGeoServers(scope).get(0);
+	public static GeoServerDescriptor getGeoServer() throws Exception{		
+		return ConfigurationManager.getVODescriptor().getGeoServers().get(0);
 	}
 
-	public static DataSourceDescriptor getGeoNetwork() throws ParameterNotFoundException, ScopeNotFoundException{
-		GCUBEScope scope=ServiceContext.getContext().getConfigurationScope();
-		return ServiceContext.getContext().getConfiguration().getGeoNetwork(scope);
+	public static DataSourceDescriptor getGeoNetwork() throws Exception{		
+		return ConfigurationManager.getVODescriptor().getGeoNetwork();
 
 	}
 
@@ -266,7 +270,7 @@ public class GISUtils {
 	private static String createLayerTable(String appTableName,String layerName,String featureLabel,DBSession session)throws Exception{
 
 		String featureTable=ServiceUtils.generateId("L"+layerName, "").replaceAll(" ", "").replaceAll("_","").replaceAll("-","").toLowerCase();
-		String worldTable=DBSession.getPostGisCredentials().getProperty(DBDescriptor.AQUAMAPS_WORLD_TABLE);
+		String worldTable=ConfigurationManager.getVODescriptor().getGeoDb().getProperty(DBDescriptor.AQUAMAPS_WORLD_TABLE);
 		logger.trace("Creating table "+featureTable);
 		session.executeUpdate("Create table "+featureTable+" AS (Select "+
 				worldTable+".*, app."+featureLabel+
@@ -327,8 +331,11 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,String> meta,GeoCaller caller,GeoServerDescriptor geoServer) throws Exception{
+	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GeoCaller caller,GeoServerDescriptor geoServer) throws Exception{
 		try{
+			ScopeProvider.instance.set(GHNContext.getContext().getStartScopes()[0].getInfrastructure().toString());
+			AquaMapsIsoMetadata metaParams=new AquaMapsIsoMetadata();
+			
 		FeatureTypeRest featureTypeRest=new FeatureTypeRest();		
 		featureTypeRest.setDatastore(geoServer.getDatastore());
 		featureTypeRest.setEnabled(true);
@@ -341,17 +348,31 @@ public class GISUtils {
 		featureTypeRest.setNativeCRS(crs);
 		featureTypeRest.setTitle(layerName);
 		featureTypeRest.setWorkspace(geoServer.getWorkspace());
-		StringBuilder description=new StringBuilder();
 		
-		meta.put("LAYER_NAME", featureTypeRest.getName());
 		
-		if(meta!=null)
-			for(Entry<String,String> entry:meta.entrySet())
-				description.append(entry.getKey()+" : "+entry.getValue()+" | ");
+		
+		
+		metaParams.setAlgorithm((AlgorithmType) meta.get(AquaMapsManager.META_ALGORITHM));
+		metaParams.setCreationDate((Date) meta.get(AquaMapsManager.META_DATE));
+		metaParams.setGeometryCount((Integer) meta.get(AquaMapsManager.META_GEOMETRY_COUNT));
+		metaParams.setSourceGenerationTime((Date)meta.get(AquaMapsManager.META_SOURCE_TIME));
+		metaParams.setSourceTableName((String) meta.get(AquaMapsManager.META_SOURCE_TABLENAME));
+		metaParams.setSourceTitle((String) meta.get(AquaMapsManager.META_SOURCE_TITLE));
+		metaParams.setTitle((String)meta.get(AquaMapsManager.META_TITLE));
+		metaParams.setType((ObjectType) meta.get(AquaMapsManager.META_OBJECT_TYPE));
+		metaParams.setUser((String)meta.get(AquaMapsManager.META_AUTHOR));
+		for(String uri:((List<String>)meta.get(AquaMapsManager.META_FILESET_URIS)))
+				metaParams.addGraphicOverview(uri);
+		
+		for(Entry<String,HashSet<String>> entry:((Map<String,HashSet<String>>)meta.get(AquaMapsManager.META_KEYWORDS_MAP)).entrySet()){
+			Thesaurus t=metaParams.getConfig().getThesauri().get(entry.getKey());
+			for(String keyword:entry.getValue())metaParams.addKeyword(keyword, t);
+		}
+		
 		logger.debug("Invoking Caller for registering layer : ");
 		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
 		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());
-		if (caller.addFeatureType(featureTypeRest,GeonetworkCategory.DATASETS,description.toString(),"")){
+		if (caller.addFeatureType(featureTypeRest,styles.get(defaultStyleIndex),GeonetworkCategory.DATASETS,metaParams.getMetadata())){
 			logger.debug("Add feature type returned true .. waiting 6 secs..");
 			try {
 				Thread.sleep(GEO_SERVER_WAIT_TIME);

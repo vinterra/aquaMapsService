@@ -27,23 +27,7 @@
 
 			<!-- Request / Response Types-->
 
-			<xsd:complexType name="getAquaMapsPerUserRequestType">
-				<xsd:sequence>
-					<xsd:element name="userID" type="xsd:string" />
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
-					<xsd:element name="aquamaps" type="xsd:boolean" />
-					<xsd:element name="jobIdEnabled" type="xsd:boolean" />
-					<xsd:element name="jobIdValue" type="xsd:int" />
-					<xsd:element name="objectStatusEnabled" type="xsd:boolean" />
-					<xsd:element name="objectStatusValue" type="xsd:string" />
-					<xsd:element name="typeEnabled" type="xsd:boolean" />
-					<xsd:element name="typeValue" type="xsd:string" />
-					<xsd:element name="jobStatusEnabled" type="xsd:boolean" />
-					<xsd:element name="jobStatusValue" type="xsd:string" />
-					<xsd:element name="dateEnabled" type="xsd:boolean" />
-					<xsd:element name="dateValue" type="xsd:string" />
-				</xsd:sequence>
-			</xsd:complexType>
+			
 
 
 
@@ -68,12 +52,7 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-			<xsd:complexType name="getOccurrenceCellsRequestType">
-				<xsd:sequence>
-					<xsd:element name="speciesID" type="xsd:string" />
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
-				</xsd:sequence>
-			</xsd:complexType>
+			
 
 			<xsd:complexType name="getPhylogenyRequestType">
 				<xsd:sequence>
@@ -97,12 +76,7 @@
 				</xsd:sequence>
 			</xsd:complexType>
 
-			<xsd:complexType name="getResourceListRequestType">
-				<xsd:sequence>
-					<xsd:element name="filters" type="aqtypes:fieldArray" />
-					<xsd:element name="pagedRequestSettings" type="aqtypes:pagedRequestSettings" />
-				</xsd:sequence>
-			</xsd:complexType>
+			
 
 			<xsd:complexType name="getSpeciesEnvelopeRequestType">
 				<xsd:sequence>
@@ -124,8 +98,6 @@
 			<xsd:element name="markSavedRequest" type="coretypes:stringArray" />
 			<xsd:element name="markSavedResponse" type="coretypes:VOID" />
 
-			<xsd:element name="getAquaMapsPerUserRequest" type="tns:getAquaMapsPerUserRequestType" />
-			<xsd:element name="getAquaMapsPerUserResponse" type="xsd:string" />
 
 			<xsd:element name="calculateEnvelopeRequest" type="tns:calculateEnvelopeRequestType" />
 			<xsd:element name="calculateEnvelopeResponse" type="aqtypes:fieldArray" />
@@ -135,8 +107,6 @@
 			<xsd:element name="calculateEnvelopefromCellSelectionResponse"
 				type="aqtypes:fieldArray" />
 
-			<xsd:element name="getOccurrenceCellsRequest" type="tns:getOccurrenceCellsRequestType" />
-			<xsd:element name="getOccurrenceCellsResponse" type="xsd:string" />
 
  
 			<xsd:element name="getObjectRequest" type="xsd:int" />
@@ -170,14 +140,6 @@
 				<xsd:element name="getSpeciesByFiltersASCSVResponse" type="xsd:string" />
 
 
-			<xsd:element name="getResourceListRequest" type="tns:getResourceListRequestType" />
-
-			<xsd:element name="getResourceListResponse" type="xsd:string" />
-
-
-			<xsd:element name="getResourceInfoRequest" type="aqtypes:resource" />
-
-			<xsd:element name="getResourceInfoResponse" type="aqtypes:resource" />
 
 
 
@@ -193,12 +155,6 @@
 
 	<!-- message part -->
 	
-	<message name="GetAquaMapsPerUserRequest">
-		<wsdl:part name="request" element="tns:getAquaMapsPerUserRequest"/>
-	</message>
-	<message name="GetAquaMapsPerUserResponse">
-		<wsdl:part name="response" element="tns:getAquaMapsPerUserResponse"/>
-	</message>
 
 	<message name="MarkSavedRequest">
 		<wsdl:part name="request" element="tns:markSavedRequest" />
@@ -228,12 +184,6 @@
 		<part name="response" element="tns:calculateEnvelopefromCellSelectionResponse" />
 	</message>
 
-	<message name="GetOccurrenceCellsRequest">
-		<part name="request" element="tns:getOccurrenceCellsRequest" />
-	</message>
-	<message name="GetOccurrenceCellsResponse">
-		<part name="response" element="tns:getOccurrenceCellsResponse" />
-	</message>
  
 	<message name="GetObjectRequest">
 		<part name="request" element="tns:getObjectRequest" />
@@ -288,19 +238,7 @@
 		<part name="response" element="tns:getPhylogenyResponse" />
 	</message>
 
-	<message name="GetResourceListRequest">
-		<part name="request" element="tns:getResourceListRequest" />
-	</message>
-	<message name="GetResourceListResponse">
-		<part name="response" element="tns:getResourceListResponse" />
-	</message>
 
-	<message name="GetResourceInfoRequest">
-		<part name="request" element="tns:getResourceInfoRequest" />
-	</message>
-	<message name="GetResourceInfoResponse">
-		<part name="response" element="tns:getResourceInfoResponse" />
-	</message>
 
 	<message name="LoadSubmittedByIdRequest">
 		<part name="request" element="tns:loadSubmittedByIdRequest" />
@@ -316,12 +254,6 @@
 	<portType name="AquaMapsServicePortType">
 
 		<!-- operation part -->
-
-		<wsdl:operation name="getAquaMapsPerUser">
-			<input message="tns:GetAquaMapsPerUserRequest" />
-			<output message="tns:GetAquaMapsPerUserResponse" />
-			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
-		</wsdl:operation>
 
 		<wsdl:operation name="markSaved">
 			<input message="tns:MarkSavedRequest" />
@@ -347,11 +279,6 @@
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
 
-		<wsdl:operation name="getOccurrenceCells">
-			<input message="tns:GetOccurrenceCellsRequest" />
-			<output message="tns:GetOccurrenceCellsResponse" />
-			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
-		</wsdl:operation>
   
 		<wsdl:operation name="getObject">
 			<input message="tns:GetObjectRequest" />
@@ -395,17 +322,7 @@
 			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
 		</wsdl:operation>
 
-		<wsdl:operation name="getResourceList">
-			<input message="tns:GetResourceListRequest" />
-			<output message="tns:GetResourceListResponse" />
-			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
-		</wsdl:operation>
 
-		<wsdl:operation name="getResourceInfo">
-			<input message="tns:GetResourceInfoRequest" />
-			<output message="tns:GetResourceInfoResponse" />
-			<fault name="fault" message="corefaults:GCUBEFaultMessage"></fault>
-		</wsdl:operation>
 
 		<wsdl:operation name="loadSubmittedById">
 			<input message="tns:LoadSubmittedByIdRequest" />

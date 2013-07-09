@@ -9,14 +9,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
-import org.gcube.application.aquamaps.enabling.model.DBDescriptor;
 import org.gcube.common.core.utils.logging.GCUBELog;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 
 
@@ -67,24 +66,19 @@ public abstract class DBSession {
 	 * @throws Exception
 	 */
 
-	public static DBDescriptor getInternalCredentials()throws Exception{
-		return ServiceContext.getContext().getConfiguration().getInternalDB(ServiceContext.getContext().getConfigurationScope());
-	}
-	public static DBDescriptor getPostGisCredentials()throws Exception{
-		return ServiceContext.getContext().getConfiguration().getGeoServerDb(ServiceContext.getContext().getConfigurationScope());
-	}
 	
 
 	public static DBSession getInternalDBSession()throws Exception{
-		try{
+		DBDescriptor internalDescriptor=ConfigurationManager.getVODescriptor().getInternalDB();
+		try{			
 			Connection conn=PoolManager.getInternalDBConnection();
-			switch(getInternalCredentials().getType()){
+			switch(internalDescriptor.getType()){
 			case mysql: return new MySQLDBSession(conn);
 			default: return new PostGresSQLDBSession(conn);
 			}
 		}catch(Exception e){
 			logger.fatal("ERROR ON OPENING CONNECTION ",e);
-			logger.fatal("Connection parameters were : "+getInternalCredentials());
+			logger.fatal("Connection parameters were : "+internalDescriptor);
 			throw e;
 		}
 	}

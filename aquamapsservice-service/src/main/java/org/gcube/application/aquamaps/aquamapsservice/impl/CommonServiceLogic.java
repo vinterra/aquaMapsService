@@ -17,6 +17,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Spe
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.common.core.utils.logging.GCUBELog;
 
@@ -31,9 +32,12 @@ public class CommonServiceLogic {
 		Job job=new Job();
 		Resource hspec=SourceManager.getById(hspecId);
 		job.setSourceHSPEC(hspec);
-		job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFIds().get(0)));
-		job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENIds().get(0)));
-		job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
+		if(hspec.getSourceHCAFIds().size()>0)job.setSourceHCAF(SourceManager.getById(hspec.getSourceHCAFIds().get(0)));
+		
+		if(hspec.getSourceHSPENIds().size()>0) {
+			job.setSourceHSPEN(SourceManager.getById(hspec.getSourceHSPENIds().get(0)));		
+			job.addSpecies(SpeciesManager.getList(speciesFilter,job.getSourceHSPEN()));
+		}else job.addSpecies(SpeciesManager.getList(speciesFilter,SourceManager.getById(SourceManager.getDefaultId(ResourceType.HSPEN))));
 		
 		if(speciesFilter.size()==0&&!forceRegeneration){
 			Submitted existing=getAlreadySubmitted(hspecId, enableGIS,job.getCompressedCoverage());

@@ -1,6 +1,7 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.db.managers;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import java.util.Map;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
@@ -17,16 +17,29 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
-import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
+import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class AquaMapsManager extends SubmittedManager{
 
 	public static String maxSpeciesCountInACell="maxspeciescountinacell";
 	
-
-
+	public static final String META_ALGORITHM="ALGORITHM";
+	public static final String META_SOURCE_TITLE="SOURCE_TITLE";
+	public static final String META_SOURCE_TABLENAME="SOURCE_TABLENAME";
+	public static final String META_SOURCE_TIME="SOURCE_TIME";
+	public static final String META_DATE="META_DATE";
+	public static final String META_TITLE="META_TITLE";
+	public static final String META_OBJECT_TYPE="META_OBJECT_TYPE";
+	public static final String META_AUTHOR="META_AUTHOR";
+	
+	//****** Generated at gis Generation Time
+	public static final String META_FILESET_URIS="META_FILESET_URIS";
+	public static final String META_GEOMETRY_COUNT="META_GEOMETRY_COUNT";
+	public static final String META_KEYWORDS_MAP="META_KEYWORDS_MAP";
+	
+	
 	public static int insertRequests(
 			List<AquaMapsObjectExecutionRequest> requests) throws Exception{
 		DBSession session=null;
@@ -105,19 +118,20 @@ public class AquaMapsManager extends SubmittedManager{
 		return toReturn;
 	}
 	
-	public static Map<String,String> getMetaForGIS(Submitted obj)throws Exception{
-		HashMap<String,String> toReturn=new HashMap<String,String>();
-		Resource hspec=SourceManager.getById(obj.getSourceHSPEC());
-		Resource hspen=SourceManager.getById(obj.getSourceHSPEN());
-		Resource hcaf=SourceManager.getById(obj.getSourceHCAF());
-		toReturn.put("ALGORITHM", hspec.getAlgorithm()+"");
-		toReturn.put("ALGORITHM CITATION",AquaMapsObject.CITATION);
-		toReturn.put("HSPEC TITLE", hspec.getTitle());
-		toReturn.put("HSPEC GENERATION TIME", ServiceUtils.formatTimeStamp(hspec.getGenerationTime()));
-		toReturn.put("HSPEN TITLE", hspen.getTitle());
-		toReturn.put("HSPEN GENERATION TIME", ServiceUtils.formatTimeStamp(hspen.getGenerationTime()));
-		toReturn.put("HCAF TITLE", hcaf.getTitle());
-		toReturn.put("HCAF GENERATION TIME", ServiceUtils.formatTimeStamp(hcaf.getGenerationTime()));
+	public static Map<String,Object> getMetaForGIS(Submitted obj) throws Exception{
+		HashMap<String,Object> toReturn=new HashMap<String,Object>();	
+		toReturn.put(META_AUTHOR, obj.getAuthor());
+		toReturn.put(META_DATE, new Date(System.currentTimeMillis()));
+		toReturn.put(META_OBJECT_TYPE, obj.getType());
+		toReturn.put(META_TITLE, obj.getTitle());
+		
+		Resource hspec = SourceManager.getById(obj.getSourceHSPEC());
+		toReturn.put(META_ALGORITHM, hspec.getAlgorithm());
+		toReturn.put(META_SOURCE_TITLE, hspec.getTitle());
+		toReturn.put(META_SOURCE_TIME, new Date(hspec.getGenerationTime()));
+		toReturn.put(META_SOURCE_TABLENAME, hspec.getTableName());		
+		
 		return toReturn;
 	}
+	
 }
