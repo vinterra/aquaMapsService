@@ -286,7 +286,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			File toExport=SpeciesManager.getCSVList(Filter.load(arg0.getGenericSearchFilters()), Filter.load(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper(scope);
+			RSWrapper wrapper=new RSWrapper();
 			wrapper.add(toExport);
 			String locator = wrapper.getLocator().toString();
 			logger.trace("Added file to locator "+locator);

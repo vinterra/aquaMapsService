@@ -149,7 +149,7 @@ public class ExportManager extends Thread{
 					workspace.createExternalFile(toSaveName, "Exported table", "text/csv", new FileInputStream(fileName), destinationBasketId);
 				}else {
 					//EXPORT TO CLIENT
-					RSWrapper wrapper=new RSWrapper(scope);
+					RSWrapper wrapper=new RSWrapper();
 					wrapper.add(new File(fileName));
 					String locator = wrapper.getLocator().toString();
 					logger.trace("Added file to locator "+locator);

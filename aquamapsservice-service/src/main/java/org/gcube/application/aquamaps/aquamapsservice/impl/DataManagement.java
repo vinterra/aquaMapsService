@@ -430,7 +430,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			Analysis analysis=AnalysisTableManager.getById(arg0);
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper(scope);
+			RSWrapper wrapper=new RSWrapper();
 			File temp=File.createTempFile("analysis",".tar.gz");
 			FileUtils.Copy(new File(analysis.getArchiveLocation()), temp);
 			temp.deleteOnExit();
