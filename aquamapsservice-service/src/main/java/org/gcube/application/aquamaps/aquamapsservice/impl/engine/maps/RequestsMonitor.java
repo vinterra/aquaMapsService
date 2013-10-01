@@ -5,10 +5,11 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RequestsMonitor extends Thread {
-	private static final GCUBELog logger=new GCUBELog(RequestsMonitor.class);
+	final static Logger logger= LoggerFactory.getLogger(RequestsMonitor.class);
 	
 	private boolean object;
 	

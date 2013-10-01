@@ -17,10 +17,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSetUtils {
-	private static GCUBELog logger= new GCUBELog(FileSetUtils.class);
+	final static Logger logger= LoggerFactory.getLogger(FileSetUtils.class);
 	
 
 

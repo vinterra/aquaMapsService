@@ -8,10 +8,11 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.F
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.AnalysisFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnalysisUpdaterThread extends Thread{
-	private static final GCUBELog logger=new GCUBELog(AnalysisUpdaterThread.class);
+	final static Logger logger= LoggerFactory.getLogger(AnalysisUpdaterThread.class);
 
 
 	private long millis;

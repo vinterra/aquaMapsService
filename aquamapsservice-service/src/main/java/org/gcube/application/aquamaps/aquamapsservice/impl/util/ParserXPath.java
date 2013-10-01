@@ -10,13 +10,14 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 public class ParserXPath {
-	protected static GCUBELog logger= new GCUBELog(ParserXPath.class);
+	final static Logger logger= LoggerFactory.getLogger(ParserXPath.class);
 
 
 	public static ArrayList<String> getTextFromXPathExpression(String xml, String xpathExpression)throws Exception{

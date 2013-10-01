@@ -1,22 +1,15 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.statistical;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
-import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube.data.analysis.statisticalmanager.stubs.SMComputationConfig;
-import org.gcube_system.namespaces.data.analysis.statisticalmanager.types.SMEntries;
-import org.gcube_system.namespaces.data.analysis.statisticalmanager.types.SMInputEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class MapsGenerationRequestHandler extends Thread {
 
-	protected static GCUBELog logger= new GCUBELog(MapsGenerationRequestHandler.class);
+	final static Logger logger= LoggerFactory.getLogger(MapsGenerationRequestHandler.class);
 	
 	String referenceId;
 	String scopeName;

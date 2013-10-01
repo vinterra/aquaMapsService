@@ -13,12 +13,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EnvironmentalStatusUpdateThread extends Thread {
 
 
-	private static final GCUBELog logger=new GCUBELog(EnvironmentalStatusUpdateThread.class);
+	final static Logger logger= LoggerFactory.getLogger(EnvironmentalStatusUpdateThread.class);
 
 
 	private long millis;

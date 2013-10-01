@@ -24,13 +24,14 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Hsp
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SpeciesManager {
 
-	private static GCUBELog logger= new GCUBELog(SpeciesManager.class);
+	final static Logger logger= LoggerFactory.getLogger(SpeciesManager.class);
 	public static final String speciesOccurSum="speciesoccursum";
 	
 	public static final String CATALOG_OF_LIFE="CATALOG OF LIFE";

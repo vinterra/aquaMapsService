@@ -42,12 +42,14 @@ import org.gcube.common.core.types.StringArray;
 import org.gcube.common.core.types.VOID;
 import org.gcube_system.namespaces.application.aquamaps.types.AquaMap;
 import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePortType{
 
 
-
+	private static Logger logger = LoggerFactory.getLogger(AquaMapsService.class);
 
 
 
@@ -286,7 +288,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			File toExport=SpeciesManager.getCSVList(Filter.load(arg0.getGenericSearchFilters()), Filter.load(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper(scope);
+			RSWrapper wrapper=new RSWrapper();
 			wrapper.add(toExport);
 			String locator = wrapper.getLocator().toString();
 			logger.trace("Added file to locator "+locator);

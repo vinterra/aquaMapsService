@@ -21,13 +21,14 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Met
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceManager {
 
-	private static final GCUBELog logger=new GCUBELog(SourceManager.class);	
+	final static Logger logger= LoggerFactory.getLogger(SourceManager.class);
 	
 	private static final String sourcesTable="meta_sources";
 	

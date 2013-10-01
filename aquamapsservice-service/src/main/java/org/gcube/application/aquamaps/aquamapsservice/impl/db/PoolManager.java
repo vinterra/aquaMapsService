@@ -11,11 +11,12 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.commons.pool.impl.StackKeyedObjectPoolFactory;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PoolManager {
 
-	protected static GCUBELog logger= new GCUBELog(PoolManager.class);
+	final static Logger logger= LoggerFactory.getLogger(PoolManager.class);
 
 	private static GenericObjectPool internalDBconnectionPool; 
 	private static ConnectionFactory internalDBconnectionFactory;
@@ -56,7 +57,7 @@ public class PoolManager {
 
 			internalDBconnectionString+=internalDBDescriptor.getEntryPoint();
 		} catch (ClassNotFoundException e) {
-			logger.fatal("Unable to instantiate driver", e);
+			logger.error("Unable to instantiate driver", e);
 			throw e;
 		}
 		internalDBconnectionPool = new GenericObjectPool(null);
@@ -79,7 +80,7 @@ public class PoolManager {
 		try {
 			Class.forName("org.postgresql.Driver");
 		} catch (ClassNotFoundException e) {
-			logger.fatal("Unable to instantiate driver", e);
+			logger.error("Unable to instantiate driver", e);
 			throw e;
 		}
 		postGISconnectionPool = new GenericObjectPool(null);
@@ -97,7 +98,7 @@ public class PoolManager {
 		postGISdriver.registerPool(postGISPoolName,postGISconnectionPool);
 		
 	}catch(Exception e){
-		logger.fatal(e);
+		logger.error("",e);
 	}
 }
 

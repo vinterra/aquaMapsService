@@ -33,10 +33,14 @@ import org.gcube_system.namespaces.application.aquamaps.types.FileArray;
 import org.gcube_system.namespaces.application.aquamaps.types.MapArray;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PublisherService extends GCUBEPortType implements
 PublisherServicePortType {
 
+	private static Logger logger = LoggerFactory.getLogger(PublisherService.class);
+	
 	@Override
 	protected GCUBEServiceContext getServiceContext() {
 		return ServiceContext.getContext();

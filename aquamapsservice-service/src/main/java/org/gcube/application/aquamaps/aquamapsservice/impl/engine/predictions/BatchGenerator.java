@@ -25,14 +25,15 @@ import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Envelop
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.GenerationModel;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.DistributionGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.processing.EnvelopeGenerator;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.InterpolateTables.INTERPOLATIONFUNCTIONS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class BatchGenerator implements BatchGeneratorI {
 
-	private static final GCUBELog logger=new GCUBELog(BatchGenerator.class);
+	final static Logger logger= LoggerFactory.getLogger(BatchGenerator.class);
 
 	private EngineConfiguration e = new EngineConfiguration();
 
@@ -370,12 +371,12 @@ public class BatchGenerator implements BatchGeneratorI {
 			session=DBSession.getInternalDBSession();			
 			session.dropTable(toDelete);
 		}catch(Exception e){
-			logger.fatal("Unexpected Exception while trying to delete table "+toDelete,e);
+			logger.error("Unexpected Exception while trying to delete table "+toDelete,e);
 		}finally{
 			if(session!=null) try{
 				session.close();
 			}catch(Exception e){
-				logger.fatal("Unable to close connection ",e);
+				logger.error("Unable to close connection ",e);
 			}
 		}
 	}

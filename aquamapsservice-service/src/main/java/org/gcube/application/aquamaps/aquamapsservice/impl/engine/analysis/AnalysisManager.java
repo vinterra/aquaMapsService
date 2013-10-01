@@ -18,11 +18,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnalysisManager {
 
-private static final GCUBELog logger=new GCUBELog(AnalysisManager.class);
+	final static Logger logger= LoggerFactory.getLogger(AnalysisManager.class);
 	
 	private static ExecutorService pool=null;
 	private static Semaphore insertedRequests=null;

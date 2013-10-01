@@ -5,11 +5,12 @@ import java.awt.Color;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StyleGenerationRequest {
 
-	private static final GCUBELog logger=new GCUBELog(StyleGenerationRequest.class);
+	final static Logger logger= LoggerFactory.getLogger(StyleGenerationRequest.class);
 	
 	
 	public static enum ClusterScaleType{

@@ -19,12 +19,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommonServiceLogic {
 
-	private static final GCUBELog logger=new GCUBELog(CommonServiceLogic.class);
-	
+	private final static Logger logger= LoggerFactory.getLogger(CommonServiceLogic.class);
 	
 	public static int generateMaps_Logic(int hspecId,List<Field> speciesFilter, String author, boolean enableGIS, boolean forceRegeneration)throws Exception{
 		logger.trace("Gnerating job for maps generation :");

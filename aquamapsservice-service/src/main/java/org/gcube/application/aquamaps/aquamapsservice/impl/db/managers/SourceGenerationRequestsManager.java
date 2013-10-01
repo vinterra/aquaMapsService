@@ -17,11 +17,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Sour
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceGenerationRequestsManager {
 
-	private static final GCUBELog logger=new GCUBELog(SourceGenerationRequestsManager.class);
+	final static Logger logger= LoggerFactory.getLogger(SourceGenerationRequestsManager.class);
 
 	public final static String requestsTable="source_generation_requests";
 

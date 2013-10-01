@@ -10,12 +10,12 @@ import java.util.concurrent.Semaphore;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.JobManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ExtendedExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.MyPooledExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
@@ -29,11 +29,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Subm
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JobExecutionManager {
 
-	private static final GCUBELog logger=new GCUBELog(JobExecutionManager.class);
+	final static Logger logger= LoggerFactory.getLogger(JobExecutionManager.class);
 
 
 	private static ExtendedExecutor jobPool=null;
@@ -212,7 +213,7 @@ public class JobExecutionManager {
 		try{
 			if(!toClean.getIsAquaMap()){
 				JobManager.cleanTemp(toClean.getSearchId());
-			}
+			}else Generator.cleanData(toClean);
 		}catch(Exception e){
 			logger.error("Unexpected Error while trying to clean up submitted "+toClean.getSearchId()+" ["+(toClean.getIsAquaMap()?"OBJECT":"JOB")+"]",e);
 		}

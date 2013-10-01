@@ -5,9 +5,9 @@ import java.util.Date;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
-import org.gcube.common.geoserverinterface.bean.iso.GcubeISOMetadata;
-import org.gcube.common.geoserverinterface.bean.iso.MissingInformationException;
-import org.gcube.common.geoserverinterface.geonetwork.utils.StringValidator;
+import org.gcube.spatial.data.geonetwork.iso.GcubeISOMetadata;
+import org.gcube.spatial.data.geonetwork.iso.MissingInformationException;
+import org.gcube.spatial.data.geonetwork.utils.StringValidator;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;

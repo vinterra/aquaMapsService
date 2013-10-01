@@ -1,10 +1,11 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnalysisMonitor extends Thread{
-	private static final GCUBELog logger=new GCUBELog(AnalysisMonitor.class);
+	final static Logger logger= LoggerFactory.getLogger(AnalysisMonitor.class);
 	
 	public AnalysisMonitor() throws Exception{
 		super("ANALYSIS MONITOR");

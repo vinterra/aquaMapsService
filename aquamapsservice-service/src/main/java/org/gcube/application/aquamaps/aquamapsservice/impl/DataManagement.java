@@ -57,9 +57,13 @@ import org.gcube.dataanalysis.ecoengine.utils.ResourceFactory;
 import org.gcube_system.namespaces.application.aquamaps.types.FieldArray;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DataManagement extends GCUBEPortType implements DataManagementPortType{
 
+	private static Logger logger = LoggerFactory.getLogger(DataManagement.class);
+	
 	@Override
 	protected GCUBEServiceContext getServiceContext() {
 		return ServiceContext.getContext();
@@ -430,7 +434,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			Analysis analysis=AnalysisTableManager.getById(arg0);
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper(scope);
+			RSWrapper wrapper=new RSWrapper();
 			File temp=File.createTempFile("analysis",".tar.gz");
 			FileUtils.Copy(new File(analysis.getArchiveLocation()), temp);
 			temp.deleteOnExit();

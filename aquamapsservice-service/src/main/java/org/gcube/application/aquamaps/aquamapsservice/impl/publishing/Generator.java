@@ -46,13 +46,14 @@ import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.FileType;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.types.LayersType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Generator<T> implements ObjectManager<T> {
-	private static final GCUBELog logger = new GCUBELog(Generator.class);
+	final static Logger logger= LoggerFactory.getLogger(Generator.class);
 	
 	final static Publisher publisher=ServiceContext.getContext().getPublisher();
 	

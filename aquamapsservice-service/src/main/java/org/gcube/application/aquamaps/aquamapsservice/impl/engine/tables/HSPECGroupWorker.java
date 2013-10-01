@@ -26,12 +26,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Logi
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HSPECGroupWorker extends Thread {
 
 	private SourceGenerationRequest request;
-	private static final GCUBELog logger=new GCUBELog(HSPECGroupWorker.class);
+	final static Logger logger= LoggerFactory.getLogger(HSPECGroupWorker.class);
 
 	final Semaphore blocking=new Semaphore(0);
 	final List<String> exceptions=new ArrayList<String>();
@@ -152,7 +153,7 @@ public class HSPECGroupWorker extends Thread {
 			try{
 				SourceGenerationRequestsManager.setPhase(SourceGenerationPhase.error,request.getId());
 			}catch(Exception e1){
-				logger.fatal("Unable to update phase , request was "+request,e);
+				logger.error("Unable to update phase , request was "+request,e);
 			}
 		}
 	}
@@ -456,7 +457,7 @@ public class HSPECGroupWorker extends Thread {
 				SourceGenerationRequestsManager.removeReportId(batch.getReportId(), request.getId());
 			}
 		}catch(Exception e){
-			logger.fatal("Unable to leave generator",e);
+			logger.error("Unable to leave generator",e);
 		}
 	}
 }

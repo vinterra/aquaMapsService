@@ -2,16 +2,15 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.monitor;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-
-
 import org.gcube.common.core.contexts.GHNContext;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
 public class StatusMonitorThread extends Thread {
 
-	private static GCUBELog logger= new GCUBELog(StatusMonitorThread.class);
+	final static Logger logger= LoggerFactory.getLogger(StatusMonitorThread.class);
 
 	private long interval;
 	private long freeSpaceThreshold;

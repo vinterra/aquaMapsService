@@ -21,7 +21,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescr
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.Type;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.resources.gcore.GenericResource;
 import org.gcube.common.resources.gcore.ServiceEndpoint;
 import org.gcube.common.resources.gcore.ServiceEndpoint.AccessPoint;
@@ -30,10 +29,12 @@ import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.common.utils.encryption.StringEncrypter;
 import org.gcube.resources.discovery.client.api.DiscoveryClient;
 import org.gcube.resources.discovery.client.queries.api.SimpleQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigurationManager {
 
-	protected static GCUBELog logger= new GCUBELog(ConfigurationManager.class);
+	final static Logger logger= LoggerFactory.getLogger(ConfigurationManager.class);
 	
 	
 	private static TransformerFactory tf = TransformerFactory.newInstance();
