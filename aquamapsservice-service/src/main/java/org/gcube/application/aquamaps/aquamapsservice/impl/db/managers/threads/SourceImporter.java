@@ -24,11 +24,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.R
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.scope.api.ScopeProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SourceImporter extends Thread {
-	private static final GCUBELog logger=new GCUBELog(SourceImporter.class);	
+	final static Logger logger= LoggerFactory.getLogger(SourceImporter.class);	
 
 	private String csv;
 	private String locator;
@@ -116,7 +117,7 @@ public class SourceImporter extends Thread {
 				try{
 					session.close();
 				}catch(Exception e){
-					logger.fatal("Unable to close session ",e);
+					logger.error("Unable to close session ",e);
 				}
 			}
 			if(lineProcessor!=null)lineProcessor.close();

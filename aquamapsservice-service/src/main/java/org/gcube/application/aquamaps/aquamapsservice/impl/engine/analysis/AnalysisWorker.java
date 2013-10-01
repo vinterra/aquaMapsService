@@ -12,7 +12,6 @@ import javax.imageio.ImageIO;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
-import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AnalysisTableManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
@@ -21,12 +20,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.A
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.AppZip;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.contentmanagement.graphtools.data.conversions.ImageTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnalysisWorker extends Thread{
 	
-	private static final GCUBELog logger=new GCUBELog(AnalysisWorker.class);
+	final static Logger logger= LoggerFactory.getLogger(AnalysisWorker.class);
 
 	private Analysis toPerform;
 	private AnalysisResponseDescriptor produced=new AnalysisResponseDescriptor(null);
@@ -82,7 +82,7 @@ public class AnalysisWorker extends Thread{
 			try {
 				AnalysisTableManager.setStatus(SubmittedStatus.Error, toPerform.getId());
 			} catch (Exception e1) {
-				logger.fatal("Unable to update reference status for analysis",e1);
+				logger.error("Unable to update reference status for analysis",e1);
 			}
 		}
 	}
@@ -120,7 +120,7 @@ public class AnalysisWorker extends Thread{
 				AnalysisTableManager.removeReportId(analyzer.getReportId(),toPerform.getId());
 				AnalysisTableManager.addCompletedAnalysis(toPerform.getId(), result.getType());
 			} catch (Exception e) {
-				logger.fatal("Unable to leave analyzer",e);
+				logger.error("Unable to leave analyzer",e);
 			}
 	}
 }

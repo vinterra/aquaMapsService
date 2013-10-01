@@ -17,11 +17,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TableGenerationExecutionManager {
 
-	private static final GCUBELog logger=new GCUBELog(TableGenerationExecutionManager.class);
+	final static Logger logger= LoggerFactory.getLogger(TableGenerationExecutionManager.class);
 	
 	private static ExecutorService pool=null;
 	private static Semaphore insertedRequest=null;

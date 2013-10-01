@@ -9,11 +9,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.CustomQueryDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryConstructurThread extends Thread {
 
-	private static final GCUBELog logger=new GCUBELog(QueryConstructurThread.class);
+	final static Logger logger= LoggerFactory.getLogger(QueryConstructurThread.class);
 
 	public enum Operation {
 		DELETE,CREATE
@@ -82,7 +83,7 @@ public class QueryConstructurThread extends Thread {
 			try {
 				session.close();
 			} catch (Exception e) {
-				logger.fatal("Unable to close session",e);
+				logger.error("Unable to close session",e);
 			}}
 	}
 

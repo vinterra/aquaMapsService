@@ -1,5 +1,10 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis;
 
+import it.geosolutions.geonetwork.util.GNInsertConfiguration;
+import it.geosolutions.geoserver.rest.decoder.RESTLayer;
+import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
+import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
+
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -11,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
 
 import net.sf.csv4j.CSVLineProcessor;
 import net.sf.csv4j.CSVReaderProcessor;
@@ -23,31 +29,32 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConsta
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DataSourceDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.GeoServerDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.common.core.contexts.GHNContext;
-import org.gcube.common.core.utils.logging.GCUBELog;
-import org.gcube.common.geoserverinterface.GeoCaller;
-import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeonetworkCategory;
-import org.gcube.common.geoserverinterface.GeonetworkCommonResourceInterface.GeoserverMethodResearch;
-import org.gcube.common.geoserverinterface.bean.BoundsRest;
-import org.gcube.common.geoserverinterface.bean.FeatureTypeRest;
-import org.gcube.common.geoserverinterface.bean.iso.Thesaurus;
-import org.gcube.common.geoserverinterface.engine.MakeStyle;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.datamodel.types.LayersType;
 import org.gcube.common.gis.datamodel.utils.ReadTemplate;
 import org.gcube.common.scope.api.ScopeProvider;
+import org.gcube.spatial.data.geonetwork.LoginLevel;
+import org.gcube.spatial.data.geonetwork.configuration.Configuration;
+import org.gcube.spatial.data.geonetwork.iso.Thesaurus;
+import org.gcube.spatial.data.gis.GISInterface;
+import org.gcube.spatial.data.gis.is.GeoServerDescriptor;
+import org.gcube.spatial.data.gis.model.report.DeleteReport;
+import org.gcube.spatial.data.gis.model.report.PublishResponse;
+import org.gcube.spatial.data.gis.model.report.Report.OperationState;
+import org.gcube.spatial.data.gis.symbology.StyleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GISUtils {
 
-	private static GCUBELog logger= new GCUBELog(GISUtils.class);
+	final static Logger logger= LoggerFactory.getLogger(GISUtils.class);
 	public static char delimiter=',';
 	public static boolean hasHeader=false;
 
@@ -65,7 +72,7 @@ public class GISUtils {
 			DB_WAIT_TIME=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_DB_MS);
 			GEO_SERVER_WAIT_TIME=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_FT);
 		}catch(Exception e){
-			logger.fatal("UNABLE TO LOAD GIS CONFGURATION",e);
+			logger.error("UNABLE TO LOAD GIS CONFGURATION",e);
 		}
 	}
 
@@ -75,12 +82,9 @@ public class GISUtils {
 		DBSession session=null;
 		String layerTable=null;
 		String appTableName=null;
-		boolean generatedLayer=false;
-		GeoCaller caller=null;
+		boolean generatedLayer=false;		
 		try{
-			GeoServerDescriptor geoServer=getGeoServer();
-			DataSourceDescriptor geoNetwork=getGeoNetwork();
-			caller=getCaller(geoServer,geoNetwork);
+			
 			
 			
 			//***** Create Layer table in postGIS
@@ -105,11 +109,15 @@ public class GISUtils {
 
 			//***** update GeoServerBox
 
+			
+			GISInterface gis=GISInterface.get();
+			GeoServerDescriptor desc=gis.getCurrentGeoServerDescriptor();
+			logger.debug("Current GeoServer "+desc);
 			//****** Styles generation
 			for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
 				//					String linearStyle=layerTable+"_linearStyle";
 				//					if(generateStyle(linearStyle, request.getFeatureLabel(), request.getMinValue(), request.getMaxValue(), request.getNClasses(), request.getColor1(), request.getColor2()));
-				if(GISUtils.generateStyle(styleReq,caller))request.getToAssociateStyles().add(styleReq.getNameStyle());
+				if(GISUtils.generateStyle(styleReq,gis))request.getToAssociateStyles().add(styleReq.getNameStyle());
 				else logger.warn("Style "+styleReq.getNameStyle()+" was not generated!!");
 
 			//**** Layer Generation
@@ -117,13 +125,13 @@ public class GISUtils {
 			if(request.getToAssociateStyles().size()==0)
 				throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
 
-			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),caller,geoServer);
+			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),gis);
 			if(!generatedLayer)	throw new Exception("Unable to generate Layer "+request.getMapName());
 
 			
-			logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start)+" layer : "+layerTable+", geoserver was "+caller.getCurrentWmsGeoserver());
-
-			return GISUtils.getLayer(request.getMapType(), layerTable, request.getMapName(), "NO DESCRIPTION", request.getToAssociateStyles(), request.getDefaultStyle(), geoServer,caller.getCurrentWmsGeoserver());
+			logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start)+" layer : "+layerTable+", geoserver was "+desc.getUrl());
+			
+			return GISUtils.getLayer(request.getMapType(), gis.getGeoServerReader(desc).getLayer(layerTable),desc);
 		}catch(Exception e){
 			logger.trace("Layer generation failed, gonna clean up data.. exception was",e);
 			if(appTableName!=null){
@@ -135,12 +143,7 @@ public class GISUtils {
 					logger.debug("Found layer table to delete : "+layerTable);
 					try{
 						session.dropTable(layerTable);
-					}catch(Exception e1){logger.warn("Unable to drop table "+appTableName,e);}
-					if(generatedLayer){
-						try{
-							logger.trace("Layer deletion ("+generatedLayer+"): "+deleteLayer(request.getMapName(),caller));
-						}catch(Exception e1){logger.warn("Unable to delete layer "+generatedLayer,e);}
-					}
+					}catch(Exception e1){logger.warn("Unable to drop table "+appTableName,e);}					
 				}
 			}			
 			throw e;}
@@ -157,29 +160,36 @@ public class GISUtils {
 	//		return wms;
 	//	}
 
-	public static void deleteLayer(LayerInfo toDelete)throws Exception{
+	public static boolean deleteLayer(LayerInfo toDelete)throws Exception{
 		logger.trace("Deleting layer "+toDelete.getName());
-		GeoServerDescriptor geoServer=getGeoServer();
-		DataSourceDescriptor geoNetwork=getGeoNetwork();
-		GeoCaller caller=getCaller(geoServer,geoNetwork);
-		if(deleteLayer(toDelete.getName(),caller))
-			if(deleteFeatureType(geoServer.getWorkspace(),
-					geoServer.getDatastore(), toDelete.getName(),caller))
-				deleteLayerTable(toDelete.getName());
-			else throw new Exception("Unable to delete Feature Type "+toDelete.getName());
-		else throw new Exception("Unable to delete layer "+toDelete.getName());
+		
+		GISInterface gis=GISInterface.get();
+		SortedSet<GeoServerDescriptor> descs=gis.getGeoServerDescriptorSet(false);
+		boolean deleted=false;
+		for(GeoServerDescriptor desc:descs){
+			if(toDelete.getUrl().contains(desc.getUrl())){
+				logger.debug("Found hosting geoserver "+desc.getUrl());
+				DeleteReport report=gis.deleteLayer("aquamaps", toDelete.getName(), 0l, desc);
+				if(report.getDataOperationResult().equals(OperationState.COMPLETE)){
+					logger.debug("Deleting layerTable : "+toDelete.getName());
+					deleteLayerTable(toDelete.getName());
+					deleted=true;
+					break;
+				}else throw new Exception("Unable to delete layer "+toDelete.getName()+", cause "+report.getDataOperationMessages());
+			}
+		}
+		if(!deleted)throw new Exception("Unable to find host for layer "+toDelete.getName());
+		return deleted;		
 	}
 
+	@Deprecated
 	public static void deleteWMSContext(WMSContextInfo toDelete)throws Exception{
-		logger.trace("DELETING wms context "+toDelete.getName());
-		GeoServerDescriptor geoServer=getGeoServer();
-		DataSourceDescriptor geoNetwork=getGeoNetwork();
-		GeoCaller caller=getCaller(geoServer,geoNetwork);
-		if(!deleteGroup(toDelete.getName(),caller))throw new Exception("Unable to delete group "+toDelete.getName());
+		throw new Exception("Logic not supported");
 	}
 
 
 
+	
 
 
 
@@ -187,24 +197,23 @@ public class GISUtils {
 
 
 
-
-	public static GeoServerDescriptor getGeoServer() throws Exception{		
-		return ConfigurationManager.getVODescriptor().getGeoServers().get(0);
-	}
-
-	public static DataSourceDescriptor getGeoNetwork() throws Exception{		
-		return ConfigurationManager.getVODescriptor().getGeoNetwork();
-
-	}
+//	public static GeoServerDescriptor getGeoServer() throws Exception{		
+//		return ConfigurationManager.getVODescriptor().getGeoServers().get(0);
+//	}
+//
+//	public static DataSourceDescriptor getGeoNetwork() throws Exception{		
+//		return ConfigurationManager.getVODescriptor().getGeoNetwork();
+//
+//	}
 
 
 	//************************** ROUTINES 
-	private static GeoCaller getCaller(GeoServerDescriptor geoServer, DataSourceDescriptor geoNetwork)throws Exception{		
-		logger.debug("instatiating caller, passed arguments are GEOSERVER : "+geoServer+", GEONETWORK : "+geoNetwork);
-		return new GeoCaller(geoNetwork.getEntryPoint(), geoNetwork.getUser(), geoNetwork.getPassword(), 
-				geoServer.getEntryPoint(),geoServer.getUser(),geoServer.getPassword()	,
-				GeoserverMethodResearch.MOSTUNLOAD);
-	}
+//	private static GeoCaller getCaller(GeoServerDescriptor geoServer, DataSourceDescriptor geoNetwork)throws Exception{		
+//		logger.debug("instatiating caller, passed arguments are GEOSERVER : "+geoServer+", GEONETWORK : "+geoNetwork);
+//		return new GeoCaller(geoNetwork.getEntryPoint(), geoNetwork.getUser(), geoNetwork.getPassword(), 
+//				geoServer.getEntryPoint(),geoServer.getUser(),geoServer.getPassword()	,
+//				GeoserverMethodResearch.MOSTUNLOAD);
+//	}
 
 
 
@@ -291,31 +300,31 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean generateStyle(StyleGenerationRequest req,GeoCaller caller)throws Exception{
+	private static boolean generateStyle(StyleGenerationRequest req,GISInterface gis)throws Exception{
 		logger.trace("Generating style "+req.getNameStyle()+" attribute :"+req.getAttributeName()+" min "+req.getMin()+" max "+req.getMax()+" N classes "+req.getNClasses());
 
 		String style;
 		if(req.getTypeValue()==Integer.class){
 			switch(req.getClusterScaleType()){
-			case logarithmic : style=MakeStyle.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
+			case logarithmic : style=StyleUtils.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
 			break;
-			default 	: style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
+			default 	: style=StyleUtils.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Integer.parseInt(req.getMax()), Integer.parseInt(req.getMin()));
 			break;
 
 			}
 		}
 		else if(req.getTypeValue()==Float.class){
 			switch(req.getClusterScaleType()){
-			case logarithmic : style=MakeStyle.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
+			case logarithmic : style=StyleUtils.createStyleLog(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
 			break;
-			default : 	style=MakeStyle.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
+			default : 	style=StyleUtils.createStyle(req.getNameStyle(), req.getAttributeName().toLowerCase(), req.getNClasses(), req.getC1(), req.getC2(), req.getTypeValue(), Float.parseFloat(req.getMax()), Float.parseFloat(req.getMin()));
 			break;
 			}
 		}
 		else throw new BadRequestException("Invalid type class : "+req.getTypeValue());
 		logger.trace("Submitting style "+req.getNameStyle());
 		boolean toReturn=false;
-		toReturn=caller.sendStyleSDL(style);
+		toReturn=gis.publishStyle(style, req.getNameStyle()).getDataOperationResult().equals(OperationState.COMPLETE);
 		logger.trace("Submitting style result : "+toReturn);
 		return toReturn;
 	}
@@ -331,23 +340,23 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GeoCaller caller,GeoServerDescriptor geoServer) throws Exception{
+	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GISInterface gis) throws Exception{
 		try{
 			ScopeProvider.instance.set(GHNContext.getContext().getStartScopes()[0].getInfrastructure().toString());
 			AquaMapsIsoMetadata metaParams=new AquaMapsIsoMetadata();
 			
-		FeatureTypeRest featureTypeRest=new FeatureTypeRest();		
-		featureTypeRest.setDatastore(geoServer.getDatastore());
-		featureTypeRest.setEnabled(true);
-		featureTypeRest.setLatLonBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
-		featureTypeRest.setNativeBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
-		featureTypeRest.setName(featureTable);
-		featureTypeRest.setNativeName(featureTable);
-		featureTypeRest.setProjectionPolicy("FORCE_DECLARED");
-		featureTypeRest.setSrs("EPSG:4326");
-		featureTypeRest.setNativeCRS(crs);
-		featureTypeRest.setTitle(layerName);
-		featureTypeRest.setWorkspace(geoServer.getWorkspace());
+//		FeatureTypeRest featureTypeRest=new FeatureTypeRest();		
+//		featureTypeRest.setDatastore(geoServer.getDatastore());
+//		featureTypeRest.setEnabled(true);
+//		featureTypeRest.setLatLonBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
+//		featureTypeRest.setNativeBoundingBox(new BoundsRest(-180.0,180.0,-85.5,90.0,"EPSG:4326"));
+//		featureTypeRest.setName(featureTable);
+//		featureTypeRest.setNativeName(featureTable);
+//		featureTypeRest.setProjectionPolicy("FORCE_DECLARED");
+//		featureTypeRest.setSrs("EPSG:4326");
+//		featureTypeRest.setNativeCRS(crs);
+//		featureTypeRest.setTitle(layerName);
+//		featureTypeRest.setWorkspace(geoServer.getWorkspace());
 		
 		
 		
@@ -369,22 +378,27 @@ public class GISUtils {
 			for(String keyword:entry.getValue())metaParams.addKeyword(keyword, t);
 		}
 		
-		logger.debug("Invoking Caller for registering layer : ");
-		logger.debug("featureTypeRest.getNativeName : "+featureTypeRest.getNativeName());
-		logger.debug("featureTypeRest.getTitle : "+featureTypeRest.getTitle());
-		if (caller.addFeatureType(featureTypeRest,styles.get(defaultStyleIndex),GeonetworkCategory.DATASETS,metaParams.getMetadata())){
-			logger.debug("Add feature type returned true .. waiting 6 secs..");
-			try {
-				Thread.sleep(GEO_SERVER_WAIT_TIME);
-			} catch (InterruptedException e) {}		
 			
-			boolean setLayerValue= caller.setLayer(featureTypeRest, styles.get(defaultStyleIndex), styles);
-			logger.debug("Set layer returned "+setLayerValue);
-			return setLayerValue;
-		}else {
-			logger.warn("Add feature type returned false, layer has not been created.");
-			return false;
-		}
+		
+		logger.debug("Invoking Caller for registering layer : ");
+		
+		GSFeatureTypeEncoder fte=new GSFeatureTypeEncoder();
+		fte.setEnabled(true);
+		fte.setLatLonBoundingBox(-180.0, -90.0, 180.0, 90.0, crs);
+		fte.setName(featureTable);
+		fte.setNativeCRS(crs);
+		
+		GSLayerEncoder le=new GSLayerEncoder();
+		le.setDefaultStyle(styles.get(defaultStyleIndex));
+		le.setEnabled(true);		
+		
+		Configuration gnConfig=gis.getGeoNetworkReader().getConfiguration();
+		
+		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamaps", fte, le, metaParams.getMetadata(), new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
+		
+		logger.debug("Publish response : "+resp);
+		return resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE);
+		
 		}catch(Exception e){
 			logger.debug("Create layer threw an exception ",e);
 			throw e;
@@ -437,25 +451,25 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static LayerInfo getLayer(LayersType type, String name, String title, String abstractDescription,List<String> styles, int defaultStyleIndex, GeoServerDescriptor geoserver, String wmsUrl)throws Exception{
+	private static LayerInfo getLayer(LayersType type, RESTLayer restLayer,GeoServerDescriptor desc)throws Exception{
 		LayerInfo layer=ReadTemplate.getLayerTemplate(type);
 		
 		layer.setType(type);
-		layer.setName(name);
-		layer.setTitle(title);
-		layer.set_abstract(abstractDescription);
+		layer.setName(restLayer.getName());
+		layer.setTitle(restLayer.getTitle());
+		layer.set_abstract(restLayer.getAbstract());
 		//GEOSERVER
-		layer.setUrl(wmsUrl);
+		layer.setUrl(restLayer.getResourceUrl());
 		layer.setServerProtocol("OGC:WMS");
-		layer.setServerLogin(geoserver.getUser());
-		layer.setServerPassword(geoserver.getPassword());
+		layer.setServerLogin(desc.getUser());
+		layer.setServerPassword(desc.getPassword());
 		layer.setServerType("geoserver");
 		layer.setSrs("EPSG:4326");
 
 		layer.setOpacity(1.0);
 		layer.setStyles(new ArrayList<String>());
-		layer.getStyles().addAll(styles);
-		layer.setDefaultStyle(styles.get(defaultStyleIndex));
+		layer.getStyles().add(restLayer.getDefaultStyle());
+		layer.setDefaultStyle(restLayer.getDefaultStyle());
 		//TODO Transect Info
 		return layer;
 	}
@@ -467,15 +481,15 @@ public class GISUtils {
 	 * @return
 	 * @throws Exception
 	 */
-	private static boolean deleteLayer(String layerName,GeoCaller caller)throws Exception{
-
-		return caller.deleteLayer(layerName);
-	}
-
-	private static boolean deleteFeatureType(String workspaceName,String dataStore,String featureType,GeoCaller caller)throws Exception{
-
-		return caller.deleteFeatureTypes(workspaceName, dataStore, featureType);
-	}
+//	private static boolean deleteLayer(String layerName,GeoCaller caller)throws Exception{
+//
+//		return caller.deleteLayer(layerName);
+//	}
+//
+//	private static boolean deleteFeatureType(String workspaceName,String dataStore,String featureType,GeoCaller caller)throws Exception{
+//
+//		return caller.deleteFeatureTypes(workspaceName, dataStore, featureType);
+//	}
 
 	private static boolean deleteLayerTable(String layerTable)throws Exception{
 		DBSession session=null;
@@ -491,8 +505,8 @@ public class GISUtils {
 		}
 	}
 
-	private static boolean deleteGroup(String groupName,GeoCaller caller)throws Exception{
-
-		return caller.deleteLayersGroup(groupName);
-	}
+//	private static boolean deleteGroup(String groupName,GeoCaller caller)throws Exception{
+//
+//		return caller.deleteLayersGroup(groupName);
+//	}
 }

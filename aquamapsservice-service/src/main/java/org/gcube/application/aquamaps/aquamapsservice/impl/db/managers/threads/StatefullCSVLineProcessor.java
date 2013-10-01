@@ -12,11 +12,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StatefullCSVLineProcessor implements CSVLineProcessor {
 	
-	private static final GCUBELog logger=new GCUBELog(StatefullCSVLineProcessor.class);	
+	final static Logger logger= LoggerFactory.getLogger(StatefullCSVLineProcessor.class);
 	boolean continueProcess=true;
 	private PreparedStatement ps=null;
 	private DBSession session=null;

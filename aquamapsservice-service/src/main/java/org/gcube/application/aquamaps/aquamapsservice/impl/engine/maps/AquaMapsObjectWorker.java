@@ -12,12 +12,13 @@ import org.gcube.application.aquamaps.publisher.UpdateConfiguration;
 import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AquaMapsObjectWorker extends Thread {
 
 
-	private static final GCUBELog logger=new GCUBELog(AquaMapsObjectWorker.class);
+	final static Logger logger= LoggerFactory.getLogger(AquaMapsObjectWorker.class);
 	
 	
 	private AquaMapsObjectExecutionRequest request;
@@ -58,7 +59,7 @@ public class AquaMapsObjectWorker extends Thread {
 			try {
 				SubmittedManager.updateStatus(request.getObject().getSearchId(), SubmittedStatus.Error);
 			} catch (Exception e1) {
-				logger.fatal("Unexpected Error ",e1);
+				logger.error("Unexpected Error ",e1);
 			}
 		}
 		finally{

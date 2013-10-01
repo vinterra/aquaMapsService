@@ -18,15 +18,16 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Fiel
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.common.core.scope.GCUBEScope;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.portlets.user.homelibrary.home.HomeLibrary;
 import org.gcube.portlets.user.homelibrary.home.HomeManagerFactory;
 import org.gcube.portlets.user.homelibrary.home.workspace.Workspace;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExportManager extends Thread{
 
-	private static final GCUBELog logger=new GCUBELog(ExportManager.class);
+	final static Logger logger= LoggerFactory.getLogger(ExportManager.class);
 	
 	private static final String EXPORT_REFERENCE_TABLE="exports";
 	private static final String EXPORT_ID="id";
@@ -167,7 +168,7 @@ public class ExportManager extends Thread{
 					updateField(referenceId, EXPORT_ERROR_MSG, FieldType.STRING, e.getMessage());
 					updateField(referenceId, EXPORT_STATUS, FieldType.STRING, ExportStatus._ERROR);
 				}catch(Exception e1){
-					logger.fatal("Unable to update export reference id  "+referenceId,e);
+					logger.error("Unable to update export reference id  "+referenceId,e);
 				}
 			}
 		}finally{if(session!=null)

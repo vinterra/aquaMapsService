@@ -4,10 +4,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PropertiesReader {
-private static final GCUBELog logger=new GCUBELog(PropertiesReader.class);
+	final static Logger logger= LoggerFactory.getLogger(PropertiesReader.class);
 	
 	private long lastAccessed=0;
 	

@@ -31,11 +31,12 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.Algo
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JobWorker extends Thread{
 
-	private static final GCUBELog logger=new GCUBELog(JobWorker.class);
+	final static Logger logger= LoggerFactory.getLogger(JobWorker.class);
 
 
 

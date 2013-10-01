@@ -15,13 +15,14 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.Sub
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SubmittedManager {
 
-	protected static GCUBELog logger= new GCUBELog(SubmittedManager.class);
+	final static Logger logger= LoggerFactory.getLogger(SubmittedManager.class);
 
 	public static final String submittedTable="submitted";
 

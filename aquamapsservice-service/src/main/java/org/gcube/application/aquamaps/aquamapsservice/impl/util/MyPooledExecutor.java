@@ -4,18 +4,18 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.util;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class MyPooledExecutor extends ThreadPoolExecutor implements ExtendedExecutor{
 
-	private static final GCUBELog logger=new GCUBELog(MyPooledExecutor.class);
+	final static Logger logger= LoggerFactory.getLogger(MyPooledExecutor.class);
 	
 	/**
 	 * Uses java.util.concurrent.Executors.defaultThreadFactory() setting threadLabel and priority (optional)

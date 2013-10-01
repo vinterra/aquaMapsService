@@ -9,13 +9,13 @@
 		<Packages>
 			<Main>
 				<Name>aquamapsservice-service</Name>
-				<Version>4.2.0-SNAPSHOT</Version>
+				<Version>4.2.1-SNAPSHOT</Version>
 				<MavenCoordinates>
 					<groupId>org.gcube.application</groupId>
 					<artifactId>aquamapsservice-service</artifactId>
-					<version>4.2.0-SNAPSHOT</version>
+					<version>4.2.1-SNAPSHOT</version>
 				</MavenCoordinates>
-				<GARArchive>aquamapsservice-service-4.2.0-SNAPSHOT.gar</GARArchive>
+				<GARArchive>aquamapsservice-service-4.2.1-SNAPSHOT.gar</GARArchive>
 				<PortType>
 					<Name>gcube/application/aquamaps/aquamapsservice/AquaMapsService</Name>
 				</PortType>
@@ -28,15 +28,15 @@
 			</Main>
 			<Software>
 				<Name>aquamapsservice-stubs</Name>
-				<Version>4.2.0-SNAPSHOT</Version>
+				<Version>4.2.1-SNAPSHOT</Version>
 				<MavenCoordinates>
 					<groupId>org.gcube.application</groupId>
 					<artifactId>aquamapsservice-stubs</artifactId>
-					<version>4.2.0-SNAPSHOT</version>
+					<version>4.2.1-SNAPSHOT</version>
 				</MavenCoordinates>
 				<Type>library</Type>
 				<Files>
-					<File>aquamapsservice-stubs-4.2.0-SNAPSHOT.jar</File>
+					<File>aquamapsservice-stubs-4.2.1-SNAPSHOT.jar</File>
 				</Files>
 			</Software>
 		</Packages>

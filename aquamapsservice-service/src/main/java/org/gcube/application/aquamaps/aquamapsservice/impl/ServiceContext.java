@@ -20,11 +20,16 @@ import org.gcube.application.aquamaps.publisher.PublisherConfiguration;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.scope.GCUBEScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class ServiceContext extends GCUBEServiceContext {
 
+	
+	private static Logger logger = LoggerFactory.getLogger(ServiceContext.class);
+	
 	public enum FOLDERS{
 		SERIALIZED,CLUSTERS,IMPORTS,TABLES,ANALYSIS
 	}
@@ -73,7 +78,7 @@ public class ServiceContext extends GCUBEServiceContext {
 			
 			logger.trace("Configuration Scope will be "+configurationScope);
 		}catch (Exception e){
-			logger.fatal("Unable to init configuration",e);
+			logger.error("Unable to init configuration",e);
 			throw e;
 		}
 		
@@ -93,14 +98,14 @@ public class ServiceContext extends GCUBEServiceContext {
 			publisher.initialize(config);
 			
 		}catch(Exception e){
-			logger.fatal("Unable to initiate Publisher library ",e);
+			logger.error("Unable to initiate Publisher library ",e);
 			throw e;
 		}
 		
 		try{
 			ServiceUtils.deleteFile(FileSetUtils.getTempMapsFolder());
 		}catch(Exception e){
-			logger.fatal("Unable to clean temp maps folder",e);
+			logger.error("Unable to clean temp maps folder",e);
 			throw e;
 		}
 		
@@ -112,7 +117,7 @@ public class ServiceContext extends GCUBEServiceContext {
 					"; freespaceThreshold="+getPropertyAsInteger(PropertiesConstants.MONITOR_FREESPACE_THRESHOLD));
 			t.start();
 		}catch(Exception e){
-			logger.fatal("Unable to start disk monitoring",e);
+			logger.error("Unable to start disk monitoring",e);
 			throw e;
 		}
 			
@@ -123,7 +128,7 @@ public class ServiceContext extends GCUBEServiceContext {
 			AnalysisManager.init(true,getPropertyAsInteger(PropertiesConstants.PROGRESS_MONITOR_INTERVAL_SEC));
 			SourceManager.checkTables();
 		}catch(Exception e){
-			logger.fatal("Unable to start managers",e);
+			logger.error("Unable to start managers",e);
 		}
 		
 		try{
@@ -131,7 +136,7 @@ public class ServiceContext extends GCUBEServiceContext {
 			t.start();
 			logger.info("Deletion Monitor started");
 		}catch(Exception e){
-			logger.fatal("Unable to start Deletion Monitor ",e);
+			logger.error("Unable to start Deletion Monitor ",e);
 		}
 		
 	}
@@ -142,7 +147,7 @@ public class ServiceContext extends GCUBEServiceContext {
         try{
         	publisher.shutdown();
         }catch(Exception e){
-        	logger.fatal("Unable to shutdown publisher ",e);
+        	logger.error("Unable to shutdown publisher ",e);
         }
         super.onShutdown();
         

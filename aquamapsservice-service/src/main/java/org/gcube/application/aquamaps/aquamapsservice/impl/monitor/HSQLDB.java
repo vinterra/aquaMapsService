@@ -1,7 +1,6 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.monitor;
 
 import java.io.File;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,13 +8,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
-
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HSQLDB {
 
-	private static GCUBELog logger= new GCUBELog(HSQLDB.class);	
+	final static Logger logger= LoggerFactory.getLogger(HSQLDB.class);
 
 	private static Connection getConnection()throws Exception{
 		try {
@@ -43,7 +42,7 @@ public class HSQLDB {
 				c.close();
 				return DriverManager.getConnection(connectionString+";ifexists=true", "SA", "");
 			}catch(Exception e1){
-				logger.fatal("Unable to init DB",e);
+				logger.error("Unable to init DB",e);
 				throw e;
 			}
 		}

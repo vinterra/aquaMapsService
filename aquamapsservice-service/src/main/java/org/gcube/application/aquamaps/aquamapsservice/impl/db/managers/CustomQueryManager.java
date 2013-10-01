@@ -18,9 +18,10 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.F
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.CustomQueryDescriptorFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FilterType;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -28,7 +29,7 @@ public class CustomQueryManager {
 
 	public static final String userQueryTable="userqueries";
 
-	private static final GCUBELog logger=new GCUBELog(CustomQueryManager.class);
+	final static Logger logger= LoggerFactory.getLogger(CustomQueryManager.class);
 
 
 	public static String setUserCustomQuery(String user,String queryString)throws Exception{

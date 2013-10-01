@@ -12,12 +12,13 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCA
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.dataanalysis.ecoengine.evaluation.bioclimate.BioClimateAnalysis;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Analyzer {
 
-	private static final GCUBELog logger=new GCUBELog(Analyzer.class);
+	final static Logger logger= LoggerFactory.getLogger(Analyzer.class);
 	
 	
 	

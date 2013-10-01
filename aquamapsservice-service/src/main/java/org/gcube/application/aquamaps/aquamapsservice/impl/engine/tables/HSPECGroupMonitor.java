@@ -1,12 +1,13 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.tables;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HSPECGroupMonitor extends Thread {
 
 
-	private static final GCUBELog logger=new GCUBELog(HSPECGroupMonitor.class);
+	final static Logger logger= LoggerFactory.getLogger(HSPECGroupMonitor.class);
 
 
 	public HSPECGroupMonitor() throws Exception{

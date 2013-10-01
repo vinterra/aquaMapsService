@@ -10,13 +10,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import org.apache.commons.io.FileUtils;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceUtils {
 
 	private static DateFormat dateFormatter= new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss_SSS_z");
 	private static DateFormat shortDateFormatter=new SimpleDateFormat("yyyy_MM_dd");
-	private static final GCUBELog logger = new GCUBELog(ServiceUtils.class);
+	final static Logger logger= LoggerFactory.getLogger(ServiceUtils.class);
 
 	public static String fileToString(String path) throws IOException {
 

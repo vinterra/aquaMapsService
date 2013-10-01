@@ -14,8 +14,9 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescr
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -28,7 +29,7 @@ import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
  */
 public abstract class DBSession {
 
-	protected static GCUBELog logger= new GCUBELog(DBSession.class);
+	protected final static Logger logger= LoggerFactory.getLogger(DBSession.class);
 //	protected static String DEFAULT_BOOLEAN_VALUE=null;
 //	protected static String DEFAULT_INTEGER_VALUE=null;
 //	protected static String DEFAULT_LONG_VALUE=null;
@@ -77,8 +78,8 @@ public abstract class DBSession {
 			default: return new PostGresSQLDBSession(conn);
 			}
 		}catch(Exception e){
-			logger.fatal("ERROR ON OPENING CONNECTION ",e);
-			logger.fatal("Connection parameters were : "+internalDescriptor);
+			logger.error("ERROR ON OPENING CONNECTION ",e);
+			logger.error("Connection parameters were : "+internalDescriptor);
 			throw e;
 		}
 	}

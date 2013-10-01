@@ -4,11 +4,12 @@ import java.util.HashMap;
 
 import org.apache.commons.pool.BasePoolableObjectFactory;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BatchGeneratorObjectFactory extends BasePoolableObjectFactory{
 
-	static GCUBELog logger= new GCUBELog(BatchGeneratorObjectFactory.class);	
+	final static Logger logger= LoggerFactory.getLogger(BatchGeneratorObjectFactory.class);
 	
 	public static enum BatchPoolType{
 		LOCAL,REMOTE

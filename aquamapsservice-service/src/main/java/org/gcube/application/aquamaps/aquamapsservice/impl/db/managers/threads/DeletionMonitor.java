@@ -17,11 +17,12 @@ import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DeletionMonitor extends Thread {
 
-	private static GCUBELog logger= new GCUBELog(DeletionMonitor.class);
+	final static Logger logger= LoggerFactory.getLogger(DeletionMonitor.class);
 
 	private long interval;
 

@@ -4,14 +4,15 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory.BatchPoolType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
-import org.gcube.common.core.utils.logging.GCUBELog;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class EnvironmentalLogicManager {
 
 	
 	
-	static GCUBELog logger= new GCUBELog(EnvironmentalLogicManager.class);
+	final static Logger logger= LoggerFactory.getLogger(EnvironmentalLogicManager.class);
 	private static GenericObjectPool batchPool=new GenericObjectPool(new BatchGeneratorObjectFactory(BatchPoolType.LOCAL));
 	private static GenericObjectPool remotePool=new GenericObjectPool(new BatchGeneratorObjectFactory(BatchPoolType.REMOTE));
 	

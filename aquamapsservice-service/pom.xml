@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>aquamapsservice</artifactId>
 		<groupId>org.gcube.application</groupId>
-		<version>4.2.0-SNAPSHOT</version>
+		<version>4.2.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>aquamapsservice-service</artifactId>
@@ -173,6 +173,12 @@
 			<groupId>org.gcube.portlets.user</groupId>
 			<artifactId>home-library</artifactId>
 			<version>[4.5.0-SNAPSHOT,5.0.0-SNAPSHOT]</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-jdk14</artifactId>
+				</exclusion>				
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.portlets.user</groupId>
@@ -188,22 +194,17 @@
 			<groupId>org.gcube.application</groupId>
 			<artifactId>aquamapsservice-publisherlibrary</artifactId>
 			<version>[3.0.0-SNAPSHOT,4.0.0-SNAPSHOT)</version>
+			<exclusions>
+				<exclusion>
+					 <groupId>com.googlecode.sli4j</groupId>
+    				 <artifactId>sli4j-slf4j-log4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.data.analysis</groupId>
 			<artifactId>statistical-manager-cl</artifactId>
 			<version>[1.0.0-SNAPSHOT,3.0.0-SNAPSHOT)</version>
-		</dependency>
-		<dependency>
-			<groupId>org.gcube.common</groupId>
-			<artifactId>geoserverinterface</artifactId>
-			<version>[1.9.1-SNAPSHOT,2.0.0-SNAPSHOT)</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>xml-apis-xerces</artifactId>
-					<groupId>xml-apis</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -282,5 +283,11 @@
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.gcube.spatial.data</groupId>
+			<artifactId>gis-interface</artifactId>
+			<version>[2.0.0-SNAPSHOT,3.0.0-SNAPSHOT)</version>		
+		</dependency>
+		
 	</dependencies>
 </project>

@@ -1,25 +1,19 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.engine.statistical;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceGenerationRequestsManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.common.core.scope.GCUBEScope;
-import org.gcube.common.core.utils.logging.GCUBELog;
 import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.data.analysis.statisticalmanager.proxies.StatisticalManagerDSL;
 import org.gcube.data.analysis.statisticalmanager.proxies.StatisticalManagerDataSpace;
 import org.gcube.data.analysis.statisticalmanager.proxies.StatisticalManagerFactory;
 import org.gcube.data.analysis.statisticalmanager.stubs.SMComputationConfig;
 import org.gcube.data.analysis.statisticalmanager.stubs.SMComputationRequest;
-import org.gcube_system.namespaces.data.analysis.statisticalmanager.types.SMEntries;
-import org.gcube_system.namespaces.data.analysis.statisticalmanager.types.SMInputEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 public class StatisticalModule {
 
-	protected static GCUBELog logger= new GCUBELog(StatisticalModule.class);
+	final static Logger logger= LoggerFactory.getLogger(StatisticalModule.class);
 	
 	private StatisticalManagerFactory factory;
 	private StatisticalManagerDataSpace dataSpace;
