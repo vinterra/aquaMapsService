@@ -8,8 +8,8 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AnalysisType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 
 public class AnalysisRequest {
 

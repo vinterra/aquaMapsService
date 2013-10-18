@@ -9,12 +9,12 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -186,7 +186,7 @@ public class SubmittedManager {
 			List<List<Field>> rows=new ArrayList<List<Field>>();
 			List<Field> row=new ArrayList<Field>();
 			for(Field f: toInsert.toRow())
-				if(!f.getName().equals(SubmittedFields.searchid+"")) row.add(f);
+				if(!f.name().equals(SubmittedFields.searchid+"")) row.add(f);
 			rows.add(row);
 			List<List<Field>> inserted=session.insertOperation(submittedTable,rows);
 			return new Submitted(inserted.get(0));
@@ -234,7 +234,7 @@ public class SubmittedManager {
 			id.add(toUpdate.getField(SubmittedFields.searchid));
 			ArrayList<Field> values=new ArrayList<Field>();
 			for(Field f: toUpdate.toRow())
-				if(!f.getName().equals(SubmittedFields.searchid+"")) values.add(f);
+				if(!f.name().equals(SubmittedFields.searchid+"")) values.add(f);
 			PreparedStatement psUpdate=session.getPreparedStatementForUpdate(values, id, submittedTable);
 			psUpdate=session.fillParameters(values, 0, psUpdate);
 			psUpdate=session.fillParameters(id, values.size(), psUpdate);

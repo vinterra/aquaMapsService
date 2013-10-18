@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.gcube.common.gis.datamodel.types.LayersType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.gis.LayerType;
 
 
 
@@ -18,7 +18,7 @@ public class LayerGenerationRequest {
 	private String featureLabel;
 	private String FeatureDefinition;
 	private String mapName;
-	private LayersType mapType;
+	private LayerType mapType;
 	
 	private List<StyleGenerationRequest> toGenerateStyles=new ArrayList<StyleGenerationRequest>();
 	private List<String> toAssociateStyles=new ArrayList<String>();
@@ -39,7 +39,7 @@ public class LayerGenerationRequest {
 
 
 	public LayerGenerationRequest(String csvFile, String featureLabel,
-			String featureDefinition, String mapName, LayersType mapType,
+			String featureDefinition, String mapName, LayerType mapType,
 			List<StyleGenerationRequest> toGenerateStyles,
 			List<String> toAssociateStyles, int defaultStyle,Map<String,Object> meta) {
 		super();
@@ -106,11 +106,11 @@ public class LayerGenerationRequest {
 
 
 
-	public LayersType getMapType() {
+	public LayerType getMapType() {
 		return mapType;
 	}
 
-	public void setMapType(LayersType mapType) {
+	public void setMapType(LayerType mapType) {
 		this.mapType = mapType;
 	}
 

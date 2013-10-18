@@ -8,17 +8,17 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SpeciesMa
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.JobExecutionManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,9 +56,9 @@ public class CommonServiceLogic {
 		job.setIsGis(false);
 		job.setName(hspec.getTitle()+"_All Maps");
 		for(Species s: job.getSelectedSpecies()){
-			AquaMapsObject object=new AquaMapsObject(s.getFieldbyName(SpeciesOccursumFields.scientific_name+"").getValue(), 0, ObjectType.SpeciesDistribution);
+			AquaMapsObject object=new AquaMapsObject(s.getFieldbyName(SpeciesOccursumFields.scientific_name+"").value(), 0, ObjectType.SpeciesDistribution);
 			if(object.getName()==null||object.getName().equals(Field.VOID))
-				object.setName(s.getFieldbyName(SpeciesOccursumFields.genus+"").getValue()+" "+s.getFieldbyName(SpeciesOccursumFields.species+"").getValue());
+				object.setName(s.getFieldbyName(SpeciesOccursumFields.genus+"").value()+" "+s.getFieldbyName(SpeciesOccursumFields.species+"").value());
 			
 			object.setAuthor(job.getAuthor());
 			object.getSelectedSpecies().add(s);

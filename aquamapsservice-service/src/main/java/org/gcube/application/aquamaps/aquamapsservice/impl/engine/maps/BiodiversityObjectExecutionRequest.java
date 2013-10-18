@@ -7,11 +7,11 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 
 public class BiodiversityObjectExecutionRequest extends
 		AquaMapsObjectExecutionRequest {

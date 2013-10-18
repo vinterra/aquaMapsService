@@ -20,13 +20,13 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.ExtendedExecutor
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.MyPooledExecutor;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;

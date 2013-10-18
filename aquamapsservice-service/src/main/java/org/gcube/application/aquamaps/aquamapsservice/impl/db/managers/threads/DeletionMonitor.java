@@ -9,10 +9,10 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.Submitted
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;

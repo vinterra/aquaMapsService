@@ -24,15 +24,14 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.A
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AreaType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -60,8 +59,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	@Override
 	public String getPhylogeny(GetPhylogenyRequestType req) throws GCUBEFault{
 		try{
-			Field toSelect= new Field(req.getToSelect());
-			return SpeciesManager.getJSONTaxonomy(toSelect, Field.load(req.getFieldList()), req.getPagedRequestSettings());
+			Field toSelect= PortTypeTranslations.fromStubs(req.getToSelect());
+			return SpeciesManager.getJSONTaxonomy(toSelect, PortTypeTranslations.fromStubs(req.getFieldList()), req.getPagedRequestSettings());
 		}catch(Exception e){
 			logger.error("Unable to get Taxonomy ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -109,8 +108,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
  			Species species=SpeciesManager.getSpeciesById(true,true,req.getSpeciesID(),SourceManager.getDefaultId(ResourceType.HSPEN));
  			
 			if(req.isUseBottomSeaTempAndSalinity())
-				species.getFieldbyName(HspenFields.layer+"").setValue("b");
-			else species.getFieldbyName(HspenFields.layer+"").setValue("u");
+				species.getFieldbyName(HspenFields.layer+"").value("b");
+			else species.getFieldbyName(HspenFields.layer+"").value("u");
  			
 			
 			
@@ -124,7 +123,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			for(Field f:generator.getEnvelope(species, foundCells))species.addField(f);
 			
 			
-			return species.extractEnvelope().toFieldArray();
+			return PortTypeTranslations.toFieldArray(species.extractEnvelope().toFieldArray().theList());
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -148,8 +147,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			
 			for(Field f:generator.getEnvelope(spec, selected))spec.addField(f);
 			
+			return PortTypeTranslations.toFieldArray(spec.extractEnvelope().toFieldArray().theList());
 			
-			return spec.extractEnvelope().toFieldArray();
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -172,7 +171,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		try{
 			logger.trace("Serving submit job "+req.getName());
 			logger.trace("Forcing group enabling if layers requested");
-			Job job= new Job(req);
+			Job job= PortTypeTranslations.fromStubs(req);
 			boolean enableGis=false;
 			for(AquaMapsObject obj : job.getAquaMapsObjectList())
 				if(obj.getGis()) {
@@ -201,7 +200,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("serving get Species envelope");
 		try{
 			Species selected=SpeciesManager.getSpeciesById(true,true,arg0.getSpeciesId(),arg0.getHspenId());
-			return Field.toStubsVersion(selected.getAttributesList());
+			return PortTypeTranslations.toFieldArray(selected.getAttributesList());
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
@@ -225,7 +224,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		
 		try{
 			return SpeciesManager.getJSONList(req.getPagedRequestSettings(),
-					Filter.load(req.getGenericSearchFilters()), Filter.load(req.getSpecieficFilters()), req.getHspen());
+					PortTypeTranslations.fromStubs(req.getGenericSearchFilters()), PortTypeTranslations.fromStubs(req.getSpecieficFilters()), req.getHspen());
 			
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
@@ -258,7 +257,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			logger.trace("Loading submitted id : "+arg0);
 			List<Field> conditions=new ArrayList<Field>();
 			conditions.add(new Field(SubmittedFields.searchid+"", arg0+"", FieldType.INTEGER));
-			return SubmittedManager.getList(conditions).get(0).toStubsVersion();			
+			return PortTypeTranslations.toStubs(SubmittedManager.getList(conditions).get(0));			
 		}catch(Exception e){
 			logger.error("",e);
 			throw new GCUBEFault("Impossible to load submitted : "+e.getMessage());
@@ -271,7 +270,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		try{
 			AquaMapsObject obj=AquaMapsManager.loadObject(arg0,true,true);
 //			logger.info("Object IS "+AquaMapsXStream.getXMLInstance().toXML(obj));
-			return obj.toStubsVersion();
+			return PortTypeTranslations.toStubs(obj);
 			
 		}catch(Exception e){
 			logger.error("",e);
@@ -285,7 +284,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		logger.trace("Serving getSpecies by filters");
 		
 		try{
-			File toExport=SpeciesManager.getCSVList(Filter.load(arg0.getGenericSearchFilters()), Filter.load(arg0.getSpecieficFilters()), arg0.getHspen());
+			File toExport=SpeciesManager.getCSVList(PortTypeTranslations.fromStubs(arg0.getGenericSearchFilters()), PortTypeTranslations.fromStubs(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
 			RSWrapper wrapper=new RSWrapper();

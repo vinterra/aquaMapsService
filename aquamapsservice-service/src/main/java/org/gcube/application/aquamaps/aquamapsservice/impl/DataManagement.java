@@ -33,18 +33,18 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.SetUserCustomQueryRe
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewCustomQueryRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ViewTableRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
@@ -71,11 +71,11 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 
 	@Override
 	public org.gcube_system.namespaces.application.aquamaps.types.Resource getResourceInfo(org.gcube_system.namespaces.application.aquamaps.types.Resource myResource) throws GCUBEFault{
-		Resource toReturn=new Resource(myResource);		
+		Resource toReturn=PortTypeTranslations.fromStubs(myResource);		
 		
 		try{
 		
-		return SourceManager.getById(toReturn.getSearchId()).toStubsVersion();
+		return PortTypeTranslations.toStubs(SourceManager.getById(toReturn.getSearchId()));
 		}catch(Exception e){
 			logger.error("Unable to load source details. id: "+myResource.getSearchId(), e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -86,7 +86,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public int generateMaps(GenerateMapsRequestType arg0) throws RemoteException,GCUBEFault{
 
 		try{
-			return CommonServiceLogic.generateMaps_Logic(arg0.getHSPECId(),Field.load(arg0.getSpeciesFilter()),arg0.getAuthor(),arg0.isGenerateLayers(),arg0.isForceRegeneration());
+			return CommonServiceLogic.generateMaps_Logic(arg0.getHSPECId(),PortTypeTranslations.fromStubs(arg0.getSpeciesFilter()),arg0.getAuthor(),arg0.isGenerateLayers(),arg0.isForceRegeneration());
 		}catch(Exception e){
 			logger.error("Unable to execute request ", e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -103,7 +103,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 
 			logger.trace("Received hspec group generation request, title : "+arg0.getGenerationName());
 			
-			SourceGenerationRequest request=new SourceGenerationRequest(arg0);
+			SourceGenerationRequest request=PortTypeTranslations.fromStubs(arg0);
 			
 			for(Integer resId:request.getHcafIds()){
 				org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource r=SourceManager.getById(resId);
@@ -204,7 +204,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 				}catch(Exception e){
 					logger.warn("Unable to locate default table for "+type,e);
 				}
-				return Field.toStubsVersion(toReturn);
+				return PortTypeTranslations.toFieldArray(toReturn);
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -216,7 +216,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	GCUBEFault {
 		try{
 			logger.trace("Editing resource "+arg0.getSearchId());
-			Resource request=new Resource(arg0);
+			Resource request=PortTypeTranslations.fromStubs(arg0);
 			Resource toEdit=SourceManager.getById(request.getSearchId());
 			toEdit.setTitle(request.getTitle());
 			toEdit.setDescription(request.getDescription());
@@ -409,7 +409,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public String analyzeTables(org.gcube_system.namespaces.application.aquamaps.types.Analysis arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			return AnalysisManager.insertRequest(new Analysis(arg0));
+			return AnalysisManager.insertRequest(PortTypeTranslations.fromStubs(arg0));
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -500,7 +500,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 	public CustomQueryDescriptorStubs getCustomQueryDescriptor(String request)
 			throws RemoteException, GCUBEFault {
 		try{
-			return CustomQueryManager.getDescriptor(request).toStubsVersion();
+			return PortTypeTranslations.toStubs(CustomQueryManager.getDescriptor(request));
 		}catch(Exception e){
 			logger.error("Unable to get descriptor for custom query "+request,e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -523,7 +523,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			ArrayList<Field> filter=new ArrayList<Field>(Field.load(request.getFilter()));
+			ArrayList<Field> filter=PortTypeTranslations.fromStubs(request.getFilter());
 			PagedRequestSettings settings=request.getSettings();
 			return DBUtils.toJSon(session.executeFilteredQuery(filter, request.getTablename(), settings.getOrderField(), settings.getOrderDirection()),settings.getOffset(),settings.getOffset()+settings.getLimit());
 		}catch(Exception e){

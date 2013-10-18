@@ -9,12 +9,12 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class SourceGenerationRequestsManager {
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");
 			for(Field f:toInsert.toRow())
-				if(f.getValue()!=null&&!f.getValue().equalsIgnoreCase("null")){
+				if(f.value()!=null&&!f.value().equalsIgnoreCase("null")){
 					toInsertRow.add(f);
 					logger.debug(f.toXML());
 				}
@@ -125,7 +125,7 @@ public class SourceGenerationRequestsManager {
 			ResultSet rs= session.executeFilteredQuery(key, requestsTable, field, OrderDirection.ASC);
 			if(rs.next())
 				for(Field f:Field.loadRow(rs)){
-					if(f.getName().equals(field)) return f;
+					if(f.name().equals(field)) return f;
 				}
 			throw new Exception("Field not found "+field);
 		}catch(Exception e){
@@ -166,14 +166,14 @@ public class SourceGenerationRequestsManager {
 	}
 	public static void addGeneratedResource(int hspecId,String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
-		ArrayList<String> current=CSVUtils.CSVToStringList(getField(id, SourceGenerationRequestFields.generatedsourcesid+"").getValue());
+		ArrayList<String> current=CSVUtils.CSVToStringList(getField(id, SourceGenerationRequestFields.generatedsourcesid+"").value());
 		current.add(hspecId+"");
 		fields.add(new Field(SourceGenerationRequestFields.generatedsourcesid+"",CSVUtils.listToCSV(current),FieldType.STRING));
 		updateField(id, fields);
 	}
 	public static void addJobIds(int jobId,String id)throws Exception{
 		ArrayList<Field> fields=new ArrayList<Field>();
-		ArrayList<String> current=CSVUtils.CSVToStringList(getField(id, SourceGenerationRequestFields.jobids+"").getValue());
+		ArrayList<String> current=CSVUtils.CSVToStringList(getField(id, SourceGenerationRequestFields.jobids+"").value());
 		current.add(jobId+"");
 		fields.add(new Field(SourceGenerationRequestFields.jobids+"",CSVUtils.listToCSV(current),FieldType.STRING));
 		updateField(id, fields);

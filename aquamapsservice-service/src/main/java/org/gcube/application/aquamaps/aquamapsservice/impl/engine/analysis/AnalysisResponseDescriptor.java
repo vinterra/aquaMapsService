@@ -3,7 +3,7 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.engine.analysis;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AnalysisType;
 
 public class AnalysisResponseDescriptor {
 

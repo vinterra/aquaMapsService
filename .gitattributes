@@ -10,6 +10,7 @@ aquamapsservice-service/pom.xml -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/AquaMapsService.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/CommonServiceLogic.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/DataManagement.java -text
+aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/PortTypeTranslations.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/PublisherService.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/ServiceContext.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/db/DBConfigurationManager.java -text

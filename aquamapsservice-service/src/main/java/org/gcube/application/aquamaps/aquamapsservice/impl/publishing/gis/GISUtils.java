@@ -29,15 +29,15 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConsta
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.gis.LayerType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ObjectType;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
 import org.gcube.common.gis.datamodel.enhanced.WMSContextInfo;
-import org.gcube.common.gis.datamodel.types.LayersType;
 import org.gcube.common.gis.datamodel.utils.ReadTemplate;
 import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.spatial.data.geonetwork.LoginLevel;
@@ -451,7 +451,7 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static LayerInfo getLayer(LayersType type, RESTLayer restLayer,GeoServerDescriptor desc)throws Exception{
+	private static LayerInfo getLayer(LayerType type, RESTLayer restLayer,GeoServerDescriptor desc)throws Exception{
 		LayerInfo layer=ReadTemplate.getLayerTemplate(type);
 		
 		layer.setType(type);

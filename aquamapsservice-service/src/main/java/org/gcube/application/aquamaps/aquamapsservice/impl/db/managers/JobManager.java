@@ -13,16 +13,16 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.Generator;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Job;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 
@@ -155,7 +155,7 @@ public class JobManager extends SubmittedManager{
 				boolean found= false;
 				for(List<Field> f:Field.loadResultSet(session.executeFilteredQuery(filter, tempFolders, tempFoldersJobId, OrderDirection.ASC))){
 					for(Field g:f)
-						if(g.getName().equals(tempFoldersFolderName)&&g.getValue().equals(folderName))
+						if(g.name().equals(tempFoldersFolderName)&&g.value().equals(folderName))
 							found=true;
 				}
 				if(!found)logger.warn("Unable to register temp folder "+folderName);
@@ -224,7 +224,7 @@ public class JobManager extends SubmittedManager{
 			filter.add(statusField);
 			long errorCount=session.getCount(submittedTable, filter);
 			logger.debug("Found "+errorCount+" ERROR aquamaps object for jobId ");
-			statusField.setValue(SubmittedStatus.Completed+"");
+			statusField.value(SubmittedStatus.Completed+"");
 			long completedCount=session.getCount(submittedTable, filter);
 			logger.debug("Found "+completedCount+" COMPLETED aquamaps object for jobId ");
 			return (completedCount+errorCount-count==0);
@@ -304,7 +304,7 @@ public class JobManager extends SubmittedManager{
 			Field idField=new Field(selectedSpeciesSpeciesID,"",FieldType.STRING);
 			filter.add(idField);
 			for(String id : toCheck){
-				idField.setValue(id);
+				idField.value(id);
 				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, OrderDirection.ASC);
 				if(rs.next()){
 					if(!rs.getString(selectedSpeciesStatus).equalsIgnoreCase(SpeciesStatus.Ready+""))
@@ -337,7 +337,7 @@ public class JobManager extends SubmittedManager{
 			Field idField=new Field(selectedSpeciesSpeciesID,"",FieldType.STRING);
 			filter.add(idField);
 			for(String id : ids){
-				idField.setValue(id);
+				idField.value(id);
 				ResultSet rs= session.executeFilteredQuery(filter, selectedSpecies, selectedSpeciesSpeciesID, OrderDirection.ASC);
 				if(rs.next()){
 					if(rs.getInt(selectedSpeciesIsCustomized)==0)
@@ -501,14 +501,14 @@ public class JobManager extends SubmittedManager{
 					fields.add(new Field(selectedSpeciesIsCustomized,"",FieldType.BOOLEAN));
 
 					PreparedStatement psSpecies=session.getPreparedStatementForInsert(fields, selectedSpecies);
-					fields.get(0).setValue(toPerform.getId()+"");
+					fields.get(0).value(toPerform.getId()+"");
 					for(Species s:toPerform.getSelectedSpecies()){
 						String status=SpeciesStatus.Ready.toString();
 						if((hasWeight)&&(toPerform.getEnvelopeWeights().containsKey(s.getId())))status=SpeciesStatus.toGenerate.toString();
 						if((hasPerturbation)&&(toPerform.getEnvelopeCustomization().containsKey(s.getId())))status=SpeciesStatus.toCustomize.toString();
-						fields.get(1).setValue(s.getId());
-						fields.get(2).setValue(status);
-						fields.get(3).setValue((hasWeight||hasPerturbation)+"");
+						fields.get(1).value(s.getId());
+						fields.get(2).value(status);
+						fields.get(3).value((hasWeight||hasPerturbation)+"");
 						psSpecies=session.fillParameters(fields,0, psSpecies);
 						psSpecies.executeUpdate();
 					}
@@ -537,9 +537,9 @@ public class JobManager extends SubmittedManager{
 	public static List<Submitted> getObjects (int jobId)throws Exception{
 		List<Field> filters=new ArrayList<Field>();
 		Field jobIdField=new Field();
-		jobIdField.setValue(jobId+"");
-		jobIdField.setType(FieldType.INTEGER);
-		jobIdField.setName(SubmittedFields.jobid+"");
+		jobIdField.value(jobId+"");
+		jobIdField.type(FieldType.INTEGER);
+		jobIdField.name(SubmittedFields.jobid+"");
 		filters.add(jobIdField);
 		return getList(filters);
 	}

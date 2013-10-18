@@ -13,12 +13,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceMan
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.BatchGeneratorObjectFactory.BatchPoolType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.EnvironmentalExecutionReportItem;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube.application.aquamaps.ecomodelling.generators.aquamapsorg.MaxMinGenerator;
 import org.gcube.application.aquamaps.ecomodelling.generators.configuration.EngineConfiguration;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.EnvelopeModel;
@@ -187,11 +187,11 @@ public class BatchGenerator implements BatchGeneratorI {
 						int secondHcafTime=0;
 						int numInterpolations=0;
 						for(Field f:configuration.getAdditionalParameters()){
-							if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_ID)) firstHcaf=f.getValueAsInteger();
-							else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_ID)) secondHcaf=f.getValueAsInteger();
-							else if(f.getName().equals(SourceGenerationRequest.FIRST_HCAF_TIME)) firstHcafTime=f.getValueAsInteger();
-							else if(f.getName().equals(SourceGenerationRequest.SECOND_HCAF_TIME)) secondHcafTime=f.getValueAsInteger();
-							else if(f.getName().equals(SourceGenerationRequest.NUM_INTERPOLATIONS)) numInterpolations=f.getValueAsInteger();
+							if(f.name().equals(SourceGenerationRequest.FIRST_HCAF_ID)) firstHcaf=f.getValueAsInteger();
+							else if(f.name().equals(SourceGenerationRequest.SECOND_HCAF_ID)) secondHcaf=f.getValueAsInteger();
+							else if(f.name().equals(SourceGenerationRequest.FIRST_HCAF_TIME)) firstHcafTime=f.getValueAsInteger();
+							else if(f.name().equals(SourceGenerationRequest.SECOND_HCAF_TIME)) secondHcafTime=f.getValueAsInteger();
+							else if(f.name().equals(SourceGenerationRequest.NUM_INTERPOLATIONS)) numInterpolations=f.getValueAsInteger();
 						}
 						if(firstHcaf==0) throw new Exception("Unable to select first HCAF");
 						if(secondHcaf==0) throw new Exception("Unable to select second HCAF");

@@ -12,15 +12,15 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedByFi
 import org.gcube.application.aquamaps.aquamapsservice.stubs.PublisherServicePortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RetrieveMapsByCoverageRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMap;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FileType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FileType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.model.CoverageDescriptor;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
@@ -95,7 +95,7 @@ PublisherServicePortType {
 				CoverageDescriptor descr=new CoverageDescriptor(fSet.getTableId(), fSet.getParameters());
 				if(fSet.isCustomized()){
 					try{
-						fileSetFilter.get(0).setValue(fSet.getId());
+						fileSetFilter.get(0).value(fSet.getId());
 						Submitted found=SubmittedManager.getList(fileSetFilter, pagedSettings).get(0);
 						formedCustomMaps.put(found.getSearchId(), formMap(fSet)); 
 					}catch(Exception e){
@@ -116,7 +116,7 @@ PublisherServicePortType {
 				CoverageDescriptor descr=new CoverageDescriptor(l.getTableId(), l.getParameters());
 				if(l.isCustomized()){
 					try{
-						layerFilter.get(0).setValue(l.getId());
+						layerFilter.get(0).value(l.getId());
 						Submitted found=SubmittedManager.getList(layerFilter, pagedSettings).get(0);
 						if(formedCustomMaps.containsKey(found.getSearchId())){
 							AquaMap toUpdate=formedCustomMaps.get(found.getSearchId());
@@ -146,7 +146,7 @@ PublisherServicePortType {
 			ArrayList<AquaMap> toReturn=new ArrayList<AquaMap>(formedMaps.values());
 			toReturn.addAll(formedCustomMaps.values());
 //			logger.debug("Found "+toReturn.size()+" Maps ("+formedCustomMaps.size()+" custom)in "+(System.currentTimeMillis()-starttime)+" ms");
-			return AquaMap.toStubsVersion(toReturn);			
+			return PortTypeTranslations.toMapArray(toReturn);			
 		}catch(Exception e){
 			logger.error("Unable to get Maps ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -165,7 +165,7 @@ PublisherServicePortType {
 				ArrayList<File> list=new ArrayList<File>();
 				for(org.gcube.application.aquamaps.publisher.impl.model.File f: fSet.getFiles())
 					list.add(new File(FileType.valueOf(f.getType()+""),publisherHost+f.getStoredUri(),f.getName()));
-				return File.toStubsVersion(list);
+				return PortTypeTranslations.toFileArray(list);
 			}else throw new Exception("FileSet with Id "+arg0+" not found");
 		}catch(Exception e){
 			logger.error("Unable to get FileSet ",e);
@@ -179,7 +179,7 @@ PublisherServicePortType {
 			GetJSONSubmittedByFiltersRequestType arg0) throws RemoteException,
 			GCUBEFault {
 		try{
-			return SubmittedManager.getJsonList(Field.load(arg0.getFilters()), arg0.getSettings());			
+			return SubmittedManager.getJsonList(PortTypeTranslations.fromStubs(arg0.getFilters()), arg0.getSettings());			
 		}catch(Exception e){
 			logger.error("Unable to get Submitted ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
@@ -194,7 +194,7 @@ PublisherServicePortType {
 			Publisher publisher=ServiceContext.getContext().getPublisher();
 			Layer layer=publisher.getById(Layer.class, arg0);
 			if(layer!=null){
-				return layer.getLayerInfo().toStubsVersion();
+				return PortTypeTranslations.toStubs(layer.getLayerInfo());
 			}else throw new Exception("Layer with Id "+arg0+" not found");
 		}catch(Exception e){
 			logger.error("Unable to get Layer ",e);

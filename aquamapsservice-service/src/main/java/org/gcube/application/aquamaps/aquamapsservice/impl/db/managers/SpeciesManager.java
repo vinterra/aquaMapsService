@@ -15,15 +15,15 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Perturbation;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -214,7 +214,7 @@ public class SpeciesManager {
 		StringBuilder toReturn=new StringBuilder();
 		if((filters.size()>0)){
 			for(Filter filter:filters)				
-				toReturn.append(getCompleteName(selHSPEN, filter.getField().getName())+filter.toSQLString()+" "+operator+" ");
+				toReturn.append(getCompleteName(selHSPEN, filter.getField().name())+filter.toSQLString()+" "+operator+" ");
 			int index=toReturn.lastIndexOf(operator);
 			toReturn.delete(index, index+3);
 		}
@@ -250,7 +250,7 @@ public class SpeciesManager {
 		for(List<Field> row:rows){
 			Species toAdd=new Species("***");
 			toAdd.getAttributesList().addAll(row);
-			toAdd.setId(toAdd.getFieldbyName(SpeciesOccursumFields.speciesid+"").getValue());
+			toAdd.setId(toAdd.getFieldbyName(SpeciesOccursumFields.speciesid+"").value());
 			toReturn.add(toAdd);
 		}
 		return toReturn;
@@ -286,8 +286,8 @@ public class SpeciesManager {
 		boolean continueCheck=true;
 		for(SpeciesOccursumFields toCheck:toCheckValues){
 			if(continueCheck)for(Species s: enrichedSpecies){
-				if(!commonLevels.containsKey(toCheck))commonLevels.put(toCheck, s.getFieldbyName(toCheck+"").getValue());
-				else if(!s.getFieldbyName(toCheck+"").getValue().equalsIgnoreCase(commonLevels.get(toCheck))){
+				if(!commonLevels.containsKey(toCheck))commonLevels.put(toCheck, s.getFieldbyName(toCheck+"").value());
+				else if(!s.getFieldbyName(toCheck+"").value().equalsIgnoreCase(commonLevels.get(toCheck))){
 					continueCheck=false;
 					commonLevels.remove(toCheck);
 				}

@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -239,7 +239,7 @@ public abstract class DBSession {
 		StringBuilder fieldsValues=new StringBuilder("(");
 		for (Field f: fields){
 			fieldsValues.append("?,");
-			fieldsName.append(f.getName()+",");
+			fieldsName.append(f.name()+",");
 		}
 
 		logger.debug(" the values are "+ fields.size());
@@ -347,7 +347,7 @@ public abstract class DBSession {
 
 	
 	protected static String formSelectDistinctQueryStringFromFields(List<Field> filters,Field toSelectField,String table,String sortColumn,OrderDirection sortDirection){
-		String toReturn="SELECT DISTINCT("+toSelectField.getName()+") FROM "+table+
+		String toReturn="SELECT DISTINCT("+toSelectField.name()+") FROM "+table+
 		(((filters!=null)&&filters.size()>0)?" WHERE "+getCondition(filters,"AND"):"")+
 		((sortColumn!=null&&!sortColumn.equalsIgnoreCase("null"))?" ORDER BY "+sortColumn+" "+sortDirection:"");
 //		logger.debug("QUERY STRING IS : "+toReturn);
@@ -373,7 +373,7 @@ public abstract class DBSession {
 	private static String getCondition(List<Field> filters,String operator){
 		StringBuilder query=new StringBuilder();
 		if((filters!=null)&&filters.size()>0){
-			for(Field f:filters)query.append(" "+f.getName()+" = ? "+operator);
+			for(Field f:filters)query.append(" "+f.name()+" = ? "+operator);
 			query.delete(query.lastIndexOf(operator),query.lastIndexOf(operator)+operator.length());
 		}
 //		logger.debug("Formed condition string "+query);

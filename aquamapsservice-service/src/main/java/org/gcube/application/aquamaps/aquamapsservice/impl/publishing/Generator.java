@@ -28,16 +28,17 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleG
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest.ClusterScaleType;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.gis.LayerType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ObjectType;
 import org.gcube.application.aquamaps.publisher.MetaInformations;
 import org.gcube.application.aquamaps.publisher.Publisher;
 import org.gcube.application.aquamaps.publisher.impl.datageneration.ObjectManager;
@@ -47,7 +48,6 @@ import org.gcube.application.aquamaps.publisher.impl.model.FileType;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube.application.aquamaps.publisher.impl.model.WMSContext;
 import org.gcube.common.gis.datamodel.enhanced.LayerInfo;
-import org.gcube.common.gis.datamodel.types.LayersType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +192,7 @@ public class Generator<T> implements ObjectManager<T> {
 						object.getType().equals(ObjectType.Biodiversity) ? AquaMapsManager.maxSpeciesCountInACell: HSPECFields.probability + "",
 						object.getType().equals(ObjectType.Biodiversity) ? "integer": "real",						
 						object.getTitle(),
-						object.getType().equals(ObjectType.Biodiversity) ?LayersType.Biodiversity:LayersType.Prediction,
+						object.getType().equals(ObjectType.Biodiversity) ?LayerType.Biodiversity:LayerType.Prediction,
 						toGenerateStyle,
 						toAssociateStyleList,
 						0,meta));
@@ -458,11 +458,11 @@ public class Generator<T> implements ObjectManager<T> {
 
 				Species s=SpeciesManager.getSpeciesById(true, false, speciesId, 0);
 				String path=objectDescriptor.getSourceHSPEC()+File.separator+
-				s.getFieldbyName(SpeciesOccursumFields.kingdom+"").getValue()+File.separator+
-				s.getFieldbyName(SpeciesOccursumFields.phylum+"").getValue()+File.separator+
-				s.getFieldbyName(SpeciesOccursumFields.classcolumn+"").getValue()+File.separator+
-				s.getFieldbyName(SpeciesOccursumFields.ordercolumn+"").getValue()+File.separator+
-				s.getFieldbyName(SpeciesOccursumFields.familycolumn+"").getValue()+File.separator+
+				s.getFieldbyName(SpeciesOccursumFields.kingdom+"").value()+File.separator+
+				s.getFieldbyName(SpeciesOccursumFields.phylum+"").value()+File.separator+
+				s.getFieldbyName(SpeciesOccursumFields.classcolumn+"").value()+File.separator+
+				s.getFieldbyName(SpeciesOccursumFields.ordercolumn+"").value()+File.separator+
+				s.getFieldbyName(SpeciesOccursumFields.familycolumn+"").value()+File.separator+
 				s.getId()+(objectDescriptor.getIsCustomized()?ServiceUtils.generateId(objectDescriptor.getAuthor(), ""):"");
 				
 				String scientificName=s.getScientificName();

@@ -14,8 +14,8 @@ import java.util.List;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext.FOLDERS;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HSPECFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 
 public class PostGresSQLDBSession extends DBSession {
@@ -45,7 +45,7 @@ public class PostGresSQLDBSession extends DBSession {
 			if(f.isNull()) ps.setNull(psIndex, ps.getParameterMetaData().getParameterType(psIndex));
 			else{
 				//			logger.trace("Field "+f.getName()+" = "+f.getValue()+" ( "+f.getType()+" )");
-				switch(f.getType()){
+				switch(f.type()){
 				case BOOLEAN:{ 
 					Integer value=f.getValueAsBoolean()?1:0;
 					ps.setInt(psIndex, value);
@@ -57,15 +57,15 @@ public class PostGresSQLDBSession extends DBSession {
 					ps.setInt(psIndex, f.getValueAsInteger());
 				}catch(NumberFormatException e){
 					//trying long
-					ps.setLong(psIndex, Long.parseLong(f.getValue()));
+					ps.setLong(psIndex, Long.parseLong(f.value()));
 				}
 				break;	
 				case TIMESTAMP : try{
-					ps.setTimestamp(psIndex, Timestamp.valueOf(f.getValue()));
+					ps.setTimestamp(psIndex, Timestamp.valueOf(f.value()));
 				}catch(IllegalArgumentException e){
 					ps.setNull(psIndex, Types.TIMESTAMP);
 				}break;
-				case STRING: ps.setString(psIndex,f.getValue());
+				case STRING: ps.setString(psIndex,f.value());
 				break;
 				case LONG: ps.setLong(psIndex, f.getValueAsLong());
 				break;

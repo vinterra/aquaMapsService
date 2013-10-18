@@ -15,12 +15,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.Configu
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescriptor;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportCSVSettings;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.ImportResourceRequestType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.MetaSourceFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -64,7 +64,7 @@ public class SourceManager {
 			rows.add(row);
 			List<List<Field>> ids = session.insertOperation(sourcesTable, rows);
 			for(Field f: ids.get(0)) 
-				if(f.getName().equals(MetaSourceFields.searchid+"")) toRegister.setSearchId(f.getValueAsInteger());
+				if(f.name().equals(MetaSourceFields.searchid+"")) toRegister.setSearchId(f.getValueAsInteger());
 			logger.trace("registered source with id : "+toRegister.getSearchId());
 			return toRegister;
 		}catch(Exception e){

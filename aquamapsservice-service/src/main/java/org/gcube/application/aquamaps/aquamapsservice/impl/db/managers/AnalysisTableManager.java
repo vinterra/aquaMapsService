@@ -12,12 +12,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.AnalysisFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AnalysisType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.AnalysisFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AnalysisType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -52,7 +51,7 @@ public class AnalysisTableManager {
 			List<Field> toInsertRow=new ArrayList<Field>();
 			logger.debug("Inserting request, fields are :");
 			for(Field f:toInsert.toRow())
-				if(f.getValue()!=null&&!f.getValue().equalsIgnoreCase("null")){
+				if(f.value()!=null&&!f.value().equalsIgnoreCase("null")){
 					toInsertRow.add(f);
 					logger.debug(f.toXML());
 				}
@@ -111,24 +110,24 @@ public class AnalysisTableManager {
 		finally{if(session!=null) session.close();}
 	}
 	
-	private static Field getField(String id, String field)throws Exception{
-		DBSession session=null;
-		try{
-			session=DBSession.getInternalDBSession();
-			List<Field> key= new ArrayList<Field>();
-			key.add(new Field(SourceGenerationRequestFields.id+"",id,FieldType.STRING));
-			ResultSet rs= session.executeFilteredQuery(key, analysisTable, field, OrderDirection.ASC);
-			if(rs.next())
-				for(Field f:Field.loadRow(rs)){
-					if(f.getName().equals(field)) return f;
-				}
-			throw new Exception("Field not found "+field);
-		}catch(Exception e){
-			throw e;
-		}finally{
-			if(session!=null) session.close();
-		}
-	}
+//	private static Field getField(String id, String field)throws Exception{
+//		DBSession session=null;
+//		try{
+//			session=DBSession.getInternalDBSession();
+//			List<Field> key= new ArrayList<Field>();
+//			key.add(new Field(SourceGenerationRequestFields.id+"",id,FieldType.STRING));
+//			ResultSet rs= session.executeFilteredQuery(key, analysisTable, field, OrderDirection.ASC);
+//			if(rs.next())
+//				for(Field f:Field.loadRow(rs)){
+//					if(f.name().equals(field)) return f;
+//				}
+//			throw new Exception("Field not found "+field);
+//		}catch(Exception e){
+//			throw e;
+//		}finally{
+//			if(session!=null) session.close();
+//		}
+//	}
 	public static void addReportId(int reportId, String id)throws Exception{
 		Analysis req=getById(id);		
 		req.addReportId(reportId);

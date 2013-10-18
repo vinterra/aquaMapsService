@@ -3,8 +3,8 @@ package org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis;
 import java.net.URISyntaxException;
 import java.util.Date;
 
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ObjectType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ObjectType;
 import org.gcube.spatial.data.geonetwork.iso.GcubeISOMetadata;
 import org.gcube.spatial.data.geonetwork.iso.MissingInformationException;
 import org.gcube.spatial.data.geonetwork.utils.StringValidator;

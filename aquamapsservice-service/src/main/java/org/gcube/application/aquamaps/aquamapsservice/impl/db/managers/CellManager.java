@@ -12,11 +12,11 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SpeciesOccursumFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SpeciesOccursumFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -170,7 +170,7 @@ public class CellManager {
 					//				Area areaM=new Area(AreaType.FAO,c.getFieldbyName(OccurrenceCellsFields.faoaream+"").getValue());
 					//				if((areas.size()>0)&&(!areas.contains(areaM))) cellsInTable.remove(c);
 				}catch(Exception e){
-					logger.error("Unable to evaluate Cell "+c.getFieldbyName(HCAF_SFields.csquarecode+"").getValue());
+					logger.error("Unable to evaluate Cell "+c.getFieldbyName(HCAF_SFields.csquarecode+"").value());
 					throw e;
 				}
 			}

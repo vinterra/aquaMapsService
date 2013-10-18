@@ -12,12 +12,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.Q
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.threads.QueryConstructurThread.Operation;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.CustomQueryDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Filter;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.CustomQueryDescriptorFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FilterType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.CustomQueryDescriptorFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.CustomQueryDescriptorStubs;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FilterType;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.gcube_system.namespaces.application.aquamaps.types.PagedRequestSettings;
 import org.slf4j.Logger;
@@ -40,12 +40,12 @@ public class CustomQueryManager {
 			String tableName=ServiceUtils.generateId("CUSTOM", "").toLowerCase();
 
 			logger.trace("Inserting reference on table..");
-			CustomQueryDescriptor toInsert= new CustomQueryDescriptor();
-			toInsert.setActualTableName(tableName);
-			toInsert.setCreationTime(System.currentTimeMillis());
-			toInsert.setQuery(queryString);
-			toInsert.setUser(user);
-			toInsert.setLastAccess(System.currentTimeMillis());
+			CustomQueryDescriptorStubs toInsert= new CustomQueryDescriptorStubs();
+			toInsert.actualTableName(tableName);
+			toInsert.creationTime(System.currentTimeMillis());
+			toInsert.query(queryString);
+			toInsert.user(user);
+			toInsert.lastAccess(System.currentTimeMillis());
 			ArrayList<List<Field>> rows=new ArrayList<List<Field>>();
 			rows.add(toInsert.toRow());
 			session.insertOperation(userQueryTable, rows);
@@ -62,10 +62,10 @@ public class CustomQueryManager {
 			session=DBSession.getInternalDBSession();
 			updateLastAccessTime(user);
 
-			CustomQueryDescriptor desc=getDescriptor(user);
+			CustomQueryDescriptorStubs desc=getDescriptor(user);
 
-			String query="SELECT * from "+desc.getActualTableName()+" ORDER BY "+settings.getOrderField()+" "+settings.getOrderDirection()+" LIMIT "+settings.getLimit()+" OFFSET "+settings.getOffset();
-			return DBUtils.toJSon(session.executeQuery(query),desc.getRows());
+			String query="SELECT * from "+desc.actualTableName()+" ORDER BY "+settings.getOrderField()+" "+settings.getOrderDirection()+" LIMIT "+settings.getLimit()+" OFFSET "+settings.getOffset();
+			return DBUtils.toJSon(session.executeQuery(query),desc.rows());
 
 		}finally{if(session!=null) session.close();}
 	}
@@ -77,9 +77,9 @@ public class CustomQueryManager {
 		DBSession session=null;
 		try{
 			session=DBSession.getInternalDBSession();
-			CustomQueryDescriptor desc=getDescriptor(user);
+			CustomQueryDescriptorStubs desc=getDescriptor(user);
 
-			QueryConstructurThread t=new QueryConstructurThread(user, Operation.DELETE, desc.getQuery(), desc.getActualTableName());
+			QueryConstructurThread t=new QueryConstructurThread(user, Operation.DELETE, desc.query(), desc.actualTableName());
 			t.start();
 
 			logger.trace("Deleting "+user+"'s custom query reference");
@@ -133,7 +133,7 @@ public class CustomQueryManager {
 		}finally{if(session!=null) session.close();}
 	}
 
-	public static CustomQueryDescriptor getDescriptor(String userid) throws Exception{
+	public static CustomQueryDescriptorStubs getDescriptor(String userid) throws Exception{
 		DBSession session=null;
 		try{
 			updateLastAccessTime(userid);
@@ -142,15 +142,15 @@ public class CustomQueryManager {
 			field.add(new Field(CustomQueryDescriptorFields.userid+"",userid,FieldType.STRING));
 			ResultSet rs=session.executeFilteredQuery(field, userQueryTable, CustomQueryDescriptorFields.userid+"", OrderDirection.ASC);
 			if(rs.next()){
-				return new CustomQueryDescriptor(rs);
+				return new CustomQueryDescriptorStubs(rs);
 			}else throw new Exception("Custom Query Not Found for user "+userid);			
 		}finally{if(session!=null) session.close();}
 	}
 	
-	public static int updateDescriptor(CustomQueryDescriptor desc)throws Exception{
+	public static int updateDescriptor(CustomQueryDescriptorStubs desc)throws Exception{
 		DBSession session=null;
 		try{
-			desc.setLastAccess(System.currentTimeMillis());
+			desc.lastAccess(System.currentTimeMillis());
 			session=DBSession.getInternalDBSession();
 			ArrayList<List<Field>> keys=new ArrayList<List<Field>>();
 			ArrayList<Field> key=new ArrayList<Field>();

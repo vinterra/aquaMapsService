@@ -5,10 +5,10 @@ import java.sql.ResultSetMetaData;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CustomQueryManager;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.CustomQueryDescriptor;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.CustomQueryDescriptorStubs;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ExportStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +43,8 @@ public class QueryConstructurThread extends Thread {
 		try{
 			switch(op){
 			case CREATE :
-				CustomQueryDescriptor desc=CustomQueryManager.getDescriptor(userId);
-				desc.setStatus(ExportStatus.ONGOING);
+				CustomQueryDescriptorStubs desc=CustomQueryManager.getDescriptor(userId);
+				desc.status(ExportStatus.ONGOING);
 				CustomQueryManager.updateDescriptor(desc);
 				try{
 					session=DBSession.getInternalDBSession();
@@ -53,18 +53,18 @@ public class QueryConstructurThread extends Thread {
 					session.executeUpdate("CREATE TABLE "+table+" AS ( "+queryString+" )");
 					logger.trace("Getting meta for custom table "+table);
 					
-					desc.setRows(session.getTableCount(table));
+					desc.rows(session.getTableCount(table));
 					ResultSet rsColumns=session.executeQuery("SELECT * FROM "+table+" LIMIT 1 OFFSET 0");
 					ResultSetMetaData meta=rsColumns.getMetaData();
 					
 					for(int i=1;i<=meta.getColumnCount();i++)
-						desc.getFields().add(new Field(meta.getColumnName(i),"",FieldType.STRING));
+						desc.fields().theList().add(new Field(meta.getColumnName(i),"",FieldType.STRING));
 					
-					desc.setStatus(ExportStatus.COMPLETED);
+					desc.status(ExportStatus.COMPLETED);
 					CustomQueryManager.updateDescriptor(desc);
 				}catch(Exception e){
-					desc.setStatus(ExportStatus.ERROR);
-					desc.setErrorMessage(e.getMessage());
+					desc.status(ExportStatus.ERROR);
+					desc.errorMessage(e.getMessage());
 					CustomQueryManager.updateDescriptor(desc);
 				}
 				break;

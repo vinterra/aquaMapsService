@@ -9,9 +9,9 @@ import net.sf.csv4j.CSVLineProcessor;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 		try{
 		for(int i=0;i<model.size();i++){
 			Field modelField=model.get(i);
-			line.add(new Field(modelField.getName(),arg1.get(modelCSVFieldsMapping[i]),modelField.getType()));
+			line.add(new Field(modelField.name(),arg1.get(modelCSVFieldsMapping[i]),modelField.type()));
 		}
 		count+=(session.fillParameters(line, 0, ps)).executeUpdate();
 		if(count % updateStep==0) {
@@ -67,7 +67,7 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 			logger.error("Parameters :");
 			for(int i=0;i<meta.getParameterCount();i++){
 				Field f=line.get(i);
-				logger.error(f.getName()+" FIELD TYPE : "+f.getType()+" SQL TYPE : "+meta.getParameterType(i+1)+" VALUE :"+f.getValue());
+				logger.error(f.name()+" FIELD TYPE : "+f.type()+" SQL TYPE : "+meta.getParameterType(i+1)+" VALUE :"+f.value());
 			}
 			}catch(Exception e1){
 				logger.error("Unable to read parameter metadata ",e1);
@@ -86,7 +86,7 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 					if(fieldsMask[i]){
 						boolean found=false;
 						for(int j=0;j<model.size();j++)
-							if(arg1.get(i).equalsIgnoreCase(model.get(j).getName())){
+							if(arg1.get(i).equalsIgnoreCase(model.get(j).name())){
 								modelCSVFieldsMapping[j]=i;
 								found=true;
 								break;
@@ -97,7 +97,7 @@ public class StatefullCSVLineProcessor implements CSVLineProcessor {
 				logger.trace("Matched "+arg1.size()+" fields : ");
 				for(int i=0;i<model.size();i++){
 					Field modelField=model.get(i);
-					logger.debug(modelField.getName()+" , " +arg1.get(modelCSVFieldsMapping[i])+" , "+modelField.getType());
+					logger.debug(modelField.name()+" , " +arg1.get(modelCSVFieldsMapping[i])+" , "+modelField.type());
 				}
 				session=DBSession.getInternalDBSession();
 				session.disableAutoCommit();

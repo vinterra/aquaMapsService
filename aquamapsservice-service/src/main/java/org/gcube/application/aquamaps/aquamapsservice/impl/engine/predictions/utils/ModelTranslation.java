@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Envelope;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.EnvelopeFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_DFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HCAF_SFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.HspenFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.EnvelopeFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HCAF_DFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HCAF_SFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.HspenFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Hcaf;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.Hspen;
 import org.gcube.application.aquamaps.ecomodelling.generators.connectors.subconnectors.Coordinates;
@@ -63,16 +63,16 @@ public class ModelTranslation {
 						speciesEnvelope.getMaxValue(EnvelopeFields.Salinity)+""));
 		//TODO coordinates
 		toReturn.setCoordinates( new Coordinates(
-				s.getFieldbyName(HspenFields.nmostlat+"").getValue(),
-				s.getFieldbyName(HspenFields.smostlat+"").getValue(),
-				s.getFieldbyName(HspenFields.wmostlong+"").getValue(),
-				s.getFieldbyName(HspenFields.emostlong+"").getValue(),
-				s.getFieldbyName(maxCLat).getValue(), 
-				s.getFieldbyName(minCLat).getValue()));
+				s.getFieldbyName(HspenFields.nmostlat+"").value(),
+				s.getFieldbyName(HspenFields.smostlat+"").value(),
+				s.getFieldbyName(HspenFields.wmostlong+"").value(),
+				s.getFieldbyName(HspenFields.emostlong+"").value(),
+				s.getFieldbyName(maxCLat).value(), 
+				s.getFieldbyName(minCLat).value()));
 		
-		toReturn.setLayer(s.getFieldbyName(HspenFields.layer+"").getValue());
+		toReturn.setLayer(s.getFieldbyName(HspenFields.layer+"").value());
 		
-		toReturn.setMeanDepth(s.getFieldbyName(HspenFields.meandepth+"").getValue());
+		toReturn.setMeanDepth(s.getFieldbyName(HspenFields.meandepth+"").value());
 		toReturn.setPelagic(speciesEnvelope.isPelagic());
 		toReturn.setLandDistanceYN(s.getFieldbyName(HspenFields.landdistyn+"").getValueAsBoolean());
 		toReturn.setFaoAreas(speciesEnvelope.getFaoAreas());
@@ -82,20 +82,20 @@ public class ModelTranslation {
 	public static Hcaf cell2Hcaf(Cell c){
 		Hcaf toReturn= new Hcaf();
 		toReturn.setCsquareCode(c.getCode());
-		toReturn.setCenterlat(c.getFieldbyName(HCAF_SFields.centerlat+"").getValue());
-		toReturn.setCenterlong(c.getFieldbyName(HCAF_SFields.centerlong+"").getValue());
-		toReturn.setDepthmax(c.getFieldbyName(HCAF_DFields.depthmax+"").getValue());
-		toReturn.setDepthmean(c.getFieldbyName(HCAF_DFields.depthmean+"").getValue());
-		toReturn.setDepthmin(c.getFieldbyName(HCAF_DFields.depthmin+"").getValue());
-		toReturn.setFaoaream(c.getFieldbyName(HCAF_SFields.faoaream+"").getValue());
-		toReturn.setIceconann(c.getFieldbyName(HCAF_DFields.iceconann+"").getValue());
-		toReturn.setLanddist(c.getFieldbyName(HCAF_SFields.landdist+"").getValue());
-		toReturn.setOceanarea(c.getFieldbyName(HCAF_SFields.oceanarea+"").getValue());
-		toReturn.setPrimprodmean(c.getFieldbyName(HCAF_DFields.primprodmean+"").getValue());
-		toReturn.setSalinitybmean(c.getFieldbyName(HCAF_DFields.salinitybmean+"").getValue());
-		toReturn.setSalinitymean(c.getFieldbyName(HCAF_DFields.salinitymean+"").getValue());
-		toReturn.setSbtanmean(c.getFieldbyName(HCAF_DFields.sbtanmean+"").getValue());
-		toReturn.setSstanmean(c.getFieldbyName(HCAF_DFields.sstanmean+"").getValue());
+		toReturn.setCenterlat(c.getFieldbyName(HCAF_SFields.centerlat+"").value());
+		toReturn.setCenterlong(c.getFieldbyName(HCAF_SFields.centerlong+"").value());
+		toReturn.setDepthmax(c.getFieldbyName(HCAF_DFields.depthmax+"").value());
+		toReturn.setDepthmean(c.getFieldbyName(HCAF_DFields.depthmean+"").value());
+		toReturn.setDepthmin(c.getFieldbyName(HCAF_DFields.depthmin+"").value());
+		toReturn.setFaoaream(c.getFieldbyName(HCAF_SFields.faoaream+"").value());
+		toReturn.setIceconann(c.getFieldbyName(HCAF_DFields.iceconann+"").value());
+		toReturn.setLanddist(c.getFieldbyName(HCAF_SFields.landdist+"").value());
+		toReturn.setOceanarea(c.getFieldbyName(HCAF_SFields.oceanarea+"").value());
+		toReturn.setPrimprodmean(c.getFieldbyName(HCAF_DFields.primprodmean+"").value());
+		toReturn.setSalinitybmean(c.getFieldbyName(HCAF_DFields.salinitybmean+"").value());
+		toReturn.setSalinitymean(c.getFieldbyName(HCAF_DFields.salinitymean+"").value());
+		toReturn.setSbtanmean(c.getFieldbyName(HCAF_DFields.sbtanmean+"").value());
+		toReturn.setSstanmean(c.getFieldbyName(HCAF_DFields.sstanmean+"").value());
 		return toReturn;
 	}
 	

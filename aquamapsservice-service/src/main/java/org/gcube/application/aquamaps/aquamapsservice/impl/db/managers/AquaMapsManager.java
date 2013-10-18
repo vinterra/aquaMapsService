@@ -10,13 +10,13 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.AquaMapsObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMapsObject;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Submitted;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SubmittedFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube.application.aquamaps.publisher.impl.model.FileSet;
 import org.gcube.application.aquamaps.publisher.impl.model.Layer;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
@@ -101,7 +101,7 @@ public class AquaMapsManager extends SubmittedManager{
 			FileSet fileSet=ServiceContext.getContext().getPublisher().getById(FileSet.class, submittedObj.getFileSetId());
 			for(org.gcube.application.aquamaps.publisher.impl.model.File f: fileSet.getFiles())
 			toReturn.getImages().add(new org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File(
-					org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.FileType.valueOf(f.getType()+""),
+					org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FileType.valueOf(f.getType()+""),
 					publisherHost+f.getStoredUri(),f.getName()));
 			}catch(Exception e){
 				logger.warn("Unablet o load fileset for obj "+objId);

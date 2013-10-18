@@ -16,16 +16,16 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.Ba
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.EnvironmentalLogicManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.predictions.TableGenerationConfiguration;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Resource;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.environments.SourceGenerationRequest;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.MetaSourceFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.fields.SourceGenerationRequestFields;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.AlgorithmType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.LogicType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.ResourceType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SourceGenerationPhase;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.MetaSourceFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SourceGenerationRequestFields;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AlgorithmType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceStatus;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class HSPECGroupWorker extends Thread {
 			int Ntabs_per_step=1;
 			if(request.getLogic().equals(LogicType.HCAF))
 				for(Field f:request.getGenerationParameters()) 
-					if(f.getName().equals(SourceGenerationRequest.NUM_INTERPOLATIONS))
+					if(f.name().equals(SourceGenerationRequest.NUM_INTERPOLATIONS))
 						Ntabs_per_step=f.getValueAsInteger()-2;
 
 			SourceGenerationRequestsManager.setEvaluatedComputationCount(sourcesSubsets.size()*request.getAlgorithms().size(), request.getId());
@@ -110,9 +110,9 @@ public class HSPECGroupWorker extends Thread {
 				boolean generateGis=false;
 
 				for(Field f:request.getExecutionParameters()){
-					if(f.getName().equals(SourceGenerationRequest.FORCE_MAPS_REGENERATION)) forceRegeneration=f.getValueAsBoolean();
-					else if(f.getName().equals(SourceGenerationRequest.GENERATE_MAPS)) generateMaps=f.getValueAsBoolean();
-					else if(f.getName().equals(SourceGenerationRequest.GIS_ENABLED)) generateGis=f.getValueAsBoolean();
+					if(f.name().equals(SourceGenerationRequest.FORCE_MAPS_REGENERATION)) forceRegeneration=f.getValueAsBoolean();
+					else if(f.name().equals(SourceGenerationRequest.GENERATE_MAPS)) generateMaps=f.getValueAsBoolean();
+					else if(f.name().equals(SourceGenerationRequest.GIS_ENABLED)) generateGis=f.getValueAsBoolean();
 				}
 				if(generateMaps){
 
@@ -201,7 +201,7 @@ public class HSPECGroupWorker extends Thread {
 						logger.trace("Found existing request [PHASE : "+request.getPhase()+" ; ID : "+request.getId()+"], waiting for generation");
 						int[] sourcesIds=new int[sources.size()];
 						for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sources.get(i).getSearchId();
-						TableGenerationExecutionManager.signForGeneration(new Execution(algorithm, logic, sourcesIds,requestFilterModel.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+						TableGenerationExecutionManager.signForGeneration(new Execution(algorithm, logic, sourcesIds,requestFilterModel.getField(SourceGenerationRequestFields.generationparameters).value()));
 					}
 				}
 			}
@@ -274,7 +274,7 @@ public class HSPECGroupWorker extends Thread {
 								int[] sourcesIds=new int[sourcesSubSet.size()];
 								for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sourcesSubSet.get(i).getSearchId();
 								TableGenerationExecutionManager.notifyGeneration(
-										new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+										new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).value()));
 								worker.notifyGenerated(toReturn);
 
 							}
@@ -288,7 +288,7 @@ public class HSPECGroupWorker extends Thread {
 								for(int i=0;i<sourcesIds.length;i++)sourcesIds[i]=sourcesSubSet.get(i).getSearchId();
 								try {
 									TableGenerationExecutionManager.notifyGeneration(
-											new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+											new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).value()));
 								} catch (Exception e2) {
 									logger.warn("Unable to notify pending generations... ",e2);
 								}
@@ -296,7 +296,7 @@ public class HSPECGroupWorker extends Thread {
 
 								try{
 									worker.notifyException(e, 
-											new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).getValue()));
+											new Execution(this.getAlgorithm(), theRequest.getLogic(), sourcesIds,theRequest.getField(SourceGenerationRequestFields.generationparameters).value()));
 								}catch(Exception e1){
 									//Exception only if empty sources 
 								}
@@ -328,7 +328,7 @@ public class HSPECGroupWorker extends Thread {
 		case HSPEC : {
 			boolean combineMatching=true;
 			for(Field f:request.getExecutionParameters())				
-				if(f.getName().equals(SourceGenerationRequest.COMBINE_MATCHING)) combineMatching=f.getValueAsBoolean();
+				if(f.name().equals(SourceGenerationRequest.COMBINE_MATCHING)) combineMatching=f.getValueAsBoolean();
 
 			if(request.getHcafIds().size()==0) throw new Exception ("No HCAF resources found for request "+request.getId()+", Logic was "+request.getLogic());
 			if(request.getHspenIds().size()==0) throw new Exception ("No HSPEN resources found for request "+request.getId()+", Logic was "+request.getLogic());

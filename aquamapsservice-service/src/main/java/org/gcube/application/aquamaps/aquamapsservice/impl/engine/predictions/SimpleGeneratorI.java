@@ -6,8 +6,8 @@ import java.util.Set;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Area;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.BoundingBox;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Cell;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Species;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 
 public interface SimpleGeneratorI {
 		
