@@ -56,12 +56,11 @@ public class PortTypeTranslations {
 	//********************* FROM Stubs
 
 	public static final Field fromStubs(org.gcube_system.namespaces.application.aquamaps.types.Field stub){
-		if(stub==null) return null;
+		if(stub==null) return new Field();
 		return new Field(stub.getName(), stub.getValue(), FieldType.valueOf(stub.getType()));
 	}
 
-	public static final ArrayList<Field> fromStubs(org.gcube_system.namespaces.application.aquamaps.types.FieldArray stub){
-		if(stub==null) return null;
+	public static final ArrayList<Field> fromStubs(org.gcube_system.namespaces.application.aquamaps.types.FieldArray stub){	
 		ArrayList<Field> toReturn=new ArrayList<Field>();
 		if((stub!=null)&&(stub.getFields()!=null))
 			for(org.gcube_system.namespaces.application.aquamaps.types.Field f:stub.getFields())
@@ -418,7 +417,6 @@ public class PortTypeTranslations {
 
 
 	public static final org.gcube_system.namespaces.application.aquamaps.types.Field toStubs(Field obj){
-		if(obj==null) return null;
 		return new org.gcube_system.namespaces.application.aquamaps.types.Field(obj.name(),obj.type()+"",obj.value());
 	}
 
@@ -620,14 +618,12 @@ public class PortTypeTranslations {
 	}
 
 	public static final org.gcube_system.namespaces.application.aquamaps.types.FieldArray toFieldArray(Collection<Field> collection){
-		if(collection==null) return null;
 		ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Field> translated=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Field>();
 		for(Field f:collection)translated.add(toStubs(f));		
 		return new org.gcube_system.namespaces.application.aquamaps.types.FieldArray(translated.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Field[translated.size()]));
 	}
 
 	public static final org.gcube_system.namespaces.application.aquamaps.types.SpeciesArray toSpeciesArray(Collection<Species> collection){
-		if(collection==null) return null;
 		ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Specie> translated=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Specie>();
 		for(Species s:collection)translated.add(toStubs(s));		
 		return new org.gcube_system.namespaces.application.aquamaps.types.SpeciesArray(translated.toArray(new org.gcube_system.namespaces.application.aquamaps.types.Specie[translated.size()]));
@@ -643,7 +639,6 @@ public class PortTypeTranslations {
 
 
 	public static final org.gcube_system.namespaces.application.aquamaps.types.MapArray toMapArray(Collection<AquaMap> collection){
-		if(collection==null) return null;
 		ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Map> translated=new ArrayList<org.gcube_system.namespaces.application.aquamaps.types.Map>();
 		for(AquaMap m:collection)
 			try{

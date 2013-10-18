@@ -79,7 +79,6 @@ aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsser
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/AquaMapsIsoMetadata.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/GISRequest.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/GISUtils.java -text
-aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/GISUtilsNew.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/GroupGenerationRequest.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/LayerGenerationRequest.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/publishing/gis/StyleGenerationRequest.java -text
