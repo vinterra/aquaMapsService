@@ -17,10 +17,10 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.Aq
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
-import org.gcube.common.core.scope.GCUBEScope;
-import org.gcube.portlets.user.homelibrary.home.HomeLibrary;
-import org.gcube.portlets.user.homelibrary.home.HomeManagerFactory;
-import org.gcube.portlets.user.homelibrary.home.workspace.Workspace;
+import org.gcube.common.homelibrary.home.HomeLibrary;
+import org.gcube.common.homelibrary.home.HomeManagerFactory;
+import org.gcube.common.homelibrary.home.workspace.Workspace;
+import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,17 +137,19 @@ public class ExportManager extends Thread{
 				String fileName=session.exportTableToCSV(rs.getString(EXPORT_TABLE), settings.isHasHeader(),settings.getDelimiter().charAt(0));				
 				updateField(referenceId, EXPORT_LOCAL_PATH, FieldType.STRING, fileName);
 
-				GCUBEScope scope=GCUBEScope.getScope(rs.getString(EXPORT_SCOPE));
+				String scope=rs.getString(EXPORT_SCOPE);
 				ExportOperation operation=ExportOperation.fromString(rs.getString(EXPORT_OPERATION));
 				if(operation.equals(ExportOperation.SAVE)){
 					//SAVE TO WORKSPACE
 					String owner=rs.getString(EXPORT_USER);
 					String destinationBasketId=rs.getString(EXPORT_BASKET);
 					String toSaveName=rs.getString(EXPORT_NAME);
+					logger.debug("Getting workspace for user "+owner+" under scope "+scope);
+					ScopeProvider.instance.set(scope);
 					HomeManagerFactory factory = HomeLibrary.getHomeManagerFactory();
-					Workspace workspace = factory.getHomeManager().getHome(owner,
-							GCUBEScope.getScope(scope.toString())).getWorkspace();
+					Workspace workspace = factory.getHomeManager().getHome(owner).getWorkspace();
 					workspace.createExternalFile(toSaveName, "Exported table", "text/csv", new FileInputStream(fileName), destinationBasketId);
+					logger.debug("File saved into user's workspace");
 				}else {
 					//EXPORT TO CLIENT
 					RSWrapper wrapper=new RSWrapper();
