@@ -49,7 +49,7 @@ public class ExportManager extends Thread{
 	public static String submitExportOperation(String tableName,String user,String basket,String name,ExportOperation operation, ExportCSVSettings settings) throws Exception{
 		DBSession session=null;
 		try{
-			session=DBSession.getInternalDBSession();
+			session=DBSession.getInternalDBSession();			
 			String referenceId=ServiceUtils.generateId("EXPORT", "").toLowerCase();
 			ArrayList<Field> row= new ArrayList<Field>();
 			
