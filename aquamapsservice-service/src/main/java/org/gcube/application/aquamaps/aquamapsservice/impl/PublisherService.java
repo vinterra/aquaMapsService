@@ -8,7 +8,9 @@ import java.util.List;
 
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.GetBulkUpdatesStatusResponseType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetJSONSubmittedByFiltersRequestType;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.PrepareBulkUpdatesFileRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.PublisherServicePortType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.RetrieveMapsByCoverageRequestType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.AquaMap;
@@ -248,5 +250,21 @@ PublisherServicePortType {
 			toAdd.setCustom(l.isCustomized());
 		}
 		return toAdd;
+	}
+
+
+	@Override
+	public GetBulkUpdatesStatusResponseType getBulkUpdatesStatus(String arg0)
+			throws RemoteException, GCUBEFault {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public String prepareBulkUpdatesFile(PrepareBulkUpdatesFileRequestType arg0)
+			throws RemoteException, GCUBEFault {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
