@@ -29,12 +29,29 @@
 				schemaLocation="GISTypes.xsd" />
 				
 				
+				<xsd:simpleType name="bulkStatus">
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="PENDING" />
+					<xsd:enumeration value="ONGOING" />
+					<xsd:enumeration value="COMPLETED" />
+					<xsd:enumeration value="ERROR" />
+				</xsd:restriction>
+			</xsd:simpleType>
+				
 	 			<xsd:complexType name="retrieveMapsByCoverageRequestType">
 					<xsd:sequence>
 						<xsd:element name="speciesList" type="coretypes:stringArray"/>
 						<xsd:element name="resourceList" type="aqtypes:resourceArray"/>
 						<xsd:element name="includeCustomMaps" type="xsd:boolean"/>
+						<xsd:element name="includeGisLayers" type="xsd:boolean"/>						
+					</xsd:sequence>
+				</xsd:complexType>
+				<xsd:complexType name="prepareBulkUpdatesFileRequestType">
+					<xsd:sequence>						
+						<xsd:element name="resourceList" type="aqtypes:resourceArray"/>
+						<xsd:element name="includeCustomMaps" type="xsd:boolean"/>
 						<xsd:element name="includeGisLayers" type="xsd:boolean"/>
+						<xsd:element name="fromTime" type="xsd:long" />						
 					</xsd:sequence>
 				</xsd:complexType>
 				<xsd:complexType name="getJSONSubmittedByFiltersRequestType">
@@ -44,10 +61,23 @@
 					</xsd:sequence>
 				</xsd:complexType>
 	
+				<xsd:complexType name="getBulkUpdatesStatusResponseType">
+					<xsd:sequence>
+						<xsd:element name="rsLocator" type="xsd:string"/>
+						<xsd:element name="status" type="tns:bulkStatus"/>
+					</xsd:sequence>
+				</xsd:complexType>
+	
 	<!-- Message elements --> 
 	
 	<xsd:element name="retrieveMapsByCoverageRequest" type="tns:retrieveMapsByCoverageRequestType" />
 	<xsd:element name="retrieveMapsByCoverageResponse" type="aqtypes:mapArray" />
+	<xsd:element name="prepareBulkUpdatesFileRequest" type="tns:prepareBulkUpdatesFileRequestType" />
+	<xsd:element name="prepareBulkUpdatesFileResponse" type="xsd:string" />
+	
+	<xsd:element name="getBulkUpdatesStatusRequest" type="xsd:string" />
+	<xsd:element name="getBulkUpdatesStatusResponse" type="tns:getBulkUpdatesStatusResponseType" />
+	
 	<xsd:element name="getFileSetByIdRequest" type="xsd:string" />
 	<xsd:element name="getFileSetByIdResponse" type="aqtypes:fileArray" />
 	<xsd:element name="getLayerByIdRequest" type="xsd:string" />
@@ -69,6 +99,21 @@
 	</message>
 	<message name="RetrieveMapsByCoverageResponse">
 		<part name="response" element="tns:retrieveMapsByCoverageResponse" />
+	</message>
+
+	<message name="PrepareBulkUpdatesFileRequest">
+		<part name="request" element="tns:prepareBulkUpdatesFileRequest" />
+	</message>
+	<message name="PrepareBulkUpdatesFileResponse">
+		<part name="response" element="tns:prepareBulkUpdatesFileResponse" />
+	</message>
+
+
+	<message name="GetBulkUpdatesStatusRequest">
+		<part name="request" element="tns:getBulkUpdatesStatusRequest" />
+	</message>
+	<message name="GetBulkUpdatesStatusResponse">
+		<part name="response" element="tns:getBulkUpdatesStatusResponse" />
 	</message>
 
 	<message name="GetFileSetByIdRequest">
@@ -98,6 +143,16 @@
 			<wsdl:output message="tns:RetrieveMapsByCoverageResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		<wsdl:operation name="PrepareBulkUpdatesFile">
+			<wsdl:input message="tns:PrepareBulkUpdatesFileRequest" />
+			<wsdl:output message="tns:PrepareBulkUpdatesFileResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
+		<wsdl:operation name="GetBulkUpdatesStatus">
+			<wsdl:input message="tns:GetBulkUpdatesStatusRequest" />
+			<wsdl:output message="tns:GetBulkUpdatesStatusResponse" />
+			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
+		</wsdl:operation>
 		<wsdl:operation name="GetFileSetById">
 			<wsdl:input message="tns:GetFileSetByIdRequest" />
 			<wsdl:output message="tns:GetFileSetByIdResponse" />
@@ -113,5 +168,6 @@
 			<wsdl:output message="tns:GetJSONSubmittedByFiltersResponse" />
 			<wsdl:fault name="fault" message="corefaults:GCUBEFaultMessage" />
 		</wsdl:operation>
+		
 	</portType>
 </definitions>
