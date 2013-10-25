@@ -22,6 +22,16 @@
 			</xsd:restriction>
 		</xsd:simpleType>
 	
+	<xsd:simpleType name="fieldType">
+			<xsd:restriction base="xsd:string">
+				<xsd:enumeration  value="INTEGER"/>
+				<xsd:enumeration  value="BOOLEAN"/>
+				<xsd:enumeration  value="STRING"/>
+				<xsd:enumeration  value="DOUBLE"/>
+				<xsd:enumeration  value="LONG"/>
+				<xsd:enumeration  value="TIMESTAMP"/>
+			</xsd:restriction>
+		</xsd:simpleType>
 	
 		<xsd:complexType name="perturbation">
 				<xsd:sequence>
@@ -52,7 +62,7 @@
 
 			<xsd:complexType name="field">
 				<xsd:sequence>
-					<xsd:element name="type" type="xsd:string" />
+					<xsd:element name="type" type="tns:fieldType" />
 					<xsd:element name="name" type="xsd:string" />
 					<xsd:element name="value" type="xsd:string" />
 				</xsd:sequence>

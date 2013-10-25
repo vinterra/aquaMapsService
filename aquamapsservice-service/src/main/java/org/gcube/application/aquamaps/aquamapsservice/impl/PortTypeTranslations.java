@@ -57,7 +57,7 @@ public class PortTypeTranslations {
 
 	public static final Field fromStubs(org.gcube_system.namespaces.application.aquamaps.types.Field stub){
 		if(stub==null) return new Field();
-		return new Field(stub.getName(), stub.getValue(), FieldType.valueOf(stub.getType()));
+		return new Field(stub.getName(), stub.getValue(), FieldType.valueOf(stub.getType()+""));
 	}
 
 	public static final ArrayList<Field> fromStubs(org.gcube_system.namespaces.application.aquamaps.types.FieldArray stub){	
@@ -417,7 +417,7 @@ public class PortTypeTranslations {
 
 
 	public static final org.gcube_system.namespaces.application.aquamaps.types.Field toStubs(Field obj){
-		return new org.gcube_system.namespaces.application.aquamaps.types.Field(obj.name(),obj.type()+"",obj.value());
+		return new org.gcube_system.namespaces.application.aquamaps.types.Field(obj.name(),org.gcube_system.namespaces.application.aquamaps.types.FieldType.fromString(obj.type()+""),obj.value());
 	}
 
 
