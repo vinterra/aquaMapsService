@@ -39,12 +39,12 @@ public class BulkReportsManager {
 
 	private static final String remoteFileField="remoteid";
 	private static final String scopeField="scope";
-	private static final String includeGisField="inclidegis";
+	private static final String includeGisField="includegis";
 	private static final String includeCustomField="includecustom";
 	private static final String lowerintervalField="lowerinterval";
 	private static final String searchidField="searchid";
 	private static final String statusField="status";
-	private static final String submissionTimeField="submissionTime";
+	private static final String submissionTimeField="submissiontime";
 	
 	
 	static{
