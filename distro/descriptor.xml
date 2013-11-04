@@ -19,6 +19,7 @@
 				<include>MAINTAINERS</include>
 				<include>changelog.xml</include>
 				<include>profile.xml</include>
+				<include>sqlUpdates.sql</include>
 			</includes>
 			<fileMode>755</fileMode>
 			<filtered>true</filtered>
