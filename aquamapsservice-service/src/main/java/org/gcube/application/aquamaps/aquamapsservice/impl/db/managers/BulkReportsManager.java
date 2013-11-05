@@ -141,7 +141,7 @@ public class BulkReportsManager {
 	 * @throws Exception 
 	 */
 	public static String prepareBulk(Long updateInterval,String scope, boolean includeGIS, boolean includeCustom) throws Exception{
-		logger.debug("Preparing bulk updates from time "+ServiceUtils.formatTimeStamp(updateInterval));
+		logger.trace("Preparing bulk updates from time "+ServiceUtils.formatTimeStamp(updateInterval));
 		DBSession session=null;
 		Publisher pub=ServiceContext.getContext().getPublisher();
 		String publisherHost=ServiceContext.getContext().getPublisher().getWebServerUrl();		
@@ -193,8 +193,10 @@ public class BulkReportsManager {
 							}
 						}
 
-					oos.writeObject(item);
-					count++;
+					if(item.hasResources()){
+						oos.writeObject(item);					
+						count++;
+					}
 				}catch(Exception e){
 					logger.error("Unable to gather information for species "+speciesId,e);
 				}
@@ -202,11 +204,11 @@ public class BulkReportsManager {
 			oos.flush();
 			oos.close();
 			oos=null;
-			logger.debug("Serialized "+count+" items into local file "+local.getAbsolutePath());
+			logger.trace("Serialized "+count+" items into local file "+local.getAbsolutePath());
 			ScopeProvider.instance.set(scope);
 			IClient client=new StorageClient(Constants.SERVICE_CLASS, Constants.SERVICE_NAME, Constants.SERVICE_NAME, AccessType.SHARED, MemoryType.VOLATILE).getClient();
 			String remoteId=client.put(true).LFile(local.getAbsolutePath()).RFile("/img/"+local.getName());
-			logger.debug("Created remote file "+remoteId);
+			logger.trace("Created remote file "+remoteId);
 			return remoteId;
 		}finally{
 			if(session!=null)session.close();
