@@ -25,6 +25,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.BadRequestException;
+import org.gcube.application.aquamaps.aquamapsservice.impl.util.ISQueryConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
@@ -125,7 +126,11 @@ public class GISUtils {
 			if(request.getToAssociateStyles().size()==0)
 				throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
 
-			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),gis);
+			logger.debug("Checking current datastore and workspace..");
+			org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.GeoServerDescriptor dbDesc=ConfigurationManager.getVODescriptor().getGeoServerByEntryPoint(desc.getUrl());
+			
+			
+			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),gis,dbDesc.getWorkspace(),dbDesc.getDatastore());
 			if(!generatedLayer)	throw new Exception("Unable to generate Layer "+request.getMapName());
 
 			
@@ -340,7 +345,7 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GISInterface gis) throws Exception{
+	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GISInterface gis, String workspace, String datastore) throws Exception{
 		try{
 			ScopeProvider.instance.set(GHNContext.getContext().getStartScopes()[0].getInfrastructure().toString());
 			AquaMapsIsoMetadata metaParams=new AquaMapsIsoMetadata();
@@ -370,8 +375,10 @@ public class GISUtils {
 		metaParams.setTitle((String)meta.get(AquaMapsManager.META_TITLE));
 		metaParams.setType((ObjectType) meta.get(AquaMapsManager.META_OBJECT_TYPE));
 		metaParams.setUser((String)meta.get(AquaMapsManager.META_AUTHOR));
-		for(String uri:((List<String>)meta.get(AquaMapsManager.META_FILESET_URIS)))
+		for(String uri:((List<String>)meta.get(AquaMapsManager.META_FILESET_URIS))){
+				logger.debug("Adding static image to meta : "+uri);
 				metaParams.addGraphicOverview(uri);
+		}
 		
 		for(Entry<String,HashSet<String>> entry:((Map<String,HashSet<String>>)meta.get(AquaMapsManager.META_KEYWORDS_MAP)).entrySet()){
 			Thesaurus t=metaParams.getConfig().getThesauri().get(entry.getKey());
@@ -394,7 +401,7 @@ public class GISUtils {
 		
 		Configuration gnConfig=gis.getGeoNetworkReader().getConfiguration();
 		
-		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamaps", fte, le, metaParams.getMetadata(), new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
+		PublishResponse resp=gis.publishDBTable(workspace, datastore, fte, le, metaParams.getMetadata(), new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
 		
 		logger.debug("Publish response : "+resp);
 		return resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE);
