@@ -24,7 +24,7 @@ import org.gcube_system.namespaces.application.aquamaps.types.OrderDirection;
 public class AquaMapsManager extends SubmittedManager{
 
 	public static String maxSpeciesCountInACell="maxspeciescountinacell";
-	
+
 	public static final String META_ALGORITHM="ALGORITHM";
 	public static final String META_SOURCE_TITLE="SOURCE_TITLE";
 	public static final String META_SOURCE_TABLENAME="SOURCE_TABLENAME";
@@ -33,13 +33,13 @@ public class AquaMapsManager extends SubmittedManager{
 	public static final String META_TITLE="META_TITLE";
 	public static final String META_OBJECT_TYPE="META_OBJECT_TYPE";
 	public static final String META_AUTHOR="META_AUTHOR";
-	
+
 	//****** Generated at gis Generation Time
 	public static final String META_FILESET_URIS="META_FILESET_URIS";
 	public static final String META_GEOMETRY_COUNT="META_GEOMETRY_COUNT";
 	public static final String META_KEYWORDS_MAP="META_KEYWORDS_MAP";
-	
-	
+
+
 	public static int insertRequests(
 			List<AquaMapsObjectExecutionRequest> requests) throws Exception{
 		DBSession session=null;
@@ -80,8 +80,8 @@ public class AquaMapsManager extends SubmittedManager{
 		}catch(Exception e){throw e;}
 		finally{if(session!=null)session.close();}
 	}
-	
-	
+
+
 	public static AquaMapsObject loadObject(int objId,boolean loadFileSet,boolean loadLayers)throws Exception{
 		if(!isAquaMap(objId)) throw new Exception("Selected ID "+objId+" doesn't refere to an AquaMapsObject");
 		Submitted submittedObj=getSubmittedById(objId);
@@ -89,49 +89,54 @@ public class AquaMapsManager extends SubmittedManager{
 		AquaMapsObject toReturn=(AquaMapsObject) AquaMapsXStream.deSerialize(submittedObj.getSerializedObject());
 		toReturn.setId(objId);
 		toReturn.setAlgorithmType(SourceManager.getById(submittedObj.getSourceHSPEC()).getAlgorithm());
-//		toReturn.setAuthor(submittedObj.getAuthor());
-//		toReturn.setDate(submittedObj.getSubmissionTime());
-//		toReturn.setGis(submittedObj.getGisEnabled());
+		//		toReturn.setAuthor(submittedObj.getAuthor());
+		//		toReturn.setDate(submittedObj.getSubmissionTime());
+		//		toReturn.setGis(submittedObj.getGisEnabled());
 		toReturn.setStatus(submittedObj.getStatus());
-//		toReturn.setThreshold()
-//		toReturn.setSelectedSpecies(selectedSpecies)
+		//		toReturn.setThreshold()
+		//		toReturn.setSelectedSpecies(selectedSpecies)
 		if(loadFileSet){
 			try{
+				logger.debug("Inserting static image reference, filesetID = "+submittedObj.getFileSetId());
 				String publisherHost=ServiceContext.getContext().getPublisher().getWebServerUrl();
-			FileSet fileSet=ServiceContext.getContext().getPublisher().getById(FileSet.class, submittedObj.getFileSetId());
-			for(org.gcube.application.aquamaps.publisher.impl.model.File f: fileSet.getFiles())
-			toReturn.getImages().add(new org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File(
-					org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FileType.valueOf(f.getType()+""),
-					publisherHost+f.getStoredUri(),f.getName()));
+				FileSet fileSet=ServiceContext.getContext().getPublisher().getById(FileSet.class, submittedObj.getFileSetId());
+				for(org.gcube.application.aquamaps.publisher.impl.model.File f: fileSet.getFiles()){
+					org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File toAdd=new org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.File(
+							org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FileType.valueOf(f.getType()+""),
+							publisherHost+f.getStoredUri(),f.getName());
+					logger.debug("Adding file "+toAdd);
+					toReturn.getImages().add(toAdd);
+				}
 			}catch(Exception e){
 				logger.warn("Unablet o load fileset for obj "+objId);
 			}
 		}
 		if(loadLayers&&submittedObj.getGisEnabled()){
-				try{					
-					Layer layer=ServiceContext.getContext().getPublisher().getById(Layer.class, submittedObj.getGisPublishedId());
-					toReturn.getLayers().add(layer.getLayerInfo());
-				}catch(Exception e){
-					logger.warn("Unable to load Layer "+submittedObj.getGisPublishedId());
-				}
+			logger.debug("Inserting layer reference, layerID = "+submittedObj.getGisPublishedId());
+			try{					
+				Layer layer=ServiceContext.getContext().getPublisher().getById(Layer.class, submittedObj.getGisPublishedId());
+				toReturn.getLayers().add(layer.getLayerInfo());
+			}catch(Exception e){
+				logger.warn("Unable to load Layer "+submittedObj.getGisPublishedId());
 			}
+		}
 		return toReturn;
 	}
-	
+
 	public static Map<String,Object> getMetaForGIS(Submitted obj) throws Exception{
 		HashMap<String,Object> toReturn=new HashMap<String,Object>();	
 		toReturn.put(META_AUTHOR, obj.getAuthor());
 		toReturn.put(META_DATE, new Date(System.currentTimeMillis()));
 		toReturn.put(META_OBJECT_TYPE, obj.getType());
 		toReturn.put(META_TITLE, obj.getTitle());
-		
+
 		Resource hspec = SourceManager.getById(obj.getSourceHSPEC());
 		toReturn.put(META_ALGORITHM, hspec.getAlgorithm());
 		toReturn.put(META_SOURCE_TITLE, hspec.getTitle());
 		toReturn.put(META_SOURCE_TIME, new Date(hspec.getGenerationTime()));
 		toReturn.put(META_SOURCE_TABLENAME, hspec.getTableName());		
-		
+
 		return toReturn;
 	}
-	
+
 }

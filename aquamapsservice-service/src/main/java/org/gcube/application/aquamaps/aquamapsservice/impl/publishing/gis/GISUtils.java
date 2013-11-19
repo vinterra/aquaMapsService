@@ -5,6 +5,7 @@ import it.geosolutions.geoserver.rest.decoder.RESTLayer;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -25,7 +26,6 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.ServiceContext;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.DBSession;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.BadRequestException;
-import org.gcube.application.aquamaps.aquamapsservice.impl.util.ISQueryConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.PropertiesConstants;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.ServiceUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.ConfigurationManager;
@@ -50,6 +50,8 @@ import org.gcube.spatial.data.gis.model.report.DeleteReport;
 import org.gcube.spatial.data.gis.model.report.PublishResponse;
 import org.gcube.spatial.data.gis.model.report.Report.OperationState;
 import org.gcube.spatial.data.gis.symbology.StyleUtils;
+import org.geotoolkit.xml.XML;
+import org.opengis.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +138,7 @@ public class GISUtils {
 			
 			logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start)+" layer : "+layerTable+", geoserver was "+desc.getUrl());
 			
-			return GISUtils.getLayer(request.getMapType(), gis.getGeoServerReader(desc).getLayer(layerTable),desc);
+			return GISUtils.getLayer(request.getMapType(), gis.getGeoServerReader(desc).getLayer(layerTable),desc,dbDesc.getWorkspace());
 		}catch(Exception e){
 			logger.trace("Layer generation failed, gonna clean up data.. exception was",e);
 			if(appTableName!=null){
@@ -155,15 +157,6 @@ public class GISUtils {
 		finally{if(session!=null)session.close();}
 	}
 
-	//	public static WMSContextInfo generateWMSContext(GroupGenerationRequest request)throws Exception{
-	//		logger.trace("Generating group "+request.getToGenerateGroupName());		
-	//		if(request.getGeoLayersAndStyles()==null||request.getGeoLayersAndStyles().size()==0) throw new Exception("Unable to generate group "+request.getToGenerateGroupName()+", No Layer selected");
-	//		GroupRest group=GISUtils.createGroupOnGeoServer(request.getGeoLayersAndStyles().keySet(), request.getGeoLayersAndStyles(), request.getToGenerateGroupName(),getCaller());
-	//		WMSContextInfo wms=ReadTemplate.getWMSContextTemplate();
-	//		wms.getLayers().addAll(request.getPublishedLayersId());
-	//		wms.setName(request.getToGenerateGroupName());
-	//		return wms;
-	//	}
 
 	public static boolean deleteLayer(LayerInfo toDelete)throws Exception{
 		logger.trace("Deleting layer "+toDelete.getName());
@@ -174,7 +167,7 @@ public class GISUtils {
 		for(GeoServerDescriptor desc:descs){
 			if(toDelete.getUrl().contains(desc.getUrl())){
 				logger.debug("Found hosting geoserver "+desc.getUrl());
-				DeleteReport report=gis.deleteLayer("aquamaps", toDelete.getName(), 0l, desc);
+				DeleteReport report=gis.deleteLayer("aquamaps", toDelete.getName(), 0l, desc,LoginLevel.DEFAULT);
 				if(report.getDataOperationResult().equals(OperationState.COMPLETE)){
 					logger.debug("Deleting layerTable : "+toDelete.getName());
 					deleteLayerTable(toDelete.getName());
@@ -403,7 +396,18 @@ public class GISUtils {
 		
 		PublishResponse resp=gis.publishDBTable(workspace, datastore, fte, le, metaParams.getMetadata(), new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
 		
-		logger.debug("Publish response : "+resp);
+		if(resp.getPublishedMetadata()!=null&&logger.isDebugEnabled()){
+			try{
+				Metadata generated=resp.getPublishedMetadata();
+				File file=File.createTempFile("", ".xml");
+				logger.debug("Serializing generated metadata to temp file "+file.getAbsolutePath());
+				XML.marshal(generated,file);	
+			}catch(Exception e){
+				logger.warn("Unable to serialize metadata to file",e);
+			}
+		}
+		
+		
 		return resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE);
 		
 		}catch(Exception e){
@@ -458,11 +462,11 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static LayerInfo getLayer(LayerType type, RESTLayer restLayer,GeoServerDescriptor desc)throws Exception{
+	private static LayerInfo getLayer(LayerType type, RESTLayer restLayer,GeoServerDescriptor desc, String workspace)throws Exception{
 		LayerInfo layer=ReadTemplate.getLayerTemplate(type);
 		
 		layer.setType(type);
-		layer.setName(restLayer.getName());
+		layer.setName(workspace+":"+restLayer.getName());
 		layer.setTitle(restLayer.getTitle());
 		layer.set_abstract(restLayer.getAbstract());
 		//GEOSERVER
