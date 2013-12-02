@@ -43,7 +43,7 @@
 
 				<configuration>
 					<fullGar>true</fullGar>
-					<attachFullGar>false</attachFullGar>
+					<attachFullGar>true</attachFullGar>
 				</configuration>
 				<executions>
 					<execution>
