@@ -1,1 +1,0 @@
-create table bulkrequests (remoteid text,scope text,includegis smallint, includecustom smallint, lowerinterval bigint, searchid varchar(50) primary key, status varchar(100), submissiontime bigint);

@@ -533,13 +533,12 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			logger.error("view Table "+request.getTablename(),e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
 		}finally{
-			if(session!=null)
-				try {
-					session.close();
-				} catch (Exception e) {
-					logger.error("view Table "+request.getTablename(),e);
-					throw new GCUBEFault("ServerSide msg: "+e.getMessage());
-				}
+			if(session!=null)try{
+				session.close();
+			}catch(Exception e){
+				logger.error("view Table "+request.getTablename(),e);
+				throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+			}
 		}
 	}
 }

@@ -124,7 +124,6 @@ distro/README -text
 distro/changelog.xml -text
 distro/descriptor.xml -text
 distro/profile.xml -text
-distro/sqlUpdates.sql -text
 distro/svnpath.txt -text
 /pom.xml -text
 wsdl/AquaMapsService.wsdl -text

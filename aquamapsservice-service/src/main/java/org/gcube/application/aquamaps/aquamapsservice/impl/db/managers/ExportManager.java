@@ -173,13 +173,11 @@ public class ExportManager extends Thread{
 					logger.error("Unable to update export reference id  "+referenceId,e);
 				}
 			}
-		}finally{
-			if(session!=null)
-				try {
-					session.close();
-				} catch (Exception e) {
-					logger.error("Unable to close session",e);
-				}
-			}		
+		}finally{if(session!=null)
+			try {
+				session.close();
+			} catch (Exception e) {
+				
+			}}		
 	}
 }
