@@ -169,7 +169,7 @@ public class GISUtils {
 		for(GeoServerDescriptor desc:descs){
 			if(toDelete.getUrl().contains(desc.getUrl())){
 				logger.debug("Found hosting geoserver "+desc.getUrl());
-				DeleteReport report=gis.deleteLayer("aquamaps", toDelete.getName(), 0l, desc, LoginLevel.DEFAULT);
+				DeleteReport report=gis.deleteLayer("aquamaps", toDelete.getName(), 0l, desc);
 				if(report.getDataOperationResult().equals(OperationState.COMPLETE)){
 					logger.debug("Deleting layerTable : "+toDelete.getName());
 					deleteLayerTable(toDelete.getName());
