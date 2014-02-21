@@ -198,7 +198,7 @@
 		<dependency>
 			<groupId>org.gcube.data.analysis</groupId>
 			<artifactId>statistical-manager-cl</artifactId>
-			<version>[1.0.0-SNAPSHOT,3.0.0-SNAPSHOT)</version>
+			<version>[1.0.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -228,17 +228,6 @@
 			<groupId>org.gcube.common</groupId>
 			<artifactId>csv4j</artifactId>
 			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
-		</dependency>
-		<dependency>
-			<groupId>org.gcube.contentmanagement</groupId>
-			<artifactId>statisticsextractor</artifactId>
-			<version>[1.2.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>rapidminer-custom</artifactId>
-					<groupId>org.gcube.common</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.contentmanagement</groupId>
