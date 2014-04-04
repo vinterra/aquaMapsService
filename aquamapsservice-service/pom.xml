@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>aquamapsservice</artifactId>
 		<groupId>org.gcube.application</groupId>
-		<version>5.0.1-SNAPSHOT</version>
+		<version>5.0.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>aquamapsservice-service</artifactId>
@@ -183,6 +183,12 @@
 			<groupId>commons-dbcp</groupId>
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-pool</artifactId>
+					<groupId>commons-pool</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.gcube.application</groupId>
@@ -192,7 +198,7 @@
 				<exclusion>
 					 <groupId>com.googlecode.sli4j</groupId>
     				 <artifactId>sli4j-slf4j-log4j</artifactId>
-				</exclusion>
+				</exclusion>				
 			</exclusions>
 		</dependency>
 		<dependency>

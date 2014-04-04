@@ -39,7 +39,7 @@ public class BulkReportsManager {
 
 	private static final String remoteFileField="remoteid";
 	private static final String scopeField="scope";
-	private static final String includeGisField="inclidegis";
+	private static final String includeGisField="includegis";
 	private static final String includeCustomField="includecustom";
 	private static final String lowerintervalField="lowerinterval";
 	private static final String searchidField="searchid";
@@ -151,17 +151,22 @@ public class BulkReportsManager {
 		ObjectOutputStream oos=	xstream.createObjectOutputStream(new FileWriter(local));
 		try{
 			long count=0;
+			long speciesCount=0;
 			// Get Species List 
 			session=DBSession.getInternalDBSession();
-			ResultSet rsSpecies=session.executeQuery("Select "+SpeciesOccursumFields.speciesid+" from speciesoccursum");
+			ResultSet rsSpecies=session.executeQuery(
+					"Select "+SpeciesOccursumFields.speciesid+","+SpeciesOccursumFields.genus+","+SpeciesOccursumFields.species+" from speciesoccursum");
+			logger.debug("Got Species list, gonna check maps..");
 			while(rsSpecies.next()){
 				String speciesId=rsSpecies.getString(1);
+				String scientificName=rsSpecies.getString(2)+"_"+rsSpecies.getString(3);
 				BulkItem item=new BulkItem();
 				item.setSpeciesId(speciesId);
 				try{
 					//Check - add fileset
-
-					for(FileSet fs:pub.getFileSetsBySpeciesIds(speciesId)){
+					List<FileSet> fileSets=pub.getFileSetsBySpeciesIds(scientificName);
+					logger.debug(String.format("Got %s filesets for %s (%s), checking generation time..",fileSets.size(),scientificName,speciesId));
+					for(FileSet fs:fileSets){
 						try{
 							if(!includeCustom||(includeCustom&&fs.isCustomized())){
 								if(fs.getMetaInfo().getDataGenerationTime() >= updateInterval){
@@ -192,9 +197,11 @@ public class BulkReportsManager {
 								logger.debug("Unable to check layer "+l.getId(),t);
 							}
 						}
-
-					oos.writeObject(item);
-					count++;
+					if(item.hasResources()){
+						oos.writeObject(item);
+						count++;
+					}			
+					speciesCount++;
 				}catch(Exception e){
 					logger.error("Unable to gather information for species "+speciesId,e);
 				}
@@ -202,7 +209,7 @@ public class BulkReportsManager {
 			oos.flush();
 			oos.close();
 			oos=null;
-			logger.debug("Serialized "+count+" items into local file "+local.getAbsolutePath());
+			logger.debug("Serialized "+count+" bulk itmes out of "+speciesCount+" species into local file "+local.getAbsolutePath());
 			ScopeProvider.instance.set(scope);
 			IClient client=new StorageClient(Constants.SERVICE_CLASS, Constants.SERVICE_NAME, Constants.SERVICE_NAME, AccessType.SHARED, MemoryType.VOLATILE).getClient();
 			String remoteId=client.put(true).LFile(local.getAbsolutePath()).RFile("/img/"+local.getName());
