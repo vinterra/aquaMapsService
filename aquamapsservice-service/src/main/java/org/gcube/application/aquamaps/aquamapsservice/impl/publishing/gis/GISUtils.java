@@ -49,6 +49,7 @@ import org.gcube.spatial.data.gis.model.report.DeleteReport;
 import org.gcube.spatial.data.gis.model.report.PublishResponse;
 import org.gcube.spatial.data.gis.model.report.Report.OperationState;
 import org.gcube.spatial.data.gis.symbology.StyleUtils;
+import org.opengis.metadata.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,19 +71,36 @@ public class GISUtils {
 	static{
 		try{
 			DB_WAIT_TIME=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_DB_MS);
-			GEO_SERVER_WAIT_TIME=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_FT);
+			GEO_SERVER_WAIT_TIME=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_WAIT_FOR_FT);			
 		}catch(Exception e){
 			logger.error("UNABLE TO LOAD GIS CONFGURATION",e);
 		}
 	}
 
+	
+	public static class GISPublishedItem{
+		private LayerInfo layerInfo;
+		private String metaId;
+		public GISPublishedItem(LayerInfo layerInfo, String metaId) {
+			super();
+			this.layerInfo = layerInfo;
+			this.metaId = metaId;
+		}
+		
+		public LayerInfo getLayerInfo() {
+			return layerInfo;
+		}
+		public String getMetaId() {
+			return metaId;
+		}
+	}
 
 
-	public static LayerInfo generateLayer(LayerGenerationRequest request)throws Exception{
+	public static GISPublishedItem generateLayer(LayerGenerationRequest request)throws Exception{
 		DBSession session=null;
 		String layerTable=null;
 		String appTableName=null;
-		boolean generatedLayer=false;		
+		String generatedLayerId=null;		
 		try{
 			
 			
@@ -109,9 +127,9 @@ public class GISUtils {
 
 			//***** update GeoServerBox
 
-			
-			GISInterface gis=GISInterface.get();
-			GeoServerDescriptor desc=gis.getCurrentGeoServerDescriptor();
+			ScopeProvider.instance.set(ServiceContext.getContext().getConfigurationScope());
+			GISInterface gis=GISInterface.get();			
+			GeoServerDescriptor desc=gis.getGeoServerDescriptorSet(true).last();
 			logger.debug("Current GeoServer "+desc);
 			//****** Styles generation
 			for(StyleGenerationRequest styleReq : request.getToGenerateStyles())				
@@ -125,13 +143,13 @@ public class GISUtils {
 			if(request.getToAssociateStyles().size()==0)
 				throw new BadRequestException("No style to associate wtih Layer "+request.getMapName());
 
-			generatedLayer=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),gis);
-			if(!generatedLayer)	throw new Exception("Unable to generate Layer "+request.getMapName());
+			generatedLayerId=GISUtils.createLayer(layerTable, request.getMapName(), (ArrayList<String>)request.getToAssociateStyles(), request.getDefaultStyle(),request.getMeta(),gis);
+			if(generatedLayerId==null)	throw new Exception("Unable to generate Layer "+request.getMapName());
 
 			
 			logger.debug("GIS GENERATOR request served in "+(System.currentTimeMillis()-start)+" layer : "+layerTable+", geoserver was "+desc.getUrl());
 			
-			return GISUtils.getLayer(request.getMapType(), gis.getGeoServerReader(desc).getLayer(layerTable),desc);
+			return new GISPublishedItem(getLayer(request.getMapType(), gis.getGeoServerReader(desc).getLayer(layerTable),desc),generatedLayerId);
 		}catch(Exception e){
 			logger.trace("Layer generation failed, gonna clean up data.. exception was",e);
 			if(appTableName!=null){
@@ -340,7 +358,7 @@ public class GISUtils {
 	 * @throws Exception
 	 */
 
-	private static boolean createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GISInterface gis) throws Exception{
+	private static String createLayer(String featureTable,String layerName, ArrayList<String> styles, int defaultStyleIndex,Map<String,Object> meta,GISInterface gis) throws Exception{
 		try{
 			ScopeProvider.instance.set(GHNContext.getContext().getStartScopes()[0].getInfrastructure().toString());
 			AquaMapsIsoMetadata metaParams=new AquaMapsIsoMetadata();
@@ -393,11 +411,12 @@ public class GISUtils {
 		le.setEnabled(true);		
 		
 		Configuration gnConfig=gis.getGeoNetworkReader().getConfiguration();
+		Metadata toSetMeta=metaParams.getMetadata();
 		
-		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamaps", fte, le, metaParams.getMetadata(), new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
+		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamapsdb", fte, le, toSetMeta, new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
 		
 		logger.debug("Publish response : "+resp);
-		return resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE);
+		return (resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE)?toSetMeta.getFileIdentifier():null);
 		
 		}catch(Exception e){
 			logger.debug("Create layer threw an exception ",e);
@@ -453,7 +472,6 @@ public class GISUtils {
 
 	private static LayerInfo getLayer(LayerType type, RESTLayer restLayer,GeoServerDescriptor desc)throws Exception{
 		LayerInfo layer=ReadTemplate.getLayerTemplate(type);
-		
 		layer.setType(type);
 		layer.setName(restLayer.getName());
 		layer.setTitle(restLayer.getTitle());

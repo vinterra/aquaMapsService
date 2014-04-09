@@ -20,6 +20,8 @@ import org.gcube.application.aquamaps.publisher.PublisherConfiguration;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.scope.GCUBEScope;
+import org.gcube.common.scope.api.ScopeProvider;
+import org.gcube.spatial.data.gis.GISInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +79,8 @@ public class ServiceContext extends GCUBEServiceContext {
 			configurationScope=ConfigurationManager.init(infrastructureScope);
 			
 			logger.trace("Configuration Scope will be "+configurationScope);
+			ScopeProvider.instance.set(configurationScope);
+			GISInterface.get().getGeoServerDescriptorSet(true);
 		}catch (Exception e){
 			logger.error("Unable to init configuration",e);
 			throw e;

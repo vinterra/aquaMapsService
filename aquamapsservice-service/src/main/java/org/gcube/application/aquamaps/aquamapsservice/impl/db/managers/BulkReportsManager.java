@@ -45,8 +45,8 @@ public class BulkReportsManager {
 	private static final String searchidField="searchid";
 	private static final String statusField="status";
 	private static final String submissionTimeField="submissionTime";
-	
-	
+
+
 	static{
 		new BulkMonitorThread().start();
 	}
@@ -165,7 +165,7 @@ public class BulkReportsManager {
 				try{
 					//Check - add fileset
 					List<FileSet> fileSets=pub.getFileSetsBySpeciesIds(scientificName);
-					logger.debug(String.format("Got %s filesets for %s (%s), checking generation time..",fileSets.size(),scientificName,speciesId));
+					//					logger.debug(String.format("Got %s filesets for %s (%s), checking generation time..",fileSets.size(),scientificName,speciesId));
 					for(FileSet fs:fileSets){
 						try{
 							if(!includeCustom||(includeCustom&&fs.isCustomized())){
@@ -174,7 +174,10 @@ public class BulkReportsManager {
 									if(!item.getResources().containsKey(hspecId)) item.getResources().put(hspecId, new ItemResources());
 									String uri=null;
 									for(org.gcube.application.aquamaps.publisher.impl.model.File f: fs.getFiles()){
-										if(uri==null||f.getName().equals("Earth")) uri=publisherHost+f.getStoredUri();
+										if(uri==null||f.getName().equals("Earth")){											
+											uri=publisherHost+f.getStoredUri();
+
+										}
 									}
 									item.getResources().get(hspecId).addResource(false, fs.isCustomized(), uri);
 								}
@@ -185,18 +188,23 @@ public class BulkReportsManager {
 					}
 
 					// Check - add gis
-					if(includeGIS)
-						for(Layer l:pub.getLayersBySpeciesIds(speciesId)){
+					if(includeGIS){
+						List<Layer> foundLayers=pub.getLayersBySpeciesIds(scientificName);
+						//						logger.debug(String.format("Got %s layers for %s (%s), checking generation time..",foundLayers.size(),scientificName,speciesId));
+						for(Layer l:foundLayers){
 							try{
 								if(!includeCustom||(includeCustom&&l.isCustomized())){
-									Integer hspecId=Integer.parseInt(l.getTableId());
-									if(!item.getResources().containsKey(hspecId)) item.getResources().put(hspecId, new ItemResources());
-									item.getResources().get(hspecId).addResource(true, l.isCustomized(), l.getId());
+									if(l.getMetaInfo().getDataGenerationTime() >= updateInterval){
+										Integer hspecId=Integer.parseInt(l.getTableId());
+										if(!item.getResources().containsKey(hspecId)) item.getResources().put(hspecId, new ItemResources());
+										item.getResources().get(hspecId).addResource(true, l.isCustomized(), l.getId());
+									}
 								}
 							}catch(Throwable t){
 								logger.debug("Unable to check layer "+l.getId(),t);
 							}
 						}
+					}
 					if(item.hasResources()){
 						oos.writeObject(item);
 						count++;
