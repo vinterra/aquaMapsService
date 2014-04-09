@@ -7,8 +7,8 @@ import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.data.analysis.statisticalmanager.proxies.StatisticalManagerDSL;
 import org.gcube.data.analysis.statisticalmanager.proxies.StatisticalManagerDataSpace;
 import org.gcube.data.analysis.statisticalmanager.proxies.StatisticalManagerFactory;
-import org.gcube.data.analysis.statisticalmanager.stubs.SMComputationConfig;
-import org.gcube.data.analysis.statisticalmanager.stubs.SMComputationRequest;
+import org.gcube.data.analysis.statisticalmanager.stubs.types.SMComputationConfig;
+import org.gcube.data.analysis.statisticalmanager.stubs.types.SMComputationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class StatisticalModule {
@@ -75,10 +75,10 @@ public class StatisticalModule {
 	
 	private String submitTableGenerationRequest(SMComputationConfig config,String description,String title, String author)throws Exception{
 		SMComputationRequest request=new SMComputationRequest(); 
-		request.setConfig(config);
-		request.setDescription(description);
-		request.setTitle(title);
-		request.setUser(author);
+//		request.setConfig(config);
+//		request.setDescription(description);
+//		request.setTitle(title);
+//		request.setUser(author);
 		return factory.executeComputation(request);
 	}
 }

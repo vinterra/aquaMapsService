@@ -23,6 +23,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.AquaMapsO
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.BiodiversityObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.engine.maps.DistributionObjectExecutionRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.GISUtils;
+import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.GISUtils.GISPublishedItem;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.LayerGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest;
 import org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis.StyleGenerationRequest.ClusterScaleType;
@@ -183,10 +184,11 @@ public class Generator<T> implements ObjectManager<T> {
 		int attemptCount=0;
 		int maxAttempt=ServiceContext.getContext().getPropertyAsInteger(PropertiesConstants.GEOSERVER_MAX_ATTEMPT);
 		LayerInfo layerInfo=null;
+		String layerId=null;
 		do{
 			try{
 				attemptCount++;
-				layerInfo = GISUtils
+				GISPublishedItem response=GISUtils
 				.generateLayer(new LayerGenerationRequest(		
 						data.getCsvFile(),
 						object.getType().equals(ObjectType.Biodiversity) ? AquaMapsManager.maxSpeciesCountInACell: HSPECFields.probability + "",
@@ -196,6 +198,8 @@ public class Generator<T> implements ObjectManager<T> {
 						toGenerateStyle,
 						toAssociateStyleList,
 						0,meta));
+				layerInfo=response.getLayerInfo();
+				layerId=response.getMetaId();
 				generated=true;
 			}catch(Exception e){
 				if(attemptCount<=maxAttempt){
@@ -216,6 +220,7 @@ public class Generator<T> implements ObjectManager<T> {
 						object.getSpeciesCoverage()), publisherMeta);
 		toReturn.setSpeciesIds(speciesList.toArray(new String[speciesList.size()]));
 		toReturn.setCustomized(object.getIsCustomized());
+		toReturn.setId(layerId);
 		return toReturn;
 	}
 

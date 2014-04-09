@@ -1,6 +1,7 @@
 * text=auto !eol
 /.project -text
 .settings/org.eclipse.core.resources.prefs -text
+.settings/org.eclipse.m2e.core.prefs -text
 aquamapsservice-service/.classpath -text
 aquamapsservice-service/.project -text
 aquamapsservice-service/.settings/org.eclipse.core.resources.prefs -text

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.BulkReportsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SubmittedManager;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.GetBulkUpdatesStatusResponseType;
@@ -256,15 +257,23 @@ PublisherServicePortType {
 	@Override
 	public GetBulkUpdatesStatusResponseType getBulkUpdatesStatus(String arg0)
 			throws RemoteException, GCUBEFault {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			return BulkReportsManager.getStatus(arg0);
+		} catch (Exception e) {
+			logger.error("Unable to insert request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
 	}
 
 
 	@Override
 	public String prepareBulkUpdatesFile(PrepareBulkUpdatesFileRequestType arg0)
 			throws RemoteException, GCUBEFault {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			return BulkReportsManager.insertRequest(arg0.getFromTime(), arg0.isIncludeGisLayers(), arg0.isIncludeCustomMaps());
+		} catch (Exception e) {
+			logger.error("Unable to insert request ",e);
+			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}
 	}
 }
