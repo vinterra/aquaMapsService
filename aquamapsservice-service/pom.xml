@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>aquamapsservice</artifactId>
 		<groupId>org.gcube.application</groupId>
-		<version>5.0.2-SNAPSHOT</version>
+		<version>5.0.3-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>aquamapsservice-service</artifactId>
@@ -279,4 +279,20 @@
 		</dependency>
 		
 	</dependencies>
+	 <repositories>
+	 	<repository>
+			<id>GeoSolutions</id>
+			<url>http://maven.research-infrastructures.eu:8081/nexus/content/repositories/geo-solutions/</url>
+		</repository>
+		<repository>
+			<id>maven.geotoolkit</id>
+			<name>maven.geotoolkit</name>
+			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/geotoolkit/</url>
+		</repository> 
+		<repository>
+			<id>unidata</id>
+			<name>unidata</name>
+			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/unidata/</url>
+		</repository>
+	</repositories>
 </project>
