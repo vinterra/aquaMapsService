@@ -1,8 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl;
 
-import gr.uoa.di.madgik.commons.utils.FileUtils;
-
-import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +42,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedF
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.utils.Storage;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.faults.GCUBEFault;
@@ -437,14 +434,12 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			Analysis analysis=AnalysisTableManager.getById(arg0);
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper();
-			File temp=File.createTempFile("analysis",".tar.gz");
-			FileUtils.Copy(new File(analysis.getArchiveLocation()), temp);
-			temp.deleteOnExit();
-			wrapper.add(temp);
-			String locator = wrapper.getLocator().toString();
-			logger.trace("Added file to locator "+locator);
-			return locator;
+			String id=Storage.storeFile(analysis.getArchiveLocation(), false);
+			
+			
+			
+			logger.trace("Storage id: "+id);
+			return id;
 		}catch(Exception e){
 			logger.error("Unable to execute request ",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());

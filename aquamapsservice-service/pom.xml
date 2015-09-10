@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>aquamapsservice</artifactId>
 		<groupId>org.gcube.application</groupId>
-		<version>5.0.4-SNAPSHOT</version>
+		<version>5.0.5-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>aquamapsservice-service</artifactId>

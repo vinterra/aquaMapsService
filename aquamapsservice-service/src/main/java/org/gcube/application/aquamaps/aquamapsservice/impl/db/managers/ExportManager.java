@@ -16,7 +16,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.ExportTableStatusTyp
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.xstream.AquaMapsXStream;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.utils.Storage;
 import org.gcube.common.homelibrary.home.HomeLibrary;
 import org.gcube.common.homelibrary.home.HomeManagerFactory;
 import org.gcube.common.homelibrary.home.workspace.Workspace;
@@ -152,12 +152,11 @@ public class ExportManager extends Thread{
 					logger.debug("File saved into user's workspace");
 				}else {
 					//EXPORT TO CLIENT
-					RSWrapper wrapper=new RSWrapper();
-					wrapper.add(new File(fileName));
-					String locator = wrapper.getLocator().toString();
-					logger.trace("Added file to locator "+locator);
 					
-					updateField(referenceId, EXPORT_LOCATOR, FieldType.STRING, locator);
+					String id=Storage.storeFile((new File(fileName)).getAbsolutePath(), false);
+					logger.trace("Storage id "+id);
+					
+					updateField(referenceId, EXPORT_LOCATOR, FieldType.STRING, id);
 					
 				}
 				

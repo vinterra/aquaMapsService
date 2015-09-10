@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URI;
 import java.nio.charset.Charset;
 import java.sql.ResultSet;
 import java.util.List;
@@ -23,7 +22,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.R
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.utils.CSVUtils;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceStatus;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.utils.Storage;
 import org.gcube.common.scope.api.ScopeProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +73,7 @@ public class SourceImporter extends Thread {
 			ScopeProvider.instance.set(scope);
 			
 			FileWriter writer=new FileWriter(csv);
-			FileInputStream is=new FileInputStream(RSWrapper.getStreamFromLocator(new URI(locator)));
+			FileInputStream is=new FileInputStream(Storage.getFileById(locator, true));			
 			IOUtils.copy(is, writer, encoding);
 			IOUtils.closeQuietly(writer);
 			IOUtils.closeQuietly(is);

@@ -32,7 +32,7 @@ import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.fields.SubmittedF
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.model.Field;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.FieldType;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.ResourceType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.RSWrapper;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.utils.Storage;
 import org.gcube.common.core.contexts.GCUBEServiceContext;
 import org.gcube.common.core.faults.GCUBEFault;
 import org.gcube.common.core.porttypes.GCUBEPortType;
@@ -287,11 +287,9 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			File toExport=SpeciesManager.getCSVList(PortTypeTranslations.fromStubs(arg0.getGenericSearchFilters()), PortTypeTranslations.fromStubs(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			RSWrapper wrapper=new RSWrapper();
-			wrapper.add(toExport);
-			String locator = wrapper.getLocator().toString();
-			logger.trace("Added file to locator "+locator);
-			return locator;
+			String id=Storage.storeFile(toExport.getAbsolutePath(), false);			
+			logger.trace("Storage id is : "+id);
+			return id;
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
