@@ -21,12 +21,12 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescr
 import org.gcube.common.core.contexts.GHNContext;
 import org.gcube.common.core.scope.GCUBEScope;
 import org.gcube.common.core.scope.GCUBEScope.Type;
+import org.gcube.common.encryption.StringEncrypter;
 import org.gcube.common.resources.gcore.GenericResource;
 import org.gcube.common.resources.gcore.ServiceEndpoint;
 import org.gcube.common.resources.gcore.ServiceEndpoint.AccessPoint;
 import org.gcube.common.resources.gcore.ServiceEndpoint.Property;
 import org.gcube.common.scope.api.ScopeProvider;
-import org.gcube.common.utils.encryption.StringEncrypter;
 import org.gcube.resources.discovery.client.api.DiscoveryClient;
 import org.gcube.resources.discovery.client.queries.api.SimpleQuery;
 import org.slf4j.Logger;
