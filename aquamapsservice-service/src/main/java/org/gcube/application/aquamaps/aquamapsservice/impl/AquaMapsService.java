@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.tools.ant.util.FileUtils;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.AquaMapsManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.CellManager;
 import org.gcube.application.aquamaps.aquamapsservice.impl.db.managers.SourceManager;
@@ -282,9 +283,9 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 	public String getSpeciesByFiltersASCSV(GetSpeciesByFiltersRequestType arg0)
 			throws RemoteException, GCUBEFault {
 		logger.trace("Serving getSpecies by filters");
-		
+		File toExport=null;
 		try{
-			File toExport=SpeciesManager.getCSVList(PortTypeTranslations.fromStubs(arg0.getGenericSearchFilters()), PortTypeTranslations.fromStubs(arg0.getSpecieficFilters()), arg0.getHspen());
+			toExport=SpeciesManager.getCSVList(PortTypeTranslations.fromStubs(arg0.getGenericSearchFilters()), PortTypeTranslations.fromStubs(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
 			String id=Storage.storeFile(toExport.getAbsolutePath(), false);			
@@ -293,6 +294,8 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 		} catch (Exception e){
 			logger.error("General Exception, unable to serve request",e);
 			throw new GCUBEFault("ServerSide msg: "+e.getMessage());
+		}finally{
+			if(toExport!=null)FileUtils.delete(toExport);
 		}
 	}
 
