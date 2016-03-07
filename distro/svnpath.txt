@@ -1,1 +1,1 @@
-https://svn.d4science-ii.research-infrastructures.eu/gcube/trunk/application/AquaMaps/AquaMapsService
+${scm.url}

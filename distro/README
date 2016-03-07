@@ -1,38 +1,61 @@
-The gCube System - Portlets - Resource Management Portlet
-------------------------------------------------------------
-
-This work has been partially supported by the following European projects: DILIGENT (FP6-2003-IST-2), D4Science (FP7-INFRA-2007-1.2.2), D4Science-II (FP7-INFRA-2008-1.2.2), iMarine (FP7-INFRASTRUCTURES-2011-2), and EUBrazilOpenBio (FP7-ICT-2011-EU-Brazil).
-
-Authors
--------
-
-* Sinibaldi Fabio (fabio.sinibaldi@isti.cnr.it),  CNR Pisa, 
-Istituto di Scienza e Tecnologie dell'Informazione "A. Faedo". 
-
-Version and Release Date
-------------------------
-
-v. 2.0.0, 3/05/2010
-
-Description
------------
-Stateless service implementing AquaMaps business logic
-
+The gCube System - ${name}
+--------------------------------------------------
+ 
+${description}
+ 
+ 
+${gcube.description}
+ 
+${gcube.funding}
+ 
+ 
+Version
+--------------------------------------------------
+ 
+${version} (${buildDate})
+ 
+Please see the file named "changelog.xml" in this directory for the release notes.
+ 
+ 
+Authors and Maintainers
+--------------------------------------------------
+ 
+* Fabio Sinibaldi (fabio.sinibaldi-AT-isti.cnr.it), CNR Pisa - Italy, Istituto di Scienza e Tecnologie dell'Informazione (I.S.T.I.) "A. Faedo" 
+Please see the file named "MAINTAINERS" in this directory for the current maintainers of this software.
+ 
+ 
 Download information
---------------------
-Source code is available from SVN:
-https://svn.d4science.research-infrastructures.eu/gcube/trunk/application/AquaMaps/AquaMapsService
-
-Binaries can be downloaded from:
-http://software.d4science.research-infrastructures.eu/
-
+--------------------------------------------------
+ 
+Source code is available from SVN: 
+    ${scm.url}
+ 
+Binaries can be downloaded from the gCube website: 
+   ${gcube.website}
+ 
+ 
 Documentation 
--------------
-Documentation is available on-line from the Projects Documentation Wiki:
-
-https://gcube.wiki.gcube-system.org/gcube/index.php/AquaMaps
-
+--------------------------------------------------
+ 
+Documentation is available on-line in the gCube Documentation Wiki:
+    Developer Guide - ${gcube.wikiRoot}/[page name here]    
+    User Guide - ${gcube.wikiRoot}/[page name here]    
+    Admin Guide - ${gcube.wikiRoot}/[page name here] 
+ 
+Support 
+--------------------------------------------------
+ 
+Bugs and support requests can be reported in the gCube issue tracking tool:
+    ${gcube.issueTracking}
+ 
+ 
+Installation
+--------------------------------------------------
+ 
+Please see the file named "INSTALL" in this directory.
+ 
+ 
 Licensing
----------
-
-This software is licensed under the terms you may find in the file named "LICENSE" in this directory. 
+--------------------------------------------------
+ 
+This software is licensed under the terms you may find in the file named "LICENSE" in this directory.

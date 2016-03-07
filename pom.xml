@@ -8,7 +8,7 @@
   <groupId>org.gcube.application</groupId>
   <artifactId>aquamapsservice</artifactId>
   <version>5.0.5-SNAPSHOT</version>
-  <name>aquamapsservice</name>
+  <name>AquaMaps Service</name>
    <properties>
    		<stubsArtifactId>aquamapsservice-stubs</stubsArtifactId>
 		<serviceArtifactId>aquamapsservice-service</serviceArtifactId>
@@ -60,4 +60,8 @@
       </dependency>
    </dependencies>
 </dependencyManagement>
+	<description>gCube Service for AquaMaps Suite.</description>
+	<scm>
+		<url>http://svn.d4science.research-infrastructures.eu/gcube/trunk/application/AquaMaps/${project.artifactId}</url>
+	</scm>
 </project>
