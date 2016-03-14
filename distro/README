@@ -16,13 +16,19 @@ ${version} (${buildDate})
  
 Please see the file named "changelog.xml" in this directory for the release notes.
  
- 
-Authors and Maintainers
+
+
+Authors
 --------------------------------------------------
  
-* Fabio Sinibaldi (fabio.sinibaldi-AT-isti.cnr.it), CNR Pisa - Italy, Istituto di Scienza e Tecnologie dell'Informazione (I.S.T.I.) "A. Faedo" 
-Please see the file named "MAINTAINERS" in this directory for the current maintainers of this software.
+* Fabio Sinibaldi (fabio.sinibaldi-AT-isti.cnr.it) Istituto di Scienza e Tecnologie dell'Informazione "A. Faedo" - CNR, Pisa (Italy).  
  
+Maintainers
+-----------
+ 
+* Fabio Sinibaldi (fabio.sinibaldi-AT-isti.cnr.it) Istituto di Scienza e Tecnologie dell'Informazione "A. Faedo" - CNR, Pisa (Italy). 
+
+
  
 Download information
 --------------------------------------------------
@@ -33,26 +39,25 @@ Source code is available from SVN:
 Binaries can be downloaded from the gCube website: 
    ${gcube.website}
  
+Installation
+--------------------------------------------------
+ 
+Installation documentation is available on-line in the gCube Wiki:
+    ${gcube.wikiRoot}/AquaMaps_Suite
  
 Documentation 
 --------------------------------------------------
  
-Documentation is available on-line in the gCube Documentation Wiki:
-    Developer Guide - ${gcube.wikiRoot}/[page name here]    
-    User Guide - ${gcube.wikiRoot}/[page name here]    
-    Admin Guide - ${gcube.wikiRoot}/[page name here] 
+Documentation is available on-line in the gCube Wiki:
+    ${gcube.wikiRoot}/AquaMaps_Suite
+    ${gcube.wikiRoot}/AquaMaps_Suite
+     
  
 Support 
 --------------------------------------------------
  
 Bugs and support requests can be reported in the gCube issue tracking tool:
     ${gcube.issueTracking}
- 
- 
-Installation
---------------------------------------------------
- 
-Please see the file named "INSTALL" in this directory.
  
  
 Licensing

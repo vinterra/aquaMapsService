@@ -15,8 +15,6 @@
 			<includes>
 				<include>README</include>
 				<include>LICENSE</include>
-				<include>INSTALL</include>
-				<include>MAINTAINERS</include>
 				<include>changelog.xml</include>
 			</includes>
 			<fileMode>755</fileMode>
@@ -25,7 +23,7 @@
 	</fileSets>
 	<files>
 		<file>
-			<source>target/${build.finalName}.war</source>
+			<source>target/${build.finalName}.${project.packaging}</source>
 			<outputDirectory>/${artifactId}</outputDirectory>
 		</file>
 	</files>
