@@ -16,7 +16,6 @@
 				<include>README</include>
 				<include>LICENSE</include>
 				<include>changelog.xml</include>
-				<include>profile.xml</include>
 			</includes>
 			<fileMode>755</fileMode>
 			<filtered>true</filtered>
