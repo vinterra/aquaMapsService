@@ -19,7 +19,7 @@ import org.gcube.application.aquamaps.aquamapsservice.impl.util.isconfig.DBDescr
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.enhanced.Analysis;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.datamodel.types.SubmittedStatus;
 import org.gcube.application.aquamaps.aquamapsservice.stubs.fw.types.AnalysisType;
-import org.gcube.application.aquamaps.aquamapsservice.stubs.wrapper.utils.AppZip;
+import org.gcube.application.aquamaps.aquamapsservice.stubs.utils.AppZip;
 import org.gcube.contentmanagement.graphtools.data.conversions.ImageTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

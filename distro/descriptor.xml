@@ -15,8 +15,6 @@
 			<includes>
 				<include>README</include>
 				<include>LICENSE</include>
-				<include>INSTALL</include>
-				<include>MAINTAINERS</include>
 				<include>changelog.xml</include>
 				<include>profile.xml</include>
 			</includes>
@@ -24,30 +22,10 @@
 			<filtered>true</filtered>
 		</fileSet>
 	</fileSets>
-	<dependencySets>
-		<dependencySet>
-			<includes>
-				<include>*:${stubsArtifactId}</include>
-			</includes>
-			<useProjectArtifact>false</useProjectArtifact>
-			<useTransitiveDependencies>false</useTransitiveDependencies>
-			<outputDirectory>${stubsArtifactId}</outputDirectory>
-		</dependencySet>	
-	</dependencySets>
 	<files>
 		<file>
-			<source>target/${build.finalName}.gar</source>
-			<outputDirectory>${serviceArtifactId}</outputDirectory>
-		</file>
-		<file>
-			<source>${distroDirectory}/svnpath.txt</source>
-			<outputDirectory>${serviceArtifactId}</outputDirectory>
-			<filtered>true</filtered>
-		</file>
-		<file>
-			<source>${distroDirectory}/svnpath.txt</source>
-			<outputDirectory>${stubsArtifactId}</outputDirectory>
-			<filtered>true</filtered>
+			<source>target/${build.finalName}.${project.packaging}</source>
+			<outputDirectory>/${artifactId}</outputDirectory>
 		</file>
 	</files>
-	</assembly>
+</assembly>
