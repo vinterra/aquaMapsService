@@ -1,6 +1,5 @@
 package org.gcube.application.aquamaps.aquamapsservice.impl.publishing.gis;
 
-import it.geosolutions.geonetwork.util.GNInsertConfiguration;
 import it.geosolutions.geoserver.rest.decoder.RESTLayer;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
@@ -41,7 +40,6 @@ import org.gcube.common.gis.datamodel.enhanced.WMSContextInfo;
 import org.gcube.common.gis.datamodel.utils.ReadTemplate;
 import org.gcube.common.scope.api.ScopeProvider;
 import org.gcube.spatial.data.geonetwork.LoginLevel;
-import org.gcube.spatial.data.geonetwork.configuration.Configuration;
 import org.gcube.spatial.data.geonetwork.iso.Thesaurus;
 import org.gcube.spatial.data.gis.GISInterface;
 import org.gcube.spatial.data.gis.is.GeoServerDescriptor;
@@ -410,10 +408,9 @@ public class GISUtils {
 		le.setDefaultStyle(styles.get(defaultStyleIndex));
 		le.setEnabled(true);		
 		
-		Configuration gnConfig=gis.getGeoNetworkReader().getConfiguration();
 		Metadata toSetMeta=metaParams.getMetadata();
 		
-		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamapsdb", fte, le, toSetMeta, new GNInsertConfiguration(gnConfig.getScopeGroup()+"", "datasets", "_none_", true), LoginLevel.DEFAULT);
+		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamapsdb", fte, le, toSetMeta,  "datasets", "_none_", LoginLevel.DEFAULT);
 		
 		logger.debug("Publish response : "+resp);
 		return (resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE)?toSetMeta.getFileIdentifier():null);
