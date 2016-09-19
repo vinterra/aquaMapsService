@@ -141,9 +141,9 @@ public class ExportManager extends Thread{
 
 				String scope=rs.getString(EXPORT_SCOPE);
 				ExportOperation operation=ExportOperation.fromString(rs.getString(EXPORT_OPERATION));
+				String owner=rs.getString(EXPORT_USER);
 				if(operation.equals(ExportOperation.SAVE)){
 					//SAVE TO WORKSPACE
-					String owner=rs.getString(EXPORT_USER);
 					String destinationBasketId=rs.getString(EXPORT_BASKET);
 					String toSaveName=rs.getString(EXPORT_NAME);
 					logger.debug("Getting workspace for user "+owner+" under scope "+scope);
@@ -155,7 +155,7 @@ public class ExportManager extends Thread{
 				}else {
 					//EXPORT TO CLIENT
 
-					String id=Storage.storeFile((new File(tmpFileName)).getAbsolutePath(), false);
+					String id=Storage.storeFile((new File(tmpFileName)).getAbsolutePath(), false,owner);
 					logger.trace("Storage id "+id);
 
 					updateField(referenceId, EXPORT_LOCATOR, FieldType.STRING, id);

@@ -73,7 +73,7 @@ public class SourceImporter extends Thread {
 			ScopeProvider.instance.set(scope);
 			
 			FileWriter writer=new FileWriter(csv);
-			FileInputStream is=new FileInputStream(Storage.getFileById(locator, true));			
+			FileInputStream is=new FileInputStream(Storage.getFileById(locator, false,"AquaMaps Service Importer"));			
 			IOUtils.copy(is, writer, encoding);
 			IOUtils.closeQuietly(writer);
 			IOUtils.closeQuietly(is);

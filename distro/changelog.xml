@@ -43,6 +43,9 @@
 	<Changeset component="org.gcube.application.aquamaps.aquamapsservice.5-0-6" date="2016-07-07">	
 		<Change>Integrated new Geonetwork</Change>
 	</Changeset>
+	<Changeset component="org.gcube.application.aquamaps.aquamapsservice.5-0-6" date="2016-07-07">	
+		<Change>Storage user set</Change>
+	</Changeset>
 </ReleaseNotes>
 
 
