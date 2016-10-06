@@ -270,7 +270,16 @@
 					<groupId>org.gcube.common</groupId>
 					<artifactId>hibernate-patched</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.gcube.dataanalysis</groupId>
+					<artifactId>ecological-engine</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+					<groupId>org.gcube.dataanalysis</groupId>
+					<artifactId>ecological-engine</artifactId>
+					<version>LATEST</version>
 		</dependency>
 
 		<!-- USED BY ecological-modelling and lexical-matcher -->

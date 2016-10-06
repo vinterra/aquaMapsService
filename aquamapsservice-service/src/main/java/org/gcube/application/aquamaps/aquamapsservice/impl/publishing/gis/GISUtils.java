@@ -410,7 +410,7 @@ public class GISUtils {
 		
 		Metadata toSetMeta=metaParams.getMetadata();
 		
-		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamapsdb", fte, le, toSetMeta,  "datasets", "_none_", LoginLevel.DEFAULT);
+		PublishResponse resp=gis.publishDBTable("aquamaps", "aquamapsdb", fte, le, toSetMeta,  "datasets", "_none_", LoginLevel.DEFAULT,false);
 		
 		logger.debug("Publish response : "+resp);
 		return (resp.getDataOperationResult().equals(OperationState.COMPLETE)&&resp.getMetaOperationResult().equals(OperationState.COMPLETE)?toSetMeta.getFileIdentifier():null);
