@@ -124,7 +124,6 @@ public class ConfigurationManager {
 
 			//************************** Checks
 
-			if(geoNetworks.size()>1) throw new Exception("Multiple GeoNetworks found");
 			if(geoServers.size()>0&&gisDBs.isEmpty()) throw new Exception("No gis databases found");
 			if(gisDBs.size()>1) throw new Exception ("Found "+gisDBs.size()+" gis DBs");
 			if(internalDBs.size()!=1) throw new Exception ("Found "+internalDBs.size()+" internal DBs");
