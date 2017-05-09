@@ -434,7 +434,7 @@ public class DataManagement extends GCUBEPortType implements DataManagementPortT
 			Analysis analysis=AnalysisTableManager.getById(arg0);
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			String id=Storage.storeFile(analysis.getArchiveLocation(), false);
+			String id=Storage.storeFile(analysis.getArchiveLocation(), false,"AquaMapsService Analysis");
 			
 			
 			

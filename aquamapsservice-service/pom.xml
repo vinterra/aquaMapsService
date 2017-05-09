@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>aquamapsservice</artifactId>
 		<groupId>org.gcube.application</groupId>
-		<version>5.0.6-SNAPSHOT</version>
+		<version>5.0.7-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>aquamapsservice-service</artifactId>
@@ -207,11 +207,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.gcube.data.analysis</groupId>
-			<artifactId>statistical-manager-cl</artifactId>
-			<version>[1.0.0-SNAPSHOT,2.0.0-SNAPSHOT)</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>[1.6.0,2.0.0)</version>
@@ -227,12 +222,12 @@
 			<version>[5.0.0-SNAPSHOT,6.0.0-SNAPSHOT)</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.gcube.tools</groupId>
-			<artifactId>my-container</artifactId>
-			<version>[2..0-SNAPSHOT,3.0.0-SNAPSHOT)</version>
-			<scope>test</scope>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.gcube.tools</groupId> -->
+<!-- 			<artifactId>my-container</artifactId> -->
+<!-- 			<version>[2..0-SNAPSHOT,3.0.0-SNAPSHOT)</version> -->
+<!-- 			<scope>test</scope> -->
+<!-- 		</dependency> -->
 
 
 		<dependency>
@@ -275,7 +270,16 @@
 					<groupId>org.gcube.common</groupId>
 					<artifactId>hibernate-patched</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.gcube.dataanalysis</groupId>
+					<artifactId>ecological-engine</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+					<groupId>org.gcube.dataanalysis</groupId>
+					<artifactId>ecological-engine</artifactId>
+					<version>LATEST</version>
 		</dependency>
 
 		<!-- USED BY ecological-modelling and lexical-matcher -->

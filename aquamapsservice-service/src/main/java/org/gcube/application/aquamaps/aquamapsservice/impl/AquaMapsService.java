@@ -288,7 +288,7 @@ public class AquaMapsService extends GCUBEPortType implements AquaMapsServicePor
 			toExport=SpeciesManager.getCSVList(PortTypeTranslations.fromStubs(arg0.getGenericSearchFilters()), PortTypeTranslations.fromStubs(arg0.getSpecieficFilters()), arg0.getHspen());
 			GCUBEScope scope=ServiceContext.getContext().getScope();
 			logger.trace("Caller scope is "+scope);
-			String id=Storage.storeFile(toExport.getAbsolutePath(), false);			
+			String id=Storage.storeFile(toExport.getAbsolutePath(), false,"Aquamaps service,SpeciesByFilter CSV");			
 			logger.trace("Storage id is : "+id);
 			return id;
 		} catch (Exception e){

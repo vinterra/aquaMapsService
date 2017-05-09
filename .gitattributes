@@ -64,7 +64,6 @@ aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsser
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/predictions/utils/ModelTranslation.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/statistical/ConfigurationException.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/statistical/MapsGenerationRequestHandler.java -text
-aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/statistical/StatisticalModule.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/tables/EnvironmentalStatusUpdateThread.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/tables/Execution.java -text
 aquamapsservice-service/src/main/java/org/gcube/application/aquamaps/aquamapsservice/impl/engine/tables/HSPECGroupMonitor.java -text
